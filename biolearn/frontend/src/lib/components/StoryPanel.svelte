@@ -1,11 +1,5 @@
 <script lang="ts">
-	let {
-		content = '',
-		step = 0
-	}: {
-		content?: string;
-		step?: number;
-	} = $props();
+	let currentStep = $state(0);
 
 	// Sample narrative content for demonstration
 	const sampleNarrative = {
@@ -24,12 +18,43 @@
 			},
 			{
 				type: 'task',
+				title: 'Quality Control',
 				text: `First, let's check the quality of our sequencing data. We've received FASTQ files from the sequencer.`,
 				command: 'fastqc sample_01.fastq.gz -o qc_reports/',
 				explanation: 'FastQC analyzes raw sequence data and generates quality reports'
+			},
+			{
+				type: 'task',
+				title: 'Read Trimming',
+				text: `The quality report shows some adapter contamination. Let's trim the reads to remove adapters and low-quality bases.`,
+				command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz output_paired_R1.fq.gz output_unpaired_R1.fq.gz output_paired_R2.fq.gz output_unpaired_R2.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36',
+				explanation: 'Trimmomatic removes adapter sequences and trims low-quality bases'
+			},
+			{
+				type: 'task',
+				title: 'Genome Assembly',
+				text: `Now we'll assemble the cleaned reads into contiguous sequences (contigs) that represent the bacterial genome.`,
+				command: 'unicycler -1 output_paired_R1.fq.gz -2 output_paired_R2.fq.gz -o assembly/',
+				explanation: 'Unicycler is optimized for bacterial genome assembly and can produce circular contigs'
 			}
 		]
 	};
+
+	function nextStep() {
+		if (currentStep < sampleNarrative.sections.length - 1) {
+			currentStep++;
+		}
+	}
+
+	function prevStep() {
+		if (currentStep > 0) {
+			currentStep--;
+		}
+	}
+
+	function goToStep(index: number) {
+		currentStep = index;
+	}
 </script>
 
 <div class="h-full flex flex-col">
@@ -48,15 +73,15 @@
 	</div>
 
 	<!-- Progress Bar -->
-	<div class="bg-gray-100 px-6 py-3 border-b">
+	<div class="bg-gray-100 px-6 py-3 border-b border-gray-200">
 		<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
 			<span>Progress</span>
-			<span>Step {step + 1} of {sampleNarrative.sections.length}</span>
+			<span>Step {currentStep + 1} of {sampleNarrative.sections.length}</span>
 		</div>
 		<div class="w-full bg-gray-200 rounded-full h-2">
 			<div
 				class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-				style="width: {((step + 1) / sampleNarrative.sections.length) * 100}%"
+				style="width: {((currentStep + 1) / sampleNarrative.sections.length) * 100}%"
 			></div>
 		</div>
 	</div>
@@ -64,8 +89,8 @@
 	<!-- Content -->
 	<div class="flex-1 overflow-auto p-6">
 		{#each sampleNarrative.sections as section, i}
-			{#if i <= step}
-				<div class="mb-6 animate-fade-in" class:opacity-50={i < step}>
+			{#if i <= currentStep}
+				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep}>
 					{#if section.type === 'intro'}
 						<div class="prose prose-lg">
 							<p class="text-gray-700 leading-relaxed">{section.text}</p>
@@ -80,14 +105,16 @@
 							{/if}
 						</div>
 					{:else if section.type === 'task'}
-						<div class="bg-gray-50 rounded-lg p-4 border">
-							<h3 class="font-semibold text-gray-800 mb-2">Your Task</h3>
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+							{#if section.title}
+								<h3 class="font-semibold text-gray-800 mb-2">📋 {section.title}</h3>
+							{/if}
 							<p class="text-gray-700 mb-4">{section.text}</p>
 
 							{#if section.command}
-								<div class="bg-gray-900 rounded p-3 font-mono text-sm">
+								<div class="bg-gray-900 rounded p-3 font-mono text-sm overflow-x-auto">
 									<div class="text-gray-400 text-xs mb-1">Try this command:</div>
-									<code class="text-green-400">{section.command}</code>
+									<code class="text-green-400 whitespace-pre-wrap break-all">{section.command}</code>
 								</div>
 								{#if section.explanation}
 									<p class="text-gray-500 text-sm mt-2 italic">
@@ -103,25 +130,29 @@
 	</div>
 
 	<!-- Navigation -->
-	<div class="border-t bg-gray-50 p-4 flex justify-between items-center">
+	<div class="border-t border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
 		<button
-			class="px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50"
-			disabled={step === 0}
+			class="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+			disabled={currentStep === 0}
+			onclick={prevStep}
 		>
 			← Previous
 		</button>
 		<div class="flex gap-2">
 			{#each sampleNarrative.sections as _, i}
-				<div
-					class="w-2 h-2 rounded-full transition-colors"
-					class:bg-blue-600={i <= step}
-					class:bg-gray-300={i > step}
-				></div>
+				<button
+					class="w-3 h-3 rounded-full transition-colors cursor-pointer hover:scale-110"
+					class:bg-blue-600={i <= currentStep}
+					class:bg-gray-300={i > currentStep}
+					onclick={() => goToStep(i)}
+					aria-label="Go to step {i + 1}"
+				></button>
 			{/each}
 		</div>
 		<button
-			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-			disabled={step >= sampleNarrative.sections.length - 1}
+			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+			disabled={currentStep >= sampleNarrative.sections.length - 1}
+			onclick={nextStep}
 		>
 			Next →
 		</button>
