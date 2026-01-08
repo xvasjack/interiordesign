@@ -129,6 +129,7 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'fastp': { min: 20, max: 45 },
 	'unicycler': { min: 180, max: 300 },  // 3-5 minutes
 	'spades': { min: 180, max: 300 },
+	'bandage': { min: 3, max: 8 },  // Graph visualization
 	'quast': { min: 15, max: 30 },
 	'checkm': { min: 60, max: 120 },
 	'confindr': { min: 30, max: 60 },
@@ -167,7 +168,7 @@ export const blockedCommands = new Set([
 // Bioinformatics tools
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
-	'unicycler', 'spades', 'quast', 'checkm', 'confindr',
+	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'confindr',
 	'prokka', 'abricate', 'mlst', 'mob_suite', 'platon',
 	'snippy', 'roary', 'iqtree', 'gubbins'
 ]);

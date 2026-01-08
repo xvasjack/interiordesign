@@ -16,6 +16,7 @@
 		if (cmds.includes('fastqc')) completedSteps.add(2);
 		if (cmds.includes('trimmomatic')) completedSteps.add(3);
 		if (cmds.includes('unicycler')) completedSteps.add(4);
+		if (cmds.includes('bandage')) completedSteps.add(5);
 		completedSteps = new Set(completedSteps);
 	});
 
@@ -41,7 +42,7 @@
 				title: 'Step 1: Quality Control',
 				text: `Check the quality of raw sequencing data (FASTQ files).`,
 				command: 'fastqc sample_01_R1.fastq.gz -o qc_reports/',
-				explanation: 'FastQC generates quality reports for raw sequence data',
+				explanation: 'FastQC generates quality reports for raw sequence data. Try running this for R2 as well!',
 				requiredDir: '/data/outbreak_investigation',
 				parameters: [
 					{ name: 'sample_01_R1.fastq.gz', desc: 'Input FASTQ file (forward reads)' },
@@ -74,6 +75,19 @@
 					{ name: '-1', desc: 'Forward reads (R1) input file' },
 					{ name: '-2', desc: 'Reverse reads (R2) input file' },
 					{ name: '-o assembly/', desc: 'Output directory for assembly results' }
+				]
+			},
+			{
+				type: 'task',
+				title: 'Step 4: Visualize Assembly Graph',
+				text: `Visualize the assembly graph to understand genome structure and identify repeat regions.`,
+				command: 'bandage image assembly/assembly.gfa assembly/assembly_graph.png',
+				explanation: 'Bandage creates visual representations of assembly graphs, showing how contigs connect',
+				requiredDir: '/data/outbreak_investigation',
+				parameters: [
+					{ name: 'image', desc: 'Bandage command to generate image output' },
+					{ name: 'assembly/assembly.gfa', desc: 'Input assembly graph file (GFA format)' },
+					{ name: 'assembly/assembly_graph.png', desc: 'Output image file' }
 				]
 			}
 		]
@@ -184,9 +198,9 @@
 												<p class="text-amber-700 text-sm">
 													You are in <code class="bg-amber-100 px-1 rounded">{getShortDir(userCurrentDir)}</code>
 												</p>
-												<p class="text-amber-700 text-sm mt-1">First, run this command:</p>
+												<p class="text-amber-700 text-sm mt-1">Return to the project directory first:</p>
 												<div class="bg-gray-900 rounded p-2 mt-1 font-mono text-sm">
-													<code class="text-yellow-400">cd {section.requiredDir}</code>
+													<code class="text-yellow-400">cd ~</code>
 												</div>
 											</div>
 										</div>
@@ -194,7 +208,7 @@
 								{:else if section.requiredDir && isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
 									<div class="flex items-center gap-2 text-green-600 text-sm mb-2">
 										<span>✓</span>
-										<span>You are in the correct directory ({getShortDir(section.requiredDir)})</span>
+										<span>You are in the correct directory (~)</span>
 									</div>
 								{/if}
 

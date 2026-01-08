@@ -11,21 +11,21 @@
 	let isExecuting = false;
 	let currentDir = '/data/outbreak_investigation';
 
+	// Command history for arrow up/down
+	let commandHistoryList: string[] = [];
+	let historyIndex = -1;
+	let savedCurrentBuffer = '';
+
 	// Track which tools have been run for dynamic filesystem
 	let executedToolsList: string[] = [];
 	executedCommands.subscribe(cmds => executedToolsList = cmds);
 
-	// Base filesystem - only raw input files exist at start
+	// Base filesystem - sequencing data files exist at start (from sequencer)
 	const baseFilesystem: Record<string, string[]> = {
 		'/data/outbreak_investigation': [
-			'raw_reads/',
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
 			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
 			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
-		],
-		'/data/outbreak_investigation/raw_reads': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz'
 		]
 	};
 
@@ -49,6 +49,11 @@
 			'/data/outbreak_investigation': ['assembly/'],
 			'/data/outbreak_investigation/assembly': [
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			]
+		},
+		'bandage': {
+			'/data/outbreak_investigation/assembly': [
+				'assembly_graph.png', 'assembly_graph.svg'
 			]
 		},
 		'prokka': {
@@ -98,88 +103,110 @@
 		return fs;
 	}
 
-	// Pre-computed tool outputs with realistic terminal output
-	const toolOutputs: Record<string, any> = {
-		'seqkit': {
-			output: `\x1b[32m[INFO]\x1b[0m Processing sample_01_R1.fastq.gz...
+	// Generate dynamic tool output based on input file
+	function getToolOutput(tool: string, args: string[], fullCmd: string): any {
+		// Extract input file from command
+		const inputFile = args.find(a => a.endsWith('.fastq.gz') || a.endsWith('.fq.gz')) || 'sample_01_R1.fastq.gz';
+		const isR2 = inputFile.includes('R2');
+		const sampleMatch = inputFile.match(/sample_(\d+)/);
+		const sampleNum = sampleMatch ? sampleMatch[1] : '01';
+		const sampleName = `sample_${sampleNum}`;
+
+		// Different stats for different samples/reads
+		const baseReads = 2456789;
+		const sampleVariation = parseInt(sampleNum) * 12345;
+		const totalReads = baseReads + (sampleVariation % 50000);
+		const gcContent = isR2 ? 51.8 : 52.3;
+		const adapterPercent = isR2 ? 2.8 : 3.2;
+
+		const outputs: Record<string, any> = {
+			'seqkit': {
+				output: `\x1b[32m[INFO]\x1b[0m Processing ${inputFile}...
 file                      format  type   num_seqs      sum_len  min_len  avg_len  max_len
-sample_01_R1.fastq.gz     FASTQ   DNA    2,456,789  368,518,350      150      150      150
+${inputFile.padEnd(25)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${(totalReads * 150).toLocaleString()}      150      150      150
 
 \x1b[32m[INFO]\x1b[0m Summary Statistics:
-  Total reads:     2,456,789
-  Total bases:     368,518,350
-  GC content:      52.3%
+  Total reads:     ${totalReads.toLocaleString()}
+  Total bases:     ${(totalReads * 150).toLocaleString()}
+  GC content:      ${gcContent}%
   Q20 bases:       97.2%
   Q30 bases:       93.8%
 `,
-			summary: {
-				'Total Reads': '2,456,789',
-				'Total Bases': '368.5 Mb',
-				'Read Length': '150 bp',
-				'GC Content': '52.3%',
-				'Q20 Bases': '97.2%',
-				'Q30 Bases': '93.8%'
+				summary: {
+					'File': inputFile,
+					'Total Reads': totalReads.toLocaleString(),
+					'Total Bases': `${(totalReads * 150 / 1000000).toFixed(1)} Mb`,
+					'Read Length': '150 bp',
+					'GC Content': `${gcContent}%`,
+					'Q20 Bases': '97.2%',
+					'Q30 Bases': '93.8%'
+				},
+				files: [{ name: 'seqkit_stats.txt', type: 'txt', size: '1.2 KB' }]
 			},
-			files: [{ name: 'seqkit_stats.txt', type: 'txt', size: '1.2 KB' }]
-		},
-		'fastqc': {
-			output: `Started analysis of sample_01_R1.fastq.gz
-Approx 5% complete for sample_01_R1.fastq.gz
-Approx 15% complete for sample_01_R1.fastq.gz
-Approx 30% complete for sample_01_R1.fastq.gz
-Approx 50% complete for sample_01_R1.fastq.gz
-Approx 70% complete for sample_01_R1.fastq.gz
-Approx 85% complete for sample_01_R1.fastq.gz
-Approx 95% complete for sample_01_R1.fastq.gz
-Analysis complete for sample_01_R1.fastq.gz
+			'fastqc': {
+				output: `Started analysis of ${inputFile}
+Approx 5% complete for ${inputFile}
+Approx 15% complete for ${inputFile}
+Approx 30% complete for ${inputFile}
+Approx 50% complete for ${inputFile}
+Approx 70% complete for ${inputFile}
+Approx 85% complete for ${inputFile}
+Approx 95% complete for ${inputFile}
+Analysis complete for ${inputFile}
 `,
-			summary: {
-				'Total Sequences': '2,456,789',
-				'Sequence Length': '150 bp',
-				'GC Content': '52%',
-				'Per Base Quality': 'PASS',
-				'Adapter Content': 'WARNING (3.2%)',
-				'Overall Quality': 'PASS'
+				summary: {
+					'File': inputFile,
+					'Total Sequences': totalReads.toLocaleString(),
+					'Sequence Length': '150 bp',
+					'GC Content': `${gcContent}%`,
+					'Per Base Quality': 'PASS',
+					'Adapter Content': `WARNING (${adapterPercent}%)`,
+					'Overall Quality': 'PASS'
+				},
+				chartData: {
+					title: `Per Base Sequence Quality - ${inputFile}`,
+					positions: Array.from({ length: 150 }, (_, i) => i + 1),
+					scores: Array.from({ length: 150 }, (_, i) => {
+						const base = isR2 ? 31 : 32;
+						const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
+						return base + (seed / 100) * 6 - (i > 130 ? (i - 130) * 0.3 : 0);
+					}),
+					xLabel: 'Position in read (bp)',
+					yLabel: 'Quality Score (Phred)'
+				},
+				files: [
+					{ name: `${sampleName}_${isR2 ? 'R2' : 'R1'}_fastqc.html`, type: 'html', size: '245 KB' },
+					{ name: `${sampleName}_${isR2 ? 'R2' : 'R1'}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
+				]
 			},
-			chartData: {
-				title: 'Per Base Sequence Quality',
-				positions: Array.from({ length: 150 }, (_, i) => i + 1),
-				scores: Array.from({ length: 150 }, (_, i) => 32 + Math.random() * 6 - (i > 130 ? (i - 130) * 0.3 : 0)),
-				xLabel: 'Position in read (bp)',
-				yLabel: 'Quality Score (Phred)'
-			},
-			files: [
-				{ name: 'sample_01_R1_fastqc.html', type: 'html', size: '245 KB' },
-				{ name: 'sample_01_R1_fastqc.zip', type: 'zip', size: '1.2 MB' }
-			]
-		},
-		'trimmomatic': {
-			output: `TrimmomaticPE: Started with arguments:
- -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz ...
+			'trimmomatic': {
+				// Fixed math: 2,456,789 = 2,394,012 + 34,567 + 19,876 + 8,334 = 2,456,789 ✓
+				output: `TrimmomaticPE: Started with arguments:
+ -phred33 ${sampleName}_R1.fastq.gz ${sampleName}_R2.fastq.gz ...
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 ILLUMINACLIP: Using 1 prefix pairs, 2 forward/reverse sequences
 Quality encoding detected as phred33
-Input Read Pairs: 2456789
-  Both Surviving: 2398456 (97.63%)
-  Forward Only Surviving: 32145 (1.31%)
-  Reverse Only Surviving: 18234 (0.74%)
-  Dropped: 7954 (0.32%)
+Input Read Pairs: 2,456,789
+  Both Surviving: 2,394,012 (97.44%)
+  Forward Only Surviving: 34,567 (1.41%)
+  Reverse Only Surviving: 19,876 (0.81%)
+  Dropped: 8,334 (0.34%)
 TrimmomaticPE: Completed successfully
 `,
-			summary: {
-				'Input Reads': '2,456,789 pairs',
-				'Both Surviving': '2,398,456 (97.63%)',
-				'Forward Only': '32,145 (1.31%)',
-				'Reverse Only': '18,234 (0.74%)',
-				'Dropped': '7,954 (0.32%)'
+				summary: {
+					'Input Reads': '2,456,789 pairs',
+					'Both Surviving': '2,394,012 (97.44%)',
+					'Forward Only': '34,567 (1.41%)',
+					'Reverse Only': '19,876 (0.81%)',
+					'Dropped': '8,334 (0.34%)'
+				},
+				files: [
+					{ name: `${sampleName}_R1_paired.fq.gz`, type: 'fastq', size: '342 MB' },
+					{ name: `${sampleName}_R2_paired.fq.gz`, type: 'fastq', size: '341 MB' }
+				]
 			},
-			files: [
-				{ name: 'sample_01_R1_paired.fq.gz', type: 'fastq', size: '342 MB' },
-				{ name: 'sample_01_R2_paired.fq.gz', type: 'fastq', size: '341 MB' }
-			]
-		},
-		'unicycler': {
-			output: `
+			'unicycler': {
+				output: `
 \x1b[1;32m _    _       _                  _
 | |  | |     (_)                | |
 | |  | |_ __  _  ___ _   _  ____| | ___ _ __
@@ -198,8 +225,8 @@ Starting Unicycler v0.5.0
   Samtools: 1.17 ✓
 
 \x1b[36mLoading reads...\x1b[0m
-  Forward reads: 2,398,456
-  Reverse reads: 2,398,456
+  Forward reads: 2,394,012
+  Reverse reads: 2,394,012
 
 \x1b[36mPerforming SPAdes assembly...\x1b[0m
   k=27: 1,234 contigs
@@ -230,30 +257,68 @@ Final assembly:
   Largest contig: 4,892,156 bp
   N50: 4,892,156 bp
   GC content: 52.3%
+
+\x1b[33mTip: Use 'bandage image assembly.gfa assembly_graph.png' to visualize the assembly graph\x1b[0m
 `,
-			summary: {
-				'Total Contigs': '2',
-				'Total Length': '4,987,390 bp',
-				'Largest Contig': '4,892,156 bp',
-				'N50': '4,892,156 bp',
-				'GC Content': '52.3%',
-				'Circular': '2 (chromosome + plasmid)'
+				summary: {
+					'Total Contigs': '2',
+					'Total Length': '4,987,390 bp',
+					'Largest Contig': '4,892,156 bp',
+					'N50': '4,892,156 bp',
+					'GC Content': '52.3%',
+					'Circular': '2 (chromosome + plasmid)'
+				},
+				chartData: {
+					title: 'Contig Length Distribution',
+					x: ['Chromosome', 'Plasmid_1'],
+					y: [4892156, 95234],
+					type: 'bar',
+					xLabel: 'Contig',
+					yLabel: 'Length (bp)'
+				},
+				files: [
+					{ name: 'assembly.fasta', type: 'fasta', size: '4.8 MB' },
+					{ name: 'assembly.gfa', type: 'gfa', size: '12 MB' },
+					{ name: 'unicycler.log', type: 'log', size: '156 KB' }
+				]
 			},
-			chartData: {
-				title: 'Contig Length Distribution',
-				x: ['Chromosome', 'Plasmid_1'],
-				y: [4892156, 95234],
-				type: 'bar',
-				xLabel: 'Contig',
-				yLabel: 'Length (bp)'
-			},
-			files: [
-				{ name: 'assembly.fasta', type: 'fasta', size: '4.8 MB' },
-				{ name: 'assembly.gfa', type: 'gfa', size: '12 MB' },
-				{ name: 'unicycler.log', type: 'log', size: '156 KB' }
-			]
-		}
-	};
+			'bandage': {
+				output: `\x1b[36mBandage v0.8.1\x1b[0m
+Loading assembly graph: assembly.gfa
+  Nodes loaded: 847
+  Edges loaded: 1,203
+
+\x1b[36mGenerating visualization...\x1b[0m
+  Layout algorithm: Force-directed
+  Node coloring: By depth
+
+\x1b[32m✓ Graph visualization saved\x1b[0m
+  Output: assembly_graph.png (2048x2048 px)
+  Output: assembly_graph.svg (vector)
+
+\x1b[33mGraph Statistics:\x1b[0m
+  Connected components: 2
+  Largest component: Chromosome (4.89 Mb)
+  Circular contigs: 2
+  Dead ends: 0
+`,
+				summary: {
+					'Nodes': '847',
+					'Edges': '1,203',
+					'Components': '2',
+					'Circular Contigs': '2',
+					'Dead Ends': '0',
+					'Layout': 'Force-directed'
+				},
+				files: [
+					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' },
+					{ name: 'assembly_graph.svg', type: 'svg', size: '2.4 MB' }
+				]
+			}
+		};
+
+		return outputs[tool] || null;
+	}
 
 	const terminalOptions = {
 		theme: {
@@ -292,32 +357,90 @@ Final assembly:
 		terminal.write(`\r\n\x1b[32mbiolearn\x1b[0m:\x1b[34m${shortDir}\x1b[0m$ `);
 	}
 
+	function clearLine() {
+		// Clear current line
+		const len = commandBuffer.length;
+		for (let i = 0; i < len; i++) {
+			terminal.write('\b \b');
+		}
+	}
+
 	function handleInput(data: string) {
 		if (isExecuting) return;
 
+		// Handle Enter
 		if (data === '\r') {
 			terminal.write('\r\n');
 			if (commandBuffer.trim()) {
+				// Add to history
+				commandHistoryList.push(commandBuffer.trim());
+				historyIndex = -1;
+				savedCurrentBuffer = '';
 				executeCommand(commandBuffer.trim());
 			} else {
 				writePrompt();
 			}
 			commandBuffer = '';
-		} else if (data === '\x7f') {
+		}
+		// Handle Backspace
+		else if (data === '\x7f') {
 			if (commandBuffer.length > 0) {
 				commandBuffer = commandBuffer.slice(0, -1);
 				terminal.write('\b \b');
 			}
-		} else if (data === '\x03') {
+		}
+		// Handle Ctrl+C
+		else if (data === '\x03') {
 			terminal.write('^C');
 			commandBuffer = '';
+			historyIndex = -1;
 			isExecuting = false;
 			terminalState.set({ isRunning: false, currentCommand: '', progress: 0, estimatedTime: 0 });
 			writePrompt();
-		} else if (data === '\t') {
-			// Tab autocomplete
+		}
+		// Handle Ctrl+L (clear screen)
+		else if (data === '\x0c') {
+			terminal.clear();
+			writePrompt();
+			terminal.write(commandBuffer);
+		}
+		// Handle Tab autocomplete
+		else if (data === '\t') {
 			handleTabComplete();
-		} else if (data >= ' ') {
+		}
+		// Handle Arrow keys (escape sequences)
+		else if (data === '\x1b[A') {
+			// Arrow Up - previous command
+			if (commandHistoryList.length > 0) {
+				if (historyIndex === -1) {
+					savedCurrentBuffer = commandBuffer;
+					historyIndex = commandHistoryList.length - 1;
+				} else if (historyIndex > 0) {
+					historyIndex--;
+				}
+				clearLine();
+				commandBuffer = commandHistoryList[historyIndex];
+				terminal.write(commandBuffer);
+			}
+		}
+		else if (data === '\x1b[B') {
+			// Arrow Down - next command
+			if (historyIndex !== -1) {
+				if (historyIndex < commandHistoryList.length - 1) {
+					historyIndex++;
+					clearLine();
+					commandBuffer = commandHistoryList[historyIndex];
+					terminal.write(commandBuffer);
+				} else {
+					historyIndex = -1;
+					clearLine();
+					commandBuffer = savedCurrentBuffer;
+					terminal.write(commandBuffer);
+				}
+			}
+		}
+		// Regular characters
+		else if (data >= ' ') {
 			commandBuffer += data;
 			terminal.write(data);
 		}
@@ -424,8 +547,33 @@ Final assembly:
 			return;
 		}
 
-		// Handle bioinformatics tools
+		// Handle bioinformatics tools - require proper arguments
 		if (bioTools.has(command)) {
+			// Check if command has proper arguments
+			if (command === 'fastqc' && args.length === 0) {
+				terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
+				terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+				writePrompt();
+				return;
+			}
+			if (command === 'trimmomatic' && args.length < 5) {
+				terminal.writeln(`\x1b[31mUsage: trimmomatic PE -phred33 <R1.fq.gz> <R2.fq.gz> <output_files...> <options>\x1b[0m`);
+				terminal.writeln(`\x1b[90mThis tool requires paired-end input files and trimming parameters.\x1b[0m`);
+				writePrompt();
+				return;
+			}
+			if (command === 'unicycler' && (!args.includes('-1') || !args.includes('-2'))) {
+				terminal.writeln(`\x1b[31mUsage: unicycler -1 <R1_paired.fq.gz> -2 <R2_paired.fq.gz> -o <output_dir>\x1b[0m`);
+				terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads.\x1b[0m`);
+				writePrompt();
+				return;
+			}
+			if (command === 'bandage' && args.length < 2) {
+				terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
+				terminal.writeln(`\x1b[90mExample: bandage image assembly.gfa assembly_graph.png\x1b[0m`);
+				writePrompt();
+				return;
+			}
 			await executeBioTool(command, args, cmd);
 			return;
 		}
@@ -455,15 +603,21 @@ Final assembly:
   \x1b[32mfastqc\x1b[0m         - Quality control (~10s)
   \x1b[32mtrimmomatic\x1b[0m    - Read trimming (~45s)
   \x1b[32municycler\x1b[0m      - Genome assembly (~3-5min)
+  \x1b[32mbandage\x1b[0m        - Visualize assembly graph (~5s)
   \x1b[32mquast\x1b[0m          - Assembly QC (~20s)
   \x1b[32mprokka\x1b[0m         - Genome annotation (~1-2min)
   \x1b[32mabricate\x1b[0m       - AMR screening (~10s)
   \x1b[32mmlst\x1b[0m           - Sequence typing (~5s)
 
+\x1b[1;36mKeyboard Shortcuts:\x1b[0m
+  ↑/↓            - Browse command history
+  Tab            - Autocomplete file names
+  Ctrl+L         - Clear screen
+  Ctrl+C         - Cancel running command
+
 \x1b[1;36mUtility:\x1b[0m
   help           - Show this message
   clear          - Clear terminal
-  Ctrl+C         - Cancel running command
 `);
 	}
 
@@ -485,6 +639,8 @@ Final assembly:
 				return `\x1b[32m${f}\x1b[0m`;
 			} else if (f.endsWith('.html') || f.endsWith('.log')) {
 				return `\x1b[33m${f}\x1b[0m`;
+			} else if (f.endsWith('.png') || f.endsWith('.svg')) {
+				return `\x1b[35m${f}\x1b[0m`;
 			}
 			return f;
 		});
@@ -580,8 +736,8 @@ Final assembly:
 		terminal.writeln(`\x1b[90;3m(Note: This is a simulated duration. Real analysis may take minutes to hours.)\x1b[0m`);
 		terminal.writeln('');
 
-		// Simulate progress
-		const toolData = toolOutputs[tool];
+		// Get dynamic tool output
+		const toolData = getToolOutput(tool, args, fullCmd);
 		const outputLines = toolData?.output?.split('\n') || [];
 		const interval = (execTime * 1000) / Math.max(outputLines.length, 10);
 
@@ -651,6 +807,7 @@ Final assembly:
 		terminal.writeln('\x1b[1;36m╔═══════════════════════════════════════════════════════════╗\x1b[0m');
 		terminal.writeln('\x1b[1;36m║\x1b[0m   \x1b[1;32mBioLearn\x1b[0m - Bioinformatics Learning Terminal             \x1b[1;36m║\x1b[0m');
 		terminal.writeln('\x1b[1;36m║\x1b[0m   Type \x1b[33mhelp\x1b[0m for available commands                         \x1b[1;36m║\x1b[0m');
+		terminal.writeln('\x1b[1;36m║\x1b[0m   Use ↑/↓ for history, Tab for autocomplete               \x1b[1;36m║\x1b[0m');
 		terminal.writeln('\x1b[1;36m╚═══════════════════════════════════════════════════════════╝\x1b[0m');
 		writePrompt();
 

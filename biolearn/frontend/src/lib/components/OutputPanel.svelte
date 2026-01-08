@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { outputData, terminalState, fileNotes } from '$lib/stores/terminal';
 
 	let plotContainer: HTMLDivElement;
@@ -9,12 +9,24 @@
 	let loadingProgress = $state(0);
 	let loadingTool = $state('');
 	let currentNotes = $state<any[]>([]);
+	let chartRendered = $state(false);
+
+	// Re-render chart when switching to chart tab
+	$effect(() => {
+		if (activeTab === 'chart' && currentOutput?.chartData && plotContainer) {
+			// Use tick to ensure DOM is updated before rendering
+			tick().then(() => {
+				renderChart(currentOutput);
+			});
+		}
+	});
 
 	// Subscribe to stores
 	onMount(() => {
 		const unsubOutput = outputData.subscribe(data => {
 			currentOutput = data;
-			if (data && data.chartData) {
+			chartRendered = false;
+			if (data && data.chartData && activeTab === 'chart') {
 				setTimeout(() => renderChart(data), 100);
 			}
 			// Update notes for the current tool
