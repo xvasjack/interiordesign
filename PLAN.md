@@ -346,7 +346,71 @@ abricate --summary abricate_*.tsv > abricate_summary.tsv
 - **Regulatory/Official**: ncbi (NCBI standard)
 - **Compare all**: Run multiple and compare - different databases may catch different genes
 
-**Phase 3 Outputs**: Species ID, MLST type, annotated genome, AMR gene tables (multiple databases), virulence genes, plasmid types
+---
+
+#### Plasmid Analysis
+
+If plasmids are detected, perform detailed plasmid analysis:
+
+| Step | Tool | Purpose | Command |
+|------|------|---------|---------|
+| 3.6 | **MOB-suite** | Plasmid reconstruction & typing | See full command below |
+| 3.7 | **Platon** | Plasmid identification | `platon contigs.fasta --db /db/platon -o platon_out/ -t 4` |
+| 3.8 | **pLannotate** | Plasmid annotation + circular map | See full command below |
+
+```bash
+# MOB-suite: Reconstruct and type plasmids
+mob_recon \
+    --infile contigs.fasta \
+    --outdir mob_recon_out/ \
+    --num_threads 4
+
+# MOB-suite output includes:
+# - chromosome.fasta (chromosomal contigs)
+# - plasmid_*.fasta (reconstructed plasmids)
+# - mobtyper_results.txt (plasmid typing)
+```
+
+```bash
+# pLannotate: Annotate plasmid and generate circular map
+plannotate batch \
+    --input mob_recon_out/plasmid_1.fasta \
+    --output plannotate_out/ \
+    --html \
+    --csv
+```
+
+**Plasmid Analysis Tools Explained**:
+
+| Tool | Purpose | Output |
+|------|---------|--------|
+| **MOB-suite** | Reconstructs plasmids from contigs, predicts mobility (conjugative/mobilizable), identifies replicon types | Separated plasmid FASTAs, typing report |
+| **Platon** | Identifies plasmid contigs using marker genes, distinguishes chromosomal vs plasmid | Plasmid classification, confidence scores |
+| **pLannotate** | Annotates plasmid features (ORFs, resistance genes, origins) and generates circular visualization | Interactive HTML circular map, annotation table |
+
+**Alternative Circular Map Tools**:
+| Tool | Best For | Output |
+|------|----------|--------|
+| **pLannotate** | Plasmid-specific, easy to use | Interactive HTML |
+| **CGView** | General circular genomes | SVG/PNG images |
+| **Circos** | Highly customizable, publication figures | SVG/PNG (complex setup) |
+| **Proksee** | Web-based, bacterial genomes | Interactive web view |
+
+```bash
+# CGView alternative for circular map
+cgview_builder.py \
+    --sequence plasmid_1.gbk \
+    --output plasmid_map.svg \
+    --format svg
+```
+
+**Plasmid Analysis Outputs**:
+- Reconstructed plasmid sequences (FASTA)
+- Plasmid typing (replicon, mobility, host range)
+- Annotated plasmid features (genes, origins, AMR)
+- Circular map visualization (HTML/SVG)
+
+**Phase 3 Outputs**: Species ID, MLST type, annotated genome, AMR gene tables (multiple databases), virulence genes, plasmid types, **plasmid circular maps**
 
 ---
 
@@ -401,6 +465,9 @@ snippy \
 | **Annotation** | **Bakta** | Modern, faster, better databases | Prokka (older) |
 | **AMR Detection** | **AMRFinderPlus** | NCBI standard, curated database | - |
 | **Multi-DB Screening** | **ABRicate** | 8 databases (resfinder, card, vfdb, etc.) | - |
+| **Plasmid Reconstruction** | **MOB-suite** | Reconstructs & types plasmids, predicts mobility | PlasmidFinder |
+| **Plasmid Detection** | **Platon** | Identifies plasmid vs chromosome contigs | - |
+| **Plasmid Visualization** | **pLannotate** | Annotates + circular map, interactive HTML | CGView, Circos |
 | **Read Mapping** | **BWA-MEM2** | Faster BWA, same accuracy | Minimap2 |
 | **SAM/BAM** | **Samtools** | Universal standard | - |
 | **Variant Calling** | **Snippy** | All-in-one SNP pipeline for bacteria | BCFtools (manual) |
@@ -426,6 +493,11 @@ mlst            v2.23.0
 bakta           v1.9.0
 amrfinderplus   v3.12.8
 abricate        v1.0.1    # databases: resfinder, card, ncbi, vfdb, plasmidfinder, etc.
+
+# Plasmid analysis
+mob_suite       v3.1.8
+platon          v1.6.0
+plannotate      v1.2.2
 
 # Variant calling & phylogeny
 bwa-mem2        v2.2.1
@@ -470,7 +542,7 @@ python          v3.10+
                                     │
                                     ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  PHASE 3: Identification & Annotation                                     │
+│  PHASE 3: Identification, Annotation & Plasmid Analysis                   │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐                            │
 │  │ Kraken2  │    │   MLST   │    │  Bakta   │                            │
 │  │(species) │    │ (typing) │    │(annotate)│                            │
@@ -481,6 +553,15 @@ python          v3.10+
 │  │  AMRFinderPlus  │    │  ABRicate (8 databases) │                      │
 │  │   (AMR genes)   │    │  resfinder, card, vfdb  │                      │
 │  └─────────────────┘    └─────────────────────────┘                      │
+│                                │                                          │
+│                                ▼                                          │
+│              ┌─────────────────────────────────────┐                     │
+│              │  PLASMID ANALYSIS (if detected)     │                     │
+│              │  ┌─────────┐ ┌─────────┐ ┌────────┐│                     │
+│              │  │MOB-suite│→│ Platon  │→│pLannot.││                     │
+│              │  │(recon)  │ │(detect) │ │(map)   ││                     │
+│              │  └─────────┘ └─────────┘ └────────┘│                     │
+│              └─────────────────────────────────────┘                     │
 └──────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
