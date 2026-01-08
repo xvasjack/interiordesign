@@ -211,22 +211,30 @@ fastp \
 
 | Step | Tool | Purpose | Command |
 |------|------|---------|---------|
-| 2.1 | **SPAdes** | De novo assembly | See full command below |
-| 2.2 | **QUAST** | Assembly statistics | `quast.py contigs.fasta -o quast_report/` |
+| 2.1 | **Unicycler** | De novo assembly | See full command below |
+| 2.2 | **QUAST** | Assembly statistics | `quast.py assembly.fasta -o quast_report/` |
 | 2.3 | **CheckM** | Contamination check | `checkm lineage_wf assembly/ checkm_out/ -t 4 -x fasta` |
 | 2.4 | **ConFindr** | Intra-species contamination | `confindr.py -i assembly/ -o confindr_out/` |
 
 ```bash
-# Complete SPAdes command
-spades.py \
+# Complete Unicycler command
+unicycler \
     -1 clean_R1.fastq.gz \
     -2 clean_R2.fastq.gz \
     -o assembly/ \
-    --careful \
-    --cov-cutoff auto \
-    -t 4 \
-    -m 16
+    --mode normal \
+    --min_fasta_length 500 \
+    -t 4
 ```
+
+**Why Unicycler over SPAdes?**
+| Feature | Unicycler | SPAdes |
+|---------|-----------|--------|
+| Circular contigs | Resolves circular chromosomes & plasmids | Often leaves them linear |
+| Assembly quality | Better contiguity, fewer contigs | Good but more fragmented |
+| Bacterial focus | Designed specifically for bacteria | General-purpose |
+| Under the hood | Uses SPAdes + Racon + Pilon polishing | Core assembler only |
+| Long reads | Hybrid assembly with Nanopore/PacBio | Separate mode |
 
 **Contamination Detection Explained**:
 | Tool | What It Detects | When to Use |
@@ -247,7 +255,7 @@ spades.py \
 | 3.2 | **MLST** | Sequence typing | `mlst contigs.fasta > mlst_results.tsv` |
 | 3.3 | **Bakta** | Genome annotation | `bakta contigs.fasta --db /db/bakta -o bakta_out/ -t 4` |
 | 3.4 | **AMRFinderPlus** | AMR gene detection | `amrfinder -n contigs.fasta -o amr_results.tsv --threads 4` |
-| 3.5 | **ABRicate** | Virulence genes | `abricate --db vfdb contigs.fasta > virulence.tsv` |
+| 3.5 | **ABRicate** | Multi-database screening | See full commands below |
 
 ```bash
 # Complete Kraken2 command
@@ -260,7 +268,45 @@ kraken2 \
     --confidence 0.1
 ```
 
-**Phase 3 Outputs**: Species ID, MLST type, annotated genome, AMR gene table, virulence genes
+#### ABRicate: Multi-Database Screening
+
+ABRicate can screen against multiple databases. Run all to compare results:
+
+```bash
+# Screen against ALL databases
+abricate --db resfinder contigs.fasta > abricate_resfinder.tsv
+abricate --db card contigs.fasta > abricate_card.tsv
+abricate --db ncbi contigs.fasta > abricate_ncbi.tsv
+abricate --db argannot contigs.fasta > abricate_argannot.tsv
+abricate --db megares contigs.fasta > abricate_megares.tsv
+abricate --db vfdb contigs.fasta > abricate_vfdb.tsv
+abricate --db plasmidfinder contigs.fasta > abricate_plasmidfinder.tsv
+abricate --db ecoli_vf contigs.fasta > abricate_ecoli_vf.tsv
+
+# Combine all results for comparison
+abricate --summary abricate_*.tsv > abricate_summary.tsv
+```
+
+**ABRicate Databases Explained**:
+
+| Database | Focus | Best For | Notes |
+|----------|-------|----------|-------|
+| **resfinder** | AMR genes | Clinical isolates | DTU database, well-curated, includes phenotype predictions |
+| **card** | AMR genes + mechanisms | Research, comprehensive | Includes resistance mechanisms, ontology-based |
+| **ncbi** | AMR genes | General use | NCBI AMRFinderPlus database, official reference |
+| **argannot** | AMR genes | Legacy studies | Older database, good for historical comparisons |
+| **megares** | AMR genes | Metagenomics | Designed for metagenomic studies, hierarchical |
+| **vfdb** | Virulence factors | Pathogenicity | Virulence Factor Database - toxins, adhesins, etc. |
+| **plasmidfinder** | Plasmid replicons | Plasmid typing | Identifies plasmid incompatibility groups |
+| **ecoli_vf** | E. coli virulence | E. coli only | Specialized for E. coli pathotypes |
+
+**Which database to use?**
+- **Clinical/Public Health**: resfinder (curated) + vfdb (virulence)
+- **Research**: card (comprehensive) + vfdb
+- **Regulatory/Official**: ncbi (NCBI standard)
+- **Compare all**: Run multiple and compare - different databases may catch different genes
+
+**Phase 3 Outputs**: Species ID, MLST type, annotated genome, AMR gene tables (multiple databases), virulence genes, plasmid types
 
 ---
 
@@ -301,20 +347,20 @@ snippy \
 
 ### The Definitive WGS Tool Stack
 
-| Category | Tool | Why This One | Alternatives (if needed) |
-|----------|------|--------------|-------------------------|
+| Category | Tool | Why This One | Alternatives |
+|----------|------|--------------|--------------|
 | **Read QC** | **FastQC** | Universal standard, detailed reports | - |
 | **Trimming** | **fastp** | All-in-one, fast, great reports | Trimmomatic |
 | **Report Aggregation** | **MultiQC** | Combines all QC into one dashboard | - |
-| **Assembly** | **SPAdes** | Gold standard for bacteria, most cited | SKESA (faster) |
+| **Assembly** | **Unicycler** | Best for bacteria, circular contigs, uses SPAdes+polishing | SPAdes (simpler) |
 | **Assembly QC** | **QUAST** | Standard metrics (N50, contigs, etc.) | - |
 | **Contamination** | **CheckM** | Industry standard, completeness + contamination | CheckM2 (newer) |
 | **Contamination (reads)** | **ConFindr** | Detects intra-species mixtures | FastQ Screen |
 | **Species ID** | **Kraken2** | Fast, accurate, widely used | GTDB-Tk (more accurate) |
 | **MLST** | **mlst** | Simple, reliable sequence typing | PubMLST web |
 | **Annotation** | **Bakta** | Modern, faster, better databases | Prokka (older) |
-| **AMR Detection** | **AMRFinderPlus** | NCBI standard, curated database | ABRicate, CARD-RGI |
-| **Virulence** | **ABRicate** | Multi-database support (VFDB, etc.) | - |
+| **AMR Detection** | **AMRFinderPlus** | NCBI standard, curated database | - |
+| **Multi-DB Screening** | **ABRicate** | 8 databases (resfinder, card, vfdb, etc.) | - |
 | **Read Mapping** | **BWA-MEM2** | Faster BWA, same accuracy | Minimap2 |
 | **SAM/BAM** | **Samtools** | Universal standard | - |
 | **Variant Calling** | **Snippy** | All-in-one SNP pipeline for bacteria | BCFtools (manual) |
@@ -329,7 +375,7 @@ snippy \
 fastqc          v0.12.1
 fastp           v0.23.4
 multiqc         v1.21
-spades          v3.15.5
+unicycler       v0.5.0
 quast           v5.2.0
 checkm          v1.2.2    # or checkm2 v1.0.1
 confindr        v0.8.1
@@ -339,7 +385,7 @@ kraken2         v2.1.3
 mlst            v2.23.0
 bakta           v1.9.0
 amrfinderplus   v3.12.8
-abricate        v1.0.1
+abricate        v1.0.1    # databases: resfinder, card, ncbi, vfdb, plasmidfinder, etc.
 
 # Variant calling & phylogeny
 bwa-mem2        v2.2.1
@@ -374,7 +420,7 @@ python          v3.10+
 ┌──────────────────────────────────────────────────────────────────────────┐
 │  PHASE 2: Assembly & Contamination Check                                  │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐           │
-│  │  SPAdes  │───▶│  QUAST   │───▶│  CheckM  │───▶│ ConFindr │           │
+│  │Unicycler │───▶│  QUAST   │───▶│  CheckM  │───▶│ ConFindr │           │
 │  │(assemble)│    │ (stats)  │    │(contam.) │    │ (purity) │           │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘           │
 │                                        │                                  │
@@ -392,8 +438,8 @@ python          v3.10+
 │        │                                │                                 │
 │        ▼                                ▼                                 │
 │  ┌─────────────────┐    ┌─────────────────────────┐                      │
-│  │  AMRFinderPlus  │    │  ABRicate (virulence)   │                      │
-│  │   (AMR genes)   │    │                         │                      │
+│  │  AMRFinderPlus  │    │  ABRicate (8 databases) │                      │
+│  │   (AMR genes)   │    │  resfinder, card, vfdb  │                      │
 │  └─────────────────┘    └─────────────────────────┘                      │
 └──────────────────────────────────────────────────────────────────────────┘
                                     │
