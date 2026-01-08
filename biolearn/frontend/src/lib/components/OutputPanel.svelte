@@ -121,8 +121,8 @@
 			const circleBottomY = 3.2;    // All circle bottoms at same Y
 
 			components.forEach((comp: any, i: number) => {
-				// X position: spread across the plot
-				const xPos = i === 0 ? 3 : 7;
+				// X position: spread further apart
+				const xPos = i === 0 ? 2 : 8;
 
 				// Scale radius based on size
 				const relativeSize = comp.size / maxSize;
