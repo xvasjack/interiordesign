@@ -737,6 +737,15 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
+				// Check for exact folder name
+				const outputDir = args[oIndex + 1].replace(/\/$/, ''); // Remove trailing slash
+				if (outputDir !== 'qc_reports') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIndex + 1]}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: qc_reports\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
 
 			if (command === 'trimmomatic') {
