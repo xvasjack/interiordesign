@@ -388,21 +388,85 @@ plannotate batch \
 | **Platon** | Identifies plasmid contigs using marker genes, distinguishes chromosomal vs plasmid | Plasmid classification, confidence scores |
 | **pLannotate** | Annotates plasmid features (ORFs, resistance genes, origins) and generates circular visualization | Interactive HTML circular map, annotation table |
 
-**Alternative Circular Map Tools**:
-| Tool | Best For | Output |
-|------|----------|--------|
-| **pLannotate** | Plasmid-specific, easy to use | Interactive HTML |
-| **CGView** | General circular genomes | SVG/PNG images |
-| **Circos** | Highly customizable, publication figures | SVG/PNG (complex setup) |
-| **Proksee** | Web-based, bacterial genomes | Interactive web view |
+---
+
+#### Circular Map Visualization Options
+
+Users can choose their preferred circular map tool based on skill level and needs:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Choose Your Circular Map Tool                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  🟢 pLannotate          │   EASY - Best for beginners                   │
+│  │     (Recommended)       │   One command, interactive HTML output        │
+│  │                         │   Perfect for plasmids                        │
+│  │  [Select →]             │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  🟡 CGView              │   MEDIUM - Good balance                       │
+│  │                         │   Command-line, SVG/PNG output                │
+│  │                         │   Works for any circular genome               │
+│  │  [Select →]             │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  🔴 Circos              │   ADVANCED - Publication quality              │
+│  │                         │   Complex setup, highly customizable          │
+│  │                         │   Best for detailed publication figures       │
+│  │  [Select →]             │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  🌐 Proksee (Web)       │   EASY - No installation needed               │
+│  │                         │   Web-based, upload and visualize             │
+│  │                         │   Good for quick visualization                │
+│  │  [Select →]             │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+| Tool | Difficulty | Output | Best For | Setup |
+|------|------------|--------|----------|-------|
+| **pLannotate** | 🟢 Easy | Interactive HTML | Plasmids, beginners | `pip install plannotate` |
+| **CGView** | 🟡 Medium | SVG/PNG | General circular genomes | `conda install cgview` |
+| **Circos** | 🔴 Advanced | Publication SVG/PNG | Complex figures, papers | Config files required |
+| **Proksee** | 🟢 Easy | Web interactive | Quick visualization | No install (web) |
 
 ```bash
-# CGView alternative for circular map
+# Option 1: pLannotate (EASY - Recommended)
+plannotate batch \
+    --input plasmid_1.fasta \
+    --output plannotate_out/ \
+    --html \
+    --csv
+
+# Option 2: CGView (MEDIUM)
 cgview_builder.py \
     --sequence plasmid_1.gbk \
     --output plasmid_map.svg \
     --format svg
+
+# Option 3: Circos (ADVANCED - requires config files)
+# Step 1: Generate Circos config
+circos_generate_config.py --input plasmid_1.gbk --outdir circos_config/
+# Step 2: Run Circos
+circos -conf circos_config/circos.conf -outputdir circos_out/
+
+# Option 4: Proksee (WEB - no command, upload to proksee.ca)
 ```
+
+**Recommendation by Use Case**:
+| Use Case | Recommended Tool |
+|----------|------------------|
+| Quick look at plasmid | pLannotate or Proksee |
+| Standard lab report | pLannotate or CGView |
+| Publication figure | Circos (if customization needed) or CGView |
+| Teaching/learning | pLannotate (clearest output) |
 
 **Plasmid Analysis Outputs**:
 - Reconstructed plasmid sequences (FASTA)
