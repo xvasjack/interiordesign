@@ -695,17 +695,28 @@ Loading assembly graph: assembly.gfa
 
 			// Check command has proper arguments
 			if (command === 'fastqc') {
-				if (args.length === 0) {
+				// Check for input file
+				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input file\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
 					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				// Check file is valid
-				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
-				if (!inputFile || !req?.checkFile?.(inputFile)) {
-					terminal.writeln(`\x1b[31mError: Invalid input file '${inputFile || args[0]}'\x1b[0m`);
+				// Check file is valid sample file
+				if (!req?.checkFile?.(inputFile)) {
+					terminal.writeln(`\x1b[31mError: Invalid input file '${inputFile}'\x1b[0m`);
 					terminal.writeln(`\x1b[90mFastQC requires a valid .fastq.gz file (e.g., sample_01_R1.fastq.gz)\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check for -o flag with output directory
+				const oIndex = args.indexOf('-o');
+				if (oIndex === -1 || !args[oIndex + 1]) {
+					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
 					writePrompt();
 					return;
 				}
