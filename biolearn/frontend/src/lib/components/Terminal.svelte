@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 
 	let terminalContainer: HTMLDivElement;
@@ -8,6 +8,7 @@
 	let fitAddon: any;
 	let resizeObserver: ResizeObserver;
 	let commandBuffer = '';
+	let stopUnsubscribe: () => void;
 	let cursorPosition = 0;  // Track cursor position for left/right arrow
 	let isExecuting = false;
 	let currentDir = '/data/outbreak_investigation';
@@ -610,7 +611,7 @@ Loading assembly graph: assembly.gfa
 		'unicycler': [
 			'trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'
 		],
-		'bandage': ['assembly.gfa'],
+		'bandage': ['assembly/assembly.gfa'],
 		'prokka': ['assembly/assembly.fasta'],
 		'abricate': ['assembly/assembly.fasta']
 	};
@@ -621,7 +622,7 @@ Loading assembly graph: assembly.gfa
 		'seqkit': { dir: '/data/outbreak_investigation' },
 		'trimmomatic': { dir: '/data/outbreak_investigation' },
 		'unicycler': { dir: '/data/outbreak_investigation' },
-		'bandage': { dir: '/data/outbreak_investigation/assembly' },
+		'bandage': { dir: '/data/outbreak_investigation' },
 		'prokka': { dir: '/data/outbreak_investigation' },
 		'abricate': { dir: '/data/outbreak_investigation' }
 	};
@@ -782,8 +783,8 @@ Loading assembly graph: assembly.gfa
 
 			if (command === 'bandage') {
 				if (!args.includes('image')) {
-					terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly.gfa assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa <output.png>\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -791,13 +792,13 @@ Loading assembly graph: assembly.gfa
 				const gfaFile = args.find(a => a.endsWith('.gfa'));
 				if (!gfaFile) {
 					terminal.writeln(`\x1b[31mError: Missing .gfa file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa <output.png>\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!isValidFileForTool('bandage', gfaFile)) {
 					terminal.writeln(`\x1b[31mError: '${gfaFile}' is not a valid input for bandage\x1b[0m`);
-					terminal.writeln(`\x1b[90mBandage requires: assembly.gfa (from unicycler output)\x1b[0m`);
+					terminal.writeln(`\x1b[90mBandage requires: assembly/assembly.gfa (from unicycler output)\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -805,7 +806,7 @@ Loading assembly graph: assembly.gfa
 				const pngFile = args.find(a => a.endsWith('.png'));
 				if (!pngFile) {
 					terminal.writeln(`\x1b[31mError: Missing output .png file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly.gfa <output.png>\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa <output.png>\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1189,7 +1190,7 @@ Annotation identified 4,523 coding sequences.
 
 		// Show tool startup with disclaimer
 		terminal.writeln(`\x1b[36m[${tool}]\x1b[0m Starting analysis...`);
-		terminal.writeln(`\x1b[90mEstimated time: ~${execTime}s\x1b[0m`);
+		terminal.writeln(`\x1b[90mEstimated time: ~${execTime}s (Press Ctrl+C to cancel)\x1b[0m`);
 		terminal.writeln(`\x1b[90;3m(Note: This is a simulated duration. Real analysis may take minutes to hours.)\x1b[0m`);
 		terminal.writeln('');
 
@@ -1198,16 +1199,25 @@ Annotation identified 4,523 coding sequences.
 		const outputLines = toolData?.output?.split('\n') || [];
 		const interval = (execTime * 1000) / Math.max(outputLines.length, 10);
 
+		let wasCancelled = false;
 		for (let i = 0; i < outputLines.length; i++) {
 			await sleep(interval);
-			if (!isExecuting) break;
+			if (!isExecuting) {
+				wasCancelled = true;
+				break;
+			}
 
 			terminal.writeln(outputLines[i]);
 			const progress = Math.floor(((i + 1) / outputLines.length) * 100);
 			terminalState.update(s => ({ ...s, progress }));
 		}
 
-		if (isExecuting && toolData) {
+		if (wasCancelled) {
+			// Tool was cancelled - don't add files to filesystem
+			terminal.writeln('');
+			terminal.writeln(`\x1b[33m⚠ ${tool} cancelled by user\x1b[0m`);
+			terminal.writeln(`\x1b[90mNo output files were created.\x1b[0m`);
+		} else if (toolData) {
 			// Track executed command for dynamic filesystem
 			executedCommands.update(cmds => {
 				if (!cmds.includes(tool)) {
@@ -1260,6 +1270,13 @@ Annotation identified 4,523 coding sequences.
 		});
 		resizeObserver.observe(terminalContainer);
 
+		// Subscribe to stop signal
+		stopUnsubscribe = stopSignal.subscribe(() => {
+			if (isExecuting) {
+				isExecuting = false;
+			}
+		});
+
 		// Welcome message
 		terminal.writeln('\x1b[1;36m╔═══════════════════════════════════════════════════════════╗\x1b[0m');
 		terminal.writeln('\x1b[1;36m║\x1b[0m   \x1b[1;32mBioLearn\x1b[0m - Bioinformatics Learning Terminal             \x1b[1;36m║\x1b[0m');
@@ -1272,6 +1289,7 @@ Annotation identified 4,523 coding sequences.
 	});
 
 	onDestroy(() => {
+		if (stopUnsubscribe) stopUnsubscribe();
 		if (resizeObserver) resizeObserver.disconnect();
 		if (terminal) terminal.dispose();
 	});

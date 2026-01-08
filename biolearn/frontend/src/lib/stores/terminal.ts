@@ -34,6 +34,9 @@ export const terminalState = writable<TerminalState>({
 	estimatedTime: 0
 });
 
+// Stop signal - increment to trigger stop
+export const stopSignal = writable<number>(0);
+
 // Track executed commands for dynamic filesystem
 export const executedCommands = writable<string[]>([]);
 

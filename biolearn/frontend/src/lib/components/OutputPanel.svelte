@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { outputData, terminalState, fileNotes } from '$lib/stores/terminal';
+	import { outputData, terminalState, fileNotes, stopSignal } from '$lib/stores/terminal';
 
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
@@ -10,6 +10,11 @@
 	let loadingTool = $state('');
 	let currentNotes = $state<any[]>([]);
 	let chartRendered = $state(false);
+
+	function handleStop() {
+		// Increment stop signal to trigger cancellation
+		stopSignal.update(n => n + 1);
+	}
 
 	// Re-render chart when switching to chart tab
 	$effect(() => {
@@ -251,6 +256,15 @@
 					</div>
 					<p class="text-sm text-gray-500 mt-2 text-center">{loadingProgress}% complete</p>
 				</div>
+				<button
+					onclick={handleStop}
+					class="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<rect x="6" y="6" width="12" height="12" rx="1" stroke-width="2" fill="currentColor"/>
+					</svg>
+					Stop
+				</button>
 			</div>
 		{:else if !currentOutput}
 			<!-- Empty State -->
