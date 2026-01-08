@@ -4,15 +4,18 @@
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
 	import { executedCommands } from '$lib/stores/terminal';
+	import type { Storyline } from '$lib/storylines/wgs-bacteria';
 
 	let {
 		storyContent = '',
 		currentStep = 0,
-		outputData = null
+		outputData = null,
+		storyline = null
 	}: {
 		storyContent?: string;
 		currentStep?: number;
 		outputData?: any;
+		storyline?: Storyline | null;
 	} = $props();
 
 	let terminalHeight = $state(70); // percentage
@@ -48,7 +51,24 @@
 		'sample_01.tsv': `locus_tag\ttype\tstart\tend\tstrand\tgene\tproduct\nSAMPLE01_00001\tCDS\t1\t1350\t+\tdnaA\tChromosomal replication initiator protein DnaA\nSAMPLE01_00002\tCDS\t1524\t2624\t+\tdnaN\tDNA polymerase III subunit beta`,
 		'sample_01.json': `{"version":"1.8.2","genome":{"length":4987390,"contigs":2,"gc":52.3},"features":{"CDS":4623,"tRNA":86,"rRNA":22,"ncRNA":89,"CRISPR":2}}`,
 		// MLST files
-		'mlst_report.tsv': `FILE\tSCHEME\tST\tadk\tfumC\tgyrB\ticd\tmdh\tpurA\trecA\nassembly/assembly.fasta\techerichia_coli_achtman\t131\t10\t11\t4\t8\t8\t8\t2`
+		'mlst_report.tsv': `FILE\tSCHEME\tST\tadk\tfumC\tgyrB\ticd\tmdh\tpurA\trecA\nassembly/assembly.fasta\techerichia_coli_achtman\t131\t10\t11\t4\t8\t8\t8\t2`,
+		// Phase 3: MOB-suite files
+		'plasmid_report.tsv': `sample_id\tnum_contigs\ttotal_length\tplasmid_id\treplicon_type\tmobility\nchromosome\t1\t4892156\t-\t-\t-\nplasmid_1\t1\t95234\tAA001\tIncFIB(K),IncFII(K)\tconjugative`,
+		'mobtyper_results.txt': `MOB-typer Results\n=================\nPlasmid: AA001\nSize: 95,234 bp\nReplicon type: IncFIB(K), IncFII(K)\nMobility: Conjugative\nRelaxase: MOBF\nMate-pair formation: MPF_F`,
+		// Phase 3: Platon files
+		'plasmid_predictions.tsv': `contig_id\tlength\tplasmid_score\tprediction\ncontig_1\t4892156\t0.023\tchromosome\ncontig_2\t95234\t0.987\tplasmid`,
+		// Phase 4: Snippy files
+		'snps.vcf': `##fileformat=VCFv4.2\n##source=snippy\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchromosome\t12345\t.\tA\tG\t999\tPASS\tDP=78`,
+		'snps.tab': `CHROM\tPOS\tTYPE\tREF\tALT\tEFFECT\nchromosome\t12345\tsnp\tA\tG\tsynonymous_variant`,
+		// Phase 4: Roary files
+		'gene_presence_absence.csv': `Gene,Non-unique,Fragments,sample_01,sample_02,sample_03,reference\ndnaA,0,0,1,1,1,1\ndnaN,0,0,1,1,1,1`,
+		'summary_statistics.txt': `Core genes: 3987\nSoft-core genes: 312\nShell genes: 489\nCloud genes: 446\nTotal genes: 5234`,
+		// Phase 4: IQ-TREE files
+		'core_alignment.treefile': `((sample_01:0.0012,sample_02:0.0008):0.0045,(sample_03:0.0023,reference:0.0089):0.0034);`,
+		'core_alignment.iqtree': `IQ-TREE 2.2.0\nBest-fit model: GTR+F+I+G4\nLog-likelihood: -22345.678\nBootstrap support: >=98% for all nodes`,
+		// Phase 4: Gubbins files
+		'recombination_predictions.gff': `##gff-version 3\nchromosome\tGubbins\trecombination\t234567\t245678\t.\t+\t.\tID=rec_1`,
+		'clean.summary.txt': `Gubbins Analysis\nRecombinant regions: 21\nBases affected: 43234 (1.25%)\nClean SNPs: 10234`
 	};
 
 	// Tool to files mapping
@@ -101,6 +121,41 @@
 		],
 		'mlst': [
 			{ name: 'mlst_report.tsv', type: 'tsv' }
+		],
+		// Phase 3: Plasmid Analysis
+		'mob_suite': [
+			{ name: 'plasmid_report.tsv', type: 'tsv' },
+			{ name: 'chromosome.fasta', type: 'fasta' },
+			{ name: 'plasmid_AA001.fasta', type: 'fasta' },
+			{ name: 'mobtyper_results.txt', type: 'txt' }
+		],
+		'platon': [
+			{ name: 'plasmid_predictions.tsv', type: 'tsv' },
+			{ name: 'plasmid_sequences.fasta', type: 'fasta' },
+			{ name: 'chromosome_sequences.fasta', type: 'fasta' }
+		],
+		// Phase 4: Phylogenetics
+		'snippy': [
+			{ name: 'snps.vcf', type: 'vcf' },
+			{ name: 'snps.tab', type: 'tsv' },
+			{ name: 'snps.aligned.fa', type: 'fasta' },
+			{ name: 'snps.consensus.fa', type: 'fasta' }
+		],
+		'roary': [
+			{ name: 'gene_presence_absence.csv', type: 'csv' },
+			{ name: 'core_gene_alignment.aln', type: 'aln' },
+			{ name: 'summary_statistics.txt', type: 'txt' }
+		],
+		'iqtree': [
+			{ name: 'core_alignment.treefile', type: 'nwk' },
+			{ name: 'core_alignment.iqtree', type: 'txt' },
+			{ name: 'core_alignment.log', type: 'log' }
+		],
+		'gubbins': [
+			{ name: 'recombination_predictions.gff', type: 'gff' },
+			{ name: 'clean.core.aln', type: 'aln' },
+			{ name: 'clean.final_tree.tre', type: 'nwk' },
+			{ name: 'clean.summary.txt', type: 'txt' }
 		]
 	};
 
@@ -173,8 +228,14 @@
 	<!-- Top Header Bar -->
 	<div class="h-10 bg-gray-800 flex items-center justify-between px-4 border-b border-gray-700">
 		<div class="flex items-center gap-2">
-			<span class="text-green-400 font-bold text-sm">🧬 BioLearn</span>
+			<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+				<span class="text-green-400 font-bold text-sm">BioLearn</span>
+			</a>
 			<span class="text-gray-400 text-xs">| Bioinformatics Training Platform</span>
+			{#if storyline}
+				<span class="text-gray-600 text-xs">|</span>
+				<span class="text-blue-400 text-xs">{storyline.title}</span>
+			{/if}
 		</div>
 
 		<!-- Files Dropdown -->
@@ -257,13 +318,13 @@
 			class="output-panel flex-1 overflow-auto"
 			style="height: {100 - terminalHeight}%"
 		>
-			<OutputPanel data={outputData} />
+			<OutputPanel />
 		</div>
 	</div>
 
 		<!-- Right Panel: Story -->
 		<div class="w-1/2 story-panel overflow-auto">
-			<StoryPanel content={storyContent} step={currentStep} />
+			<StoryPanel {storyline} />
 		</div>
 	</div>
 </div>

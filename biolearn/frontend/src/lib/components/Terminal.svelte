@@ -105,6 +105,50 @@
 			'/data/outbreak_investigation/mlst_results': [
 				'mlst_report.tsv'
 			]
+		},
+		// Phase 3: Plasmid Analysis
+		'mob_suite': {
+			'/data/outbreak_investigation': ['mob_suite_results/'],
+			'/data/outbreak_investigation/mob_suite_results': [
+				'plasmid_report.tsv', 'chromosome.fasta', 'plasmid_AA001.fasta',
+				'mobtyper_results.txt', 'contig_report.txt'
+			]
+		},
+		'platon': {
+			'/data/outbreak_investigation': ['platon_results/'],
+			'/data/outbreak_investigation/platon_results': [
+				'plasmid_predictions.tsv', 'plasmid_sequences.fasta',
+				'chromosome_sequences.fasta', 'platon.log'
+			]
+		},
+		// Phase 4: Phylogenetics
+		'snippy': {
+			'/data/outbreak_investigation': ['snippy_results/'],
+			'/data/outbreak_investigation/snippy_results': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa',
+				'snps.consensus.fa', 'snps.log'
+			]
+		},
+		'roary': {
+			'/data/outbreak_investigation': ['roary_results/'],
+			'/data/outbreak_investigation/roary_results': [
+				'gene_presence_absence.csv', 'core_gene_alignment.aln',
+				'pan_genome_reference.fa', 'summary_statistics.txt'
+			]
+		},
+		'iqtree': {
+			'/data/outbreak_investigation': ['iqtree_results/'],
+			'/data/outbreak_investigation/iqtree_results': [
+				'core_alignment.treefile', 'core_alignment.iqtree',
+				'core_alignment.log', 'core_alignment.contree'
+			]
+		},
+		'gubbins': {
+			'/data/outbreak_investigation': ['gubbins_results/'],
+			'/data/outbreak_investigation/gubbins_results': [
+				'recombination_predictions.gff', 'clean.core.aln',
+				'clean.final_tree.tre', 'clean.summary.txt'
+			]
 		}
 	};
 
@@ -774,6 +818,387 @@ Loading assembly graph: assembly.gfa
 				files: [
 					{ name: 'mlst_report.tsv', type: 'tsv', size: '512 B' }
 				]
+			},
+			// Phase 3: Plasmid Analysis
+			'mob_suite': {
+				output: `\x1b[36mMOB-suite v3.1.4\x1b[0m
+[2024-01-15 12:00:00] INFO: Starting plasmid reconstruction
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Contigs: 2
+
+\x1b[36mRunning MOB-recon...\x1b[0m
+  Identifying plasmid-associated sequences...
+  Clustering contigs by mobility markers...
+  Reconstructing plasmid replicons...
+
+\x1b[36mRunning MOB-typer...\x1b[0m
+  Typing plasmid replicons...
+  Identifying mobility genes...
+  Detecting relaxases and mate-pair formation genes...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PLASMID RECONSTRUCTION RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Chromosome: 1 (4,892,156 bp)
+  Plasmids detected: 1
+
+  \x1b[33mPlasmid AA001:\x1b[0m
+    Size: 95,234 bp
+    Replicon type: IncFIB(K), IncFII(K)
+    Mobility: Conjugative
+    Relaxase type: MOBF
+    Mate-pair formation: MPF_F
+    Predicted host: Klebsiella/Escherichia
+
+\x1b[31m⚠ This plasmid carries AMR genes:\x1b[0m
+    - blaCTX-M-15 (ESBL)
+    - tet(A) (Tetracycline resistance)
+
+\x1b[33mNote: IncF plasmids are highly transmissible in clinical settings\x1b[0m
+`,
+				summary: {
+					'Chromosome': '1 (4.89 Mb)',
+					'Plasmids Found': '1',
+					'Plasmid Size': '95,234 bp',
+					'Replicon Type': 'IncFIB(K), IncFII(K)',
+					'Mobility': 'Conjugative',
+					'Relaxase': 'MOBF',
+					'AMR Genes on Plasmid': '2'
+				},
+				chartData: {
+					title: 'Genome Composition',
+					x: ['Chromosome', 'Plasmid AA001'],
+					y: [4892156, 95234],
+					type: 'bar',
+					xLabel: 'Replicon',
+					yLabel: 'Size (bp)'
+				},
+				files: [
+					{ name: 'plasmid_report.tsv', type: 'tsv', size: '2.1 KB' },
+					{ name: 'chromosome.fasta', type: 'fasta', size: '4.7 MB' },
+					{ name: 'plasmid_AA001.fasta', type: 'fasta', size: '92 KB' },
+					{ name: 'mobtyper_results.txt', type: 'txt', size: '1.5 KB' }
+				]
+			},
+			'platon': {
+				output: `\x1b[36mPlaton v1.6.0\x1b[0m
+[2024-01-15 12:10:00] INFO: Starting plasmid detection
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Contigs: 2
+
+\x1b[36mClassifying contigs...\x1b[0m
+  Using machine learning model: gradient boosting
+  Analyzing sequence features:
+    - Replication proteins
+    - Mobilization proteins
+    - Conjugation genes
+    - Plasmid-specific markers
+
+\x1b[36mFeature detection:\x1b[0m
+  contig_1: Chromosome markers detected
+  contig_2: Plasmid markers detected (score: 0.987)
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PLASMID DETECTION RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Classification Summary:
+    Chromosomal contigs: 1 (4,892,156 bp)
+    Plasmid contigs: 1 (95,234 bp)
+
+  \x1b[33mPlasmid contig_2:\x1b[0m
+    Confidence: 98.7%
+    Replication genes: repA, repB
+    Mobilization genes: mobA, mobC
+    Conjugation: traI, traD, traM
+
+\x1b[32m✓ High confidence plasmid prediction\x1b[0m
+`,
+				summary: {
+					'Chromosomal Contigs': '1',
+					'Plasmid Contigs': '1',
+					'Confidence': '98.7%',
+					'Replication Genes': 'repA, repB',
+					'Mobilization': 'mobA, mobC',
+					'Conjugation': 'traI, traD, traM'
+				},
+				chartData: {
+					title: 'Plasmid Prediction Confidence',
+					x: ['contig_1 (Chromosome)', 'contig_2 (Plasmid)'],
+					y: [2.3, 98.7],
+					type: 'bar',
+					xLabel: 'Contig',
+					yLabel: 'Plasmid Score (%)'
+				},
+				files: [
+					{ name: 'plasmid_predictions.tsv', type: 'tsv', size: '1.2 KB' },
+					{ name: 'plasmid_sequences.fasta', type: 'fasta', size: '92 KB' },
+					{ name: 'chromosome_sequences.fasta', type: 'fasta', size: '4.7 MB' }
+				]
+			},
+			// Phase 4: Phylogenetics
+			'snippy': {
+				output: `\x1b[36mSnippy v4.6.0\x1b[0m
+[2024-01-15 12:20:00] INFO: Starting variant calling
+
+\x1b[36mReference:\x1b[0m
+  Genome: reference.fasta (E. coli K-12 MG1655)
+  Size: 4,641,652 bp
+
+\x1b[36mReads:\x1b[0m
+  R1: sample_01_R1_paired.fq.gz
+  R2: sample_01_R2_paired.fq.gz
+
+\x1b[36mAlignment (BWA-MEM)...\x1b[0m
+  Reads mapped: 2,389,456 (99.8%)
+  Mean coverage: 77.3x
+  Median coverage: 76x
+
+\x1b[36mVariant calling (Freebayes)...\x1b[0m
+  Processing regions...
+  Calling variants...
+  Filtering low-quality variants...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  VARIANT CALLING RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Total variants: 1,247
+    SNPs: 1,189 (95.3%)
+    Insertions: 32 (2.6%)
+    Deletions: 26 (2.1%)
+
+  Variant density: 0.27 per kb
+  Transition/Transversion: 2.34
+
+  \x1b[33mCore genome SNPs: 1,156\x1b[0m
+  (used for phylogenetic analysis)
+
+\x1b[32m✓ Consensus sequence generated\x1b[0m
+`,
+				summary: {
+					'Reference': 'E. coli K-12 MG1655',
+					'Coverage': '77.3x',
+					'Total Variants': '1,247',
+					'SNPs': '1,189',
+					'Insertions': '32',
+					'Deletions': '26',
+					'Core SNPs': '1,156',
+					'Ti/Tv Ratio': '2.34'
+				},
+				chartData: {
+					title: 'Variant Types Distribution',
+					x: ['SNPs', 'Insertions', 'Deletions'],
+					y: [1189, 32, 26],
+					type: 'bar',
+					xLabel: 'Variant Type',
+					yLabel: 'Count'
+				},
+				files: [
+					{ name: 'snps.vcf', type: 'vcf', size: '156 KB' },
+					{ name: 'snps.tab', type: 'tsv', size: '89 KB' },
+					{ name: 'snps.aligned.fa', type: 'fasta', size: '4.5 MB' },
+					{ name: 'snps.consensus.fa', type: 'fasta', size: '4.5 MB' }
+				]
+			},
+			'roary': {
+				output: `\x1b[36mRoary v3.13.0\x1b[0m
+[2024-01-15 12:30:00] INFO: Starting pan-genome analysis
+
+\x1b[36mInput GFF files:\x1b[0m
+  - sample_01.gff (4,523 genes)
+  - sample_02.gff (4,498 genes)
+  - sample_03.gff (4,512 genes)
+  - reference.gff (4,489 genes)
+
+\x1b[36mClustering genes...\x1b[0m
+  Identity threshold: 95%
+  Using CD-HIT for clustering...
+  Paralog splitting enabled...
+
+\x1b[36mBuilding pan-genome...\x1b[0m
+  Identifying core genes (99-100% presence)...
+  Identifying soft-core genes (95-99%)...
+  Identifying shell genes (15-95%)...
+  Identifying cloud genes (0-15%)...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PAN-GENOME ANALYSIS RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Total genes in pan-genome: 5,234
+
+  \x1b[32mCore genes:      3,987 (76.2%)\x1b[0m
+  Soft-core genes:   312 (6.0%)
+  Shell genes:       489 (9.3%)
+  \x1b[31mCloud genes:       446 (8.5%)\x1b[0m
+
+  Core genome alignment: 3,456,789 bp
+  Informative sites: 12,345
+
+\x1b[33mTip: Core gene alignment can be used for phylogenetic analysis\x1b[0m
+`,
+				summary: {
+					'Isolates Analyzed': '4',
+					'Total Pan-genome': '5,234 genes',
+					'Core Genes': '3,987 (76.2%)',
+					'Soft-core': '312 (6.0%)',
+					'Shell': '489 (9.3%)',
+					'Cloud': '446 (8.5%)',
+					'Core Alignment': '3.46 Mb'
+				},
+				chartData: {
+					title: 'Pan-genome Composition',
+					x: ['Core', 'Soft-core', 'Shell', 'Cloud'],
+					y: [3987, 312, 489, 446],
+					type: 'bar',
+					xLabel: 'Gene Category',
+					yLabel: 'Number of Genes'
+				},
+				files: [
+					{ name: 'gene_presence_absence.csv', type: 'csv', size: '2.3 MB' },
+					{ name: 'core_gene_alignment.aln', type: 'aln', size: '3.5 MB' },
+					{ name: 'pan_genome_reference.fa', type: 'fasta', size: '5.2 MB' },
+					{ name: 'summary_statistics.txt', type: 'txt', size: '1.8 KB' }
+				]
+			},
+			'iqtree': {
+				output: `\x1b[36mIQ-TREE v2.2.0\x1b[0m
+[2024-01-15 12:45:00] INFO: Starting phylogenetic analysis
+
+\x1b[36mInput alignment:\x1b[0m
+  File: core_gene_alignment.aln
+  Sequences: 4
+  Sites: 3,456,789
+  Informative sites: 12,345
+
+\x1b[36mModel selection (ModelFinder)...\x1b[0m
+  Testing 88 DNA models...
+  Best model: GTR+F+I+G4 (BIC: 45678.234)
+
+\x1b[36mTree inference...\x1b[0m
+  Initial tree: NJ
+  Optimization: Maximum likelihood
+  Log-likelihood: -22345.678
+
+\x1b[36mBranch support (UFBoot)...\x1b[0m
+  Replicates: 1000
+  Calculating bootstrap values...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PHYLOGENETIC ANALYSIS RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Best-fit model: GTR+F+I+G4
+  Log-likelihood: -22345.678
+  Tree length: 0.0234
+
+  \x1b[33mTree topology:\x1b[0m
+  ((sample_01:0.0012,sample_02:0.0008)100:0.0045,
+   (sample_03:0.0023,reference:0.0089)98:0.0034);
+
+  Bootstrap support:
+    All nodes: ≥98%
+
+\x1b[32m✓ Phylogenetic tree saved to: core_alignment.treefile\x1b[0m
+\x1b[33mTip: Visualize tree with FigTree or iTOL\x1b[0m
+`,
+				summary: {
+					'Sequences': '4',
+					'Alignment Length': '3,456,789 bp',
+					'Best Model': 'GTR+F+I+G4',
+					'Log-likelihood': '-22345.678',
+					'Bootstrap Replicates': '1000',
+					'Min Bootstrap': '98%',
+					'Tree Format': 'Newick'
+				},
+				chartData: {
+					title: 'Branch Lengths (substitutions/site)',
+					x: ['sample_01', 'sample_02', 'sample_03', 'reference'],
+					y: [0.0012, 0.0008, 0.0023, 0.0089],
+					type: 'bar',
+					xLabel: 'Sample',
+					yLabel: 'Branch Length'
+				},
+				files: [
+					{ name: 'core_alignment.treefile', type: 'nwk', size: '256 B' },
+					{ name: 'core_alignment.iqtree', type: 'txt', size: '12 KB' },
+					{ name: 'core_alignment.log', type: 'log', size: '45 KB' }
+				]
+			},
+			'gubbins': {
+				output: `\x1b[36mGubbins v3.3.0\x1b[0m
+[2024-01-15 13:00:00] INFO: Starting recombination detection
+
+\x1b[36mInput:\x1b[0m
+  Alignment: core_gene_alignment.aln
+  Sequences: 4
+  Length: 3,456,789 bp
+
+\x1b[36mIterative recombination detection...\x1b[0m
+
+  Iteration 1:
+    Building tree (RAxML)...
+    Detecting recombination (Gubbins)...
+    Recombinant regions: 23
+    Masked sites: 45,678
+
+  Iteration 2:
+    Rebuilding tree...
+    Re-detecting recombination...
+    Recombinant regions: 21
+    Masked sites: 43,234
+
+  Iteration 3:
+    Converged! No new recombination detected.
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  RECOMBINATION ANALYSIS RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Total recombinant regions: 21
+  Total bases affected: 43,234 (1.25%)
+
+  \x1b[33mRecombination hotspots:\x1b[0m
+    - Region 1: 234,567-245,678 (11 kb) - \x1b[31mHigh density\x1b[0m
+    - Region 2: 567,890-578,901 (11 kb)
+    - Region 3: 1,234,567-1,239,012 (4.4 kb)
+    ... (18 more regions)
+
+  Clean alignment: 3,413,555 bp (98.75%)
+  SNPs after removing recombination: 10,234
+
+\x1b[32m✓ Recombination-free tree generated\x1b[0m
+\x1b[33mNote: Use clean.final_tree.tre for outbreak analysis\x1b[0m
+`,
+				summary: {
+					'Input Sequences': '4',
+					'Recombinant Regions': '21',
+					'Bases Affected': '43,234 (1.25%)',
+					'Clean Alignment': '3.41 Mb',
+					'SNPs (clean)': '10,234',
+					'Iterations': '3',
+					'Status': 'Converged'
+				},
+				chartData: {
+					title: 'Recombination Impact',
+					x: ['Original Sites', 'Recombinant Sites', 'Clean Sites'],
+					y: [3456789, 43234, 3413555],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'Base Pairs'
+				},
+				files: [
+					{ name: 'recombination_predictions.gff', type: 'gff', size: '8.5 KB' },
+					{ name: 'clean.core.aln', type: 'aln', size: '3.4 MB' },
+					{ name: 'clean.final_tree.tre', type: 'nwk', size: '312 B' },
+					{ name: 'clean.summary.txt', type: 'txt', size: '2.1 KB' }
+				]
 			}
 		};
 
@@ -1058,7 +1483,15 @@ Loading assembly graph: assembly.gfa
 		'checkm': ['assembly/'],
 		'confindr': ['assembly/assembly.fasta'],
 		'bakta': ['assembly/assembly.fasta'],
-		'mlst': ['assembly/assembly.fasta']
+		'mlst': ['assembly/assembly.fasta'],
+		// Phase 3: Plasmid Analysis
+		'mob_suite': ['assembly/assembly.fasta'],
+		'platon': ['assembly/assembly.fasta'],
+		// Phase 4: Phylogenetics
+		'snippy': ['trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'],
+		'roary': ['annotation/'],
+		'iqtree': ['roary_results/core_gene_alignment.aln'],
+		'gubbins': ['roary_results/core_gene_alignment.aln']
 	};
 
 	// Tool requirements: directory
@@ -1074,7 +1507,15 @@ Loading assembly graph: assembly.gfa
 		'checkm': { dir: '/data/outbreak_investigation' },
 		'confindr': { dir: '/data/outbreak_investigation' },
 		'bakta': { dir: '/data/outbreak_investigation' },
-		'mlst': { dir: '/data/outbreak_investigation' }
+		'mlst': { dir: '/data/outbreak_investigation' },
+		// Phase 3
+		'mob_suite': { dir: '/data/outbreak_investigation' },
+		'platon': { dir: '/data/outbreak_investigation' },
+		// Phase 4
+		'snippy': { dir: '/data/outbreak_investigation' },
+		'roary': { dir: '/data/outbreak_investigation' },
+		'iqtree': { dir: '/data/outbreak_investigation' },
+		'gubbins': { dir: '/data/outbreak_investigation' }
 	};
 
 	// Check if file is valid for a tool
@@ -1530,6 +1971,175 @@ Loading assembly graph: assembly.gfa
 				}
 			}
 
+			// Phase 3: Plasmid Analysis
+			if (command === 'mob_suite') {
+				// MOB-suite: mob_recon -i assembly/assembly.fasta -o mob_suite_results/
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: mob_recon -i assembly/assembly.fasta -o mob_suite_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('mob_suite', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for mob_suite\x1b[0m`);
+					terminal.writeln(`\x1b[90mMOB-suite requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -o mob_suite_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'mob_suite_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: mob_suite_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'platon') {
+				// Platon: platon assembly/assembly.fasta --output platon_results/
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: platon assembly/assembly.fasta --output platon_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('platon', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for platon\x1b[0m`);
+					terminal.writeln(`\x1b[90mPlaton requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--output') && !args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --output platon_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'platon_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: platon_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			// Phase 4: Phylogenetics
+			if (command === 'snippy') {
+				// Snippy: snippy --ref reference.fasta --R1 trimmed/sample_01_R1_paired.fq.gz --R2 trimmed/sample_01_R2_paired.fq.gz --outdir snippy_results/
+				if (!args.includes('--ref')) {
+					terminal.writeln(`\x1b[31mError: Missing reference file (--ref flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: snippy --ref reference.fasta --R1 R1.fq.gz --R2 R2.fq.gz --outdir snippy_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--R1') || !args.includes('--R2')) {
+					terminal.writeln(`\x1b[31mError: Missing read files (--R1 and --R2 flags)\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: snippy --ref reference.fasta --R1 trimmed/sample_01_R1_paired.fq.gz --R2 trimmed/sample_01_R2_paired.fq.gz --outdir snippy_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--outdir')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --outdir snippy_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.indexOf('--outdir');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'snippy_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: snippy_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'roary') {
+				// Roary: roary -f roary_results/ annotation/*.gff
+				if (!args.includes('-f')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-f flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: roary -f roary_results/ annotation/*.gff\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const gffFiles = args.filter(a => a.endsWith('.gff') || a.includes('*.gff'));
+				if (gffFiles.length === 0) {
+					terminal.writeln(`\x1b[31mError: Missing GFF annotation files\x1b[0m`);
+					terminal.writeln(`\x1b[90mRoary requires GFF files from prokka annotation\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: roary -f roary_results/ annotation/*.gff\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const fIdx = args.indexOf('-f');
+				const outDir = args[fIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'roary_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[fIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: roary_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'iqtree') {
+				// IQ-TREE: iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 --prefix iqtree_results/core_alignment
+				if (!args.includes('-s')) {
+					terminal.writeln(`\x1b[31mError: Missing alignment file (-s flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: iqtree -s roary_results/core_gene_alignment.aln --prefix iqtree_results/core_alignment\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const sIdx = args.indexOf('-s');
+				const alnFile = args[sIdx + 1];
+				if (!alnFile || !alnFile.endsWith('.aln')) {
+					terminal.writeln(`\x1b[31mError: Invalid or missing alignment file\x1b[0m`);
+					terminal.writeln(`\x1b[90mIQ-TREE requires: roary_results/core_gene_alignment.aln\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--prefix')) {
+					terminal.writeln(`\x1b[31mError: Missing output prefix (--prefix flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --prefix iqtree_results/core_alignment\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'gubbins') {
+				// Gubbins: run_gubbins.py roary_results/core_gene_alignment.aln --prefix gubbins_results/clean
+				const alnFile = args.find(a => a.endsWith('.aln'));
+				if (!alnFile) {
+					terminal.writeln(`\x1b[31mError: Missing alignment file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: run_gubbins.py roary_results/core_gene_alignment.aln --prefix gubbins_results/clean\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--prefix')) {
+					terminal.writeln(`\x1b[31mError: Missing output prefix (--prefix flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --prefix gubbins_results/clean\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const pIdx = args.indexOf('--prefix');
+				const prefix = args[pIdx + 1];
+				if (!prefix || !prefix.startsWith('gubbins_results/')) {
+					terminal.writeln(`\x1b[31mError: Invalid output prefix '${prefix || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: gubbins_results/clean\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
 			await executeBioTool(command, args, cmd);
 			return;
 		}
@@ -1572,6 +2182,16 @@ Loading assembly graph: assembly.gfa
 		terminal.writeln('  \x1b[32mbakta\x1b[0m           Gene annotation (~1-2min)');
 		terminal.writeln('  \x1b[32mabricate\x1b[0m        AMR screening (~10s)');
 		terminal.writeln('  \x1b[32mmlst\x1b[0m            Sequence typing (~5s)');
+		terminal.writeln('');
+		terminal.writeln('  \x1b[1;33mPhase 3 - Plasmid Analysis:\x1b[0m');
+		terminal.writeln('  \x1b[32mmob_suite\x1b[0m       Plasmid reconstruction (~30s)');
+		terminal.writeln('  \x1b[32mplaton\x1b[0m          Plasmid detection (~20s)');
+		terminal.writeln('');
+		terminal.writeln('  \x1b[1;33mPhase 4 - Phylogenetics:\x1b[0m');
+		terminal.writeln('  \x1b[32msnippy\x1b[0m          Variant calling (~1min)');
+		terminal.writeln('  \x1b[32mroary\x1b[0m           Pan-genome analysis (~2-4min)');
+		terminal.writeln('  \x1b[32miqtree\x1b[0m          Phylogenetic tree (~1-3min)');
+		terminal.writeln('  \x1b[32mgubbins\x1b[0m         Recombination detection (~2-5min)');
 		terminal.writeln('');
 		terminal.writeln('\x1b[1;36mKeyboard Shortcuts:\x1b[0m');
 		terminal.writeln('');

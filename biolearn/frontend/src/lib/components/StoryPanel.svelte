@@ -1,29 +1,20 @@
 <script lang="ts">
 	import { executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
+	import type { Storyline, StorylineSection } from '$lib/storylines/wgs-bacteria';
+
+	let { storyline = null }: { storyline?: Storyline | null } = $props();
 
 	let currentStep = $state(0);
 	let completedSteps = $state<Set<number>>(new Set());
 	let userCurrentDir = $state('/data/outbreak_investigation');
 
-	// Subscribe to current directory
-	currentDirectory.subscribe(dir => {
-		userCurrentDir = dir;
-	});
-
-	// Subscribe to executed commands to track step completion
-	executedCommands.subscribe(cmds => {
-		// Map commands to steps
-		if (cmds.includes('fastqc')) completedSteps.add(2);
-		if (cmds.includes('trimmomatic')) completedSteps.add(3);
-		if (cmds.includes('unicycler')) completedSteps.add(4);
-		if (cmds.includes('bandage')) completedSteps.add(5);
-		completedSteps = new Set(completedSteps);
-	});
-
-	// Brief narrative content
-	const sampleNarrative = {
+	// Default storyline if none provided
+	const defaultStoryline: Storyline = {
+		id: 'default',
 		title: 'Hospital Outbreak Investigation',
 		subtitle: 'WGS Analysis Pipeline',
+		phase: 'Phase 1: Quality Control',
+		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{
 				type: 'intro',
@@ -93,8 +84,39 @@
 		]
 	};
 
+	// Use provided storyline or default
+	const activeStoryline = $derived(storyline ?? defaultStoryline);
+
+	// Subscribe to current directory
+	currentDirectory.subscribe(dir => {
+		userCurrentDir = dir;
+	});
+
+	// Subscribe to executed commands to track step completion
+	executedCommands.subscribe(cmds => {
+		// Map commands to steps based on task index
+		activeStoryline.sections.forEach((section, index) => {
+			if (section.type === 'task' && section.command) {
+				// Extract tool name from command
+				const toolName = section.command.split(' ')[0];
+				const altToolName = section.command.split(' ')[0].replace('_', '-');
+				if (cmds.includes(toolName) || cmds.includes(altToolName)) {
+					completedSteps.add(index);
+				}
+				// Also check for specific tools
+				if (section.command.includes('mob_recon') && cmds.includes('mob_suite')) {
+					completedSteps.add(index);
+				}
+				if (section.command.includes('run_gubbins') && cmds.includes('gubbins')) {
+					completedSteps.add(index);
+				}
+			}
+		});
+		completedSteps = new Set(completedSteps);
+	});
+
 	// Check if user is in the correct directory for a task
-	function isInCorrectDir(requiredDir: string | null): boolean {
+	function isInCorrectDir(requiredDir: string | null | undefined): boolean {
 		if (!requiredDir) return true;
 		return userCurrentDir === requiredDir;
 	}
@@ -115,7 +137,7 @@
 
 	function nextStep() {
 		const nextIdx = currentStep + 1;
-		if (nextIdx < sampleNarrative.sections.length && canProceed(nextIdx)) {
+		if (nextIdx < activeStoryline.sections.length && canProceed(nextIdx)) {
 			currentStep = nextIdx;
 		}
 	}
@@ -141,30 +163,36 @@
 				WGS Analysis
 			</span>
 			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium">
-				Phase 1: Quality Control
+				{activeStoryline.phase}
 			</span>
 		</div>
-		<h1 class="text-2xl font-bold">{sampleNarrative.title}</h1>
-		<p class="text-blue-100 mt-1">{sampleNarrative.subtitle}</p>
+		<h1 class="text-2xl font-bold">{activeStoryline.title}</h1>
+		<p class="text-blue-100 mt-1">{activeStoryline.subtitle}</p>
 	</div>
 
 	<!-- Progress Bar -->
 	<div class="bg-gray-100 px-6 py-3 border-b border-gray-200">
 		<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
 			<span>Progress</span>
-			<span>Step {currentStep + 1} of {sampleNarrative.sections.length}</span>
+			<span>Step {currentStep + 1} of {activeStoryline.sections.length}</span>
 		</div>
 		<div class="w-full bg-gray-200 rounded-full h-2">
 			<div
 				class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-				style="width: {((currentStep + 1) / sampleNarrative.sections.length) * 100}%"
+				style="width: {((currentStep + 1) / activeStoryline.sections.length) * 100}%"
 			></div>
+		</div>
+		<!-- Tools used -->
+		<div class="mt-2 flex flex-wrap gap-1">
+			{#each activeStoryline.toolsUsed as tool}
+				<span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">{tool}</span>
+			{/each}
 		</div>
 	</div>
 
 	<!-- Content -->
 	<div class="flex-1 overflow-auto p-6">
-		{#each sampleNarrative.sections as section, i}
+		{#each activeStoryline.sections as section, i}
 			{#if i <= currentStep}
 				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep}>
 					{#if section.type === 'intro'}
@@ -179,10 +207,10 @@
 						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" class:border-green-400={completedSteps.has(i)} class:bg-green-50={completedSteps.has(i)}>
 							<div class="flex items-center justify-between mb-2">
 								{#if section.title}
-									<h3 class="font-semibold text-gray-800">📋 {section.title}</h3>
+									<h3 class="font-semibold text-gray-800">{section.title}</h3>
 								{/if}
 								{#if completedSteps.has(i)}
-									<span class="text-green-600 text-sm font-medium">✓ Completed</span>
+									<span class="text-green-600 text-sm font-medium">Completed</span>
 								{/if}
 							</div>
 							<p class="text-gray-700 mb-3">{section.text}</p>
@@ -192,7 +220,7 @@
 								{#if section.requiredDir && !isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
 									<div class="bg-amber-50 border border-amber-300 rounded p-3 mb-3">
 										<div class="flex items-start gap-2">
-											<span class="text-amber-500">⚠️</span>
+											<span class="text-amber-500">Warning</span>
 											<div class="flex-1">
 												<p class="text-amber-800 text-sm font-medium">Wrong directory</p>
 												<p class="text-amber-700 text-sm">
@@ -207,7 +235,7 @@
 									</div>
 								{:else if section.requiredDir && isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
 									<div class="flex items-center gap-2 text-green-600 text-sm mb-2">
-										<span>✓</span>
+										<span>OK</span>
 										<span>You are in the correct directory (~)</span>
 									</div>
 								{/if}
@@ -233,7 +261,7 @@
 
 								{#if section.explanation}
 									<p class="text-gray-500 text-sm italic">
-										ℹ️ {section.explanation}
+										Info: {section.explanation}
 									</p>
 								{/if}
 							{/if}
@@ -244,9 +272,9 @@
 		{/each}
 
 		<!-- Next step locked message -->
-		{#if currentStep < sampleNarrative.sections.length - 1 && !canProceed(currentStep + 1)}
+		{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1)}
 			<div class="text-center py-4 text-gray-500 border-t border-dashed">
-				<span class="text-lg">🔒</span>
+				<span class="text-lg">Locked</span>
 				<p class="text-sm mt-1">Execute the current command to unlock the next step</p>
 			</div>
 		{/if}
@@ -259,10 +287,10 @@
 			disabled={currentStep === 0}
 			onclick={prevStep}
 		>
-			← Previous
+			Previous
 		</button>
 		<div class="flex gap-2">
-			{#each sampleNarrative.sections as _, i}
+			{#each activeStoryline.sections as _, i}
 				<button
 					class="w-3 h-3 rounded-full transition-colors"
 					class:bg-blue-600={i <= currentStep && canProceed(i)}
@@ -279,13 +307,13 @@
 		</div>
 		<button
 			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-			disabled={currentStep >= sampleNarrative.sections.length - 1 || !canProceed(currentStep + 1)}
+			disabled={currentStep >= activeStoryline.sections.length - 1 || !canProceed(currentStep + 1)}
 			onclick={nextStep}
 		>
-			{#if currentStep < sampleNarrative.sections.length - 1 && !canProceed(currentStep + 1)}
-				🔒 Next
+			{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1)}
+				Locked
 			{:else}
-				Next →
+				Next
 			{/if}
 		</button>
 	</div>
