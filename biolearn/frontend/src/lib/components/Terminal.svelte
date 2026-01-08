@@ -699,6 +699,135 @@ Loading assembly graph: assembly.gfa
 		}
 	}
 
+	// File contents for different file types
+	const fileContents: Record<string, string> = {
+		// FASTQ files
+		'.fastq.gz': `\x1b[90m[Compressed file - showing first reads]\x1b[0m
+@M00123:45:000000000-ABC12:1:1101:15234:1000 1:N:0:1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15235:1001 1:N:0:1
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15236:1002 1:N:0:1
+TACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+...`,
+		'.fq.gz': `\x1b[90m[Compressed file - showing first reads]\x1b[0m
+@M00123:45:000000000-ABC12:1:1101:15234:1000 1:N:0:1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+...`,
+		// FASTA assembly
+		'assembly.fasta': `>chromosome_1 length=4892156 circular=true
+ATGAAACGCATTAGCACCACCATTACCACCACCATCACCATTACCACAGGTAACGGTGCGGGCTGA
+CGCGTACAGGAAACACAGAAAAAAGCCCGCACCTGACAGTGCGGGCTTTTTTTTTCGACCAAAGGT
+AACGAGGTAACAACCATGCGAGTGTTGAAGTTCGGCGGTACATCAGTGGCAAATGCAGAACGTTTT
+CTGCGTGTTGCCGATATTCTGGAAAGCAATGCCAGGCAGGGGCAGGTGGCCACCGTCCTCTCTGCC
+CCCGCCAAAATCACCAACCACCTGGTGGCGATGATTGAAAAAACCATTAGCGGCCAGGATGCTTTAC
+CCAATATCAGCGATGCCGAACGTATTTTTGCCGAACTTTTGACGGGACTCGCCGCCGCCCAGCCGG
+GGTTCCCGCTGGCGCAATTGAAAACTTTCGTCGATCAGGAATTTGCCCAAATAAAACATGTCCTGC
+ATGGCATTAGTTTGTTGGGGCAGTGCCCGGATAGCATCAACGCTGCGCTGATTTGCCGTGGCGAGA
+AAATGTCGATCGCCATTATGGCCGGCGTATTAGAAGCGCGCGGTCACAACGTTACTGTTATCGATC
+CGGTTGATTTCAGAGCTGCCCATGTTTGCGATGGCGGCATGTTTGTTGATGAAACGCGCGAATCGA
+...`,
+		// GFA assembly graph
+		'assembly.gfa': `H	VN:Z:1.0
+S	1	ATGAAACGCATTAGCACCACCATTACCACCACCATCACCATTACCACAGGT
+S	2	AACGGTGCGGGCTGACGCGTACAGGAAACACAGAAAAAAGCCCGCACCTGA
+S	3	CAGTGCGGGCTTTTTTTTTCGACCAAAGGTAACGAGGTAACAACCATGCGA
+S	4	GTGTTGAAGTTCGGCGGTACATCAGTGGCAAATGCAGAACGTTTTCTGCGT
+L	1	+	2	+	45M
+L	2	+	3	+	45M
+L	3	+	4	+	45M
+L	4	+	1	+	45M
+P	chromosome	1+,2+,3+,4+	45M,45M,45M
+...`,
+		// Unicycler log
+		'unicycler.log': `
+Unicycler v0.5.0
+Command: unicycler -1 sample_01_R1_paired.fq.gz -2 sample_01_R2_paired.fq.gz -o assembly/
+
+2024-01-15 10:23:45 - Starting Unicycler
+2024-01-15 10:23:45 - Checking dependencies
+2024-01-15 10:23:46 - SPAdes version: 3.15.5
+2024-01-15 10:23:46 - Racon version: 1.5.0
+2024-01-15 10:23:47 - Loading reads
+2024-01-15 10:23:52 - Read count: 2,394,012 pairs
+2024-01-15 10:24:15 - Running SPAdes assembly
+2024-01-15 10:35:23 - SPAdes assembly complete
+...`,
+		// FastQC HTML (simplified)
+		'_fastqc.html': `<!DOCTYPE html>
+<html>
+<head><title>FastQC Report</title></head>
+<body>
+<h1>FastQC Report - sample_01_R1</h1>
+<h2>Basic Statistics</h2>
+<table>
+  <tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+  <tr><td>Total Sequences</td><td>2,456,789</td></tr>
+  <tr><td>Sequence length</td><td>150</td></tr>
+  <tr><td>%GC</td><td>52</td></tr>
+</table>
+...`,
+		// TSV report
+		'.tsv': `#Sample	Total_Reads	Mapped_Reads	Coverage	GC_Content
+sample_01	2456789	2394012	97.44	52.3
+sample_02	2489123	2421456	97.28	51.9
+sample_03	2512456	2445678	97.34	52.1
+...`,
+		// GFF annotation
+		'.gff': `##gff-version 3
+##sequence-region chromosome_1 1 4892156
+chromosome_1	Prokka	gene	1	1350	.	+	.	ID=gene_0001;Name=dnaA
+chromosome_1	Prokka	CDS	1	1350	.	+	0	ID=CDS_0001;Parent=gene_0001;product=Chromosomal replication initiator protein DnaA
+chromosome_1	Prokka	gene	1524	2624	.	+	.	ID=gene_0002;Name=dnaN
+chromosome_1	Prokka	CDS	1524	2624	.	+	0	ID=CDS_0002;Parent=gene_0002;product=Beta sliding clamp
+chromosome_1	Prokka	gene	2801	3901	.	+	.	ID=gene_0003;Name=recF
+chromosome_1	Prokka	CDS	2801	3901	.	+	0	ID=CDS_0003;Parent=gene_0003;product=DNA replication and repair protein RecF
+chromosome_1	Prokka	gene	3978	6311	.	+	.	ID=gene_0004;Name=gyrB
+chromosome_1	Prokka	CDS	3978	6311	.	+	0	ID=CDS_0004;Parent=gene_0004;product=DNA gyrase subunit B
+...`,
+		// GenBank format
+		'.gbk': `LOCUS       chromosome_1         4892156 bp    DNA     circular BCT 15-JAN-2024
+DEFINITION  Klebsiella pneumoniae strain sample_01 chromosome, complete genome.
+ACCESSION   CP000001
+VERSION     CP000001.1
+KEYWORDS    .
+SOURCE      Klebsiella pneumoniae
+  ORGANISM  Klebsiella pneumoniae
+            Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;
+            Enterobacteriaceae; Klebsiella.
+FEATURES             Location/Qualifiers
+     source          1..4892156
+                     /organism="Klebsiella pneumoniae"
+                     /mol_type="genomic DNA"
+                     /strain="sample_01"
+...`,
+		// AMR report
+		'amr_report.tsv': `#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
+sample_01	chromosome	123456	124789	+	blaSHV-11	100.00	99.89	CARD	ARO:3000839	SHV-11 beta-lactamase	ampicillin;amoxicillin
+sample_01	chromosome	234567	235890	+	oqxA	100.00	98.76	CARD	ARO:3002999	multidrug efflux pump	quinolone
+sample_01	plasmid_1	12345	14567	+	blaCTX-M-15	100.00	100.00	CARD	ARO:3000096	CTX-M-15 extended-spectrum beta-lactamase	cefotaxime;ceftazidime
+...`,
+		// Default text file
+		'.txt': `Analysis Summary
+================
+Sample: sample_01
+Date: 2024-01-15
+Status: Complete
+
+Quality metrics passed all thresholds.
+Assembly completed successfully.
+Annotation identified 4,523 coding sequences.
+...`
+	};
+
 	function handleFileView(cmd: string, args: string[]) {
 		if (args.length === 0) {
 			terminal.writeln(`\x1b[31m${cmd}: missing file operand\x1b[0m`);
@@ -706,14 +835,100 @@ Loading assembly graph: assembly.gfa
 		}
 
 		const filename = args[0];
-		if (filename.endsWith('.fastq.gz') || filename.endsWith('.fq.gz')) {
-			terminal.writeln(`\x1b[90m[Binary file - showing first reads]\x1b[0m`);
-			terminal.writeln(`@M00123:45:000000000-ABC12:1:1101:15234:1000 1:N:0:1`);
-			terminal.writeln(`ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG...`);
-			terminal.writeln(`+`);
-			terminal.writeln(`FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...`);
+		const filesystem = getFilesystem();
+
+		// Resolve the path
+		let fullPath: string;
+		let dirPath: string;
+		let baseName: string;
+
+		if (filename.includes('/')) {
+			// Path includes directory
+			const parts = filename.split('/');
+			baseName = parts.pop() || '';
+			const relativeDirPath = parts.join('/');
+			dirPath = relativeDirPath.startsWith('/')
+				? relativeDirPath
+				: `${currentDir}/${relativeDirPath}`.replace(/\/+/g, '/');
+			fullPath = `${dirPath}/${baseName}`;
 		} else {
-			terminal.writeln(`\x1b[31m${cmd}: ${filename}: No such file\x1b[0m`);
+			baseName = filename;
+			dirPath = currentDir;
+			fullPath = `${currentDir}/${filename}`;
+		}
+
+		// Check if file exists in filesystem
+		const filesInDir = filesystem[dirPath] || [];
+		const fileExists = filesInDir.some(f => f === baseName || f === baseName + '/');
+
+		if (!fileExists) {
+			terminal.writeln(`\x1b[31m${cmd}: ${filename}: No such file or directory\x1b[0m`);
+			return;
+		}
+
+		// Check if it's a directory
+		if (filesInDir.includes(baseName + '/')) {
+			terminal.writeln(`\x1b[31m${cmd}: ${filename}: Is a directory\x1b[0m`);
+			return;
+		}
+
+		// Get file content based on extension or name
+		let content: string | null = null;
+
+		// Check for exact filename matches first
+		for (const [key, value] of Object.entries(fileContents)) {
+			if (baseName === key || baseName.endsWith(key)) {
+				content = value;
+				break;
+			}
+		}
+
+		// If no match, try extension
+		if (!content) {
+			const ext = '.' + baseName.split('.').pop();
+			content = fileContents[ext] || null;
+		}
+
+		// Special handling for specific file types
+		if (!content) {
+			if (baseName.endsWith('.fastq.gz') || baseName.endsWith('.fq.gz')) {
+				content = fileContents['.fastq.gz'];
+			} else if (baseName.endsWith('.fasta') || baseName.endsWith('.fna') || baseName.endsWith('.faa') || baseName.endsWith('.ffn')) {
+				content = fileContents['assembly.fasta'];
+			} else if (baseName.endsWith('.gfa')) {
+				content = fileContents['assembly.gfa'];
+			} else if (baseName.endsWith('.log')) {
+				content = fileContents['unicycler.log'];
+			} else if (baseName.endsWith('.html')) {
+				content = fileContents['_fastqc.html'];
+			} else if (baseName.endsWith('.tsv')) {
+				content = fileContents['.tsv'];
+			} else if (baseName.endsWith('.gff')) {
+				content = fileContents['.gff'];
+			} else if (baseName.endsWith('.gbk')) {
+				content = fileContents['.gbk'];
+			} else if (baseName.endsWith('.png') || baseName.endsWith('.svg')) {
+				terminal.writeln(`\x1b[90m[Binary image file - cannot display in terminal]\x1b[0m`);
+				terminal.writeln(`\x1b[90mFile: ${baseName}\x1b[0m`);
+				return;
+			} else if (baseName.endsWith('.zip')) {
+				terminal.writeln(`\x1b[90m[Compressed archive - cannot display in terminal]\x1b[0m`);
+				terminal.writeln(`\x1b[90mFile: ${baseName}\x1b[0m`);
+				return;
+			} else {
+				content = fileContents['.txt'];
+			}
+		}
+
+		// Display the content
+		if (content) {
+			const lines = content.split('\n');
+			const maxLines = cmd === 'head' ? 10 : (cmd === 'tail' ? 10 : lines.length);
+			const startLine = cmd === 'tail' ? Math.max(0, lines.length - maxLines) : 0;
+
+			for (let i = startLine; i < Math.min(startLine + maxLines, lines.length); i++) {
+				terminal.writeln(lines[i]);
+			}
 		}
 	}
 
