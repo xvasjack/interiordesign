@@ -505,14 +505,18 @@ Loading assembly graph: assembly.gfa
 				terminal.write('\x1b[C');  // Move cursor right
 			}
 		}
-		// Regular characters
-		else if (data >= ' ') {
-			// Insert character at cursor position
-			commandBuffer = commandBuffer.slice(0, cursorPosition) + data + commandBuffer.slice(cursorPosition);
-			cursorPosition++;
-			// Write from cursor position to end
-			terminal.write(commandBuffer.slice(cursorPosition - 1));
-			// Move cursor back to position
+		// Regular characters (handles both single chars and paste)
+		else if (data >= ' ' || data.length > 1) {
+			// Filter out control characters for pasted text
+			const cleanData = data.split('').filter(c => c >= ' ' || c === '\t').join('');
+			if (cleanData.length === 0) return;
+
+			// Insert characters at cursor position
+			commandBuffer = commandBuffer.slice(0, cursorPosition) + cleanData + commandBuffer.slice(cursorPosition);
+			cursorPosition += cleanData.length;
+			// Write from old cursor position to end
+			terminal.write(commandBuffer.slice(cursorPosition - cleanData.length));
+			// Move cursor back to correct position
 			for (let i = 0; i < commandBuffer.length - cursorPosition; i++) {
 				terminal.write('\b');
 			}
