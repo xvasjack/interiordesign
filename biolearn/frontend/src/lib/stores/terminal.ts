@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 
 // Types
 export interface OutputData {
@@ -17,6 +17,12 @@ export interface TerminalState {
 	estimatedTime: number;
 }
 
+export interface FileNote {
+	name: string;
+	description: string;
+	format?: string;
+}
+
 // Output panel data - starts empty
 export const outputData = writable<OutputData | null>(null);
 
@@ -28,8 +34,88 @@ export const terminalState = writable<TerminalState>({
 	estimatedTime: 0
 });
 
+// Track executed commands for dynamic filesystem
+export const executedCommands = writable<string[]>([]);
+
+// Track current step in story (for hiding next steps)
+export const currentStoryStep = writable<number>(0);
+export const executedSteps = writable<Set<number>>(new Set());
+
 // Command history
 export const commandHistory = writable<string[]>([]);
+
+// File notes/descriptions for Notes tab
+export const fileNotes: Record<string, FileNote[]> = {
+	'fastqc': [
+		{
+			name: 'FASTQ Format',
+			description: 'FASTQ files contain 4 lines per read: @header, sequence, +, quality scores (Phred+33 encoded)',
+			format: '.fastq.gz'
+		},
+		{
+			name: 'Quality Scores',
+			description: 'Phred scores (Q) indicate base call accuracy: Q30 = 99.9% accuracy, Q20 = 99% accuracy',
+		},
+		{
+			name: 'FastQC Report',
+			description: 'HTML report showing per-base quality, GC content, adapter contamination, and sequence duplication levels',
+			format: '.html'
+		}
+	],
+	'trimmomatic': [
+		{
+			name: 'Adapter Trimming',
+			description: 'Removes Illumina adapter sequences that can interfere with downstream analysis',
+		},
+		{
+			name: 'Quality Trimming',
+			description: 'SLIDINGWINDOW:4:15 means scan with 4bp window, cut when average quality < 15',
+		},
+		{
+			name: 'Paired Output',
+			description: 'Both R1 and R2 must survive trimming to be in "paired" output files',
+			format: '_paired.fq.gz'
+		}
+	],
+	'unicycler': [
+		{
+			name: 'Assembly Graph',
+			description: 'GFA file shows connections between contigs - useful for visualizing repeat regions',
+			format: '.gfa'
+		},
+		{
+			name: 'Contigs vs Scaffolds',
+			description: 'Contigs are contiguous sequences. Unicycler can circularize bacterial chromosomes and plasmids',
+			format: '.fasta'
+		},
+		{
+			name: 'N50 Metric',
+			description: 'N50 is the length such that 50% of the assembly is in contigs of this length or longer',
+		}
+	],
+	'prokka': [
+		{
+			name: 'GFF3 Annotation',
+			description: 'Standard format for genomic features including genes, CDS, rRNA, and tRNA',
+			format: '.gff'
+		},
+		{
+			name: 'GenBank Format',
+			description: 'Contains sequence + annotations, viewable in tools like Artemis or SnapGene',
+			format: '.gbk'
+		}
+	],
+	'abricate': [
+		{
+			name: 'AMR Genes',
+			description: 'Identifies antimicrobial resistance genes by searching against databases like CARD, ResFinder',
+		},
+		{
+			name: 'Coverage & Identity',
+			description: 'Higher % coverage and identity = more confident match to known resistance gene',
+		}
+	]
+};
 
 // Tool execution times (in seconds) - realistic estimates
 export const toolExecutionTimes: Record<string, { min: number; max: number }> = {

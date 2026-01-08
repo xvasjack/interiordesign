@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { outputData, terminalState } from '$lib/stores/terminal';
+	import { outputData, terminalState, fileNotes } from '$lib/stores/terminal';
 
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
@@ -8,6 +8,7 @@
 	let isLoading = $state(false);
 	let loadingProgress = $state(0);
 	let loadingTool = $state('');
+	let currentNotes = $state<any[]>([]);
 
 	// Subscribe to stores
 	onMount(() => {
@@ -15,6 +16,12 @@
 			currentOutput = data;
 			if (data && data.chartData) {
 				setTimeout(() => renderChart(data), 100);
+			}
+			// Update notes for the current tool
+			if (data?.type) {
+				currentNotes = fileNotes[data.type] || [];
+			} else {
+				currentNotes = [];
 			}
 		});
 
@@ -29,6 +36,28 @@
 			unsubTerminal();
 		};
 	});
+
+	function viewFile(file: any) {
+		// For HTML files, show in a new window or modal
+		if (file.type === 'html') {
+			alert(`Viewing ${file.name}\n\nIn a real application, this would open the HTML report in a new tab or modal.`);
+		} else {
+			alert(`Preview not available for ${file.type.toUpperCase()} files.\n\nIn a real application, this would show a preview or text content.`);
+		}
+	}
+
+	function downloadFile(file: any) {
+		// Simulate download
+		const blob = new Blob([`Simulated content for ${file.name}`], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = file.name;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
 
 	async function renderChart(data: any) {
 		if (!plotContainer || !data?.chartData) return;
@@ -92,6 +121,16 @@
 			onclick={() => (activeTab = 'files')}
 		>
 			📁 Files
+		</button>
+		<button
+			class="px-4 py-2 text-sm font-medium transition-colors"
+			class:text-blue-600={activeTab === 'notes'}
+			class:border-b-2={activeTab === 'notes'}
+			class:border-blue-600={activeTab === 'notes'}
+			class:text-gray-600={activeTab !== 'notes'}
+			onclick={() => (activeTab = 'notes')}
+		>
+			📝 Notes
 		</button>
 	</div>
 
@@ -173,9 +212,22 @@
 										<p class="text-sm text-gray-500">{file.type.toUpperCase()} • {file.size}</p>
 									</div>
 								</div>
-								<button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-									{file.type === 'html' ? 'View' : 'Download'}
-								</button>
+								<div class="flex gap-2">
+									{#if file.type === 'html'}
+										<button
+											class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded text-sm font-medium transition-colors"
+											onclick={() => viewFile(file)}
+										>
+											View
+										</button>
+									{/if}
+									<button
+										class="px-3 py-1 text-green-600 hover:bg-green-50 rounded text-sm font-medium transition-colors"
+										onclick={() => downloadFile(file)}
+									>
+										Download
+									</button>
+								</div>
 							</li>
 						{/each}
 					</ul>
@@ -183,6 +235,38 @@
 			{:else}
 				<div class="h-full flex items-center justify-center text-gray-400">
 					<p>No files generated</p>
+				</div>
+			{/if}
+		{:else if activeTab === 'notes'}
+			{#if currentNotes.length > 0}
+				<div class="bg-white rounded-lg shadow-sm border">
+					<div class="px-4 py-3 border-b">
+						<h3 class="font-semibold text-gray-800">File Format Notes</h3>
+						<p class="text-sm text-gray-500">Helpful information about the files and formats</p>
+					</div>
+					<ul class="divide-y">
+						{#each currentNotes as note}
+							<li class="px-4 py-3">
+								<div class="flex items-start gap-3">
+									<span class="text-blue-500 mt-0.5">💡</span>
+									<div>
+										<p class="font-medium text-gray-800">{note.name}</p>
+										{#if note.format}
+											<span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded mb-1">{note.format}</span>
+										{/if}
+										<p class="text-sm text-gray-600">{note.description}</p>
+									</div>
+								</div>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{:else}
+				<div class="h-full flex items-center justify-center text-gray-400">
+					<div class="text-center">
+						<p class="mb-2">No notes available</p>
+						<p class="text-sm">Run a bioinformatics tool to see file format notes</p>
+					</div>
 				</div>
 			{/if}
 		{/if}

@@ -1,48 +1,86 @@
 <script lang="ts">
-	let currentStep = $state(0);
+	import { executedCommands, executedSteps } from '$lib/stores/terminal';
 
-	// Sample narrative content for demonstration
+	let currentStep = $state(0);
+	let completedSteps = $state<Set<number>>(new Set());
+
+	// Subscribe to executed commands to track step completion
+	executedCommands.subscribe(cmds => {
+		// Map commands to steps
+		if (cmds.includes('fastqc')) completedSteps.add(2);
+		if (cmds.includes('trimmomatic')) completedSteps.add(3);
+		if (cmds.includes('unicycler')) completedSteps.add(4);
+		completedSteps = new Set(completedSteps);
+	});
+
+	// Brief narrative content
 	const sampleNarrative = {
 		title: 'Hospital Outbreak Investigation',
-		subtitle: 'A mysterious cluster of infections',
+		subtitle: 'WGS Analysis Pipeline',
 		sections: [
 			{
 				type: 'intro',
-				text: `It's Monday morning at St. Mary's Hospital. Dr. Sarah Chen reviews the weekend reports and notices something unusual: five patients in the ICU have developed similar antibiotic-resistant infections within the past 72 hours.`,
+				text: `UM Medical Centre Saturday Report: 5 patients in the ICU did not respond to antibiotics, suspected to have developed antimicrobial resistance within the past 72 hours.`,
 				hint: null
 			},
 			{
 				type: 'context',
-				text: `The infection control team has collected samples and sent them for whole genome sequencing. Your task is to analyze these bacterial genomes to determine if this is an outbreak and identify the source.`,
-				hint: 'You will use WGS analysis to trace the outbreak'
+				text: `Samples were collected and sent for whole genome sequencing. Data has been released to you. Your task is to analyze the bacterial genomes to determine if this is an outbreak and identify the source.`,
+				hint: null
 			},
 			{
 				type: 'task',
-				title: 'Quality Control',
-				text: `First, let's check the quality of our sequencing data. We've received FASTQ files from the sequencer.`,
-				command: 'fastqc sample_01.fastq.gz -o qc_reports/',
-				explanation: 'FastQC analyzes raw sequence data and generates quality reports'
+				title: 'Step 1: Quality Control',
+				text: `Check the quality of raw sequencing data (FASTQ files).`,
+				command: 'fastqc sample_01_R1.fastq.gz -o qc_reports/',
+				explanation: 'FastQC generates quality reports for raw sequence data',
+				parameters: [
+					{ name: 'sample_01_R1.fastq.gz', desc: 'Input FASTQ file (forward reads)' },
+					{ name: '-o qc_reports/', desc: 'Output directory for QC reports' }
+				]
 			},
 			{
 				type: 'task',
-				title: 'Read Trimming',
-				text: `The quality report shows some adapter contamination. Let's trim the reads to remove adapters and low-quality bases.`,
-				command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz output_paired_R1.fq.gz output_unpaired_R1.fq.gz output_paired_R2.fq.gz output_unpaired_R2.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36',
-				explanation: 'Trimmomatic removes adapter sequences and trims low-quality bases'
+				title: 'Step 2: Read Trimming',
+				text: `Remove adapter sequences and low-quality bases from reads.`,
+				command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
+				explanation: 'Trimmomatic cleans reads by removing adapters and trimming poor-quality bases',
+				parameters: [
+					{ name: 'PE', desc: 'Paired-end mode (R1 + R2 reads)' },
+					{ name: '-phred33', desc: 'Quality score encoding (standard Illumina)' },
+					{ name: 'ILLUMINACLIP:TruSeq3-PE.fa:2:30:10', desc: 'Remove Illumina adapters (seed=2, palindrome=30, simple=10)' },
+					{ name: 'SLIDINGWINDOW:4:15', desc: 'Cut when 4bp window average quality < 15' },
+					{ name: 'MINLEN:36', desc: 'Drop reads shorter than 36bp' }
+				]
 			},
 			{
 				type: 'task',
-				title: 'Genome Assembly',
-				text: `Now we'll assemble the cleaned reads into contiguous sequences (contigs) that represent the bacterial genome.`,
-				command: 'unicycler -1 output_paired_R1.fq.gz -2 output_paired_R2.fq.gz -o assembly/',
-				explanation: 'Unicycler is optimized for bacterial genome assembly and can produce circular contigs'
+				title: 'Step 3: Genome Assembly',
+				text: `Assemble cleaned reads into contiguous sequences (contigs).`,
+				command: 'unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly/',
+				explanation: 'Unicycler assembles bacterial genomes and can circularize chromosomes and plasmids',
+				parameters: [
+					{ name: '-1', desc: 'Forward reads (R1) input file' },
+					{ name: '-2', desc: 'Reverse reads (R2) input file' },
+					{ name: '-o assembly/', desc: 'Output directory for assembly results' }
+				]
 			}
 		]
 	};
 
+	// Check if user can proceed to next step
+	function canProceed(stepIndex: number): boolean {
+		if (stepIndex <= 1) return true; // Intro and context are always visible
+		// For task steps, check if previous task step is completed
+		const prevTaskIndex = stepIndex - 1;
+		if (prevTaskIndex <= 1) return true;
+		return completedSteps.has(prevTaskIndex);
+	}
+
 	function nextStep() {
-		if (currentStep < sampleNarrative.sections.length - 1) {
-			currentStep++;
+		const nextIdx = currentStep + 1;
+		if (nextIdx < sampleNarrative.sections.length && canProceed(nextIdx)) {
+			currentStep = nextIdx;
 		}
 	}
 
@@ -53,7 +91,9 @@
 	}
 
 	function goToStep(index: number) {
-		currentStep = index;
+		if (canProceed(index)) {
+			currentStep = index;
+		}
 	}
 </script>
 
@@ -92,33 +132,48 @@
 			{#if i <= currentStep}
 				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep}>
 					{#if section.type === 'intro'}
-						<div class="prose prose-lg">
-							<p class="text-gray-700 leading-relaxed">{section.text}</p>
+						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r">
+							<p class="text-gray-700 leading-relaxed font-medium">{section.text}</p>
 						</div>
 					{:else if section.type === 'context'}
 						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
 							<p class="text-gray-700">{section.text}</p>
-							{#if section.hint}
-								<p class="text-blue-600 text-sm mt-2 font-medium">
-									💡 {section.hint}
-								</p>
-							{/if}
 						</div>
 					{:else if section.type === 'task'}
-						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-							{#if section.title}
-								<h3 class="font-semibold text-gray-800 mb-2">📋 {section.title}</h3>
-							{/if}
-							<p class="text-gray-700 mb-4">{section.text}</p>
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" class:border-green-400={completedSteps.has(i)} class:bg-green-50={completedSteps.has(i)}>
+							<div class="flex items-center justify-between mb-2">
+								{#if section.title}
+									<h3 class="font-semibold text-gray-800">📋 {section.title}</h3>
+								{/if}
+								{#if completedSteps.has(i)}
+									<span class="text-green-600 text-sm font-medium">✓ Completed</span>
+								{/if}
+							</div>
+							<p class="text-gray-700 mb-3">{section.text}</p>
 
 							{#if section.command}
-								<div class="bg-gray-900 rounded p-3 font-mono text-sm overflow-x-auto">
-									<div class="text-gray-400 text-xs mb-1">Try this command:</div>
+								<div class="bg-gray-900 rounded p-3 font-mono text-sm overflow-x-auto mb-3">
+									<div class="text-gray-400 text-xs mb-1">Command:</div>
 									<code class="text-green-400 whitespace-pre-wrap break-all">{section.command}</code>
 								</div>
+
+								{#if section.parameters && section.parameters.length > 0}
+									<div class="bg-white rounded border border-gray-200 p-3 mb-3">
+										<div class="text-xs font-semibold text-gray-500 uppercase mb-2">Parameter Reference</div>
+										<dl class="space-y-1 text-sm">
+											{#each section.parameters as param}
+												<div class="flex">
+													<dt class="font-mono text-blue-600 min-w-[180px] flex-shrink-0">{param.name}</dt>
+													<dd class="text-gray-600">{param.desc}</dd>
+												</div>
+											{/each}
+										</dl>
+									</div>
+								{/if}
+
 								{#if section.explanation}
-									<p class="text-gray-500 text-sm mt-2 italic">
-										{section.explanation}
+									<p class="text-gray-500 text-sm italic">
+										ℹ️ {section.explanation}
 									</p>
 								{/if}
 							{/if}
@@ -127,6 +182,14 @@
 				</div>
 			{/if}
 		{/each}
+
+		<!-- Next step locked message -->
+		{#if currentStep < sampleNarrative.sections.length - 1 && !canProceed(currentStep + 1)}
+			<div class="text-center py-4 text-gray-500 border-t border-dashed">
+				<span class="text-lg">🔒</span>
+				<p class="text-sm mt-1">Execute the current command to unlock the next step</p>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Navigation -->
@@ -141,20 +204,29 @@
 		<div class="flex gap-2">
 			{#each sampleNarrative.sections as _, i}
 				<button
-					class="w-3 h-3 rounded-full transition-colors cursor-pointer hover:scale-110"
-					class:bg-blue-600={i <= currentStep}
-					class:bg-gray-300={i > currentStep}
+					class="w-3 h-3 rounded-full transition-colors"
+					class:bg-blue-600={i <= currentStep && canProceed(i)}
+					class:bg-green-500={completedSteps.has(i)}
+					class:bg-gray-300={i > currentStep || !canProceed(i)}
+					class:cursor-pointer={canProceed(i)}
+					class:cursor-not-allowed={!canProceed(i)}
+					class:hover:scale-110={canProceed(i)}
 					onclick={() => goToStep(i)}
 					aria-label="Go to step {i + 1}"
+					disabled={!canProceed(i)}
 				></button>
 			{/each}
 		</div>
 		<button
 			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-			disabled={currentStep >= sampleNarrative.sections.length - 1}
+			disabled={currentStep >= sampleNarrative.sections.length - 1 || !canProceed(currentStep + 1)}
 			onclick={nextStep}
 		>
-			Next →
+			{#if currentStep < sampleNarrative.sections.length - 1 && !canProceed(currentStep + 1)}
+				🔒 Next
+			{:else}
+				Next →
+			{/if}
 		</button>
 	</div>
 </div>

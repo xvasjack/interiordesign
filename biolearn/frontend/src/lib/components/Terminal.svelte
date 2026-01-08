@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools } from '$lib/stores/terminal';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps } from '$lib/stores/terminal';
+	import { get } from 'svelte/store';
 
 	let terminalContainer: HTMLDivElement;
 	let terminal: any;
@@ -10,10 +11,14 @@
 	let isExecuting = false;
 	let currentDir = '/data/outbreak_investigation';
 
-	// Simulated filesystem
-	const filesystem: Record<string, string[]> = {
+	// Track which tools have been run for dynamic filesystem
+	let executedToolsList: string[] = [];
+	executedCommands.subscribe(cmds => executedToolsList = cmds);
+
+	// Base filesystem - only raw input files exist at start
+	const baseFilesystem: Record<string, string[]> = {
 		'/data/outbreak_investigation': [
-			'raw_reads/', 'qc_reports/', 'assembly/', 'annotation/', 'results/',
+			'raw_reads/',
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
 			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
 			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
@@ -21,12 +26,77 @@
 		'/data/outbreak_investigation/raw_reads': [
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
 			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz'
-		],
-		'/data/outbreak_investigation/qc_reports': [],
-		'/data/outbreak_investigation/assembly': [],
-		'/data/outbreak_investigation/annotation': [],
-		'/data/outbreak_investigation/results': []
+		]
 	};
+
+	// Files created by each tool
+	const toolCreatedFiles: Record<string, Record<string, string[]>> = {
+		'fastqc': {
+			'/data/outbreak_investigation': ['qc_reports/'],
+			'/data/outbreak_investigation/qc_reports': [
+				'sample_01_R1_fastqc.html', 'sample_01_R1_fastqc.zip',
+				'sample_01_R2_fastqc.html', 'sample_01_R2_fastqc.zip'
+			]
+		},
+		'trimmomatic': {
+			'/data/outbreak_investigation': ['trimmed/'],
+			'/data/outbreak_investigation/trimmed': [
+				'sample_01_R1_paired.fq.gz', 'sample_01_R2_paired.fq.gz',
+				'sample_01_R1_unpaired.fq.gz', 'sample_01_R2_unpaired.fq.gz'
+			]
+		},
+		'unicycler': {
+			'/data/outbreak_investigation': ['assembly/'],
+			'/data/outbreak_investigation/assembly': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			]
+		},
+		'prokka': {
+			'/data/outbreak_investigation': ['annotation/'],
+			'/data/outbreak_investigation/annotation': [
+				'sample_01.gff', 'sample_01.gbk', 'sample_01.fna',
+				'sample_01.faa', 'sample_01.ffn', 'sample_01.txt'
+			]
+		},
+		'abricate': {
+			'/data/outbreak_investigation': ['results/'],
+			'/data/outbreak_investigation/results': [
+				'amr_report.tsv', 'amr_summary.txt'
+			]
+		},
+		'quast': {
+			'/data/outbreak_investigation/assembly': [
+				'quast_report.html', 'quast_report.tsv'
+			]
+		}
+	};
+
+	// Get dynamic filesystem based on executed commands
+	function getFilesystem(): Record<string, string[]> {
+		const fs: Record<string, string[]> = {};
+
+		// Start with base filesystem
+		for (const [path, files] of Object.entries(baseFilesystem)) {
+			fs[path] = [...files];
+		}
+
+		// Add files from executed tools
+		for (const tool of executedToolsList) {
+			const created = toolCreatedFiles[tool];
+			if (created) {
+				for (const [path, files] of Object.entries(created)) {
+					if (!fs[path]) fs[path] = [];
+					for (const file of files) {
+						if (!fs[path].includes(file)) {
+							fs[path].push(file);
+						}
+					}
+				}
+			}
+		}
+
+		return fs;
+	}
 
 	// Pre-computed tool outputs with realistic terminal output
 	const toolOutputs: Record<string, any> = {
@@ -244,10 +314,64 @@ Final assembly:
 			isExecuting = false;
 			terminalState.set({ isRunning: false, currentCommand: '', progress: 0, estimatedTime: 0 });
 			writePrompt();
-		} else if (data >= ' ' || data === '\t') {
+		} else if (data === '\t') {
+			// Tab autocomplete
+			handleTabComplete();
+		} else if (data >= ' ') {
 			commandBuffer += data;
 			terminal.write(data);
 		}
+	}
+
+	function handleTabComplete() {
+		const parts = commandBuffer.split(/\s+/);
+		const lastPart = parts[parts.length - 1] || '';
+
+		// Get current filesystem
+		const filesystem = getFilesystem();
+		const files = filesystem[currentDir] || [];
+
+		// Find matches
+		const matches = files.filter(f => f.startsWith(lastPart));
+
+		if (matches.length === 0) {
+			return; // No matches
+		} else if (matches.length === 1) {
+			// Single match - complete it
+			const completion = matches[0].slice(lastPart.length);
+			commandBuffer += completion;
+			terminal.write(completion);
+		} else {
+			// Multiple matches - show them
+			terminal.write('\r\n');
+			const formatted = matches.map(f => {
+				if (f.endsWith('/')) return `\x1b[34m${f}\x1b[0m`;
+				if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) return `\x1b[32m${f}\x1b[0m`;
+				return f;
+			});
+			terminal.writeln(formatted.join('  '));
+			writePrompt();
+			terminal.write(commandBuffer);
+
+			// Find common prefix
+			const commonPrefix = findCommonPrefix(matches);
+			if (commonPrefix.length > lastPart.length) {
+				const completion = commonPrefix.slice(lastPart.length);
+				commandBuffer += completion;
+				terminal.write(completion);
+			}
+		}
+	}
+
+	function findCommonPrefix(strings: string[]): string {
+		if (strings.length === 0) return '';
+		let prefix = strings[0];
+		for (let i = 1; i < strings.length; i++) {
+			while (!strings[i].startsWith(prefix)) {
+				prefix = prefix.slice(0, -1);
+			}
+		}
+		return prefix;
 	}
 
 	async function executeCommand(cmd: string) {
@@ -344,9 +468,10 @@ Final assembly:
 	}
 
 	function handleLs(args: string[]) {
+		const filesystem = getFilesystem();
 		const path = args[0] || currentDir;
-		const fullPath = path.startsWith('/') ? path : `${currentDir}/${path}`.replace(/\/+/g, '/');
-		const files = filesystem[fullPath] || filesystem[currentDir] || [];
+		const fullPath = path.startsWith('/') ? path : `${currentDir}/${path}`.replace(/\/+/g, '/').replace(/\/$/, '');
+		const files = filesystem[fullPath] || [];
 
 		if (files.length === 0) {
 			terminal.writeln('\x1b[90m(empty directory)\x1b[0m');
@@ -358,6 +483,8 @@ Final assembly:
 				return `\x1b[34m${f}\x1b[0m`;
 			} else if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) {
 				return `\x1b[32m${f}\x1b[0m`;
+			} else if (f.endsWith('.html') || f.endsWith('.log')) {
+				return `\x1b[33m${f}\x1b[0m`;
 			}
 			return f;
 		});
@@ -367,21 +494,46 @@ Final assembly:
 	}
 
 	function handleCd(args: string[]) {
+		const filesystem = getFilesystem();
+
 		if (args.length === 0 || args[0] === '~') {
 			currentDir = '/data/outbreak_investigation';
 			return;
 		}
 
-		const newPath = args[0].startsWith('/')
-			? args[0]
-			: `${currentDir}/${args[0]}`.replace(/\/+/g, '/');
+		let targetPath = args[0];
 
-		if (filesystem[newPath] || filesystem[newPath.replace(/\/$/, '')]) {
-			currentDir = newPath.replace(/\/$/, '');
-		} else if (args[0] === '..') {
-			const parts = currentDir.split('/');
-			parts.pop();
-			currentDir = parts.join('/') || '/data/outbreak_investigation';
+		// Handle .. (parent directory)
+		if (targetPath === '..' || targetPath === '../' || targetPath.startsWith('../')) {
+			const parts = currentDir.split('/').filter(p => p);
+			if (parts.length > 0) {
+				parts.pop();
+			}
+			if (targetPath.startsWith('../')) {
+				// Handle ../something
+				const remaining = targetPath.slice(3);
+				if (remaining) {
+					currentDir = '/' + parts.join('/');
+					handleCd([remaining]);
+					return;
+				}
+			}
+			currentDir = parts.length > 0 ? '/' + parts.join('/') : '/data';
+			// Don't go above /data
+			if (!currentDir.startsWith('/data')) {
+				currentDir = '/data/outbreak_investigation';
+			}
+			return;
+		}
+
+		// Build full path
+		const newPath = targetPath.startsWith('/')
+			? targetPath
+			: `${currentDir}/${targetPath}`.replace(/\/+/g, '/').replace(/\/$/, '');
+
+		// Check if directory exists in filesystem
+		if (filesystem[newPath] !== undefined) {
+			currentDir = newPath;
 		} else {
 			terminal.writeln(`\x1b[31mbash: cd: ${args[0]}: No such directory\x1b[0m`);
 		}
@@ -418,9 +570,10 @@ Final assembly:
 			estimatedTime: execTime
 		});
 
-		// Show tool startup
+		// Show tool startup with disclaimer
 		terminal.writeln(`\x1b[36m[${tool}]\x1b[0m Starting analysis...`);
 		terminal.writeln(`\x1b[90mEstimated time: ~${execTime}s\x1b[0m`);
+		terminal.writeln(`\x1b[90;3m(Note: This is a simulated duration. Real analysis may take minutes to hours.)\x1b[0m`);
 		terminal.writeln('');
 
 		// Simulate progress
@@ -438,6 +591,14 @@ Final assembly:
 		}
 
 		if (isExecuting && toolData) {
+			// Track executed command for dynamic filesystem
+			executedCommands.update(cmds => {
+				if (!cmds.includes(tool)) {
+					return [...cmds, tool];
+				}
+				return cmds;
+			});
+
 			// Update output panel with results
 			outputData.set({
 				type: tool,
