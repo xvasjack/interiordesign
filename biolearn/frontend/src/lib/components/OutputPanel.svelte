@@ -110,22 +110,29 @@
 			const components = chartData.components || [];
 			const stats = chartData.graphStats || {};
 
-			// Calculate circle sizes based on component sizes (log scale for visibility)
+			// Calculate circle sizes based on component sizes
 			const maxSize = Math.max(...components.map((c: any) => c.size));
 
-			// Position circles - large chromosome on left, smaller plasmids on right
-			let xPos = 0.3;
 			const shapes: any[] = [];
 			const annotations: any[] = [];
 
+			// Fixed positions for clean layout
+			const labelY = 0.18; // Labels at bottom
+			const circleBottomY = 0.28; // Circle bottom edge above labels
+
 			components.forEach((comp: any, i: number) => {
-				// Scale radius: chromosome gets larger, plasmids scaled proportionally (min 0.08)
+				// Position: first at 0.3, second at 0.7
+				const xPos = i === 0 ? 0.3 : 0.7;
+
+				// Scale radius based on size (chromosome larger, plasmid smaller)
 				const relativeSize = comp.size / maxSize;
-				const radius = Math.max(0.08, 0.20 * Math.sqrt(relativeSize));
-				const yCenter = 0.58; // Center circles higher up
+				const radius = Math.max(0.06, 0.15 * Math.sqrt(relativeSize));
+
+				// Circle center is above the label
+				const yCenter = circleBottomY + radius;
 
 				if (comp.circular) {
-					// Draw circular component as a ring (circle with hollow center)
+					// Draw circular component as a ring
 					shapes.push({
 						type: 'circle',
 						xref: 'paper',
@@ -134,11 +141,11 @@
 						y0: yCenter - radius,
 						x1: xPos + radius,
 						y1: yCenter + radius,
-						line: { color: comp.color, width: 6 },
+						line: { color: comp.color, width: 5 },
 						fillcolor: 'rgba(255,255,255,0)'
 					});
 				} else {
-					// Draw linear component as a line/arc fragment
+					// Draw linear component as a line
 					shapes.push({
 						type: 'line',
 						xref: 'paper',
@@ -147,54 +154,52 @@
 						y0: yCenter,
 						x1: xPos + radius,
 						y1: yCenter,
-						line: { color: comp.color, width: 6 }
+						line: { color: comp.color, width: 5 }
 					});
 				}
 
-				// Add label below the circle
+				// Label below circle - name in component color, size in gray
 				annotations.push({
 					x: xPos,
-					y: yCenter - radius - 0.10,
+					y: labelY,
 					xref: 'paper',
 					yref: 'paper',
-					text: `<b>${comp.name}</b><br>${(comp.size / 1e6).toFixed(2)} Mb`,
+					text: `<b style="color:${comp.color}">${comp.name}</b><br><span style="color:#6b7280">${(comp.size / 1e6).toFixed(2)} Mb</span>`,
 					showarrow: false,
-					font: { size: 12, color: '#374151' },
+					font: { size: 12, color: comp.color },
 					align: 'center'
 				});
-
-				xPos += 0.4;
 			});
 
-			// Add quality badge at top
+			// Quality badge at top
 			const quality = stats.quality || 'unknown';
 			const qualityColor = quality === 'excellent' ? '#10b981' : quality === 'good' ? '#f59e0b' : '#ef4444';
 			annotations.push({
 				x: 0.5,
-				y: 0.95,
+				y: 0.92,
 				xref: 'paper',
 				yref: 'paper',
 				text: `<b>Quality: ${quality.toUpperCase()}</b> | ${stats.circular || 0} circular | ${stats.deadEnds || 0} dead ends`,
 				showarrow: false,
-				font: { size: 13, color: qualityColor }
+				font: { size: 12, color: qualityColor }
 			});
 
-			// Add node/edge stats
+			// Node/edge stats at very bottom
 			annotations.push({
 				x: 0.5,
-				y: 0.08,
+				y: 0.04,
 				xref: 'paper',
 				yref: 'paper',
 				text: `Nodes: ${stats.totalNodes?.toLocaleString() || 'N/A'} | Edges: ${stats.totalEdges?.toLocaleString() || 'N/A'}`,
 				showarrow: false,
-				font: { size: 11, color: '#6b7280' }
+				font: { size: 11, color: '#9ca3af' }
 			});
 
 			layout = {
 				title: { text: chartData.title, font: { size: 16, color: '#1f2937' } },
-				xaxis: { visible: false, range: [0, 1] },
-				yaxis: { visible: false, range: [0, 1], scaleanchor: 'x' },
-				margin: { t: 50, r: 20, b: 40, l: 20 },
+				xaxis: { visible: false, range: [0, 1], fixedrange: true },
+				yaxis: { visible: false, range: [0, 1], fixedrange: true },
+				margin: { t: 50, r: 20, b: 20, l: 20 },
 				paper_bgcolor: 'transparent',
 				plot_bgcolor: '#fafafa',
 				shapes: shapes,
@@ -202,10 +207,10 @@
 				showlegend: false
 			};
 
-			// Empty trace just to render the plot
+			// Empty trace to render the plot
 			traces.push({
-				x: [0],
-				y: [0],
+				x: [0.5],
+				y: [0.5],
 				type: 'scatter',
 				mode: 'markers',
 				marker: { size: 0.1, opacity: 0 }
