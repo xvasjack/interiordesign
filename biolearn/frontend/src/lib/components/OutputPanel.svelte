@@ -54,18 +54,57 @@
 		};
 	});
 
+	// Sample file contents for different file types
+	const fileContents: Record<string, string> = {
+		'sample_01_R1_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R1</title></head><body><h1>FastQC Report</h1><p>Sample: sample_01_R1.fastq.gz</p><p>Total Sequences: 2,847,293</p><p>Sequence Length: 150bp</p><p>%GC: 52%</p></body></html>`,
+		'sample_01_R2_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R2</title></head><body><h1>FastQC Report</h1><p>Sample: sample_01_R2.fastq.gz</p><p>Total Sequences: 2,847,293</p><p>Sequence Length: 150bp</p><p>%GC: 52%</p></body></html>`,
+		'assembly.fasta': `>contig_1 length=4892156 circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\n>contig_2 length=95234 circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG`,
+		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\nL\t1\t+\t2\t+\t50M`,
+		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:23:46] Input files validated\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,
+		'quast_report.tsv': `Assembly\tcontigs\tTotal length\tN50\tGC (%)\nsample_01\t2\t4987390\t4892156\t52.3`,
+		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title></head><body><h1>QUAST Report</h1><table><tr><th>Contigs</th><td>2</td></tr><tr><th>Total Length</th><td>4,987,390 bp</td></tr><tr><th>N50</th><td>4,892,156 bp</td></tr></table></body></html>`,
+		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tGENE\tCOVERAGE\tIDENTITY\ncontig_1\t1\t1245\t2156\tblaCTX-M-15\t100.00\t99.89\ncontig_2\t2\t523\t1245\ttet(A)\t100.00\t100.00`,
+		'amr_summary.txt': `AMR Gene Summary\n================\nTotal genes found: 2\n\n1. blaCTX-M-15 (Beta-lactamase)\n   - Confers resistance to: Extended-spectrum cephalosporins\n\n2. tet(A) (Tetracycline efflux pump)\n   - Confers resistance to: Tetracycline`
+	};
+
+	// MIME types for different file extensions
+	const mimeTypes: Record<string, string> = {
+		'html': 'text/html',
+		'txt': 'text/plain',
+		'tsv': 'text/tab-separated-values',
+		'fasta': 'text/plain',
+		'gfa': 'text/plain',
+		'log': 'text/plain',
+		'png': 'image/png',
+		'zip': 'application/zip',
+		'gff': 'text/plain',
+		'gbk': 'text/plain',
+		'fna': 'text/plain',
+		'faa': 'text/plain',
+		'ffn': 'text/plain'
+	};
+
 	function viewFile(file: any) {
-		// For HTML files, show in a new window or modal
-		if (file.type === 'html') {
-			alert(`Viewing ${file.name}\n\nIn a real application, this would open the HTML report in a new tab or modal.`);
+		const content = fileContents[file.name];
+		if (file.type === 'html' && content) {
+			// Open HTML in new window
+			const newWindow = window.open('', '_blank');
+			if (newWindow) {
+				newWindow.document.write(content);
+				newWindow.document.close();
+			}
+		} else if (content) {
+			// Show text content in alert (could be improved with modal)
+			alert(`File: ${file.name}\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
 		} else {
-			alert(`Preview not available for ${file.type.toUpperCase()} files.\n\nIn a real application, this would show a preview or text content.`);
+			alert(`Preview not available for ${file.name}\n\nThis is a simulated file in the training environment.`);
 		}
 	}
 
 	function downloadFile(file: any) {
-		// Simulate download
-		const blob = new Blob([`Simulated content for ${file.name}`], { type: 'text/plain' });
+		const content = fileContents[file.name] || `# Simulated content for ${file.name}\n# This file was generated in the BioLearn training environment`;
+		const mimeType = mimeTypes[file.type] || 'text/plain';
+		const blob = new Blob([content], { type: mimeType });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;

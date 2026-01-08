@@ -761,6 +761,22 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
+				// Check output files are in trimmed/ folder
+				const outputFiles = args.filter(a => a.includes('_paired.fq.gz') || a.includes('_unpaired.fq.gz'));
+				if (outputFiles.length === 0) {
+					terminal.writeln(`\x1b[31mError: Missing output files\x1b[0m`);
+					terminal.writeln(`\x1b[90mOutput files should be: trimmed/sample_01_R1_paired.fq.gz, trimmed/sample_01_R1_unpaired.fq.gz, etc.\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const invalidOutput = outputFiles.find(f => !f.startsWith('trimmed/'));
+				if (invalidOutput) {
+					terminal.writeln(`\x1b[31mError: Invalid output path '${invalidOutput}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, output files must be in the 'trimmed/' folder\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: trimmed/sample_01_R1_paired.fq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
 
 			if (command === 'unicycler') {
@@ -795,6 +811,16 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
+				// Enforce exact output directory name
+				const oIdx = args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'assembly') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: assembly\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
 
 			if (command === 'bandage') {
@@ -823,6 +849,14 @@ Loading assembly graph: assembly.gfa
 				if (!pngFile) {
 					terminal.writeln(`\x1b[31mError: Missing output .png file\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa <output.png>\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Enforce exact output file name
+				if (pngFile !== 'assembly_graph.png') {
+					terminal.writeln(`\x1b[31mError: Invalid output file name '${pngFile}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use the exact file name: assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
