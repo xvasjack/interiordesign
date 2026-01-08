@@ -84,11 +84,11 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Forward Only Surviving',
-			description: 'R1 (forward read) passed quality thresholds but its R2 partner was discarded. Can be used as unpaired reads in some assemblers.',
+			description: 'R1 (forward read) passed quality thresholds but its R2 partner was discarded due to low quality scores, adapter contamination, or being too short after trimming.',
 		},
 		{
 			name: 'Reverse Only Surviving',
-			description: 'R2 (reverse read) passed quality thresholds but its R1 partner was discarded. Can be used as unpaired reads in some assemblers.',
+			description: 'R2 (reverse read) passed quality thresholds but its R1 partner was discarded due to low quality scores, adapter contamination, or being too short after trimming.',
 		},
 		{
 			name: 'Dropped',

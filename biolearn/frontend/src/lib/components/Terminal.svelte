@@ -592,37 +592,46 @@ Loading assembly graph: assembly.gfa
 		return prefix;
 	}
 
-	// Tool requirements: directory and required files
-	const toolRequirements: Record<string, { dir: string; requiredFiles?: string[]; checkFile?: (f: string) => boolean }> = {
-		'fastqc': {
-			dir: '/data/outbreak_investigation',
-			checkFile: (f) => f.endsWith('.fastq.gz') && (f.includes('sample_01') || f.includes('sample_02') || f.includes('sample_03'))
-		},
-		'seqkit': {
-			dir: '/data/outbreak_investigation',
-			checkFile: (f) => f.endsWith('.fastq.gz')
-		},
-		'trimmomatic': {
-			dir: '/data/outbreak_investigation',
-			requiredFiles: ['sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz']
-		},
-		'unicycler': {
-			dir: '/data/outbreak_investigation',
-			checkFile: (f) => f.endsWith('_paired.fq.gz')
-		},
-		'bandage': {
-			dir: '/data/outbreak_investigation/assembly',
-			checkFile: (f) => f.endsWith('.gfa')
-		},
-		'prokka': {
-			dir: '/data/outbreak_investigation',
-			checkFile: (f) => f.endsWith('.fasta')
-		},
-		'abricate': {
-			dir: '/data/outbreak_investigation',
-			checkFile: (f) => f.endsWith('.fasta')
-		}
+	// Valid files for each tool - must match exactly
+	const validToolFiles: Record<string, string[]> = {
+		'fastqc': [
+			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
+			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
+			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+		],
+		'seqkit': [
+			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
+			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
+			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+		],
+		'trimmomatic': [
+			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz'
+		],
+		'unicycler': [
+			'trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'
+		],
+		'bandage': ['assembly.gfa'],
+		'prokka': ['assembly/assembly.fasta'],
+		'abricate': ['assembly/assembly.fasta']
 	};
+
+	// Tool requirements: directory
+	const toolRequirements: Record<string, { dir: string }> = {
+		'fastqc': { dir: '/data/outbreak_investigation' },
+		'seqkit': { dir: '/data/outbreak_investigation' },
+		'trimmomatic': { dir: '/data/outbreak_investigation' },
+		'unicycler': { dir: '/data/outbreak_investigation' },
+		'bandage': { dir: '/data/outbreak_investigation/assembly' },
+		'prokka': { dir: '/data/outbreak_investigation' },
+		'abricate': { dir: '/data/outbreak_investigation' }
+	};
+
+	// Check if file is valid for a tool
+	function isValidFileForTool(tool: string, filename: string): boolean {
+		const validFiles = validToolFiles[tool];
+		if (!validFiles) return true;
+		return validFiles.some(f => f === filename || f.endsWith(filename) || filename.endsWith(f.split('/').pop() || ''));
+	}
 
 	async function executeCommand(cmd: string) {
 		const parts = cmd.trim().split(/\s+/);
@@ -704,10 +713,10 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
-				// Check file is valid sample file
-				if (!req?.checkFile?.(inputFile)) {
-					terminal.writeln(`\x1b[31mError: Invalid input file '${inputFile}'\x1b[0m`);
-					terminal.writeln(`\x1b[90mFastQC requires a valid .fastq.gz file (e.g., sample_01_R1.fastq.gz)\x1b[0m`);
+				// Check file is valid for this tool
+				if (!isValidFileForTool('fastqc', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for fastqc\x1b[0m`);
+					terminal.writeln(`\x1b[90mFastQC requires raw sequencing files: sample_01_R1.fastq.gz, sample_01_R2.fastq.gz, etc.\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -740,7 +749,7 @@ Loading assembly graph: assembly.gfa
 			if (command === 'unicycler') {
 				if (!args.includes('-1') || !args.includes('-2')) {
 					terminal.writeln(`\x1b[31mUsage: unicycler -1 <R1_paired.fq.gz> -2 <R2_paired.fq.gz> -o <output_dir>\x1b[0m`);
-					terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads.\x1b[0m`);
+					terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads from the trimmed/ folder.\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -749,16 +758,30 @@ Loading assembly graph: assembly.gfa
 				const r2Idx = args.indexOf('-2');
 				const r1File = args[r1Idx + 1];
 				const r2File = args[r2Idx + 1];
-				if (!r1File?.includes('_paired') || !r2File?.includes('_paired')) {
-					terminal.writeln(`\x1b[31mError: Unicycler requires trimmed paired files\x1b[0m`);
-					terminal.writeln(`\x1b[90mUse files from trimmed/ folder (e.g., sample_01_R1_paired.fq.gz)\x1b[0m`);
+				// Check files are valid for unicycler
+				if (!r1File || !isValidFileForTool('unicycler', r1File)) {
+					terminal.writeln(`\x1b[31mError: '${r1File || 'missing'}' is not a valid input for unicycler\x1b[0m`);
+					terminal.writeln(`\x1b[90mUnicycler requires: trimmed/sample_01_R1_paired.fq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!r2File || !isValidFileForTool('unicycler', r2File)) {
+					terminal.writeln(`\x1b[31mError: '${r2File || 'missing'}' is not a valid input for unicycler\x1b[0m`);
+					terminal.writeln(`\x1b[90mUnicycler requires: trimmed/sample_01_R2_paired.fq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check -o flag
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: unicycler -1 <R1_paired.fq.gz> -2 <R2_paired.fq.gz> -o <output_dir>\x1b[0m`);
 					writePrompt();
 					return;
 				}
 			}
 
 			if (command === 'bandage') {
-				if (args.length < 2 || !args.includes('image')) {
+				if (!args.includes('image')) {
 					terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
 					terminal.writeln(`\x1b[90mExample: bandage image assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
@@ -767,7 +790,22 @@ Loading assembly graph: assembly.gfa
 				// Check GFA file
 				const gfaFile = args.find(a => a.endsWith('.gfa'));
 				if (!gfaFile) {
-					terminal.writeln(`\x1b[31mError: Bandage requires a .gfa assembly graph file\x1b[0m`);
+					terminal.writeln(`\x1b[31mError: Missing .gfa file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('bandage', gfaFile)) {
+					terminal.writeln(`\x1b[31mError: '${gfaFile}' is not a valid input for bandage\x1b[0m`);
+					terminal.writeln(`\x1b[90mBandage requires: assembly.gfa (from unicycler output)\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check PNG output
+				const pngFile = args.find(a => a.endsWith('.png'));
+				if (!pngFile) {
+					terminal.writeln(`\x1b[31mError: Missing output .png file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly.gfa <output.png>\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1256,9 +1294,27 @@ Annotation identified 4,523 coding sequences.
 <style>
 	:global(.xterm) {
 		padding: 8px;
+		height: 100%;
 	}
 
 	:global(.xterm-viewport) {
-		overflow-y: auto !important;
+		overflow-y: scroll !important;
+	}
+
+	:global(.xterm-viewport::-webkit-scrollbar) {
+		width: 10px;
+	}
+
+	:global(.xterm-viewport::-webkit-scrollbar-track) {
+		background: #2d2d2d;
+	}
+
+	:global(.xterm-viewport::-webkit-scrollbar-thumb) {
+		background: #555;
+		border-radius: 5px;
+	}
+
+	:global(.xterm-viewport::-webkit-scrollbar-thumb:hover) {
+		background: #777;
 	}
 </style>
