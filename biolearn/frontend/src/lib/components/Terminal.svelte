@@ -1277,9 +1277,9 @@ Annotation identified 4,523 coding sequences.
 	});
 </script>
 
-<div class="flex flex-col h-full bg-gray-900">
+<div class="flex flex-col h-full bg-gray-900 overflow-hidden">
 	<!-- Command bar -->
-	<div class="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border-b border-gray-700 text-xs">
+	<div class="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 bg-gray-800 border-b border-gray-700 text-xs">
 		<span class="text-gray-400">Commands:</span>
 		<div class="flex gap-1 flex-wrap">
 			{#each ['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'clear', 'help'] as cmd}
@@ -1288,13 +1288,17 @@ Annotation identified 4,523 coding sequences.
 		</div>
 	</div>
 	<!-- Terminal -->
-	<div bind:this={terminalContainer} class="flex-1 p-2 bg-[#1e1e1e]"></div>
+	<div bind:this={terminalContainer} class="flex-1 min-h-0 bg-[#1e1e1e] overflow-hidden"></div>
 </div>
 
 <style>
 	:global(.xterm) {
 		padding: 8px;
 		height: 100%;
+	}
+
+	:global(.xterm-screen) {
+		height: 100% !important;
 	}
 
 	:global(.xterm-viewport) {
