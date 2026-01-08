@@ -122,7 +122,7 @@
 
 			components.forEach((comp: any, i: number) => {
 				// X position: spread further apart
-				const xPos = i === 0 ? 2 : 8;
+				const xPos = i === 0 ? 2 : 10;
 
 				// Scale radius based on size
 				const relativeSize = comp.size / maxSize;
@@ -173,7 +173,7 @@
 			const quality = stats.quality || 'unknown';
 			const qualityColor = quality === 'excellent' ? '#10b981' : quality === 'good' ? '#f59e0b' : '#ef4444';
 			annotations.push({
-				x: 5,
+				x: 6,
 				y: 9.2,
 				xref: 'x',
 				yref: 'y',
@@ -184,7 +184,7 @@
 
 			// Node/edge stats at bottom
 			annotations.push({
-				x: 5,
+				x: 6,
 				y: 0.5,
 				xref: 'x',
 				yref: 'y',
@@ -195,7 +195,7 @@
 
 			layout = {
 				title: { text: chartData.title, font: { size: 16, color: '#1f2937' } },
-				xaxis: { visible: false, range: [0, 10], fixedrange: true, constrain: 'domain' },
+				xaxis: { visible: false, range: [0, 12], fixedrange: true, constrain: 'domain' },
 				yaxis: { visible: false, range: [0, 10], fixedrange: true, scaleanchor: 'x', scaleratio: 1 },
 				margin: { t: 50, r: 20, b: 20, l: 20 },
 				paper_bgcolor: 'transparent',
