@@ -114,15 +114,15 @@
 			const maxSize = Math.max(...components.map((c: any) => c.size));
 
 			// Position circles - large chromosome on left, smaller plasmids on right
-			let xPos = 0.25;
+			let xPos = 0.3;
 			const shapes: any[] = [];
 			const annotations: any[] = [];
 
 			components.forEach((comp: any, i: number) => {
-				// Scale radius: chromosome gets 0.15, plasmids scaled proportionally (min 0.05)
+				// Scale radius: chromosome gets larger, plasmids scaled proportionally (min 0.08)
 				const relativeSize = comp.size / maxSize;
-				const radius = Math.max(0.06, 0.18 * Math.sqrt(relativeSize));
-				const yPos = 0.5;
+				const radius = Math.max(0.08, 0.20 * Math.sqrt(relativeSize));
+				const yCenter = 0.58; // Center circles higher up
 
 				if (comp.circular) {
 					// Draw circular component as a ring (circle with hollow center)
@@ -131,10 +131,10 @@
 						xref: 'paper',
 						yref: 'paper',
 						x0: xPos - radius,
-						y0: yPos - radius * 1.5,
+						y0: yCenter - radius,
 						x1: xPos + radius,
-						y1: yPos + radius * 1.5,
-						line: { color: comp.color, width: 8 },
+						y1: yCenter + radius,
+						line: { color: comp.color, width: 6 },
 						fillcolor: 'rgba(255,255,255,0)'
 					});
 				} else {
@@ -144,17 +144,17 @@
 						xref: 'paper',
 						yref: 'paper',
 						x0: xPos - radius,
-						y0: yPos,
+						y0: yCenter,
 						x1: xPos + radius,
-						y1: yPos,
+						y1: yCenter,
 						line: { color: comp.color, width: 6 }
 					});
 				}
 
-				// Add label below
+				// Add label below the circle
 				annotations.push({
 					x: xPos,
-					y: yPos - radius * 1.5 - 0.12,
+					y: yCenter - radius - 0.10,
 					xref: 'paper',
 					yref: 'paper',
 					text: `<b>${comp.name}</b><br>${(comp.size / 1e6).toFixed(2)} Mb`,
@@ -163,7 +163,7 @@
 					align: 'center'
 				});
 
-				xPos += 0.5;
+				xPos += 0.4;
 			});
 
 			// Add quality badge at top
