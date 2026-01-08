@@ -2,7 +2,7 @@
 
 ## Overview
 
-An interactive web-based platform for learning bacterial WGS (Whole Genome Sequencing) analysis through narrative-driven, output-first learning. Users select a story/case study, then progress through phases of increasingly deep analysis - mirroring real-world bioinformatics workflows.
+An interactive web-based platform for learning bioinformatics analysis through narrative-driven, output-first learning. Users select a sequencing category, then a story/case study, then progress through phases of increasingly deep analysis - mirroring real-world workflows.
 
 **Key Principle**: Every command, every line of code is shown. Nothing is skipped.
 
@@ -13,21 +13,64 @@ An interactive web-based platform for learning bacterial WGS (Whole Genome Seque
 - **Skill range**: Complete beginners to advanced users
 - **Background**: Lab scientists, biologists, bioinformaticians, students
 - **Assumption**: No prior coding required, but platform scales to advanced users
-- **End goal**: Users can independently run WGS analysis and generate publication-ready charts
+- **End goal**: Users can independently run analysis and generate publication-ready charts
 
 ---
 
-## Why Website Over Desktop Software?
+## Sequencing Categories
 
-| Factor | Website | Desktop App |
-|--------|---------|-------------|
-| **Accessibility** | Works instantly in browser | Requires download/install |
-| **Cross-platform** | Any OS with a browser | Need separate builds |
-| **Updates** | Deploy once, everyone gets it | Users must update manually |
-| **Backend execution** | Run real tools server-side | Complex local setup |
-| **User accounts** | Easy authentication | More complex |
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BioLearn - Choose Your Sequencing Type                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────┐   ┌─────────────────────────┐                 │
+│  │  🧬 WHOLE GENOME        │   │  🔬 AMPLICON             │                 │
+│  │     SEQUENCING (WGS)    │   │     SEQUENCING           │                 │
+│  │                         │   │                          │                 │
+│  │  Complete bacterial     │   │  16S rRNA, targeted      │                 │
+│  │  genome analysis        │   │  gene sequencing         │                 │
+│  │                         │   │                          │                 │
+│  │  [5 Narratives]         │   │  [Coming Soon]           │                 │
+│  │  [Enter →]              │   │                          │                 │
+│  └─────────────────────────┘   └─────────────────────────┘                 │
+│                                                                             │
+│  ┌─────────────────────────┐   ┌─────────────────────────┐                 │
+│  │  📊 RNA SEQUENCING      │   │  🦠 METAGENOMICS         │                 │
+│  │     (RNA-seq)           │   │                          │                 │
+│  │                         │   │  Community profiling,    │                 │
+│  │  Gene expression,       │   │  functional analysis     │                 │
+│  │  differential analysis  │   │                          │                 │
+│  │                         │   │  [Coming Soon]           │                 │
+│  │  [Coming Soon]          │   │                          │                 │
+│  └─────────────────────────┘   └─────────────────────────┘                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-**Recommendation: Web application with real backend execution**
+### Category Roadmap
+
+| Category | Status | Focus |
+|----------|--------|-------|
+| **Whole Genome Sequencing (WGS)** | Active | Bacterial isolate analysis |
+| Amplicon Sequencing | Planned | 16S/ITS community profiling |
+| RNA Sequencing | Planned | Differential expression |
+| Metagenomics | Planned | Shotgun community analysis |
+
+---
+
+## Category: Whole Genome Sequencing (WGS)
+
+### Focus: Bacterial Isolate Analysis
+
+Complete workflow from raw reads to publication-ready outputs:
+- Quality control & preprocessing
+- Contamination detection
+- Assembly & annotation
+- Species identification
+- AMR & virulence detection
+- Variant calling & phylogenetics
+- Visualization & reporting
 
 ---
 
@@ -35,40 +78,43 @@ An interactive web-based platform for learning bacterial WGS (Whole Genome Seque
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  WGS Learn    [Narrative: Soil Outbreak]    Phase 2/4    [User ▾]          │
+│  BioLearn  [WGS]  [Narrative: Hospital Outbreak]  Phase 2/4  [User ▾]       │
 ├────────────────────────────────┬────────────────────────────────────────────┤
 │                                │                                            │
 │  TERMINAL (Black)              │  STORY PANEL (White)                       │
 │  ─────────────────             │  ──────────────────                        │
 │                                │                                            │
-│  $ fastp \                     │  📖 Chapter: Quality Control               │
-│      -i reads_R1.fastq.gz \    │                                            │
-│      -I reads_R2.fastq.gz \    │  The sequencing facility just sent your    │
-│      -o clean_R1.fastq.gz \    │  data. Before we can identify the          │
-│      -O clean_R2.fastq.gz \    │  pathogen, we need to ensure the reads     │
-│      --html qc_report.html \   │  are high quality.                         │
-│      --json qc_report.json \   │                                            │
-│      --thread 4                │  ┌────────────────────────────────────┐    │
-│                                │  │ 📋 NEXT COMMAND                    │    │
-│  Read1 before filtering:       │  │                                    │    │
-│  total reads: 1234567          │  │ fastp \                            │    │
-│  total bases: 185185050        │  │   -i reads_R1.fastq.gz \           │    │
-│  Q30 bases: 176426298(95.27%)  │  │   -I reads_R2.fastq.gz \           │    │
-│                                │  │   -o clean_R1.fastq.gz \           │    │
-│  $ _                           │  │   ...                    [Copy]    │    │
+│  $ checkm lineage_wf \         │  📖 Chapter: Contamination Check           │
+│      assembly/ \               │                                            │
+│      checkm_output/ \          │  Before we trust our assembly, we need     │
+│      -t 4 \                    │  to verify it's not contaminated with      │
+│      -x fasta                  │  DNA from other organisms.                 │
+│                                │                                            │
+│  [Processing...]               │  ┌────────────────────────────────────┐    │
+│  Completeness: 99.2%           │  │ 📋 NEXT COMMAND                    │    │
+│  Contamination: 0.8%           │  │                                    │    │
+│  ✓ Assembly is clean!          │  │ checkm lineage_wf \                │    │
+│                                │  │   assembly/ checkm_output/ \       │    │
+│  $ _                           │  │   -t 4 -x fasta         [Copy]     │    │
 │                                │  └────────────────────────────────────┘    │
 │                                │                                            │
 ├────────────────────────────────┴────────────────────────────────────────────┤
 │  OUTPUT PANEL                                                               │
 │  ───────────────────────────────────────────────────────────────────────    │
 │                                                                             │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐             │
-│  │ QC Report       │  │ Read Quality    │  │ Adapter Content │             │
-│  │ [View HTML →]   │  │ [Chart]         │  │ [Chart]         │             │
-│  └─────────────────┘  └─────────────────┘  └─────────────────┘             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  CONTAMINATION CHECK RESULTS                                         │   │
+│  │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━                                         │   │
+│  │  Completeness:  ████████████████████████████████████████░░  99.2%    │   │
+│  │  Contamination: █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0.8%    │   │
+│  │                                                                      │   │
+│  │  ✅ PASS - Assembly is high quality and uncontaminated               │   │
+│  │                                                                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
-│  💡 What this did: Removed low-quality reads and adapter sequences.        │
-│     Input: 1,234,567 reads → Output: 1,189,234 reads (96.3% retained)      │
+│  💡 CheckM uses marker genes to assess if your assembly is complete and    │
+│     free from contamination. >95% completeness and <5% contamination       │
+│     is considered good quality.                                            │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -83,547 +129,505 @@ An interactive web-based platform for learning bacterial WGS (Whole Genome Seque
 
 ---
 
-## Narrative-Based Learning Structure
+## WGS Narratives
 
-### Users Select a Narrative (Story)
-
-Instead of abstract "modes" or "levels", users choose a real-world case study:
+Users select a real-world case study:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Choose Your Investigation                                       │
+│  Whole Genome Sequencing - Choose Your Investigation            │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  🌱 SOIL OUTBREAK                        🦠 GUT MICROBIOME      │
-│  A farming community reports             A patient with          │
-│  mysterious illness. Trace the           recurring infections.   │
-│  pathogen in soil samples.               Analyze their gut       │
-│  [Start →]                               bacteria.               │
-│                                          [Start →]               │
+│  🏥 HOSPITAL OUTBREAK              🍔 FOOD POISONING            │
+│  MRSA spreading in the ICU.        Salmonella outbreak at       │
+│  Track transmission and find       a restaurant. Confirm        │
+│  the source patient.               the source strain.           │
+│  [Start →]                         [Start →]                    │
 │                                                                  │
-│  💧 WATER CONTAMINATION                  🏥 HOSPITAL OUTBREAK   │
-│  E. coli detected in the                 MRSA spreading in       │
-│  city water supply. Find                 the ICU. Track the      │
-│  the source.                             transmission chain.     │
-│  [Start →]                               [Start →]               │
+│  💧 WATER CONTAMINATION            🌱 ENVIRONMENTAL             │
+│  E. coli in the city water.        Anthrax-like bacteria in     │
+│  Trace it back to the source.      agricultural soil samples.   │
+│  [Start →]                         [Start →]                    │
 │                                                                  │
-│  🍔 FOOD POISONING                                               │
-│  Salmonella outbreak linked                                      │
-│  to a restaurant. Confirm                                        │
-│  the source strain.                                              │
+│  🧪 CLINICAL ISOLATE                                             │
+│  A patient's wound infection.                                    │
+│  Identify the pathogen and                                       │
+│  check for antibiotic resistance.                                │
 │  [Start →]                                                       │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 5 Narrative Storylines
+### 5 WGS Narratives
 
-| # | Narrative | Organism Focus | Unique Analysis |
-|---|-----------|----------------|-----------------|
-| 1 | **Soil Outbreak** | Environmental bacteria, *Bacillus* | Soil metagenomics, environmental sampling |
-| 2 | **Gut Microbiome** | Mixed community, *Enterococcus*, *Bacteroides* | Diversity analysis, dysbiosis |
-| 3 | **Water Contamination** | *E. coli*, coliforms | Source tracking, contamination mapping |
-| 4 | **Hospital Outbreak** | *MRSA*, *Klebsiella* | Transmission networks, AMR genes |
-| 5 | **Food Poisoning** | *Salmonella*, *Listeria* | Serotyping, outbreak cluster analysis |
-
----
-
-## Phases Within Each Narrative
-
-Every narrative follows the same 4-phase structure (but with story-specific data):
-
-### Phase 1: Basic Processing (QC & Preprocessing)
-**Goal**: Clean, quality-checked reads ready for analysis
-
-| Step | Tool | Command (Complete) | Output |
-|------|------|-------------------|--------|
-| 1.1 | Check raw quality | `fastqc reads_R1.fastq.gz reads_R2.fastq.gz -o fastqc_raw/` | HTML reports |
-| 1.2 | Trim & filter | `fastp -i reads_R1.fastq.gz -I reads_R2.fastq.gz -o clean_R1.fastq.gz -O clean_R2.fastq.gz --html fastp_report.html --json fastp_report.json --thread 4 --detect_adapter_for_pe --cut_front --cut_tail --cut_mean_quality 20 --length_required 50` | Cleaned FASTQ, reports |
-| 1.3 | Verify clean quality | `fastqc clean_R1.fastq.gz clean_R2.fastq.gz -o fastqc_clean/` | HTML reports |
-| 1.4 | Aggregate reports | `multiqc fastqc_raw/ fastqc_clean/ fastp_report.json -o multiqc_report/` | Summary dashboard |
-
-**Phase 1 Outputs**: QC dashboard, before/after comparison charts
+| # | Narrative | Organism | Learning Focus |
+|---|-----------|----------|----------------|
+| 1 | **Hospital Outbreak** | *MRSA* (S. aureus) | Transmission tracking, AMR, SNP phylogeny |
+| 2 | **Food Poisoning** | *Salmonella enterica* | Serotyping, outbreak clustering |
+| 3 | **Water Contamination** | *E. coli* | Source attribution, virulence genes |
+| 4 | **Environmental** | *Bacillus* species | Environmental isolates, species ID |
+| 5 | **Clinical Isolate** | *Klebsiella pneumoniae* | Clinical workflow, AMR profiling |
 
 ---
 
-### Phase 2: Deep Analysis
+## WGS Analysis Phases
 
-| Step | Tool | Purpose | Command (Complete) |
-|------|------|---------|-------------------|
-| **Assembly** |
-| 2.1 | SPAdes/SKESA | Assemble genome | `spades.py -1 clean_R1.fastq.gz -2 clean_R2.fastq.gz -o assembly/ --careful -t 4` |
-| 2.2 | QUAST | Assembly QC | `quast.py assembly/contigs.fasta -o quast_report/` |
-| **Species ID** |
-| 2.3 | Kraken2 | Taxonomic classification | `kraken2 --db /db/kraken2_standard --paired clean_R1.fastq.gz clean_R2.fastq.gz --output kraken2_output.txt --report kraken2_report.txt --threads 4` |
-| 2.4 | Bracken | Abundance estimation | `bracken -d /db/kraken2_standard -i kraken2_report.txt -o bracken_output.txt -r 150 -l S` |
-| 2.5 | Krona | Visualization | `ktImportTaxonomy -q 2 -t 3 kraken2_output.txt -o krona_chart.html` |
-| **Annotation** |
-| 2.6 | Bakta | Genome annotation | `bakta assembly/contigs.fasta --db /db/bakta --output bakta_results/ --threads 4` |
-| 2.7 | Prokka (alt) | Genome annotation | `prokka assembly/contigs.fasta --outdir prokka_results/ --prefix sample --cpus 4` |
-| **AMR & Virulence** |
-| 2.8 | ABRicate | AMR gene detection | `abricate --db resfinder assembly/contigs.fasta > abricate_amr.tsv` |
-| 2.9 | ABRicate | Virulence genes | `abricate --db vfdb assembly/contigs.fasta > abricate_virulence.tsv` |
-| **Variant Calling** |
-| 2.10 | BWA | Index reference | `bwa index reference.fasta` |
-| 2.11 | BWA | Map reads | `bwa mem -t 4 reference.fasta clean_R1.fastq.gz clean_R2.fastq.gz \| samtools sort -o aligned.bam` |
-| 2.12 | Samtools | Index BAM | `samtools index aligned.bam` |
-| 2.13 | BCFtools | Call variants | `bcftools mpileup -f reference.fasta aligned.bam \| bcftools call -mv -Oz -o variants.vcf.gz` |
-| 2.14 | SnpEff | Annotate variants | `snpeff -v organism_db variants.vcf.gz > annotated_variants.vcf` |
+Every narrative follows 4 phases:
 
-**Phase 2 Outputs**: Species ID chart, annotated genome, AMR gene table, variant list
+### Phase 1: Quality Control & Preprocessing
+**Goal**: Clean, verified reads ready for analysis
+
+| Step | Tool | Purpose | Command |
+|------|------|---------|---------|
+| 1.1 | **FastQC** | Raw read quality | `fastqc *.fastq.gz -o fastqc_raw/ -t 2` |
+| 1.2 | **fastp** | Trim, filter, QC | See full command below |
+| 1.3 | **FastQC** | Verify cleaned reads | `fastqc clean_*.fastq.gz -o fastqc_clean/ -t 2` |
+| 1.4 | **MultiQC** | Aggregate reports | `multiqc . -o multiqc_report/` |
+
+```bash
+# Complete fastp command
+fastp \
+    -i reads_R1.fastq.gz \
+    -I reads_R2.fastq.gz \
+    -o clean_R1.fastq.gz \
+    -O clean_R2.fastq.gz \
+    --html fastp_report.html \
+    --json fastp_report.json \
+    --thread 4 \
+    --detect_adapter_for_pe \
+    --cut_front \
+    --cut_tail \
+    --cut_mean_quality 20 \
+    --length_required 50 \
+    --correction
+```
+
+**Phase 1 Outputs**: QC dashboard, before/after quality comparison
 
 ---
 
-### Phase 3: Visualization & Charts (Scripting)
+### Phase 2: Assembly & Contamination Check
+**Goal**: High-quality, uncontaminated genome assembly
 
-Users learn to create publication-ready figures using R and Python:
+| Step | Tool | Purpose | Command |
+|------|------|---------|---------|
+| 2.1 | **SPAdes** | De novo assembly | See full command below |
+| 2.2 | **QUAST** | Assembly statistics | `quast.py contigs.fasta -o quast_report/` |
+| 2.3 | **CheckM** | Contamination check | `checkm lineage_wf assembly/ checkm_out/ -t 4 -x fasta` |
+| 2.4 | **ConFindr** | Intra-species contamination | `confindr.py -i assembly/ -o confindr_out/` |
 
-| Step | Language | Purpose | Script (Complete) |
-|------|----------|---------|-------------------|
-| 3.1 | R | AMR heatmap | See full script below |
-| 3.2 | R | Abundance bar chart | See full script below |
-| 3.3 | Python | Coverage plot | See full script below |
-| 3.4 | R | Phylogenetic tree | See full script below |
+```bash
+# Complete SPAdes command
+spades.py \
+    -1 clean_R1.fastq.gz \
+    -2 clean_R2.fastq.gz \
+    -o assembly/ \
+    --careful \
+    --cov-cutoff auto \
+    -t 4 \
+    -m 16
+```
 
-#### Example: Complete R Script for AMR Heatmap
+**Contamination Detection Explained**:
+| Tool | What It Detects | When to Use |
+|------|-----------------|-------------|
+| **CheckM** | Mixed species, incomplete genomes | Always - standard QC |
+| **ConFindr** | Same-species strain mixtures | When purity is critical |
+
+**Phase 2 Outputs**: Assembly stats, contamination report, PASS/FAIL status
+
+---
+
+### Phase 3: Species ID, Annotation & AMR
+**Goal**: Know what organism it is and what genes it has
+
+| Step | Tool | Purpose | Command |
+|------|------|---------|---------|
+| 3.1 | **Kraken2** | Species identification | See full command below |
+| 3.2 | **MLST** | Sequence typing | `mlst contigs.fasta > mlst_results.tsv` |
+| 3.3 | **Bakta** | Genome annotation | `bakta contigs.fasta --db /db/bakta -o bakta_out/ -t 4` |
+| 3.4 | **AMRFinderPlus** | AMR gene detection | `amrfinder -n contigs.fasta -o amr_results.tsv --threads 4` |
+| 3.5 | **ABRicate** | Virulence genes | `abricate --db vfdb contigs.fasta > virulence.tsv` |
+
+```bash
+# Complete Kraken2 command
+kraken2 \
+    --db /db/kraken2_standard \
+    --paired clean_R1.fastq.gz clean_R2.fastq.gz \
+    --output kraken2_output.txt \
+    --report kraken2_report.txt \
+    --threads 4 \
+    --confidence 0.1
+```
+
+**Phase 3 Outputs**: Species ID, MLST type, annotated genome, AMR gene table, virulence genes
+
+---
+
+### Phase 4: Variant Calling, Phylogeny & Visualization
+**Goal**: Understand relationships and create publication figures
+
+| Step | Tool | Purpose | Command |
+|------|------|---------|---------|
+| 4.1 | **Snippy** | SNP calling vs reference | See full command below |
+| 4.2 | **snippy-core** | Core genome alignment | `snippy-core --ref ref.gbk sample1/ sample2/ sample3/` |
+| 4.3 | **IQ-TREE** | Phylogenetic tree | `iqtree -s core.aln -m GTR+G -bb 1000 -nt AUTO` |
+| 4.4 | **R/Python** | Visualization scripts | See scripts below |
+
+```bash
+# Complete Snippy command
+snippy \
+    --ref reference.gbk \
+    --R1 clean_R1.fastq.gz \
+    --R2 clean_R2.fastq.gz \
+    --outdir snippy_sample1/ \
+    --cpus 4 \
+    --ram 8 \
+    --mincov 10 \
+    --minfrac 0.9
+```
+
+**Phase 4 Outputs**: SNP table, phylogenetic tree, AMR heatmap, outbreak report
+
+---
+
+## Curated Tool List: Best-in-Class Only
+
+### Selection Criteria
+- Widely used in published research
+- Actively maintained
+- Best performance in benchmarks
+- Good documentation
+
+### The Definitive WGS Tool Stack
+
+| Category | Tool | Why This One | Alternatives (if needed) |
+|----------|------|--------------|-------------------------|
+| **Read QC** | **FastQC** | Universal standard, detailed reports | - |
+| **Trimming** | **fastp** | All-in-one, fast, great reports | Trimmomatic |
+| **Report Aggregation** | **MultiQC** | Combines all QC into one dashboard | - |
+| **Assembly** | **SPAdes** | Gold standard for bacteria, most cited | SKESA (faster) |
+| **Assembly QC** | **QUAST** | Standard metrics (N50, contigs, etc.) | - |
+| **Contamination** | **CheckM** | Industry standard, completeness + contamination | CheckM2 (newer) |
+| **Contamination (reads)** | **ConFindr** | Detects intra-species mixtures | FastQ Screen |
+| **Species ID** | **Kraken2** | Fast, accurate, widely used | GTDB-Tk (more accurate) |
+| **MLST** | **mlst** | Simple, reliable sequence typing | PubMLST web |
+| **Annotation** | **Bakta** | Modern, faster, better databases | Prokka (older) |
+| **AMR Detection** | **AMRFinderPlus** | NCBI standard, curated database | ABRicate, CARD-RGI |
+| **Virulence** | **ABRicate** | Multi-database support (VFDB, etc.) | - |
+| **Read Mapping** | **BWA-MEM2** | Faster BWA, same accuracy | Minimap2 |
+| **SAM/BAM** | **Samtools** | Universal standard | - |
+| **Variant Calling** | **Snippy** | All-in-one SNP pipeline for bacteria | BCFtools (manual) |
+| **Phylogeny** | **IQ-TREE** | Fast, model selection, bootstrap | RAxML-NG, FastTree |
+| **Visualization (R)** | **ggplot2 + ggtree** | Publication quality | - |
+| **Visualization (Py)** | **matplotlib + seaborn** | Standard scientific plotting | - |
+
+### Tool Versions (Recommended)
+
+```bash
+# Core tools
+fastqc          v0.12.1
+fastp           v0.23.4
+multiqc         v1.21
+spades          v3.15.5
+quast           v5.2.0
+checkm          v1.2.2    # or checkm2 v1.0.1
+confindr        v0.8.1
+
+# Taxonomy & Annotation
+kraken2         v2.1.3
+mlst            v2.23.0
+bakta           v1.9.0
+amrfinderplus   v3.12.8
+abricate        v1.0.1
+
+# Variant calling & phylogeny
+bwa-mem2        v2.2.1
+samtools        v1.19
+snippy          v4.6.0
+iqtree          v2.2.6
+
+# Visualization
+R               v4.3+
+python          v3.10+
+```
+
+---
+
+## Complete Workflow Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     WGS BACTERIAL ANALYSIS WORKFLOW                       │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PHASE 1: Quality Control                                                 │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐           │
+│  │  FastQC  │───▶│  fastp   │───▶│  FastQC  │───▶│ MultiQC  │           │
+│  │  (raw)   │    │ (trim)   │    │ (clean)  │    │ (report) │           │
+│  └──────────┘    └──────────┘    └──────────┘    └──────────┘           │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PHASE 2: Assembly & Contamination Check                                  │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐           │
+│  │  SPAdes  │───▶│  QUAST   │───▶│  CheckM  │───▶│ ConFindr │           │
+│  │(assemble)│    │ (stats)  │    │(contam.) │    │ (purity) │           │
+│  └──────────┘    └──────────┘    └──────────┘    └──────────┘           │
+│                                        │                                  │
+│                              [PASS: <5% contamination]                    │
+│                              [FAIL: Investigate or re-sequence]           │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PHASE 3: Identification & Annotation                                     │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐                            │
+│  │ Kraken2  │    │   MLST   │    │  Bakta   │                            │
+│  │(species) │    │ (typing) │    │(annotate)│                            │
+│  └──────────┘    └──────────┘    └──────────┘                            │
+│        │                                │                                 │
+│        ▼                                ▼                                 │
+│  ┌─────────────────┐    ┌─────────────────────────┐                      │
+│  │  AMRFinderPlus  │    │  ABRicate (virulence)   │                      │
+│  │   (AMR genes)   │    │                         │                      │
+│  └─────────────────┘    └─────────────────────────┘                      │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PHASE 4: Phylogeny & Visualization                                       │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐           │
+│  │  Snippy  │───▶│snippy-   │───▶│ IQ-TREE  │───▶│  ggtree  │           │
+│  │  (SNPs)  │    │  core    │    │ (tree)   │    │  (plot)  │           │
+│  └──────────┘    └──────────┘    └──────────┘    └──────────┘           │
+│                                                         │                 │
+│                                                         ▼                 │
+│                                              ┌──────────────────┐        │
+│                                              │ Publication-ready │        │
+│                                              │     Figures       │        │
+│                                              └──────────────────┘        │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Example Scripts
+
+### R: AMR Heatmap
 
 ```r
 # amr_heatmap.R
-# Creates a heatmap of antimicrobial resistance genes
-
-# Load libraries
 library(tidyverse)
 library(pheatmap)
-library(RColorBrewer)
 
-# Read ABRicate output
-amr_data <- read_tsv("abricate_amr.tsv", col_names = c(
-  "file", "sequence", "start", "end", "strand",
-  "gene", "coverage", "identity", "database",
-  "accession", "product", "resistance"
-))
+# Read AMRFinderPlus output
+amr <- read_tsv("amr_results.tsv")
 
 # Create presence/absence matrix
-amr_matrix <- amr_data %>%
+amr_matrix <- amr %>%
+  select(sample = `Protein identifier`, gene = `Gene symbol`) %>%
   mutate(present = 1) %>%
-  select(gene, present) %>%
-  distinct() %>%
   pivot_wider(names_from = gene, values_from = present, values_fill = 0)
 
-# Generate heatmap
-pdf("amr_heatmap.pdf", width = 10, height = 8)
+# Plot heatmap
+pdf("amr_heatmap.pdf", width = 12, height = 8)
 pheatmap(
-  as.matrix(amr_matrix),
-  color = c("white", "#E41A1C"),
+  as.matrix(amr_matrix[-1]),
+  color = c("white", "#d62728"),
   legend_breaks = c(0, 1),
   legend_labels = c("Absent", "Present"),
-  main = "Antimicrobial Resistance Genes Detected",
-  fontsize = 12,
-  border_color = "grey60"
+  main = "Antimicrobial Resistance Genes",
+  fontsize = 10
 )
 dev.off()
-
-print("Heatmap saved to amr_heatmap.pdf")
 ```
 
-**Phase 3 Outputs**: Publication-ready PDF figures, interactive HTML charts
-
----
-
-### Phase 4: Advanced Analysis & Reporting
-
-| Step | Tool | Purpose | Command/Script |
-|------|------|---------|----------------|
-| 4.1 | Snippy | SNP calling vs reference | `snippy --ref reference.gbk --R1 clean_R1.fastq.gz --R2 clean_R2.fastq.gz --outdir snippy_results/ --cpus 4` |
-| 4.2 | Snippy-core | Core SNP alignment | `snippy-core --ref reference.gbk snippy_results/` |
-| 4.3 | IQ-TREE | Phylogenetic tree | `iqtree -s core.aln -m GTR+G -bb 1000 -nt AUTO` |
-| 4.4 | R (ggtree) | Tree visualization | See script below |
-| 4.5 | R Markdown | Final report | Knit complete analysis report |
-
-#### Outbreak Transmission Analysis (Narrative-specific)
+### R: Phylogenetic Tree with ggtree
 
 ```r
-# transmission_network.R
-# Visualize outbreak transmission based on SNP distances
+# phylo_tree.R
+library(ggtree)
+library(treeio)
 
-library(tidyverse)
-library(igraph)
-library(ggraph)
+# Read IQ-TREE output
+tree <- read.tree("core.aln.treefile")
 
-# Load SNP distance matrix
-snp_dist <- read_tsv("core.dist.tab")
-
-# Create network (edges where SNP distance < 10)
-edges <- snp_dist %>%
-  pivot_longer(-1, names_to = "sample2", values_to = "snps") %>%
-  rename(sample1 = 1) %>%
-  filter(snps > 0, snps < 10)
-
-# Build graph
-g <- graph_from_data_frame(edges, directed = FALSE)
-
-# Plot transmission network
-pdf("transmission_network.pdf", width = 12, height = 10)
-ggraph(g, layout = "fr") +
-  geom_edge_link(aes(width = 1/snps), alpha = 0.5, color = "grey40") +
-  geom_node_point(size = 8, color = "#3182bd") +
-  geom_node_text(aes(label = name), repel = TRUE) +
-  theme_void() +
-  labs(title = "Outbreak Transmission Network",
-       subtitle = "Edges connect samples with < 10 SNP differences")
+# Plot tree
+pdf("phylogenetic_tree.pdf", width = 10, height = 8)
+ggtree(tree, layout = "rectangular") +
+  geom_tiplab(size = 3) +
+  geom_treescale() +
+  theme_tree2() +
+  ggtitle("Core Genome SNP Phylogeny")
 dev.off()
 ```
 
-**Phase 4 Outputs**: Phylogenetic tree, transmission network, complete outbreak report
+### Python: Coverage Plot
 
----
+```python
+# coverage_plot.py
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-## Bioinformatics Tools: Complete List
+# Read samtools depth output
+depth = pd.read_csv("depth.txt", sep="\t",
+                    names=["chrom", "pos", "depth"])
 
-### Tool Fit Considerations (Real-World Selection)
-
-| Category | Recommended Tool | Alternatives | Why This One |
-|----------|-----------------|--------------|--------------|
-| **QC** | fastp | Trimmomatic, cutadapt | Faster, all-in-one, great reports |
-| **Assembly** | SPAdes | SKESA, Unicycler | Gold standard for bacterial genomes |
-| **Species ID** | Kraken2 + Bracken | GTDB-Tk, Centrifuge | Fast, accurate, good visualization |
-| **Annotation** | Bakta | Prokka, PGAP | Modern, better database, faster |
-| **AMR** | ABRicate | AMRFinderPlus, CARD-RGI | Simple, multi-database, scriptable |
-| **Mapping** | BWA-MEM | Bowtie2, Minimap2 | Standard for short reads |
-| **Variants** | BCFtools | GATK, FreeBayes | Lightweight, accurate for bacteria |
-| **Phylogeny** | IQ-TREE | RAxML, FastTree | Modern, fast, model selection |
-| **Viz (R)** | ggplot2 + ggtree | base R, lattice | Publication quality, flexible |
-| **Viz (Py)** | matplotlib + seaborn | plotly, bokeh | Standard, widely used |
-
-### Docker Container Organization
-
+# Plot coverage
+plt.figure(figsize=(14, 4))
+plt.fill_between(depth["pos"], depth["depth"], alpha=0.7)
+plt.xlabel("Genome Position (bp)")
+plt.ylabel("Read Depth")
+plt.title("Genome Coverage")
+plt.axhline(y=30, color="red", linestyle="--", label="30x threshold")
+plt.legend()
+plt.tight_layout()
+plt.savefig("coverage_plot.pdf")
 ```
-┌────────────────────────────────────────────────────────────────┐
-│  bioinfo-base                                                   │
-│  FastQC, fastp, MultiQC, basic utils                           │
-├────────────────────────────────────────────────────────────────┤
-│  bioinfo-assembly                                               │
-│  SPAdes, SKESA, QUAST, Unicycler                               │
-├────────────────────────────────────────────────────────────────┤
-│  bioinfo-taxonomy                                               │
-│  Kraken2, Bracken, Krona, GTDB-Tk                              │
-├────────────────────────────────────────────────────────────────┤
-│  bioinfo-annotation                                             │
-│  Bakta, Prokka, ABRicate, AMRFinderPlus                        │
-├────────────────────────────────────────────────────────────────┤
-│  bioinfo-mapping                                                │
-│  BWA, Bowtie2, Samtools, BCFtools, SnpEff                      │
-├────────────────────────────────────────────────────────────────┤
-│  bioinfo-phylogeny                                              │
-│  Snippy, IQ-TREE, FastTree, Gubbins                            │
-├────────────────────────────────────────────────────────────────┤
-│  bioinfo-viz                                                    │
-│  R (tidyverse, ggplot2, ggtree, pheatmap)                      │
-│  Python (matplotlib, seaborn, pandas, biopython)               │
-└────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Complete Script Coverage Philosophy
-
-### Every Line Shown
-
-Traditional tutorials:
-```
-"Run FastQC on your reads"
-$ fastqc reads.fastq
-```
-
-**Our approach**:
-```
-$ fastqc \
-    reads_R1.fastq.gz \
-    reads_R2.fastq.gz \
-    --outdir fastqc_results/ \
-    --threads 4 \
-    --noextract
-
-# Explanation for each flag:
-# --outdir      : Where to save reports
-# --threads     : Use 4 CPU cores (faster)
-# --noextract   : Don't unzip the results
-```
-
-### Why Complete Scripts Matter
-
-1. **Copy-paste works** - Users can take scripts directly to their own work
-2. **No hidden magic** - Everything is explicit
-3. **Real-world ready** - Same commands work in actual pipelines
-4. **Learn flags** - Understand what each option does
-5. **Debug-friendly** - When things break, users know what was run
 
 ---
 
 ## Technical Architecture
 
-### Architecture: Full Stack with Real Tools
-
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        FRONTEND                                  │
+│                        FRONTEND (SvelteKit)                      │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │   SvelteKit  │  │   xterm.js   │  │  Plotly.js   │          │
-│  │   (3 panels) │  │  (Terminal)  │  │  (Charts)    │          │
+│  │  3-Panel UI  │  │   xterm.js   │  │  Plotly.js   │          │
+│  │   Layout     │  │  (Terminal)  │  │  (Charts)    │          │
 │  └──────────────┘  └──────────────┘  └──────────────┘          │
 │                            │                                     │
 │                     WebSocket + REST                             │
 └────────────────────────────┼─────────────────────────────────────┘
                              │
 ┌────────────────────────────┼─────────────────────────────────────┐
-│                        BACKEND                                   │
+│                     BACKEND (FastAPI)                            │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │   FastAPI    │  │   Redis      │  │  PostgreSQL  │          │
-│  │  (Python)    │  │  (Queue)     │  │  (Users)     │          │
+│  │   Auth +     │  │    Redis     │  │  PostgreSQL  │          │
+│  │   Sessions   │  │   (Queue)    │  │   (Users)    │          │
 │  └──────────────┘  └──────────────┘  └──────────────┘          │
 │                            │                                     │
 │  ┌─────────────────────────┴───────────────────────────┐        │
-│  │         Docker Container Pool (per user)             │        │
-│  │  All bioinfo tools installed, isolated filesystem    │        │
+│  │           Docker Container (per user session)        │        │
+│  │  All bioinfo tools pre-installed                     │        │
+│  │  Isolated filesystem with sample data                │        │
 │  └─────────────────────────────────────────────────────┘        │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-### Recommended Tech Stack
+### Tech Stack
 
-| Layer | Technology | Why |
-|-------|------------|-----|
-| **Frontend** | **SvelteKit** | Lightweight, fast, great for 3-panel layout |
-| **Terminal** | **xterm.js** | Industry standard, WebSocket support |
-| **Styling** | **Tailwind CSS** | Rapid development |
-| **Charts** | **Plotly.js** | Interactive scientific charts |
-| **Backend** | **FastAPI (Python)** | Async, Python bioinfo ecosystem |
-| **Auth** | **Auth.js** | Simple authentication |
-| **Database** | **PostgreSQL** | User accounts, progress tracking |
-| **Queue** | **Redis + Celery** | Job management for long-running tools |
-| **Containers** | **Docker** | Isolated tool execution |
-| **Deploy** | **Railway / Fly.io** | Docker-friendly, affordable |
+| Layer | Technology |
+|-------|------------|
+| Frontend | SvelteKit + Tailwind + xterm.js + Plotly |
+| Backend | FastAPI (Python) |
+| Database | PostgreSQL |
+| Queue | Redis + Celery |
+| Containers | Docker |
+| Deploy | Railway / Fly.io |
 
 ---
 
 ## File Structure
 
 ```
-wgs-learn/
+biolearn/
 ├── frontend/
-│   ├── src/
-│   │   ├── routes/
-│   │   │   ├── +page.svelte              # Landing: narrative selection
-│   │   │   ├── +layout.svelte
-│   │   │   ├── auth/
-│   │   │   │   ├── login/+page.svelte
-│   │   │   │   └── register/+page.svelte
-│   │   │   └── learn/
-│   │   │       └── [narrativeId]/
-│   │   │           └── [phaseId]/
-│   │   │               └── +page.svelte  # 3-panel learning interface
-│   │   ├── lib/
-│   │   │   ├── components/
-│   │   │   │   ├── Terminal.svelte       # xterm.js (left panel)
-│   │   │   │   ├── StoryPanel.svelte     # Narrative + commands (right)
-│   │   │   │   ├── OutputPanel.svelte    # Results & charts (bottom)
-│   │   │   │   ├── ThreePanelLayout.svelte
-│   │   │   │   ├── CommandCard.svelte    # Copyable command block
-│   │   │   │   ├── OutputViewer.svelte   # HTML/chart/file viewer
-│   │   │   │   └── ProgressTracker.svelte
-│   │   │   ├── stores/
-│   │   │   │   ├── user.ts
-│   │   │   │   ├── narrative.ts          # Current story state
-│   │   │   │   └── terminal.ts
-│   │   │   └── api/
-│   │   │       └── client.ts
-│   │   └── app.css
-│   ├── static/
-│   │   └── previews/                     # Goal output images
-│   └── package.json
+│   └── src/
+│       ├── routes/
+│       │   ├── +page.svelte              # Category selection
+│       │   ├── wgs/
+│       │   │   ├── +page.svelte          # WGS narrative selection
+│       │   │   └── [narrativeId]/
+│       │   │       └── [phaseId]/
+│       │   │           └── +page.svelte  # 3-panel learning UI
+│       │   ├── amplicon/                 # Future
+│       │   └── rnaseq/                   # Future
+│       └── lib/
+│           └── components/
+│               ├── Terminal.svelte
+│               ├── StoryPanel.svelte
+│               └── OutputPanel.svelte
 │
 ├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── routers/
-│   │   │   ├── auth.py
-│   │   │   ├── terminal.py               # WebSocket terminal
-│   │   │   ├── narratives.py             # Narrative content API
-│   │   │   └── progress.py
-│   │   ├── services/
-│   │   │   ├── docker_executor.py        # Run tools in containers
-│   │   │   ├── output_watcher.py         # Detect new output files
-│   │   │   └── session_manager.py
-│   │   └── models/
-│   │       ├── user.py
-│   │       └── progress.py
-│   ├── requirements.txt
-│   └── Dockerfile
+│   └── app/
+│       ├── main.py
+│       ├── routers/
+│       │   ├── terminal.py
+│       │   ├── narratives.py
+│       │   └── progress.py
+│       └── services/
+│           ├── docker_executor.py
+│           └── output_watcher.py
 │
 ├── docker/
-│   ├── bioinfo-base/Dockerfile
-│   ├── bioinfo-assembly/Dockerfile
-│   ├── bioinfo-taxonomy/Dockerfile
-│   ├── bioinfo-annotation/Dockerfile
-│   ├── bioinfo-mapping/Dockerfile
-│   ├── bioinfo-phylogeny/Dockerfile
-│   └── bioinfo-viz/Dockerfile
+│   └── bioinfo-wgs/
+│       └── Dockerfile                    # All WGS tools
 │
-├── content/
-│   ├── narratives/
-│   │   ├── soil-outbreak/
-│   │   │   ├── narrative.json            # Story metadata
-│   │   │   ├── phase1.json               # Steps, commands, explanations
-│   │   │   ├── phase2.json
-│   │   │   ├── phase3.json
-│   │   │   ├── phase4.json
-│   │   │   ├── scripts/                  # Complete R/Python scripts
-│   │   │   │   ├── amr_heatmap.R
-│   │   │   │   ├── abundance_plot.R
-│   │   │   │   └── transmission_network.R
-│   │   │   └── data/
-│   │   │       ├── reads_R1.fastq.gz
-│   │   │       ├── reads_R2.fastq.gz
-│   │   │       └── reference.fasta
-│   │   ├── gut-microbiome/
-│   │   ├── water-contamination/
-│   │   ├── hospital-outbreak/
-│   │   └── food-poisoning/
-│   └── shared/
-│       ├── commands.json                 # Shared command definitions
-│       └── explanations.json             # Tool explanations
-│
-├── docker-compose.yml
-└── README.md
+└── content/
+    └── wgs/
+        ├── hospital-outbreak/
+        │   ├── narrative.json
+        │   ├── phase1.json
+        │   ├── phase2.json
+        │   ├── phase3.json
+        │   ├── phase4.json
+        │   ├── scripts/
+        │   └── data/
+        ├── food-poisoning/
+        ├── water-contamination/
+        ├── environmental/
+        └── clinical-isolate/
 ```
 
 ---
 
-## Narrative Content Schema
-
-### narrative.json
-```json
-{
-  "id": "soil-outbreak",
-  "title": "Soil Outbreak Investigation",
-  "description": "A farming community reports mysterious illness. Trace the pathogen in soil samples.",
-  "icon": "🌱",
-  "organism": "Bacillus cereus",
-  "difficulty": "beginner-friendly",
-  "estimatedTime": "4-6 hours",
-  "phases": [
-    {
-      "id": "phase1",
-      "title": "Quality Control",
-      "description": "Prepare raw sequencing data for analysis",
-      "steps": 4
-    },
-    {
-      "id": "phase2",
-      "title": "Deep Analysis",
-      "description": "Species ID, annotation, AMR detection, variants",
-      "steps": 14
-    },
-    {
-      "id": "phase3",
-      "title": "Visualization",
-      "description": "Create publication-ready charts with R/Python",
-      "steps": 4
-    },
-    {
-      "id": "phase4",
-      "title": "Outbreak Report",
-      "description": "Phylogenetics, transmission analysis, final report",
-      "steps": 5
-    }
-  ]
-}
-```
-
-### phase1.json (example step)
-```json
-{
-  "phaseId": "phase1",
-  "title": "Quality Control",
-  "steps": [
-    {
-      "id": "step-1-1",
-      "title": "Check Raw Read Quality",
-      "story": {
-        "text": "The sequencing facility just sent your data from the soil samples. Before we can hunt for pathogens, we need to make sure the data is good quality. Low-quality reads can lead to false results.",
-        "narrativeHook": "You open the email from the sequencing core. Two files attached: reads_R1.fastq.gz and reads_R2.fastq.gz. Time to see what we're working with..."
-      },
-      "command": {
-        "tool": "fastqc",
-        "full": "fastqc reads_R1.fastq.gz reads_R2.fastq.gz --outdir fastqc_raw/ --threads 2",
-        "breakdown": [
-          { "part": "fastqc", "explanation": "The tool for quality control of sequencing data" },
-          { "part": "reads_R1.fastq.gz reads_R2.fastq.gz", "explanation": "Input files (forward and reverse reads)" },
-          { "part": "--outdir fastqc_raw/", "explanation": "Save reports to this folder" },
-          { "part": "--threads 2", "explanation": "Use 2 CPU cores for faster processing" }
-        ]
-      },
-      "expectedOutput": {
-        "files": ["fastqc_raw/reads_R1_fastqc.html", "fastqc_raw/reads_R2_fastqc.html"],
-        "display": "html",
-        "successIndicator": "Analysis complete"
-      },
-      "explanation": {
-        "whatHappened": "FastQC scanned 1.2 million reads and generated quality reports.",
-        "keyMetrics": ["Per-base quality scores", "GC content", "Adapter contamination", "Sequence duplication"],
-        "nextStep": "If quality looks good (mostly green), we proceed. If not, we'll trim the bad parts."
-      }
-    }
-  ]
-}
-```
-
----
-
-## Implementation Phases
+## Implementation Roadmap
 
 ### Phase 1: Foundation
 1. Backend: FastAPI + PostgreSQL + Docker executor
 2. Frontend: SvelteKit 3-panel layout + xterm.js
-3. Terminal: Real execution via Docker containers
-4. Auth: User registration, login, session management
+3. Auth: User accounts, session management
 
-### Phase 2: First Narrative (Soil Outbreak)
-5. Content: Write complete Phase 1-4 for soil outbreak
-6. Scripts: Create all R/Python visualization scripts
-7. Data: Prepare sample FASTQ files
-8. UI: Command cards, output viewers, progress tracking
+### Phase 2: First Narrative (Hospital Outbreak)
+4. Content: Write all 4 phases
+5. Docker: Build bioinfo-wgs container with all tools
+6. UI: Command cards, output viewers
 
-### Phase 3: Additional Narratives
-9. Add Gut Microbiome narrative
-10. Add Water Contamination narrative
-11. Add Hospital Outbreak narrative
-12. Add Food Poisoning narrative
+### Phase 3: Remaining Narratives
+7. Food Poisoning narrative
+8. Water Contamination narrative
+9. Environmental narrative
+10. Clinical Isolate narrative
 
-### Phase 4: Polish
-13. Difficulty fade system
-14. Mobile responsiveness
-15. Performance optimization
-16. Deploy to production
+### Phase 4: Polish & Future Categories
+11. Performance optimization
+12. Deploy to production
+13. Plan Amplicon Sequencing category
 
 ---
 
-## Summary: What Makes This Platform Unique?
+## Summary
 
-| Feature | Traditional Tutorials | This Platform |
-|---------|----------------------|---------------|
-| Structure | Levels/modules | Story-driven narratives |
-| Starting point | Theory | Output shown first |
-| Commands | Simplified examples | Complete, production-ready |
-| Scripts | Snippets | Full scripts, copy-paste ready |
-| Tool selection | Whatever | Real-world best practices |
-| Execution | Simulated/local | Real tools, cloud-hosted |
-| Output | Screenshots | Live, interactive charts |
+| Aspect | Choice |
+|--------|--------|
+| **Focus** | WGS bacterial analysis (first category) |
+| **Narratives** | 5 real-world stories |
+| **Tools** | Best-in-class only, widely used |
+| **Contamination** | CheckM + ConFindr |
+| **AMR** | AMRFinderPlus (NCBI standard) |
+| **Phylogeny** | Snippy + IQ-TREE |
+| **Visualization** | R (ggplot2/ggtree) + Python (matplotlib) |
 
 ---
 
 ## Next Steps
 
-1. Does the 3-panel layout (terminal / story / output) work?
-2. Are the 5 narratives good starting points?
-3. Should I start scaffolding the project?
+1. Does this category structure work?
+2. Tool selection looks good?
+3. Ready to start building?
