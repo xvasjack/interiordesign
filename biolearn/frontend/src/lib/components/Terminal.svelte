@@ -1,14 +1,189 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools } from '$lib/stores/terminal';
 
 	let terminalContainer: HTMLDivElement;
 	let terminal: any;
 	let fitAddon: any;
 	let resizeObserver: ResizeObserver;
-
-	// WebSocket connection for backend
-	let ws: WebSocket | null = null;
 	let commandBuffer = '';
+	let isExecuting = false;
+	let currentDir = '/data/outbreak_investigation';
+
+	// Simulated filesystem
+	const filesystem: Record<string, string[]> = {
+		'/data/outbreak_investigation': [
+			'raw_reads/', 'qc_reports/', 'assembly/', 'annotation/', 'results/',
+			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
+			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
+			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+		],
+		'/data/outbreak_investigation/raw_reads': [
+			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
+			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz'
+		],
+		'/data/outbreak_investigation/qc_reports': [],
+		'/data/outbreak_investigation/assembly': [],
+		'/data/outbreak_investigation/annotation': [],
+		'/data/outbreak_investigation/results': []
+	};
+
+	// Pre-computed tool outputs with realistic terminal output
+	const toolOutputs: Record<string, any> = {
+		'seqkit': {
+			output: `\x1b[32m[INFO]\x1b[0m Processing sample_01_R1.fastq.gz...
+file                      format  type   num_seqs      sum_len  min_len  avg_len  max_len
+sample_01_R1.fastq.gz     FASTQ   DNA    2,456,789  368,518,350      150      150      150
+
+\x1b[32m[INFO]\x1b[0m Summary Statistics:
+  Total reads:     2,456,789
+  Total bases:     368,518,350
+  GC content:      52.3%
+  Q20 bases:       97.2%
+  Q30 bases:       93.8%
+`,
+			summary: {
+				'Total Reads': '2,456,789',
+				'Total Bases': '368.5 Mb',
+				'Read Length': '150 bp',
+				'GC Content': '52.3%',
+				'Q20 Bases': '97.2%',
+				'Q30 Bases': '93.8%'
+			},
+			files: [{ name: 'seqkit_stats.txt', type: 'txt', size: '1.2 KB' }]
+		},
+		'fastqc': {
+			output: `Started analysis of sample_01_R1.fastq.gz
+Approx 5% complete for sample_01_R1.fastq.gz
+Approx 15% complete for sample_01_R1.fastq.gz
+Approx 30% complete for sample_01_R1.fastq.gz
+Approx 50% complete for sample_01_R1.fastq.gz
+Approx 70% complete for sample_01_R1.fastq.gz
+Approx 85% complete for sample_01_R1.fastq.gz
+Approx 95% complete for sample_01_R1.fastq.gz
+Analysis complete for sample_01_R1.fastq.gz
+`,
+			summary: {
+				'Total Sequences': '2,456,789',
+				'Sequence Length': '150 bp',
+				'GC Content': '52%',
+				'Per Base Quality': 'PASS',
+				'Adapter Content': 'WARNING (3.2%)',
+				'Overall Quality': 'PASS'
+			},
+			chartData: {
+				title: 'Per Base Sequence Quality',
+				positions: Array.from({ length: 150 }, (_, i) => i + 1),
+				scores: Array.from({ length: 150 }, (_, i) => 32 + Math.random() * 6 - (i > 130 ? (i - 130) * 0.3 : 0)),
+				xLabel: 'Position in read (bp)',
+				yLabel: 'Quality Score (Phred)'
+			},
+			files: [
+				{ name: 'sample_01_R1_fastqc.html', type: 'html', size: '245 KB' },
+				{ name: 'sample_01_R1_fastqc.zip', type: 'zip', size: '1.2 MB' }
+			]
+		},
+		'trimmomatic': {
+			output: `TrimmomaticPE: Started with arguments:
+ -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz ...
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 2 forward/reverse sequences
+Quality encoding detected as phred33
+Input Read Pairs: 2456789
+  Both Surviving: 2398456 (97.63%)
+  Forward Only Surviving: 32145 (1.31%)
+  Reverse Only Surviving: 18234 (0.74%)
+  Dropped: 7954 (0.32%)
+TrimmomaticPE: Completed successfully
+`,
+			summary: {
+				'Input Reads': '2,456,789 pairs',
+				'Both Surviving': '2,398,456 (97.63%)',
+				'Forward Only': '32,145 (1.31%)',
+				'Reverse Only': '18,234 (0.74%)',
+				'Dropped': '7,954 (0.32%)'
+			},
+			files: [
+				{ name: 'sample_01_R1_paired.fq.gz', type: 'fastq', size: '342 MB' },
+				{ name: 'sample_01_R2_paired.fq.gz', type: 'fastq', size: '341 MB' }
+			]
+		},
+		'unicycler': {
+			output: `
+\x1b[1;32m _    _       _                  _
+| |  | |     (_)                | |
+| |  | |_ __  _  ___ _   _  ____| | ___ _ __
+| |  | | '_ \\| |/ __| | | |/ __| |/ _ \\ '__|
+| |__| | | | | | (__| |_| | (__| |  __/ |
+ \\____/|_| |_|_|\\___|\\__, |\\___|_|\\___|_|
+                      __/ |
+                     |___/\x1b[0m
+
+Starting Unicycler v0.5.0
+
+\x1b[36mChecking dependencies...\x1b[0m
+  SPAdes: 3.15.5 ✓
+  Racon: 1.5.0 ✓
+  Bowtie2: 2.4.5 ✓
+  Samtools: 1.17 ✓
+
+\x1b[36mLoading reads...\x1b[0m
+  Forward reads: 2,398,456
+  Reverse reads: 2,398,456
+
+\x1b[36mPerforming SPAdes assembly...\x1b[0m
+  k=27: 1,234 contigs
+  k=47: 856 contigs
+  k=63: 423 contigs
+  k=77: 245 contigs
+  k=89: 128 contigs
+  k=99: 67 contigs
+
+\x1b[36mBuilding assembly graph...\x1b[0m
+  Nodes: 847
+  Edges: 1,203
+
+\x1b[36mRotating circular sequences...\x1b[0m
+  \x1b[32mChromosome: circularized (4,892,156 bp)\x1b[0m
+  \x1b[32mPlasmid 1: circularized (95,234 bp)\x1b[0m
+
+\x1b[36mPolishing assembly...\x1b[0m
+  Round 1: 23 corrections
+  Round 2: 3 corrections
+  Round 3: 0 corrections
+
+\x1b[1;32mAssembly complete!\x1b[0m
+
+Final assembly:
+  Contigs: 2
+  Total length: 4,987,390 bp
+  Largest contig: 4,892,156 bp
+  N50: 4,892,156 bp
+  GC content: 52.3%
+`,
+			summary: {
+				'Total Contigs': '2',
+				'Total Length': '4,987,390 bp',
+				'Largest Contig': '4,892,156 bp',
+				'N50': '4,892,156 bp',
+				'GC Content': '52.3%',
+				'Circular': '2 (chromosome + plasmid)'
+			},
+			chartData: {
+				title: 'Contig Length Distribution',
+				x: ['Chromosome', 'Plasmid_1'],
+				y: [4892156, 95234],
+				type: 'bar',
+				xLabel: 'Contig',
+				yLabel: 'Length (bp)'
+			},
+			files: [
+				{ name: 'assembly.fasta', type: 'fasta', size: '4.8 MB' },
+				{ name: 'assembly.gfa', type: 'gfa', size: '12 MB' },
+				{ name: 'unicycler.log', type: 'log', size: '156 KB' }
+			]
+		}
+	};
 
 	const terminalOptions = {
 		theme: {
@@ -39,70 +214,254 @@
 		lineHeight: 1.2,
 		cursorBlink: true,
 		cursorStyle: 'block' as const,
-		scrollback: 10000,
-		allowProposedApi: true
+		scrollback: 10000
 	};
 
-	function connectWebSocket() {
-		// TODO: Connect to actual backend WebSocket
-		// For now, we'll simulate locally
-		console.log('WebSocket connection would be established here');
-	}
-
 	function writePrompt() {
-		terminal.write('\r\n\x1b[32mbiolearn\x1b[0m:\x1b[34m~\x1b[0m$ ');
+		const shortDir = currentDir.replace('/data/outbreak_investigation', '~');
+		terminal.write(`\r\n\x1b[32mbiolearn\x1b[0m:\x1b[34m${shortDir}\x1b[0m$ `);
 	}
 
 	function handleInput(data: string) {
-		// Handle special keys
+		if (isExecuting) return;
+
 		if (data === '\r') {
-			// Enter key
 			terminal.write('\r\n');
 			if (commandBuffer.trim()) {
 				executeCommand(commandBuffer.trim());
+			} else {
+				writePrompt();
 			}
 			commandBuffer = '';
-			writePrompt();
 		} else if (data === '\x7f') {
-			// Backspace
 			if (commandBuffer.length > 0) {
 				commandBuffer = commandBuffer.slice(0, -1);
 				terminal.write('\b \b');
 			}
 		} else if (data === '\x03') {
-			// Ctrl+C
 			terminal.write('^C');
 			commandBuffer = '';
+			isExecuting = false;
+			terminalState.set({ isRunning: false, currentCommand: '', progress: 0, estimatedTime: 0 });
 			writePrompt();
 		} else if (data >= ' ' || data === '\t') {
-			// Printable characters
 			commandBuffer += data;
 			terminal.write(data);
 		}
 	}
 
-	function executeCommand(cmd: string) {
-		// TODO: Send to backend via WebSocket
-		// For now, show a placeholder response
-		if (cmd === 'help') {
-			terminal.writeln('\x1b[33mAvailable commands:\x1b[0m');
-			terminal.writeln('  fastqc     - Quality control for FASTQ files');
-			terminal.writeln('  trimmomatic - Trim adapters and low-quality bases');
-			terminal.writeln('  unicycler  - Assemble bacterial genomes');
-			terminal.writeln('  quast      - Assembly quality assessment');
-			terminal.writeln('  abricate   - Screen for AMR/virulence genes');
-			terminal.writeln('  help       - Show this help message');
-			terminal.writeln('  clear      - Clear the terminal');
-		} else if (cmd === 'clear') {
+	async function executeCommand(cmd: string) {
+		const parts = cmd.trim().split(/\s+/);
+		const command = parts[0];
+		const args = parts.slice(1);
+
+		// Check for blocked commands
+		if (blockedCommands.has(command)) {
+			terminal.writeln(`\x1b[31mbash: ${command}: Operation not permitted\x1b[0m`);
+			terminal.writeln(`\x1b[90mThis is a learning environment. Modifying files is disabled.\x1b[0m`);
+			writePrompt();
+			return;
+		}
+
+		// Handle built-in commands
+		if (command === 'help') {
+			showHelp();
+			writePrompt();
+			return;
+		}
+
+		if (command === 'clear') {
 			terminal.clear();
+			writePrompt();
+			return;
+		}
+
+		if (command === 'pwd') {
+			terminal.writeln(currentDir);
+			writePrompt();
+			return;
+		}
+
+		if (command === 'ls') {
+			handleLs(args);
+			writePrompt();
+			return;
+		}
+
+		if (command === 'cd') {
+			handleCd(args);
+			writePrompt();
+			return;
+		}
+
+		if (command === 'cat' || command === 'head' || command === 'tail') {
+			handleFileView(command, args);
+			writePrompt();
+			return;
+		}
+
+		// Handle bioinformatics tools
+		if (bioTools.has(command)) {
+			await executeBioTool(command, args, cmd);
+			return;
+		}
+
+		// Unknown command
+		terminal.writeln(`\x1b[31mbash: ${command}: command not found\x1b[0m`);
+		terminal.writeln(`\x1b[90mType 'help' for available commands\x1b[0m`);
+		writePrompt();
+	}
+
+	function showHelp() {
+		terminal.writeln(`
+\x1b[1;33m═══════════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;33m  BioLearn Terminal - Available Commands\x1b[0m
+\x1b[1;33m═══════════════════════════════════════════════════════════════\x1b[0m
+
+\x1b[1;36mFile Navigation:\x1b[0m
+  ls [path]      - List directory contents
+  cd [path]      - Change directory
+  pwd            - Print working directory
+  cat [file]     - View file contents
+  head [file]    - View first 10 lines
+  tail [file]    - View last 10 lines
+
+\x1b[1;36mBioinformatics Tools:\x1b[0m
+  \x1b[32mseqkit stats\x1b[0m   - Read statistics (~3s)
+  \x1b[32mfastqc\x1b[0m         - Quality control (~10s)
+  \x1b[32mtrimmomatic\x1b[0m    - Read trimming (~45s)
+  \x1b[32municycler\x1b[0m      - Genome assembly (~3-5min)
+  \x1b[32mquast\x1b[0m          - Assembly QC (~20s)
+  \x1b[32mprokka\x1b[0m         - Genome annotation (~1-2min)
+  \x1b[32mabricate\x1b[0m       - AMR screening (~10s)
+  \x1b[32mmlst\x1b[0m           - Sequence typing (~5s)
+
+\x1b[1;36mUtility:\x1b[0m
+  help           - Show this message
+  clear          - Clear terminal
+  Ctrl+C         - Cancel running command
+`);
+	}
+
+	function handleLs(args: string[]) {
+		const path = args[0] || currentDir;
+		const fullPath = path.startsWith('/') ? path : `${currentDir}/${path}`.replace(/\/+/g, '/');
+		const files = filesystem[fullPath] || filesystem[currentDir] || [];
+
+		if (files.length === 0) {
+			terminal.writeln('\x1b[90m(empty directory)\x1b[0m');
+			return;
+		}
+
+		const formatted = files.map(f => {
+			if (f.endsWith('/')) {
+				return `\x1b[34m${f}\x1b[0m`;
+			} else if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) {
+				return `\x1b[32m${f}\x1b[0m`;
+			}
+			return f;
+		});
+
+		// Display in columns
+		terminal.writeln(formatted.join('  '));
+	}
+
+	function handleCd(args: string[]) {
+		if (args.length === 0 || args[0] === '~') {
+			currentDir = '/data/outbreak_investigation';
+			return;
+		}
+
+		const newPath = args[0].startsWith('/')
+			? args[0]
+			: `${currentDir}/${args[0]}`.replace(/\/+/g, '/');
+
+		if (filesystem[newPath] || filesystem[newPath.replace(/\/$/, '')]) {
+			currentDir = newPath.replace(/\/$/, '');
+		} else if (args[0] === '..') {
+			const parts = currentDir.split('/');
+			parts.pop();
+			currentDir = parts.join('/') || '/data/outbreak_investigation';
 		} else {
-			terminal.writeln(`\x1b[36mExecuting: ${cmd}\x1b[0m`);
-			terminal.writeln('\x1b[90m[Connecting to analysis backend...]\x1b[0m');
+			terminal.writeln(`\x1b[31mbash: cd: ${args[0]}: No such directory\x1b[0m`);
 		}
 	}
 
+	function handleFileView(cmd: string, args: string[]) {
+		if (args.length === 0) {
+			terminal.writeln(`\x1b[31m${cmd}: missing file operand\x1b[0m`);
+			return;
+		}
+
+		const filename = args[0];
+		if (filename.endsWith('.fastq.gz') || filename.endsWith('.fq.gz')) {
+			terminal.writeln(`\x1b[90m[Binary file - showing first reads]\x1b[0m`);
+			terminal.writeln(`@M00123:45:000000000-ABC12:1:1101:15234:1000 1:N:0:1`);
+			terminal.writeln(`ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG...`);
+			terminal.writeln(`+`);
+			terminal.writeln(`FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...`);
+		} else {
+			terminal.writeln(`\x1b[31m${cmd}: ${filename}: No such file\x1b[0m`);
+		}
+	}
+
+	async function executeBioTool(tool: string, args: string[], fullCmd: string) {
+		isExecuting = true;
+		const times = toolExecutionTimes[tool] || { min: 5, max: 15 };
+		const execTime = Math.floor(Math.random() * (times.max - times.min + 1)) + times.min;
+
+		// Update terminal state for output panel
+		terminalState.set({
+			isRunning: true,
+			currentCommand: fullCmd,
+			progress: 0,
+			estimatedTime: execTime
+		});
+
+		// Show tool startup
+		terminal.writeln(`\x1b[36m[${tool}]\x1b[0m Starting analysis...`);
+		terminal.writeln(`\x1b[90mEstimated time: ~${execTime}s\x1b[0m`);
+		terminal.writeln('');
+
+		// Simulate progress
+		const toolData = toolOutputs[tool];
+		const outputLines = toolData?.output?.split('\n') || [];
+		const interval = (execTime * 1000) / Math.max(outputLines.length, 10);
+
+		for (let i = 0; i < outputLines.length; i++) {
+			await sleep(interval);
+			if (!isExecuting) break;
+
+			terminal.writeln(outputLines[i]);
+			const progress = Math.floor(((i + 1) / outputLines.length) * 100);
+			terminalState.update(s => ({ ...s, progress }));
+		}
+
+		if (isExecuting && toolData) {
+			// Update output panel with results
+			outputData.set({
+				type: tool,
+				title: `${tool.charAt(0).toUpperCase() + tool.slice(1)} Results`,
+				tool: fullCmd,
+				summary: toolData.summary,
+				chartData: toolData.chartData,
+				files: toolData.files
+			});
+
+			terminal.writeln('');
+			terminal.writeln(`\x1b[32m✓ Analysis complete\x1b[0m`);
+		}
+
+		isExecuting = false;
+		terminalState.set({ isRunning: false, currentCommand: '', progress: 100, estimatedTime: 0 });
+		writePrompt();
+	}
+
+	function sleep(ms: number): Promise<void> {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
 	onMount(async () => {
-		// Dynamic imports for client-side only (xterm doesn't support SSR)
 		const { Terminal } = await import('@xterm/xterm');
 		const { FitAddon } = await import('@xterm/addon-fit');
 		const { WebLinksAddon } = await import('@xterm/addon-web-links');
@@ -116,46 +475,30 @@
 		terminal.loadAddon(webLinksAddon);
 		terminal.open(terminalContainer);
 
-		// Fit terminal to container
 		setTimeout(() => fitAddon.fit(), 0);
 
-		// Handle resize
 		resizeObserver = new ResizeObserver(() => {
 			fitAddon.fit();
 		});
 		resizeObserver.observe(terminalContainer);
 
 		// Welcome message
-		terminal.writeln('\x1b[1;36m╔═══════════════════════════════════════════════════════╗\x1b[0m');
-		terminal.writeln('\x1b[1;36m║\x1b[0m   \x1b[1;32mBioLearn\x1b[0m - Bioinformatics Learning Terminal         \x1b[1;36m║\x1b[0m');
-		terminal.writeln('\x1b[1;36m║\x1b[0m   Type \x1b[33mhelp\x1b[0m for available commands                     \x1b[1;36m║\x1b[0m');
-		terminal.writeln('\x1b[1;36m╚═══════════════════════════════════════════════════════╝\x1b[0m');
+		terminal.writeln('\x1b[1;36m╔═══════════════════════════════════════════════════════════╗\x1b[0m');
+		terminal.writeln('\x1b[1;36m║\x1b[0m   \x1b[1;32mBioLearn\x1b[0m - Bioinformatics Learning Terminal             \x1b[1;36m║\x1b[0m');
+		terminal.writeln('\x1b[1;36m║\x1b[0m   Type \x1b[33mhelp\x1b[0m for available commands                         \x1b[1;36m║\x1b[0m');
+		terminal.writeln('\x1b[1;36m╚═══════════════════════════════════════════════════════════╝\x1b[0m');
 		writePrompt();
 
-		// Handle input
 		terminal.onData(handleInput);
-
-		// Connect to backend
-		connectWebSocket();
 	});
 
 	onDestroy(() => {
-		if (resizeObserver) {
-			resizeObserver.disconnect();
-		}
-		if (terminal) {
-			terminal.dispose();
-		}
-		if (ws) {
-			ws.close();
-		}
+		if (resizeObserver) resizeObserver.disconnect();
+		if (terminal) terminal.dispose();
 	});
 </script>
 
-<div
-	bind:this={terminalContainer}
-	class="w-full h-full p-2"
-></div>
+<div bind:this={terminalContainer} class="w-full h-full p-2"></div>
 
 <style>
 	div {

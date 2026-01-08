@@ -1,119 +1,63 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
-	let {
-		data = null
-	}: {
-		data?: any;
-	} = $props();
+	import { outputData, terminalState } from '$lib/stores/terminal';
 
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
+	let currentOutput = $state<any>(null);
+	let isLoading = $state(false);
+	let loadingProgress = $state(0);
+	let loadingTool = $state('');
 
-	// Sample data for demonstration
-	const sampleQCData = {
-		type: 'fastqc',
-		title: 'Sequence Quality Report',
-		summary: {
-			totalSequences: '2,456,789',
-			sequenceLength: '150 bp',
-			gcContent: '52%',
-			qualityScore: 'Pass'
-		},
-		qualityScores: {
-			positions: Array.from({ length: 150 }, (_, i) => i + 1),
-			scores: Array.from({ length: 150 }, () => Math.random() * 10 + 28)
-		}
-	};
+	// Subscribe to stores
+	onMount(() => {
+		const unsubOutput = outputData.subscribe(data => {
+			currentOutput = data;
+			if (data && data.chartData) {
+				setTimeout(() => renderChart(data), 100);
+			}
+		});
 
-	async function renderChart() {
-		if (!plotContainer) return;
+		const unsubTerminal = terminalState.subscribe(state => {
+			isLoading = state.isRunning;
+			loadingProgress = state.progress;
+			loadingTool = state.currentCommand.split(' ')[0] || '';
+		});
 
-		// Dynamic import Plotly to avoid SSR issues
+		return () => {
+			unsubOutput();
+			unsubTerminal();
+		};
+	});
+
+	async function renderChart(data: any) {
+		if (!plotContainer || !data?.chartData) return;
+
 		const Plotly = await import('plotly.js-dist-min');
 
 		const trace = {
-			x: sampleQCData.qualityScores.positions,
-			y: sampleQCData.qualityScores.scores,
-			type: 'scatter',
+			x: data.chartData.positions || data.chartData.x,
+			y: data.chartData.scores || data.chartData.y,
+			type: data.chartData.type || 'scatter',
 			mode: 'lines',
 			fill: 'tozeroy',
 			fillcolor: 'rgba(78, 201, 176, 0.3)',
-			line: {
-				color: '#4ec9b0',
-				width: 2
-			},
-			name: 'Quality Score'
+			line: { color: '#4ec9b0', width: 2 },
+			name: data.chartData.name || 'Data'
 		};
 
 		const layout = {
-			title: {
-				text: 'Per Base Sequence Quality',
-				font: { size: 14 }
-			},
-			xaxis: {
-				title: 'Position in read (bp)',
-				gridcolor: '#e5e7eb'
-			},
-			yaxis: {
-				title: 'Quality Score (Phred)',
-				range: [0, 42],
-				gridcolor: '#e5e7eb'
-			},
-			shapes: [
-				{
-					type: 'rect',
-					xref: 'paper',
-					yref: 'y',
-					x0: 0,
-					y0: 28,
-					x1: 1,
-					y1: 42,
-					fillcolor: 'rgba(34, 197, 94, 0.1)',
-					line: { width: 0 }
-				},
-				{
-					type: 'rect',
-					xref: 'paper',
-					yref: 'y',
-					x0: 0,
-					y0: 20,
-					x1: 1,
-					y1: 28,
-					fillcolor: 'rgba(234, 179, 8, 0.1)',
-					line: { width: 0 }
-				},
-				{
-					type: 'rect',
-					xref: 'paper',
-					yref: 'y',
-					x0: 0,
-					y0: 0,
-					x1: 1,
-					y1: 20,
-					fillcolor: 'rgba(239, 68, 68, 0.1)',
-					line: { width: 0 }
-				}
-			],
+			title: { text: data.chartData.title || data.title, font: { size: 14 } },
+			xaxis: { title: data.chartData.xLabel || 'X', gridcolor: '#e5e7eb' },
+			yaxis: { title: data.chartData.yLabel || 'Y', gridcolor: '#e5e7eb' },
 			margin: { t: 40, r: 20, b: 50, l: 60 },
 			paper_bgcolor: 'transparent',
 			plot_bgcolor: 'transparent',
 			font: { family: 'system-ui, sans-serif' }
 		};
 
-		const config = {
-			responsive: true,
-			displayModeBar: true,
-			modeBarButtonsToRemove: ['lasso2d', 'select2d'],
-			displaylogo: false
-		};
-
-		Plotly.default.newPlot(plotContainer, [trace], layout, config);
+		Plotly.default.newPlot(plotContainer, [trace], layout, { responsive: true, displaylogo: false });
 	}
-
-	onMount(() => {
-		renderChart();
-	});
 </script>
 
 <div class="h-full flex flex-col bg-gray-50">
@@ -153,76 +97,94 @@
 
 	<!-- Content -->
 	<div class="flex-1 overflow-auto p-4">
-		{#if activeTab === 'chart'}
-			<div bind:this={plotContainer} class="w-full h-full min-h-[200px]"></div>
+		{#if isLoading}
+			<!-- Loading State -->
+			<div class="h-full flex flex-col items-center justify-center text-gray-500">
+				<div class="mb-4">
+					<svg class="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+					</svg>
+				</div>
+				<p class="text-lg font-medium text-gray-700">Running {loadingTool}...</p>
+				<div class="w-64 mt-4">
+					<div class="bg-gray-200 rounded-full h-2">
+						<div
+							class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+							style="width: {loadingProgress}%"
+						></div>
+					</div>
+					<p class="text-sm text-gray-500 mt-2 text-center">{loadingProgress}% complete</p>
+				</div>
+			</div>
+		{:else if !currentOutput}
+			<!-- Empty State -->
+			<div class="h-full flex flex-col items-center justify-center text-gray-400">
+				<svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+				</svg>
+				<p class="text-lg font-medium">No output yet</p>
+				<p class="text-sm mt-1">Run a command in the terminal to see results</p>
+			</div>
+		{:else if activeTab === 'chart'}
+			{#if currentOutput.chartData}
+				<div bind:this={plotContainer} class="w-full h-full min-h-[200px]"></div>
+			{:else}
+				<div class="h-full flex items-center justify-center text-gray-400">
+					<p>No chart data available for this command</p>
+				</div>
+			{/if}
 		{:else if activeTab === 'table'}
-			<div class="bg-white rounded-lg shadow-sm border">
-				<div class="px-4 py-3 border-b">
-					<h3 class="font-semibold text-gray-800">{sampleQCData.title}</h3>
+			{#if currentOutput.summary}
+				<div class="bg-white rounded-lg shadow-sm border">
+					<div class="px-4 py-3 border-b">
+						<h3 class="font-semibold text-gray-800">{currentOutput.title}</h3>
+						<p class="text-sm text-gray-500">{currentOutput.tool}</p>
+					</div>
+					<div class="p-4">
+						<dl class="grid grid-cols-2 gap-4">
+							{#each Object.entries(currentOutput.summary) as [key, value]}
+								<div>
+									<dt class="text-sm text-gray-500">{key}</dt>
+									<dd class="text-lg font-semibold text-gray-800">{value}</dd>
+								</div>
+							{/each}
+						</dl>
+					</div>
 				</div>
-				<div class="p-4">
-					<dl class="grid grid-cols-2 gap-4">
-						<div>
-							<dt class="text-sm text-gray-500">Total Sequences</dt>
-							<dd class="text-lg font-semibold text-gray-800">
-								{sampleQCData.summary.totalSequences}
-							</dd>
-						</div>
-						<div>
-							<dt class="text-sm text-gray-500">Sequence Length</dt>
-							<dd class="text-lg font-semibold text-gray-800">
-								{sampleQCData.summary.sequenceLength}
-							</dd>
-						</div>
-						<div>
-							<dt class="text-sm text-gray-500">GC Content</dt>
-							<dd class="text-lg font-semibold text-gray-800">
-								{sampleQCData.summary.gcContent}
-							</dd>
-						</div>
-						<div>
-							<dt class="text-sm text-gray-500">Overall Quality</dt>
-							<dd class="text-lg font-semibold">
-								<span class="text-green-600 bg-green-100 px-2 py-1 rounded">
-									{sampleQCData.summary.qualityScore}
-								</span>
-							</dd>
-						</div>
-					</dl>
+			{:else}
+				<div class="h-full flex items-center justify-center text-gray-400">
+					<p>No summary data available</p>
 				</div>
-			</div>
+			{/if}
 		{:else if activeTab === 'files'}
-			<div class="bg-white rounded-lg shadow-sm border">
-				<div class="px-4 py-3 border-b">
-					<h3 class="font-semibold text-gray-800">Generated Files</h3>
+			{#if currentOutput.files && currentOutput.files.length > 0}
+				<div class="bg-white rounded-lg shadow-sm border">
+					<div class="px-4 py-3 border-b">
+						<h3 class="font-semibold text-gray-800">Generated Files</h3>
+					</div>
+					<ul class="divide-y">
+						{#each currentOutput.files as file}
+							<li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
+								<div class="flex items-center gap-3">
+									<span class="text-2xl">{file.type === 'html' ? '📄' : file.type === 'zip' ? '📦' : '📁'}</span>
+									<div>
+										<p class="font-medium text-gray-800">{file.name}</p>
+										<p class="text-sm text-gray-500">{file.type.toUpperCase()} • {file.size}</p>
+									</div>
+								</div>
+								<button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+									{file.type === 'html' ? 'View' : 'Download'}
+								</button>
+							</li>
+						{/each}
+					</ul>
 				</div>
-				<ul class="divide-y">
-					<li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
-						<div class="flex items-center gap-3">
-							<span class="text-2xl">📄</span>
-							<div>
-								<p class="font-medium text-gray-800">sample_01_fastqc.html</p>
-								<p class="text-sm text-gray-500">HTML Report • 245 KB</p>
-							</div>
-						</div>
-						<button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-							View
-						</button>
-					</li>
-					<li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
-						<div class="flex items-center gap-3">
-							<span class="text-2xl">📦</span>
-							<div>
-								<p class="font-medium text-gray-800">sample_01_fastqc.zip</p>
-								<p class="text-sm text-gray-500">Archive • 1.2 MB</p>
-							</div>
-						</div>
-						<button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-							Download
-						</button>
-					</li>
-				</ul>
-			</div>
+			{:else}
+				<div class="h-full flex items-center justify-center text-gray-400">
+					<p>No files generated</p>
+				</div>
+			{/if}
 		{/if}
 	</div>
 </div>
