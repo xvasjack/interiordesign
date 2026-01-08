@@ -75,29 +75,113 @@
 		if (!plotContainer || !data?.chartData) return;
 
 		const Plotly = await import('plotly.js-dist-min');
+		const chartData = data.chartData;
 
-		const trace = {
-			x: data.chartData.positions || data.chartData.x,
-			y: data.chartData.scores || data.chartData.y,
-			type: data.chartData.type || 'scatter',
-			mode: 'lines',
-			fill: 'tozeroy',
-			fillcolor: 'rgba(78, 201, 176, 0.3)',
-			line: { color: '#4ec9b0', width: 2 },
-			name: data.chartData.name || 'Data'
-		};
-
-		const layout = {
-			title: { text: data.chartData.title || data.title, font: { size: 14 } },
-			xaxis: { title: data.chartData.xLabel || 'X', gridcolor: '#e5e7eb' },
-			yaxis: { title: data.chartData.yLabel || 'Y', gridcolor: '#e5e7eb' },
-			margin: { t: 40, r: 20, b: 50, l: 60 },
+		let traces: any[] = [];
+		let layout: any = {
+			title: {
+				text: chartData.title || data.title,
+				font: { size: 16, color: '#1f2937' }
+			},
+			xaxis: {
+				title: { text: chartData.xLabel || 'X', font: { size: 12, color: '#4b5563' } },
+				gridcolor: '#e5e7eb',
+				tickfont: { size: 11, color: '#6b7280' }
+			},
+			yaxis: {
+				title: { text: chartData.yLabel || 'Y', font: { size: 12, color: '#4b5563' } },
+				gridcolor: '#e5e7eb',
+				tickfont: { size: 11, color: '#6b7280' }
+			},
+			margin: { t: 50, r: 30, b: 60, l: 80 },
 			paper_bgcolor: 'transparent',
-			plot_bgcolor: 'transparent',
-			font: { family: 'system-ui, sans-serif' }
+			plot_bgcolor: '#fafafa',
+			font: { family: 'system-ui, sans-serif' },
+			showlegend: false
 		};
 
-		Plotly.default.newPlot(plotContainer, [trace], layout, { responsive: true, displaylogo: false });
+		if (chartData.type === 'bar') {
+			// Bar chart for trimmomatic, unicycler, bandage
+			const colors = chartData.isAssemblyGraph
+				? ['#3b82f6', '#10b981']  // Blue and green for assembly
+				: ['#10b981', '#f59e0b', '#f97316', '#ef4444'];  // Green, amber, orange, red for trimmomatic
+
+			traces.push({
+				x: chartData.x,
+				y: chartData.y,
+				type: 'bar',
+				marker: {
+					color: colors.slice(0, chartData.x.length),
+					line: { color: '#1f2937', width: 1 }
+				},
+				text: chartData.y.map((v: number) => v.toLocaleString()),
+				textposition: 'outside',
+				textfont: { size: 11, color: '#374151' }
+			});
+
+			layout.yaxis.rangemode = 'tozero';
+
+			// Add annotation for assembly graph quality
+			if (chartData.isAssemblyGraph && chartData.graphStats) {
+				const quality = chartData.graphStats.quality;
+				const qualityColor = quality === 'excellent' ? '#10b981' : quality === 'good' ? '#f59e0b' : '#ef4444';
+				layout.annotations = [{
+					x: 0.5,
+					y: 1.08,
+					xref: 'paper',
+					yref: 'paper',
+					text: `Quality: ${quality.toUpperCase()} | ${chartData.graphStats.circular} circular | ${chartData.graphStats.deadEnds} dead ends`,
+					showarrow: false,
+					font: { size: 12, color: qualityColor }
+				}];
+			}
+		} else {
+			// Line chart for FastQC quality scores
+			traces.push({
+				x: chartData.positions || chartData.x,
+				y: chartData.scores || chartData.y,
+				type: 'scatter',
+				mode: 'lines',
+				fill: 'tozeroy',
+				fillcolor: 'rgba(16, 185, 129, 0.2)',
+				line: { color: '#10b981', width: 2 },
+				name: chartData.name || 'Quality Score'
+			});
+
+			// Add quality threshold lines for FastQC
+			if (chartData.yLabel?.includes('Phred') || chartData.yLabel?.includes('Quality')) {
+				// Q30 line (excellent)
+				traces.push({
+					x: [1, 150],
+					y: [30, 30],
+					type: 'scatter',
+					mode: 'lines',
+					line: { color: '#10b981', width: 1, dash: 'dash' },
+					name: 'Q30 (Excellent)',
+					showlegend: true
+				});
+				// Q20 line (acceptable)
+				traces.push({
+					x: [1, 150],
+					y: [20, 20],
+					type: 'scatter',
+					mode: 'lines',
+					line: { color: '#f59e0b', width: 1, dash: 'dash' },
+					name: 'Q20 (Acceptable)',
+					showlegend: true
+				});
+
+				layout.showlegend = true;
+				layout.legend = { x: 0.7, y: 0.1, bgcolor: 'rgba(255,255,255,0.8)' };
+				layout.yaxis.range = [0, 42];
+			}
+		}
+
+		Plotly.default.newPlot(plotContainer, traces, layout, {
+			responsive: true,
+			displaylogo: false,
+			modeBarButtonsToRemove: ['lasso2d', 'select2d']
+		});
 	}
 </script>
 

@@ -8,6 +8,7 @@
 	let fitAddon: any;
 	let resizeObserver: ResizeObserver;
 	let commandBuffer = '';
+	let cursorPosition = 0;  // Track cursor position for left/right arrow
 	let isExecuting = false;
 	let currentDir = '/data/outbreak_investigation';
 
@@ -15,6 +16,11 @@
 	let commandHistoryList: string[] = [];
 	let historyIndex = -1;
 	let savedCurrentBuffer = '';
+
+	// Allowed commands for dropdown display
+	const allowedCommandsList = [
+		'ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'clear', 'help'
+	];
 
 	// Track which tools have been run for dynamic filesystem
 	let executedToolsList: string[] = [];
@@ -200,9 +206,19 @@ TrimmomaticPE: Completed successfully
 					'Reverse Only': '19,876 (0.81%)',
 					'Dropped': '8,334 (0.34%)'
 				},
+				chartData: {
+					title: 'Trimmomatic Read Retention',
+					x: ['Both Surviving', 'Forward Only', 'Reverse Only', 'Dropped'],
+					y: [2394012, 34567, 19876, 8334],
+					type: 'bar',
+					xLabel: 'Read Category',
+					yLabel: 'Number of Reads'
+				},
 				files: [
 					{ name: `${sampleName}_R1_paired.fq.gz`, type: 'fastq', size: '342 MB' },
-					{ name: `${sampleName}_R2_paired.fq.gz`, type: 'fastq', size: '341 MB' }
+					{ name: `${sampleName}_R2_paired.fq.gz`, type: 'fastq', size: '341 MB' },
+					{ name: `${sampleName}_R1_unpaired.fq.gz`, type: 'fastq', size: '4.8 MB' },
+					{ name: `${sampleName}_R2_unpaired.fq.gz`, type: 'fastq', size: '2.7 MB' }
 				]
 			},
 			'unicycler': {
@@ -308,7 +324,23 @@ Loading assembly graph: assembly.gfa
 					'Components': '2',
 					'Circular Contigs': '2',
 					'Dead Ends': '0',
-					'Layout': 'Force-directed'
+					'Layout': 'Force-directed',
+					'Quality': 'Excellent (complete circular genome)'
+				},
+				chartData: {
+					title: 'Assembly Graph - Component Sizes',
+					x: ['Chromosome', 'Plasmid 1'],
+					y: [4892156, 95234],
+					type: 'bar',
+					xLabel: 'Component',
+					yLabel: 'Size (bp)',
+					isAssemblyGraph: true,
+					graphStats: {
+						components: 2,
+						circular: 2,
+						deadEnds: 0,
+						quality: 'excellent'
+					}
 				},
 				files: [
 					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' },
@@ -381,18 +413,28 @@ Loading assembly graph: assembly.gfa
 				writePrompt();
 			}
 			commandBuffer = '';
+			cursorPosition = 0;
 		}
 		// Handle Backspace
 		else if (data === '\x7f') {
-			if (commandBuffer.length > 0) {
-				commandBuffer = commandBuffer.slice(0, -1);
-				terminal.write('\b \b');
+			if (cursorPosition > 0) {
+				// Delete character before cursor
+				commandBuffer = commandBuffer.slice(0, cursorPosition - 1) + commandBuffer.slice(cursorPosition);
+				cursorPosition--;
+				// Redraw line from cursor position
+				terminal.write('\b');
+				terminal.write(commandBuffer.slice(cursorPosition) + ' ');
+				// Move cursor back to position
+				for (let i = 0; i <= commandBuffer.length - cursorPosition; i++) {
+					terminal.write('\b');
+				}
 			}
 		}
 		// Handle Ctrl+C
 		else if (data === '\x03') {
 			terminal.write('^C');
 			commandBuffer = '';
+			cursorPosition = 0;
 			historyIndex = -1;
 			isExecuting = false;
 			terminalState.set({ isRunning: false, currentCommand: '', progress: 0, estimatedTime: 0 });
@@ -403,6 +445,7 @@ Loading assembly graph: assembly.gfa
 			terminal.clear();
 			writePrompt();
 			terminal.write(commandBuffer);
+			cursorPosition = commandBuffer.length;
 		}
 		// Handle Tab autocomplete
 		else if (data === '\t') {
@@ -420,6 +463,7 @@ Loading assembly graph: assembly.gfa
 				}
 				clearLine();
 				commandBuffer = commandHistoryList[historyIndex];
+				cursorPosition = commandBuffer.length;
 				terminal.write(commandBuffer);
 			}
 		}
@@ -430,39 +474,90 @@ Loading assembly graph: assembly.gfa
 					historyIndex++;
 					clearLine();
 					commandBuffer = commandHistoryList[historyIndex];
+					cursorPosition = commandBuffer.length;
 					terminal.write(commandBuffer);
 				} else {
 					historyIndex = -1;
 					clearLine();
 					commandBuffer = savedCurrentBuffer;
+					cursorPosition = commandBuffer.length;
 					terminal.write(commandBuffer);
 				}
 			}
 		}
+		// Arrow Left - move cursor left
+		else if (data === '\x1b[D') {
+			if (cursorPosition > 0) {
+				cursorPosition--;
+				terminal.write('\x1b[D');  // Move cursor left
+			}
+		}
+		// Arrow Right - move cursor right
+		else if (data === '\x1b[C') {
+			if (cursorPosition < commandBuffer.length) {
+				cursorPosition++;
+				terminal.write('\x1b[C');  // Move cursor right
+			}
+		}
 		// Regular characters
 		else if (data >= ' ') {
-			commandBuffer += data;
-			terminal.write(data);
+			// Insert character at cursor position
+			commandBuffer = commandBuffer.slice(0, cursorPosition) + data + commandBuffer.slice(cursorPosition);
+			cursorPosition++;
+			// Write from cursor position to end
+			terminal.write(commandBuffer.slice(cursorPosition - 1));
+			// Move cursor back to position
+			for (let i = 0; i < commandBuffer.length - cursorPosition; i++) {
+				terminal.write('\b');
+			}
 		}
 	}
 
 	function handleTabComplete() {
 		const parts = commandBuffer.split(/\s+/);
 		const lastPart = parts[parts.length - 1] || '';
+		const command = parts[0] || '';
+
+		// Don't allow tab completion for non-existent commands
+		const validCommands = [...allowedCommandsList, ...Array.from(bioTools)];
+		if (parts.length > 1 && !validCommands.includes(command)) {
+			return; // Don't tab complete for invalid commands
+		}
 
 		// Get current filesystem
 		const filesystem = getFilesystem();
-		const files = filesystem[currentDir] || [];
+
+		// Handle subdirectory paths (e.g., trimmed/sample)
+		let searchDir = currentDir;
+		let searchPrefix = lastPart;
+		let pathPrefix = '';
+
+		if (lastPart.includes('/')) {
+			const lastSlash = lastPart.lastIndexOf('/');
+			const dirPart = lastPart.slice(0, lastSlash);
+			searchPrefix = lastPart.slice(lastSlash + 1);
+			pathPrefix = dirPart + '/';
+
+			// Resolve the directory path
+			if (dirPart.startsWith('/')) {
+				searchDir = dirPart;
+			} else {
+				searchDir = `${currentDir}/${dirPart}`.replace(/\/+/g, '/');
+			}
+		}
+
+		const files = filesystem[searchDir] || [];
 
 		// Find matches
-		const matches = files.filter(f => f.startsWith(lastPart));
+		const matches = files.filter(f => f.startsWith(searchPrefix));
 
 		if (matches.length === 0) {
 			return; // No matches
 		} else if (matches.length === 1) {
 			// Single match - complete it
-			const completion = matches[0].slice(lastPart.length);
+			const completion = matches[0].slice(searchPrefix.length);
 			commandBuffer += completion;
+			cursorPosition += completion.length;
 			terminal.write(completion);
 		} else {
 			// Multiple matches - show them
@@ -475,12 +570,14 @@ Loading assembly graph: assembly.gfa
 			terminal.writeln(formatted.join('  '));
 			writePrompt();
 			terminal.write(commandBuffer);
+			cursorPosition = commandBuffer.length;
 
 			// Find common prefix
 			const commonPrefix = findCommonPrefix(matches);
-			if (commonPrefix.length > lastPart.length) {
-				const completion = commonPrefix.slice(lastPart.length);
+			if (commonPrefix.length > searchPrefix.length) {
+				const completion = commonPrefix.slice(searchPrefix.length);
 				commandBuffer += completion;
+				cursorPosition += completion.length;
 				terminal.write(completion);
 			}
 		}
@@ -497,15 +594,52 @@ Loading assembly graph: assembly.gfa
 		return prefix;
 	}
 
+	// Tool requirements: directory and required files
+	const toolRequirements: Record<string, { dir: string; requiredFiles?: string[]; checkFile?: (f: string) => boolean }> = {
+		'fastqc': {
+			dir: '/data/outbreak_investigation',
+			checkFile: (f) => f.endsWith('.fastq.gz') && (f.includes('sample_01') || f.includes('sample_02') || f.includes('sample_03'))
+		},
+		'seqkit': {
+			dir: '/data/outbreak_investigation',
+			checkFile: (f) => f.endsWith('.fastq.gz')
+		},
+		'trimmomatic': {
+			dir: '/data/outbreak_investigation',
+			requiredFiles: ['sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz']
+		},
+		'unicycler': {
+			dir: '/data/outbreak_investigation',
+			checkFile: (f) => f.endsWith('_paired.fq.gz')
+		},
+		'bandage': {
+			dir: '/data/outbreak_investigation/assembly',
+			checkFile: (f) => f.endsWith('.gfa')
+		},
+		'prokka': {
+			dir: '/data/outbreak_investigation',
+			checkFile: (f) => f.endsWith('.fasta')
+		},
+		'abricate': {
+			dir: '/data/outbreak_investigation',
+			checkFile: (f) => f.endsWith('.fasta')
+		}
+	};
+
 	async function executeCommand(cmd: string) {
 		const parts = cmd.trim().split(/\s+/);
 		const command = parts[0];
 		const args = parts.slice(1);
 
-		// Check for blocked commands
-		if (blockedCommands.has(command)) {
-			terminal.writeln(`\x1b[31mbash: ${command}: Operation not permitted\x1b[0m`);
-			terminal.writeln(`\x1b[90mThis is a learning environment. Modifying files is disabled.\x1b[0m`);
+		// Check for blocked commands (including less/more)
+		if (blockedCommands.has(command) || command === 'less' || command === 'more') {
+			if (command === 'less' || command === 'more') {
+				terminal.writeln(`\x1b[31mbash: ${command}: command not available\x1b[0m`);
+				terminal.writeln(`\x1b[90mUse 'head' or 'cat' to view files instead.\x1b[0m`);
+			} else {
+				terminal.writeln(`\x1b[31mbash: ${command}: Operation not permitted\x1b[0m`);
+				terminal.writeln(`\x1b[90mThis is a learning environment. Modifying files is disabled.\x1b[0m`);
+			}
 			writePrompt();
 			return;
 		}
@@ -547,33 +681,89 @@ Loading assembly graph: assembly.gfa
 			return;
 		}
 
-		// Handle bioinformatics tools - require proper arguments
+		// Handle bioinformatics tools - require proper arguments and correct directory/files
 		if (bioTools.has(command)) {
-			// Check if command has proper arguments
-			if (command === 'fastqc' && args.length === 0) {
-				terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
-				terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+			const req = toolRequirements[command];
+
+			// Check directory requirement
+			if (req && currentDir !== req.dir) {
+				const shortDir = req.dir.replace('/data/outbreak_investigation', '~');
+				terminal.writeln(`\x1b[31mError: ${command} must be run from ${shortDir}\x1b[0m`);
+				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace('/data/outbreak_investigation', '~')}\x1b[0m`);
+				terminal.writeln(`\x1b[90mUse 'cd ${shortDir}' to navigate there first.\x1b[0m`);
 				writePrompt();
 				return;
 			}
-			if (command === 'trimmomatic' && args.length < 5) {
-				terminal.writeln(`\x1b[31mUsage: trimmomatic PE -phred33 <R1.fq.gz> <R2.fq.gz> <output_files...> <options>\x1b[0m`);
-				terminal.writeln(`\x1b[90mThis tool requires paired-end input files and trimming parameters.\x1b[0m`);
-				writePrompt();
-				return;
+
+			// Check command has proper arguments
+			if (command === 'fastqc') {
+				if (args.length === 0) {
+					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check file is valid
+				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
+				if (!inputFile || !req?.checkFile?.(inputFile)) {
+					terminal.writeln(`\x1b[31mError: Invalid input file '${inputFile || args[0]}'\x1b[0m`);
+					terminal.writeln(`\x1b[90mFastQC requires a valid .fastq.gz file (e.g., sample_01_R1.fastq.gz)\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
-			if (command === 'unicycler' && (!args.includes('-1') || !args.includes('-2'))) {
-				terminal.writeln(`\x1b[31mUsage: unicycler -1 <R1_paired.fq.gz> -2 <R2_paired.fq.gz> -o <output_dir>\x1b[0m`);
-				terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads.\x1b[0m`);
-				writePrompt();
-				return;
+
+			if (command === 'trimmomatic') {
+				if (args.length < 5) {
+					terminal.writeln(`\x1b[31mUsage: trimmomatic PE -phred33 <R1.fq.gz> <R2.fq.gz> <output_files...> <options>\x1b[0m`);
+					terminal.writeln(`\x1b[90mThis tool requires paired-end input files and trimming parameters.\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check PE mode and paired files
+				if (!args.includes('PE')) {
+					terminal.writeln(`\x1b[31mError: Trimmomatic requires 'PE' mode for paired-end reads\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
-			if (command === 'bandage' && args.length < 2) {
-				terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
-				terminal.writeln(`\x1b[90mExample: bandage image assembly.gfa assembly_graph.png\x1b[0m`);
-				writePrompt();
-				return;
+
+			if (command === 'unicycler') {
+				if (!args.includes('-1') || !args.includes('-2')) {
+					terminal.writeln(`\x1b[31mUsage: unicycler -1 <R1_paired.fq.gz> -2 <R2_paired.fq.gz> -o <output_dir>\x1b[0m`);
+					terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads.\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check that input files are trimmed paired files
+				const r1Idx = args.indexOf('-1');
+				const r2Idx = args.indexOf('-2');
+				const r1File = args[r1Idx + 1];
+				const r2File = args[r2Idx + 1];
+				if (!r1File?.includes('_paired') || !r2File?.includes('_paired')) {
+					terminal.writeln(`\x1b[31mError: Unicycler requires trimmed paired files\x1b[0m`);
+					terminal.writeln(`\x1b[90mUse files from trimmed/ folder (e.g., sample_01_R1_paired.fq.gz)\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
+
+			if (command === 'bandage') {
+				if (args.length < 2 || !args.includes('image')) {
+					terminal.writeln(`\x1b[31mUsage: bandage image <assembly.gfa> <output.png>\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly.gfa assembly_graph.png\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check GFA file
+				const gfaFile = args.find(a => a.endsWith('.gfa'));
+				if (!gfaFile) {
+					terminal.writeln(`\x1b[31mError: Bandage requires a .gfa assembly graph file\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
 			await executeBioTool(command, args, cmd);
 			return;
 		}
@@ -585,40 +775,45 @@ Loading assembly graph: assembly.gfa
 	}
 
 	function showHelp() {
-		terminal.writeln(`
-\x1b[1;33m═══════════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;33m  BioLearn Terminal - Available Commands\x1b[0m
-\x1b[1;33m═══════════════════════════════════════════════════════════════\x1b[0m
-
-\x1b[1;36mFile Navigation:\x1b[0m
-  ls [path]      - List directory contents
-  cd [path]      - Change directory
-  pwd            - Print working directory
-  cat [file]     - View file contents
-  head [file]    - View first 10 lines
-  tail [file]    - View last 10 lines
-
-\x1b[1;36mBioinformatics Tools:\x1b[0m
-  \x1b[32mseqkit stats\x1b[0m   - Read statistics (~3s)
-  \x1b[32mfastqc\x1b[0m         - Quality control (~10s)
-  \x1b[32mtrimmomatic\x1b[0m    - Read trimming (~45s)
-  \x1b[32municycler\x1b[0m      - Genome assembly (~3-5min)
-  \x1b[32mbandage\x1b[0m        - Visualize assembly graph (~5s)
-  \x1b[32mquast\x1b[0m          - Assembly QC (~20s)
-  \x1b[32mprokka\x1b[0m         - Genome annotation (~1-2min)
-  \x1b[32mabricate\x1b[0m       - AMR screening (~10s)
-  \x1b[32mmlst\x1b[0m           - Sequence typing (~5s)
-
-\x1b[1;36mKeyboard Shortcuts:\x1b[0m
-  ↑/↓            - Browse command history
-  Tab            - Autocomplete file names
-  Ctrl+L         - Clear screen
-  Ctrl+C         - Cancel running command
-
-\x1b[1;36mUtility:\x1b[0m
-  help           - Show this message
-  clear          - Clear terminal
-`);
+		terminal.writeln('');
+		terminal.writeln('\x1b[1;33m════════════════════════════════════════════════════════\x1b[0m');
+		terminal.writeln('\x1b[1;33m  BioLearn Terminal - Available Commands\x1b[0m');
+		terminal.writeln('\x1b[1;33m════════════════════════════════════════════════════════\x1b[0m');
+		terminal.writeln('');
+		terminal.writeln('\x1b[1;36mFile Navigation:\x1b[0m');
+		terminal.writeln('');
+		terminal.writeln('  ls [path]       List directory contents');
+		terminal.writeln('  cd [path]       Change directory');
+		terminal.writeln('  pwd             Print working directory');
+		terminal.writeln('  cat [file]      View file contents');
+		terminal.writeln('  head [file]     View first 10 lines');
+		terminal.writeln('  tail [file]     View last 10 lines');
+		terminal.writeln('');
+		terminal.writeln('\x1b[1;36mBioinformatics Tools:\x1b[0m');
+		terminal.writeln('');
+		terminal.writeln('  \x1b[32mseqkit stats\x1b[0m    Read statistics (~3s)');
+		terminal.writeln('  \x1b[32mfastqc\x1b[0m          Quality control (~10s)');
+		terminal.writeln('  \x1b[32mtrimmomatic\x1b[0m     Read trimming (~45s)');
+		terminal.writeln('  \x1b[32municycler\x1b[0m       Genome assembly (~3-5min)');
+		terminal.writeln('  \x1b[32mbandage\x1b[0m         Visualize assembly graph (~5s)');
+		terminal.writeln('  \x1b[32mquast\x1b[0m           Assembly QC (~20s)');
+		terminal.writeln('  \x1b[32mprokka\x1b[0m          Genome annotation (~1-2min)');
+		terminal.writeln('  \x1b[32mabricate\x1b[0m        AMR screening (~10s)');
+		terminal.writeln('  \x1b[32mmlst\x1b[0m            Sequence typing (~5s)');
+		terminal.writeln('');
+		terminal.writeln('\x1b[1;36mKeyboard Shortcuts:\x1b[0m');
+		terminal.writeln('');
+		terminal.writeln('  ↑/↓             Browse command history');
+		terminal.writeln('  ←/→             Move cursor in command line');
+		terminal.writeln('  Tab             Autocomplete file names');
+		terminal.writeln('  Ctrl+L          Clear screen');
+		terminal.writeln('  Ctrl+C          Cancel running command');
+		terminal.writeln('');
+		terminal.writeln('\x1b[1;36mUtility:\x1b[0m');
+		terminal.writeln('');
+		terminal.writeln('  help            Show this message');
+		terminal.writeln('  clear           Clear terminal');
+		terminal.writeln('');
 	}
 
 	function handleLs(args: string[]) {
@@ -1035,13 +1230,25 @@ Annotation identified 4,523 coding sequences.
 	});
 </script>
 
-<div bind:this={terminalContainer} class="w-full h-full p-2"></div>
+<div class="flex flex-col h-full bg-gray-900">
+	<!-- Command dropdown bar -->
+	<div class="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border-b border-gray-700 text-xs">
+		<span class="text-gray-400">Commands:</span>
+		<div class="flex gap-1 flex-wrap">
+			{#each ['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'clear', 'help'] as cmd}
+				<span class="px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded text-[10px]">{cmd}</span>
+			{/each}
+			<span class="text-gray-500 mx-1">|</span>
+			{#each ['fastqc', 'trimmomatic', 'unicycler', 'bandage', 'prokka', 'abricate'] as cmd}
+				<span class="px-1.5 py-0.5 bg-green-900/50 text-green-400 rounded text-[10px]">{cmd}</span>
+			{/each}
+		</div>
+	</div>
+	<!-- Terminal -->
+	<div bind:this={terminalContainer} class="flex-1 p-2 bg-[#1e1e1e]"></div>
+</div>
 
 <style>
-	div {
-		background-color: #1e1e1e;
-	}
-
 	:global(.xterm) {
 		padding: 8px;
 	}

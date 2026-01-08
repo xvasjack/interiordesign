@@ -57,7 +57,15 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Quality Scores',
-			description: 'Phred scores (Q) indicate base call accuracy: Q30 = 99.9% accuracy, Q20 = 99% accuracy',
+			description: 'Phred scores (Q) indicate base call accuracy: Q30 = 99.9% accuracy, Q20 = 99% accuracy. Scores above Q30 are excellent; Q20-Q30 is acceptable.',
+		},
+		{
+			name: 'GC Content',
+			description: 'Expected GC% varies by organism. For bacteria: 25-75% is normal. ~50% GC is typical for E. coli/Klebsiella. Unexpected GC may indicate contamination.',
+		},
+		{
+			name: 'Adapter Content',
+			description: 'Adapter sequences appear when read length exceeds insert size. <5% adapter content is acceptable; higher values require trimming before assembly.',
 		},
 		{
 			name: 'FastQC Report',
@@ -67,55 +75,96 @@ export const fileNotes: Record<string, FileNote[]> = {
 	],
 	'trimmomatic': [
 		{
-			name: 'Adapter Trimming',
-			description: 'Removes Illumina adapter sequences that can interfere with downstream analysis',
+			name: 'Input Reads',
+			description: 'Total paired-end read pairs from sequencing. Each pair consists of forward (R1) and reverse (R2) reads from opposite ends of a DNA fragment.',
+		},
+		{
+			name: 'Both Surviving',
+			description: 'Read pairs where BOTH R1 and R2 passed quality filters. These are your best quality reads for assembly. >90% retention is good; >95% is excellent.',
+		},
+		{
+			name: 'Forward Only Surviving',
+			description: 'R1 (forward read) passed quality thresholds but its R2 partner was discarded. Can be used as unpaired reads in some assemblers.',
+		},
+		{
+			name: 'Reverse Only Surviving',
+			description: 'R2 (reverse read) passed quality thresholds but its R1 partner was discarded. Can be used as unpaired reads in some assemblers.',
+		},
+		{
+			name: 'Dropped',
+			description: 'Read pairs where BOTH R1 and R2 failed quality thresholds. Low drop rates (<2%) indicate good sequencing quality.',
 		},
 		{
 			name: 'Quality Trimming',
-			description: 'SLIDINGWINDOW:4:15 means scan with 4bp window, cut when average quality < 15',
-		},
-		{
-			name: 'Paired Output',
-			description: 'Both R1 and R2 must survive trimming to be in "paired" output files',
-			format: '_paired.fq.gz'
+			description: 'SLIDINGWINDOW:4:15 scans with 4bp window, cuts when average quality drops below Q15. LEADING/TRAILING removes low quality bases from ends.',
 		}
 	],
 	'unicycler': [
 		{
 			name: 'Assembly Graph',
-			description: 'GFA file shows connections between contigs - useful for visualizing repeat regions',
+			description: 'GFA file shows connections between contigs - useful for visualizing repeat regions and resolving complex structures',
 			format: '.gfa'
 		},
 		{
 			name: 'Contigs vs Scaffolds',
-			description: 'Contigs are contiguous sequences. Unicycler can circularize bacterial chromosomes and plasmids',
+			description: 'Contigs are contiguous sequences. Unicycler can circularize bacterial chromosomes and plasmids, which is ideal for complete genome assembly.',
 			format: '.fasta'
 		},
 		{
 			name: 'N50 Metric',
-			description: 'N50 is the length such that 50% of the assembly is in contigs of this length or longer',
+			description: 'N50 is the length such that 50% of the assembly is in contigs of this length or longer. Higher N50 = better assembly continuity.',
+		},
+		{
+			name: 'GC Content Interpretation',
+			description: '52.3% GC is typical for Klebsiella pneumoniae (range: 50-58%). Matching expected GC suggests correct organism and no major contamination.',
+		}
+	],
+	'bandage': [
+		{
+			name: 'Assembly Graph Visualization',
+			description: 'Visual representation of the assembly graph showing how contigs connect. Circular paths indicate complete chromosomes/plasmids.',
+		},
+		{
+			name: 'Dead Ends',
+			description: 'Nodes with only one connection. Zero dead ends = complete assembly. Dead ends may indicate incomplete data or repetitive regions.',
+		},
+		{
+			name: 'Graph Quality Assessment',
+			description: 'Excellent: 0 dead ends, circular components, clean paths. Good: <5 dead ends. Poor: many dead ends, fragmented graph, tangled regions.',
+		},
+		{
+			name: 'Component Count',
+			description: 'Number of separate connected components. For bacteria: expect 1 chromosome + 0-5 plasmids. Many components may indicate fragmentation.',
 		}
 	],
 	'prokka': [
 		{
 			name: 'GFF3 Annotation',
-			description: 'Standard format for genomic features including genes, CDS, rRNA, and tRNA',
+			description: 'Standard format for genomic features including genes, CDS, rRNA, and tRNA. Can be viewed in genome browsers like IGV.',
 			format: '.gff'
 		},
 		{
 			name: 'GenBank Format',
-			description: 'Contains sequence + annotations, viewable in tools like Artemis or SnapGene',
+			description: 'Contains sequence + annotations, viewable in tools like Artemis or SnapGene. Standard format for GenBank submissions.',
 			format: '.gbk'
+		},
+		{
+			name: 'Annotation Quality',
+			description: 'Prokka identifies ~4000-5000 genes in typical bacterial genomes. Check for expected housekeeping genes (dnaA, gyrB, rpoB) as quality control.',
 		}
 	],
 	'abricate': [
 		{
 			name: 'AMR Genes',
-			description: 'Identifies antimicrobial resistance genes by searching against databases like CARD, ResFinder',
+			description: 'Identifies antimicrobial resistance genes by searching against databases like CARD, ResFinder. Critical for clinical microbiology.',
 		},
 		{
 			name: 'Coverage & Identity',
-			description: 'Higher % coverage and identity = more confident match to known resistance gene',
+			description: 'Coverage >90% and Identity >90% = high confidence match. Lower values may indicate partial genes or novel variants.',
+		},
+		{
+			name: 'Clinical Interpretation',
+			description: 'Presence of resistance genes predicts phenotypic resistance. blaSHV = ampicillin resistance, blaCTX-M = extended-spectrum beta-lactamase (ESBL).',
 		}
 	]
 };
@@ -150,11 +199,10 @@ export function getExecutionTime(tool: string): number {
 	return Math.floor(Math.random() * (times.max - times.min + 1)) + times.min;
 }
 
-// Allowed read-only commands
+// Allowed read-only commands (less/more are NOT available)
 export const allowedCommands = new Set([
-	'ls', 'cat', 'head', 'tail', 'less', 'more',
-	'pwd', 'cd', 'echo', 'wc', 'grep', 'find',
-	'tree', 'file', 'stat', 'du', 'df'
+	'ls', 'cat', 'head', 'tail',
+	'pwd', 'cd', 'clear', 'help'
 ]);
 
 // Blocked/dangerous commands
