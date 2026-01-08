@@ -1229,16 +1229,12 @@ Annotation identified 4,523 coding sequences.
 </script>
 
 <div class="flex flex-col h-full bg-gray-900">
-	<!-- Command dropdown bar -->
+	<!-- Command bar -->
 	<div class="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border-b border-gray-700 text-xs">
 		<span class="text-gray-400">Commands:</span>
 		<div class="flex gap-1 flex-wrap">
 			{#each ['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'clear', 'help'] as cmd}
 				<span class="px-1.5 py-0.5 bg-gray-700 text-gray-300 rounded text-[10px]">{cmd}</span>
-			{/each}
-			<span class="text-gray-500 mx-1">|</span>
-			{#each ['fastqc', 'trimmomatic', 'unicycler', 'bandage', 'prokka', 'abricate'] as cmd}
-				<span class="px-1.5 py-0.5 bg-green-900/50 text-green-400 rounded text-[10px]">{cmd}</span>
 			{/each}
 		</div>
 	</div>
