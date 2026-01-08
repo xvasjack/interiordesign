@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps } from '$lib/stores/terminal';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 
 	let terminalContainer: HTMLDivElement;
@@ -498,6 +498,7 @@ Final assembly:
 
 		if (args.length === 0 || args[0] === '~') {
 			currentDir = '/data/outbreak_investigation';
+			currentDirectory.set(currentDir);
 			return;
 		}
 
@@ -514,6 +515,7 @@ Final assembly:
 				const remaining = targetPath.slice(3);
 				if (remaining) {
 					currentDir = '/' + parts.join('/');
+					currentDirectory.set(currentDir);
 					handleCd([remaining]);
 					return;
 				}
@@ -523,6 +525,7 @@ Final assembly:
 			if (!currentDir.startsWith('/data')) {
 				currentDir = '/data/outbreak_investigation';
 			}
+			currentDirectory.set(currentDir);
 			return;
 		}
 
@@ -534,6 +537,7 @@ Final assembly:
 		// Check if directory exists in filesystem
 		if (filesystem[newPath] !== undefined) {
 			currentDir = newPath;
+			currentDirectory.set(currentDir);
 		} else {
 			terminal.writeln(`\x1b[31mbash: cd: ${args[0]}: No such directory\x1b[0m`);
 		}

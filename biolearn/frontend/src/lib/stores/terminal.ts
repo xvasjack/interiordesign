@@ -37,6 +37,9 @@ export const terminalState = writable<TerminalState>({
 // Track executed commands for dynamic filesystem
 export const executedCommands = writable<string[]>([]);
 
+// Track current directory for directory awareness
+export const currentDirectory = writable<string>('/data/outbreak_investigation');
+
 // Track current step in story (for hiding next steps)
 export const currentStoryStep = writable<number>(0);
 export const executedSteps = writable<Set<number>>(new Set());

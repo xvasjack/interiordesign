@@ -1,8 +1,14 @@
 <script lang="ts">
-	import { executedCommands, executedSteps } from '$lib/stores/terminal';
+	import { executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
 
 	let currentStep = $state(0);
 	let completedSteps = $state<Set<number>>(new Set());
+	let userCurrentDir = $state('/data/outbreak_investigation');
+
+	// Subscribe to current directory
+	currentDirectory.subscribe(dir => {
+		userCurrentDir = dir;
+	});
 
 	// Subscribe to executed commands to track step completion
 	executedCommands.subscribe(cmds => {
@@ -21,12 +27,14 @@
 			{
 				type: 'intro',
 				text: `UM Medical Centre Saturday Report: 5 patients in the ICU did not respond to antibiotics, suspected to have developed antimicrobial resistance within the past 72 hours.`,
-				hint: null
+				hint: null,
+				requiredDir: null
 			},
 			{
 				type: 'context',
 				text: `Samples were collected and sent for whole genome sequencing. Data has been released to you. Your task is to analyze the bacterial genomes to determine if this is an outbreak and identify the source.`,
-				hint: null
+				hint: null,
+				requiredDir: null
 			},
 			{
 				type: 'task',
@@ -34,6 +42,7 @@
 				text: `Check the quality of raw sequencing data (FASTQ files).`,
 				command: 'fastqc sample_01_R1.fastq.gz -o qc_reports/',
 				explanation: 'FastQC generates quality reports for raw sequence data',
+				requiredDir: '/data/outbreak_investigation',
 				parameters: [
 					{ name: 'sample_01_R1.fastq.gz', desc: 'Input FASTQ file (forward reads)' },
 					{ name: '-o qc_reports/', desc: 'Output directory for QC reports' }
@@ -45,6 +54,7 @@
 				text: `Remove adapter sequences and low-quality bases from reads.`,
 				command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
 				explanation: 'Trimmomatic cleans reads by removing adapters and trimming poor-quality bases',
+				requiredDir: '/data/outbreak_investigation',
 				parameters: [
 					{ name: 'PE', desc: 'Paired-end mode (R1 + R2 reads)' },
 					{ name: '-phred33', desc: 'Quality score encoding (standard Illumina)' },
@@ -59,6 +69,7 @@
 				text: `Assemble cleaned reads into contiguous sequences (contigs).`,
 				command: 'unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly/',
 				explanation: 'Unicycler assembles bacterial genomes and can circularize chromosomes and plasmids',
+				requiredDir: '/data/outbreak_investigation',
 				parameters: [
 					{ name: '-1', desc: 'Forward reads (R1) input file' },
 					{ name: '-2', desc: 'Reverse reads (R2) input file' },
@@ -67,6 +78,17 @@
 			}
 		]
 	};
+
+	// Check if user is in the correct directory for a task
+	function isInCorrectDir(requiredDir: string | null): boolean {
+		if (!requiredDir) return true;
+		return userCurrentDir === requiredDir;
+	}
+
+	// Get short directory name for display
+	function getShortDir(dir: string): string {
+		return dir.replace('/data/outbreak_investigation', '~');
+	}
 
 	// Check if user can proceed to next step
 	function canProceed(stepIndex: number): boolean {
@@ -152,6 +174,30 @@
 							<p class="text-gray-700 mb-3">{section.text}</p>
 
 							{#if section.command}
+								<!-- Directory check warning -->
+								{#if section.requiredDir && !isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
+									<div class="bg-amber-50 border border-amber-300 rounded p-3 mb-3">
+										<div class="flex items-start gap-2">
+											<span class="text-amber-500">⚠️</span>
+											<div class="flex-1">
+												<p class="text-amber-800 text-sm font-medium">Wrong directory</p>
+												<p class="text-amber-700 text-sm">
+													You are in <code class="bg-amber-100 px-1 rounded">{getShortDir(userCurrentDir)}</code>
+												</p>
+												<p class="text-amber-700 text-sm mt-1">First, run this command:</p>
+												<div class="bg-gray-900 rounded p-2 mt-1 font-mono text-sm">
+													<code class="text-yellow-400">cd {section.requiredDir}</code>
+												</div>
+											</div>
+										</div>
+									</div>
+								{:else if section.requiredDir && isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
+									<div class="flex items-center gap-2 text-green-600 text-sm mb-2">
+										<span>✓</span>
+										<span>You are in the correct directory ({getShortDir(section.requiredDir)})</span>
+									</div>
+								{/if}
+
 								<div class="bg-gray-900 rounded p-3 font-mono text-sm overflow-x-auto mb-3">
 									<div class="text-gray-400 text-xs mb-1">Command:</div>
 									<code class="text-green-400 whitespace-pre-wrap break-all">{section.command}</code>
