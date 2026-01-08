@@ -116,57 +116,54 @@
 			const shapes: any[] = [];
 			const annotations: any[] = [];
 
-			// Fixed positions for clean layout
-			const labelY = 0.18; // Labels at bottom
-			const circleBottomY = 0.28; // Circle bottom edge above labels
-
+			// Use data coordinates for true circles
+			// Layout: circles in middle area, labels below
 			components.forEach((comp: any, i: number) => {
-				// Position: first at 0.3, second at 0.7
-				const xPos = i === 0 ? 0.3 : 0.7;
+				// X position: spread across the plot
+				const xPos = i === 0 ? 2.5 : 7.5;
 
-				// Scale radius based on size (chromosome larger, plasmid smaller)
+				// Scale radius based on size
 				const relativeSize = comp.size / maxSize;
-				const radius = Math.max(0.06, 0.15 * Math.sqrt(relativeSize));
+				const radius = Math.max(0.6, 1.5 * Math.sqrt(relativeSize));
 
-				// Circle center is above the label
-				const yCenter = circleBottomY + radius;
+				// Y center for circle
+				const yCenter = 5.5;
 
 				if (comp.circular) {
-					// Draw circular component as a ring
+					// Draw circular component as a ring using data coordinates
 					shapes.push({
 						type: 'circle',
-						xref: 'paper',
-						yref: 'paper',
+						xref: 'x',
+						yref: 'y',
 						x0: xPos - radius,
 						y0: yCenter - radius,
 						x1: xPos + radius,
 						y1: yCenter + radius,
-						line: { color: comp.color, width: 5 },
+						line: { color: comp.color, width: 4 },
 						fillcolor: 'rgba(255,255,255,0)'
 					});
 				} else {
-					// Draw linear component as a line
 					shapes.push({
 						type: 'line',
-						xref: 'paper',
-						yref: 'paper',
+						xref: 'x',
+						yref: 'y',
 						x0: xPos - radius,
 						y0: yCenter,
 						x1: xPos + radius,
 						y1: yCenter,
-						line: { color: comp.color, width: 5 }
+						line: { color: comp.color, width: 4 }
 					});
 				}
 
-				// Label below circle - name in component color, size in gray
+				// Label below circle using data coordinates
 				annotations.push({
 					x: xPos,
-					y: labelY,
-					xref: 'paper',
-					yref: 'paper',
-					text: `<b style="color:${comp.color}">${comp.name}</b><br><span style="color:#6b7280">${(comp.size / 1e6).toFixed(2)} Mb</span>`,
+					y: yCenter - radius - 1.2,
+					xref: 'x',
+					yref: 'y',
+					text: `<b>${comp.name}</b><br>${(comp.size / 1e6).toFixed(2)} Mb`,
 					showarrow: false,
-					font: { size: 12, color: comp.color },
+					font: { size: 13, color: comp.color },
 					align: 'center'
 				});
 			});
@@ -175,21 +172,21 @@
 			const quality = stats.quality || 'unknown';
 			const qualityColor = quality === 'excellent' ? '#10b981' : quality === 'good' ? '#f59e0b' : '#ef4444';
 			annotations.push({
-				x: 0.5,
-				y: 0.92,
-				xref: 'paper',
-				yref: 'paper',
+				x: 5,
+				y: 9.2,
+				xref: 'x',
+				yref: 'y',
 				text: `<b>Quality: ${quality.toUpperCase()}</b> | ${stats.circular || 0} circular | ${stats.deadEnds || 0} dead ends`,
 				showarrow: false,
 				font: { size: 12, color: qualityColor }
 			});
 
-			// Node/edge stats at very bottom
+			// Node/edge stats at bottom
 			annotations.push({
-				x: 0.5,
-				y: 0.04,
-				xref: 'paper',
-				yref: 'paper',
+				x: 5,
+				y: 0.8,
+				xref: 'x',
+				yref: 'y',
 				text: `Nodes: ${stats.totalNodes?.toLocaleString() || 'N/A'} | Edges: ${stats.totalEdges?.toLocaleString() || 'N/A'}`,
 				showarrow: false,
 				font: { size: 11, color: '#9ca3af' }
@@ -197,8 +194,8 @@
 
 			layout = {
 				title: { text: chartData.title, font: { size: 16, color: '#1f2937' } },
-				xaxis: { visible: false, range: [0, 1], fixedrange: true },
-				yaxis: { visible: false, range: [0, 1], fixedrange: true },
+				xaxis: { visible: false, range: [0, 10], fixedrange: true, constrain: 'domain' },
+				yaxis: { visible: false, range: [0, 10], fixedrange: true, scaleanchor: 'x', scaleratio: 1 },
 				margin: { t: 50, r: 20, b: 20, l: 20 },
 				paper_bgcolor: 'transparent',
 				plot_bgcolor: '#fafafa',
@@ -209,8 +206,8 @@
 
 			// Empty trace to render the plot
 			traces.push({
-				x: [0.5],
-				y: [0.5],
+				x: [5],
+				y: [5],
 				type: 'scatter',
 				mode: 'markers',
 				marker: { size: 0.1, opacity: 0 }
