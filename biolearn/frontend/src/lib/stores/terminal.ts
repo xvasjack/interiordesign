@@ -186,6 +186,7 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'checkm': { min: 60, max: 120 },
 	'confindr': { min: 30, max: 60 },
 	'prokka': { min: 60, max: 120 },
+	'bakta': { min: 60, max: 120 },  // Similar to prokka
 	'abricate': { min: 5, max: 15 },
 	'mlst': { min: 3, max: 8 },
 	'mob_suite': { min: 30, max: 60 },
@@ -220,6 +221,6 @@ export const blockedCommands = new Set([
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
 	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'confindr',
-	'prokka', 'abricate', 'mlst', 'mob_suite', 'platon',
+	'prokka', 'bakta', 'abricate', 'mlst', 'mob_suite', 'platon',
 	'snippy', 'roary', 'iqtree', 'gubbins'
 ]);

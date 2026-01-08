@@ -80,6 +80,31 @@
 			'/data/outbreak_investigation/assembly': [
 				'quast_report.html', 'quast_report.tsv'
 			]
+		},
+		'checkm': {
+			'/data/outbreak_investigation': ['checkm_results/'],
+			'/data/outbreak_investigation/checkm_results': [
+				'checkm_report.tsv', 'lineage.ms', 'storage/'
+			]
+		},
+		'confindr': {
+			'/data/outbreak_investigation': ['confindr_results/'],
+			'/data/outbreak_investigation/confindr_results': [
+				'confindr_report.csv', 'confindr_log.txt'
+			]
+		},
+		'bakta': {
+			'/data/outbreak_investigation': ['bakta_annotation/'],
+			'/data/outbreak_investigation/bakta_annotation': [
+				'sample_01.gff3', 'sample_01.gbff', 'sample_01.fna',
+				'sample_01.faa', 'sample_01.tsv', 'sample_01.json'
+			]
+		},
+		'mlst': {
+			'/data/outbreak_investigation': ['mlst_results/'],
+			'/data/outbreak_investigation/mlst_results': [
+				'mlst_report.tsv'
+			]
 		}
 	};
 
@@ -344,6 +369,410 @@ Loading assembly graph: assembly.gfa
 				},
 				files: [
 					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' }
+				]
+			},
+			'quast': {
+				output: `\x1b[36mQUAST v5.2.0\x1b[0m
+[2024-01-15 11:00:00] INFO: Starting QUAST analysis
+
+\x1b[36mAnalyzing assembly: assembly/assembly.fasta\x1b[0m
+  Contigs: 2
+  Total length: 4,987,390 bp
+
+\x1b[36mCalculating assembly metrics...\x1b[0m
+  N50: 4,892,156 bp
+  L50: 1
+  GC content: 52.3%
+  Largest contig: 4,892,156 bp
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  ASSEMBLY QUALITY REPORT\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Assembly:           assembly
+  # contigs:          2
+  Largest contig:     4,892,156 bp
+  Total length:       4,987,390 bp
+  GC (%):             52.3
+  N50:                4,892,156 bp
+  L50:                1
+
+\x1b[32m✓ Assembly quality: EXCELLENT\x1b[0m
+\x1b[33mNote: N50 close to expected genome size indicates high contiguity\x1b[0m
+`,
+				summary: {
+					'Contigs': '2',
+					'Total Length': '4,987,390 bp',
+					'Largest Contig': '4,892,156 bp',
+					'N50': '4,892,156 bp',
+					'L50': '1',
+					'GC Content': '52.3%',
+					'Quality': 'EXCELLENT'
+				},
+				chartData: {
+					title: 'Assembly Quality Metrics',
+					x: ['Total Length', 'Largest Contig', 'N50'],
+					y: [4987390, 4892156, 4892156],
+					type: 'bar',
+					xLabel: 'Metric',
+					yLabel: 'Length (bp)'
+				},
+				files: [
+					{ name: 'quast_report.html', type: 'html', size: '156 KB' },
+					{ name: 'quast_report.tsv', type: 'tsv', size: '2.3 KB' }
+				]
+			},
+			'prokka': {
+				output: `\x1b[36mProkka v1.14.6\x1b[0m
+[2024-01-15 11:15:00] INFO: Starting annotation
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Contigs: 2
+  Total length: 4,987,390 bp
+
+\x1b[36mRunning annotation pipeline...\x1b[0m
+  tRNA detection (Aragorn): 86 tRNAs found
+  rRNA detection (Barrnap): 22 rRNAs found
+  CDS prediction (Prodigal): 4,523 CDSs predicted
+
+\x1b[36mFunctional annotation...\x1b[0m
+  Running BLASTP against UniProt...
+  Assigning protein functions...
+  Identifying signal peptides...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  ANNOTATION SUMMARY\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Organism:         Escherichia coli sample_01
+  Features:
+    - CDS: 4,523
+    - tRNA: 86
+    - rRNA: 22
+    - tmRNA: 1
+    - misc_RNA: 12
+
+  Hypothetical proteins: 487 (10.8%)
+  Proteins with function: 4,036 (89.2%)
+
+\x1b[33mOutput files written to: annotation/\x1b[0m
+`,
+				summary: {
+					'Total Features': '4,644',
+					'CDS': '4,523',
+					'tRNA': '86',
+					'rRNA': '22',
+					'tmRNA': '1',
+					'misc_RNA': '12',
+					'Functional Annotation': '89.2%',
+					'Hypothetical': '10.8%'
+				},
+				chartData: {
+					title: 'Genome Annotation Summary',
+					x: ['CDS', 'tRNA', 'rRNA', 'Other'],
+					y: [4523, 86, 22, 13],
+					type: 'bar',
+					xLabel: 'Feature Type',
+					yLabel: 'Count'
+				},
+				files: [
+					{ name: 'sample_01.gff', type: 'gff', size: '2.5 MB' },
+					{ name: 'sample_01.gbk', type: 'gbk', size: '7.8 MB' },
+					{ name: 'sample_01.txt', type: 'txt', size: '1.2 KB' }
+				]
+			},
+			'abricate': {
+				output: `\x1b[36mABRicate v1.0.1\x1b[0m
+[2024-01-15 11:25:00] INFO: Starting AMR gene screening
+
+\x1b[36mUsing database: NCBI AMRFinderPlus\x1b[0m
+  Sequences: 5,386 resistance genes
+  Last updated: 2024-01-10
+
+\x1b[36mScanning assembly...\x1b[0m
+  Input: assembly/assembly.fasta
+  Contigs: 2
+
+\x1b[36mResults:\x1b[0m
+  Genes found: 2 AMR genes
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  ANTIMICROBIAL RESISTANCE GENES DETECTED\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[31m1. blaCTX-M-15\x1b[0m
+     Location: chromosome, 123456-124789
+     Identity: 99.89%
+     Resistance: Cephalosporins (ESBL)
+
+  \x1b[31m2. tet(A)\x1b[0m
+     Location: plasmid_1, 12345-13567
+     Identity: 100.00%
+     Resistance: Tetracycline
+
+\x1b[33m⚠ WARNING: ESBL-producing organism detected\x1b[0m
+\x1b[33mRecommendation: Confirm with phenotypic testing\x1b[0m
+`,
+				summary: {
+					'AMR Genes Found': '2',
+					'Database': 'NCBI AMRFinderPlus',
+					'Gene 1': 'blaCTX-M-15 (99.89%)',
+					'Gene 2': 'tet(A) (100.00%)',
+					'Resistance': 'Cephalosporins, Tetracycline',
+					'Clinical Alert': 'ESBL detected'
+				},
+				chartData: {
+					title: 'AMR Gene Distribution',
+					x: ['blaCTX-M-15', 'tet(A)'],
+					y: [99.89, 100.00],
+					type: 'bar',
+					xLabel: 'Gene',
+					yLabel: 'Identity (%)'
+				},
+				files: [
+					{ name: 'amr_report.tsv', type: 'tsv', size: '1.8 KB' },
+					{ name: 'amr_summary.txt', type: 'txt', size: '856 B' }
+				]
+			},
+			'checkm': {
+				output: `\x1b[36mCheckM v1.2.2\x1b[0m
+[2024-01-15 11:30:00] INFO: Running CheckM lineage workflow
+
+\x1b[36mPlacing bins in reference genome tree...\x1b[0m
+  Identifying marker genes: Done
+  Aligning marker genes: Done
+  Placing bins in tree: Done
+
+\x1b[36mAnalyzing bins...\x1b[0m
+  Bin: assembly
+  Lineage: Bacteria > Proteobacteria > Gammaproteobacteria > Enterobacterales
+  Marker lineage: f__Enterobacteriaceae
+
+\x1b[36mCalculating genome statistics...\x1b[0m
+  Genome size: 4,987,390 bp
+  # contigs: 2
+  N50: 4,892,156 bp
+  GC: 52.3%
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  QUALITY ASSESSMENT RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[32mCompleteness:    99.45%\x1b[0m  (Near complete)
+  \x1b[32mContamination:   0.28%\x1b[0m   (Low contamination)
+  \x1b[32mStrain heterog.: 0.00%\x1b[0m
+
+  Quality tier: \x1b[1;32mHIGH-QUALITY DRAFT\x1b[0m
+  MIMAG standard: \x1b[32mMeets high-quality criteria\x1b[0m
+
+\x1b[33mTip: Completeness >90% and Contamination <5% indicates a high-quality genome\x1b[0m
+`,
+				summary: {
+					'Completeness': '99.45%',
+					'Contamination': '0.28%',
+					'Strain Heterogeneity': '0.00%',
+					'Lineage': 'f__Enterobacteriaceae',
+					'Marker Genes': '104/104 found',
+					'Quality': 'HIGH-QUALITY DRAFT',
+					'MIMAG Standard': 'High-quality'
+				},
+				chartData: {
+					title: 'Genome Quality Assessment',
+					x: ['Completeness', 'Contamination', 'Strain Heterog.'],
+					y: [99.45, 0.28, 0],
+					type: 'bar',
+					xLabel: 'Metric',
+					yLabel: 'Percentage (%)'
+				},
+				files: [
+					{ name: 'checkm_report.tsv', type: 'tsv', size: '2.3 KB' }
+				]
+			},
+			'confindr': {
+				output: `\x1b[36mConFindr v0.8.0\x1b[0m
+[2024-01-15 11:35:00] INFO: Starting contamination detection
+
+\x1b[36mAnalyzing sample: sample_01\x1b[0m
+  Database: Enterobacteriaceae rMLST
+  Method: rMLST gene analysis
+
+\x1b[36mExtracting rMLST genes...\x1b[0m
+  BACT000001: Found (1 copy)
+  BACT000002: Found (1 copy)
+  BACT000003: Found (1 copy)
+  ...
+  Total rMLST genes: 53/53
+
+\x1b[36mChecking for multiple alleles...\x1b[0m
+  Genes with single allele: 53
+  Genes with multiple alleles: 0
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  CONTAMINATION DETECTION RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Sample: sample_01
+  \x1b[32mContamination Status: CLEAN\x1b[0m
+
+  Evidence:
+    - No multi-allelic genes detected
+    - Single genus detected: Escherichia
+    - All rMLST genes present with single copies
+
+  \x1b[32m✓ No intra-species contamination detected\x1b[0m
+  \x1b[32m✓ No inter-species contamination detected\x1b[0m
+
+\x1b[33mNote: Sample appears to be a pure isolate suitable for downstream analysis\x1b[0m
+`,
+				summary: {
+					'Sample': 'sample_01',
+					'Status': 'CLEAN (No contamination)',
+					'Genus Detected': 'Escherichia',
+					'rMLST Genes': '53/53 found',
+					'Multi-allelic Genes': '0',
+					'Intra-species Contam.': 'Not detected',
+					'Inter-species Contam.': 'Not detected'
+				},
+				chartData: {
+					title: 'Contamination Analysis',
+					x: ['rMLST Genes Found', 'Single-allele Genes', 'Multi-allele Genes'],
+					y: [53, 53, 0],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'Gene Count'
+				},
+				files: [
+					{ name: 'confindr_report.csv', type: 'csv', size: '1.1 KB' },
+					{ name: 'confindr_log.txt', type: 'txt', size: '4.5 KB' }
+				]
+			},
+			'bakta': {
+				output: `\x1b[36mBakta v1.8.2\x1b[0m
+[2024-01-15 11:40:00] INFO: Starting annotation
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Contigs: 2
+  Total length: 4,987,390 bp
+
+\x1b[36mRunning annotation pipeline...\x1b[0m
+  tRNA detection (tRNAscan-SE): 86 tRNAs found
+  tmRNA detection: 1 tmRNA found
+  rRNA detection (Infernal): 22 rRNAs found
+  ncRNA detection: 89 ncRNAs found
+  CRISPR detection: 2 CRISPR arrays found
+  CDS prediction (Prodigal): 4,623 CDSs predicted
+
+\x1b[36mFunctional annotation...\x1b[0m
+  UniProt matches: 4,102 (88.7%)
+  COG assignments: 3,856 (83.4%)
+  KEGG orthologs: 2,934 (63.5%)
+  Pfam domains: 3,678 (79.6%)
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  ANNOTATION SUMMARY\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Features annotated: 4,823
+    - CDS: 4,623
+    - tRNA: 86
+    - rRNA: 22
+    - tmRNA: 1
+    - ncRNA: 89
+    - CRISPR: 2
+
+  Hypothetical proteins: 521 (11.3%)
+  Proteins with function: 4,102 (88.7%)
+
+\x1b[33mOutput files written to: bakta_annotation/\x1b[0m
+`,
+				summary: {
+					'Total Features': '4,823',
+					'CDS': '4,623',
+					'tRNA': '86',
+					'rRNA': '22',
+					'ncRNA': '89',
+					'CRISPR Arrays': '2',
+					'Functional Annotation': '88.7%',
+					'Hypothetical': '11.3%'
+				},
+				chartData: {
+					title: 'Genome Annotation Summary',
+					x: ['CDS', 'tRNA', 'rRNA', 'ncRNA', 'Other'],
+					y: [4623, 86, 22, 89, 3],
+					type: 'bar',
+					xLabel: 'Feature Type',
+					yLabel: 'Count'
+				},
+				files: [
+					{ name: 'sample_01.gff3', type: 'gff', size: '2.8 MB' },
+					{ name: 'sample_01.gbff', type: 'gbk', size: '8.4 MB' },
+					{ name: 'sample_01.faa', type: 'faa', size: '1.6 MB' },
+					{ name: 'sample_01.tsv', type: 'tsv', size: '890 KB' }
+				]
+			},
+			'mlst': {
+				output: `\x1b[36mmlst v2.23.0\x1b[0m
+[2024-01-15 11:45:00] INFO: Scanning for MLST alleles
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+
+\x1b[36mScheme detection...\x1b[0m
+  Best match: Escherichia coli #1 (Achtman)
+
+\x1b[36mAllele identification...\x1b[0m
+  adk:   10  (exact match)
+  fumC:  11  (exact match)
+  gyrB:  4   (exact match)
+  icd:   8   (exact match)
+  mdh:   8   (exact match)
+  purA:  8   (exact match)
+  recA:  2   (exact match)
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  MLST RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Scheme: \x1b[36mescherichia_coli_achtman\x1b[0m
+
+  \x1b[1;33mSequence Type: ST131\x1b[0m
+
+  Allelic Profile:
+    adk(10) fumC(11) gyrB(4) icd(8) mdh(8) purA(8) recA(2)
+
+  \x1b[31m⚠ ST131 is a high-risk pandemic clone associated with:\x1b[0m
+    - Extended-spectrum beta-lactamase (ESBL) production
+    - Fluoroquinolone resistance
+    - Extraintestinal pathogenic E. coli (ExPEC)
+    - Urinary tract infections
+    - Bloodstream infections
+
+\x1b[33mRecommendation: Further antimicrobial susceptibility testing advised\x1b[0m
+`,
+				summary: {
+					'Scheme': 'E. coli (Achtman)',
+					'Sequence Type': 'ST131',
+					'adk': '10',
+					'fumC': '11',
+					'gyrB': '4',
+					'icd': '8',
+					'mdh': '8',
+					'purA': '8',
+					'recA': '2',
+					'Clinical Significance': 'High-risk clone'
+				},
+				chartData: {
+					title: 'MLST Allelic Profile',
+					x: ['adk', 'fumC', 'gyrB', 'icd', 'mdh', 'purA', 'recA'],
+					y: [10, 11, 4, 8, 8, 8, 2],
+					type: 'bar',
+					xLabel: 'Locus',
+					yLabel: 'Allele Number'
+				},
+				files: [
+					{ name: 'mlst_report.tsv', type: 'tsv', size: '512 B' }
 				]
 			}
 		};
@@ -624,7 +1053,12 @@ Loading assembly graph: assembly.gfa
 		],
 		'bandage': ['assembly/assembly.gfa'],
 		'prokka': ['assembly/assembly.fasta'],
-		'abricate': ['assembly/assembly.fasta']
+		'abricate': ['assembly/assembly.fasta'],
+		'quast': ['assembly/assembly.fasta'],
+		'checkm': ['assembly/'],
+		'confindr': ['assembly/assembly.fasta'],
+		'bakta': ['assembly/assembly.fasta'],
+		'mlst': ['assembly/assembly.fasta']
 	};
 
 	// Tool requirements: directory
@@ -635,7 +1069,12 @@ Loading assembly graph: assembly.gfa
 		'unicycler': { dir: '/data/outbreak_investigation' },
 		'bandage': { dir: '/data/outbreak_investigation' },
 		'prokka': { dir: '/data/outbreak_investigation' },
-		'abricate': { dir: '/data/outbreak_investigation' }
+		'abricate': { dir: '/data/outbreak_investigation' },
+		'quast': { dir: '/data/outbreak_investigation' },
+		'checkm': { dir: '/data/outbreak_investigation' },
+		'confindr': { dir: '/data/outbreak_investigation' },
+		'bakta': { dir: '/data/outbreak_investigation' },
+		'mlst': { dir: '/data/outbreak_investigation' }
 	};
 
 	// Check if file is valid for a tool
@@ -866,6 +1305,231 @@ Loading assembly graph: assembly.gfa
 				}
 			}
 
+			if (command === 'quast') {
+				// Check for input file
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: quast assembly/assembly.fasta -o assembly\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: quast assembly/assembly.fasta -o assembly\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('quast', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for quast\x1b[0m`);
+					terminal.writeln(`\x1b[90mQuast requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'prokka') {
+				// Prokka: prokka assembly/assembly.fasta --outdir annotation --prefix sample_01
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: prokka assembly/assembly.fasta --outdir annotation --prefix sample_01\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: prokka assembly/assembly.fasta --outdir annotation --prefix sample_01\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('prokka', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for prokka\x1b[0m`);
+					terminal.writeln(`\x1b[90mProkka requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output directory
+				if (!args.includes('--outdir')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --outdir annotation\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.indexOf('--outdir');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'annotation') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: annotation\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'abricate') {
+				// Abricate: abricate assembly/assembly.fasta --db ncbi > results/amr_report.tsv
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: abricate assembly/assembly.fasta --db ncbi --output results/amr_report.tsv\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: abricate assembly/assembly.fasta --db ncbi --output results/amr_report.tsv\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('abricate', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for abricate\x1b[0m`);
+					terminal.writeln(`\x1b[90mABRicate requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check database
+				if (!args.includes('--db')) {
+					terminal.writeln(`\x1b[31mError: Missing database (--db flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mAvailable databases: ncbi, card, resfinder, vfdb\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: abricate assembly/assembly.fasta --db ncbi --output results/amr_report.tsv\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output
+				if (!args.includes('--output') && !args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output file (--output flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --output results/amr_report.tsv\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
+				const outFile = args[oIdx + 1];
+				if (!outFile || !outFile.startsWith('results/')) {
+					terminal.writeln(`\x1b[31mError: Invalid output path '${outFile || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, output must be in 'results/' folder\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: --output results/amr_report.tsv\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'checkm') {
+				// CheckM: checkm lineage_wf assembly/ checkm_results/
+				if (!args.includes('lineage_wf')) {
+					terminal.writeln(`\x1b[31mUsage: checkm lineage_wf assembly/ checkm_results/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: checkm lineage_wf assembly/ checkm_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check input directory
+				const inputDir = args.find(a => a === 'assembly/' || a === 'assembly');
+				if (!inputDir) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly directory\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: checkm lineage_wf assembly/ checkm_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output directory
+				const outDir = args.find(a => a.includes('checkm'));
+				if (!outDir) {
+					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: checkm_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (outDir !== 'checkm_results/' && outDir !== 'checkm_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${outDir}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: checkm_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'confindr') {
+				// ConFindr: confindr -i assembly/assembly.fasta -o confindr_results/
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mUsage: confindr -i assembly/assembly.fasta -o confindr_results/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: confindr -i assembly/assembly.fasta -o confindr_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check input file
+				const iIdx = args.indexOf('-i');
+				const inputFile = args[iIdx + 1];
+				if (!inputFile || !isValidFileForTool('confindr', inputFile)) {
+					terminal.writeln(`\x1b[31mError: Invalid or missing input file\x1b[0m`);
+					terminal.writeln(`\x1b[90mConFindr requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output directory
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -o confindr_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'confindr_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: confindr_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'bakta') {
+				// Bakta: bakta assembly/assembly.fasta --output bakta_annotation/
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bakta assembly/assembly.fasta --output bakta_annotation/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bakta assembly/assembly.fasta --output bakta_annotation/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('bakta', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for bakta\x1b[0m`);
+					terminal.writeln(`\x1b[90mBakta requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output directory
+				if (!args.includes('--output') && !args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --output bakta_annotation/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'bakta_annotation') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: bakta_annotation/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'mlst') {
+				// MLST: mlst assembly/assembly.fasta > mlst_results/mlst_report.tsv
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: mlst assembly/assembly.fasta --output mlst_results/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: mlst assembly/assembly.fasta --output mlst_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!isValidFileForTool('mlst', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for mlst\x1b[0m`);
+					terminal.writeln(`\x1b[90mMLST requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output directory
+				if (!args.includes('--output') && !args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --output mlst_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'mlst_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: mlst_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
 			await executeBioTool(command, args, cmd);
 			return;
 		}
@@ -893,13 +1557,19 @@ Loading assembly graph: assembly.gfa
 		terminal.writeln('');
 		terminal.writeln('\x1b[1;36mBioinformatics Tools:\x1b[0m');
 		terminal.writeln('');
+		terminal.writeln('  \x1b[1;33mPhase 1 - QC & Assembly:\x1b[0m');
 		terminal.writeln('  \x1b[32mseqkit stats\x1b[0m    Read statistics (~3s)');
 		terminal.writeln('  \x1b[32mfastqc\x1b[0m          Quality control (~10s)');
 		terminal.writeln('  \x1b[32mtrimmomatic\x1b[0m     Read trimming (~45s)');
 		terminal.writeln('  \x1b[32municycler\x1b[0m       Genome assembly (~3-5min)');
 		terminal.writeln('  \x1b[32mbandage\x1b[0m         Visualize assembly graph (~5s)');
+		terminal.writeln('');
+		terminal.writeln('  \x1b[1;33mPhase 2 - QC & Analysis:\x1b[0m');
 		terminal.writeln('  \x1b[32mquast\x1b[0m           Assembly QC (~20s)');
+		terminal.writeln('  \x1b[32mcheckm\x1b[0m          Genome completeness (~30s)');
+		terminal.writeln('  \x1b[32mconfindr\x1b[0m        Contamination detection (~15s)');
 		terminal.writeln('  \x1b[32mprokka\x1b[0m          Genome annotation (~1-2min)');
+		terminal.writeln('  \x1b[32mbakta\x1b[0m           Gene annotation (~1-2min)');
 		terminal.writeln('  \x1b[32mabricate\x1b[0m        AMR screening (~10s)');
 		terminal.writeln('  \x1b[32mmlst\x1b[0m            Sequence typing (~5s)');
 		terminal.writeln('');

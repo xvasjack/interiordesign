@@ -29,8 +29,26 @@
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234`,
 		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,
 		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial;margin:20px;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:12px;} th{background:#4CAF50;color:white;}</style></head><body><h1>QUAST Report</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td>Total contigs</td><td>2</td></tr><tr><td>Total length</td><td>4,987,390 bp</td></tr><tr><td>N50</td><td>4,892,156 bp</td></tr></table></body></html>`,
+		'quast_report.tsv': `Assembly\tcontigs\ttotal_length\tlargest_contig\tN50\tGC_percent\nassembly\t2\t4987390\t4892156\t4892156\t52.3`,
 		'amr_report.tsv': `#FILE\tSEQUENCE\tGENE\t%IDENTITY\tRESISTANCE\nassembly.fasta\tcontig_1\tblaCTX-M-15\t99.89\tCephalosporin\nassembly.fasta\tcontig_2\ttet(A)\t100.00\tTetracycline`,
-		'amr_summary.txt': `AMR Gene Summary\n================\nTotal genes found: 2\n\n1. blaCTX-M-15 - Cephalosporin resistance\n2. tet(A) - Tetracycline resistance`
+		'amr_summary.txt': `AMR Gene Summary\n================\nTotal genes found: 2\n\n1. blaCTX-M-15 - Cephalosporin resistance\n2. tet(A) - Tetracycline resistance`,
+		// CheckM files
+		'checkm_report.tsv': `Bin Id\tMarker lineage\tCompleteness\tContamination\tStrain heterogeneity\nassembly\tf__Enterobacteriaceae\t99.45\t0.28\t0.00`,
+		// ConFindr files
+		'confindr_report.csv': `Sample,Genus,NumContamSNVs,ContamStatus,PercentContam\nsample_01,Escherichia,0,False,0.00`,
+		'confindr_log.txt': `[2024-01-15 11:35:00] ConFindr v0.8.0\n[2024-01-15 11:35:01] Analyzing sample_01\n[2024-01-15 11:35:15] rMLST genes extracted: 53/53\n[2024-01-15 11:35:20] No contamination detected\n[2024-01-15 11:35:20] Analysis complete`,
+		// Prokka files
+		'sample_01.gff': `##gff-version 3\n##sequence-region chromosome_1 1 4892156\nchromosome_1\tProkka\tgene\t1\t1350\t.\t+\t.\tID=gene_0001;Name=dnaA\nchromosome_1\tProkka\tCDS\t1\t1350\t.\t+\t0\tID=CDS_0001;product=Chromosomal replication initiator`,
+		'sample_01.gbk': `LOCUS       chromosome_1         4892156 bp    DNA     circular BCT 15-JAN-2024\nDEFINITION  Escherichia coli strain sample_01 chromosome\nFEATURES             Location/Qualifiers\n     source          1..4892156\n                     /organism="Escherichia coli"`,
+		'sample_01.txt': `organism: Escherichia coli sample_01\ncontigs: 2\nbases: 4987390\nCDS: 4523\ntRNA: 86\nrRNA: 22`,
+		// Bakta files
+		'sample_01.gff3': `##gff-version 3\n##sequence-region chromosome_1 1 4892156\nchromosome_1\tBakta\tgene\t1\t1350\t.\t+\t.\tID=gene_0001;Name=dnaA;locus_tag=SAMPLE01_00001\nchromosome_1\tBakta\tCDS\t1\t1350\t.\t+\t0\tID=cds_0001;product=Chromosomal replication initiator protein DnaA`,
+		'sample_01.gbff': `LOCUS       chromosome_1         4892156 bp    DNA     circular BCT 15-JAN-2024\nDEFINITION  Escherichia coli strain sample_01, complete genome.\nACCESSION   .\nVERSION     .\nKEYWORDS    .\nSOURCE      Escherichia coli\n  ORGANISM  Escherichia coli`,
+		'sample_01.faa': `>SAMPLE01_00001 Chromosomal replication initiator protein DnaA\nMSLSLWQQCLARLQDELPAIPSEIIEMEKKPSTNATVGRPLRWLVDKILEQEKKTPDVVTH\n>SAMPLE01_00002 DNA polymerase III subunit beta\nMKFTVERINQGYLDGLSQRLQMRSGVVASPHDPAAAMIRQSQHLTDRLVNDLVGALEIATR`,
+		'sample_01.tsv': `locus_tag\ttype\tstart\tend\tstrand\tgene\tproduct\nSAMPLE01_00001\tCDS\t1\t1350\t+\tdnaA\tChromosomal replication initiator protein DnaA\nSAMPLE01_00002\tCDS\t1524\t2624\t+\tdnaN\tDNA polymerase III subunit beta`,
+		'sample_01.json': `{"version":"1.8.2","genome":{"length":4987390,"contigs":2,"gc":52.3},"features":{"CDS":4623,"tRNA":86,"rRNA":22,"ncRNA":89,"CRISPR":2}}`,
+		// MLST files
+		'mlst_report.tsv': `FILE\tSCHEME\tST\tadk\tfumC\tgyrB\ticd\tmdh\tpurA\trecA\nassembly/assembly.fasta\techerichia_coli_achtman\t131\t10\t11\t4\t8\t8\t8\t2`
 	};
 
 	// Tool to files mapping
@@ -58,9 +76,31 @@
 			{ name: 'quast_report.html', type: 'html' },
 			{ name: 'quast_report.tsv', type: 'tsv' }
 		],
+		'checkm': [
+			{ name: 'checkm_report.tsv', type: 'tsv' }
+		],
+		'confindr': [
+			{ name: 'confindr_report.csv', type: 'csv' },
+			{ name: 'confindr_log.txt', type: 'txt' }
+		],
+		'prokka': [
+			{ name: 'sample_01.gff', type: 'gff' },
+			{ name: 'sample_01.gbk', type: 'gbk' },
+			{ name: 'sample_01.txt', type: 'txt' }
+		],
+		'bakta': [
+			{ name: 'sample_01.gff3', type: 'gff' },
+			{ name: 'sample_01.gbff', type: 'gbk' },
+			{ name: 'sample_01.faa', type: 'faa' },
+			{ name: 'sample_01.tsv', type: 'tsv' },
+			{ name: 'sample_01.json', type: 'json' }
+		],
 		'abricate': [
 			{ name: 'amr_report.tsv', type: 'tsv' },
 			{ name: 'amr_summary.txt', type: 'txt' }
+		],
+		'mlst': [
+			{ name: 'mlst_report.tsv', type: 'tsv' }
 		]
 	};
 
