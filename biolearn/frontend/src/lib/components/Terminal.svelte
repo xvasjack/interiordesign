@@ -59,7 +59,7 @@
 		},
 		'bandage': {
 			'/data/outbreak_investigation/assembly': [
-				'assembly_graph.png', 'assembly_graph.svg'
+				'assembly_graph.png'
 			]
 		},
 		'prokka': {
@@ -310,7 +310,6 @@ Loading assembly graph: assembly.gfa
 
 \x1b[32m✓ Graph visualization saved\x1b[0m
   Output: assembly_graph.png (2048x2048 px)
-  Output: assembly_graph.svg (vector)
 
 \x1b[33mGraph Statistics:\x1b[0m
   Connected components: 2
@@ -343,8 +342,7 @@ Loading assembly graph: assembly.gfa
 					}
 				},
 				files: [
-					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' },
-					{ name: 'assembly_graph.svg', type: 'svg', size: '2.4 MB' }
+					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' }
 				]
 			}
 		};
