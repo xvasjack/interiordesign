@@ -72,6 +72,46 @@ Complete workflow from raw reads to publication-ready outputs:
 - Variant calling & phylogenetics
 - Visualization & reporting
 
+### WGS Read Modes
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  WGS - Select Your Sequencing Type                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  📊 SHORT READS          │   Illumina sequencing (MiSeq, NextSeq,       │
+│  │     (Illumina)           │   NovaSeq). High accuracy, 150-300bp reads.  │
+│  │                          │                                               │
+│  │  [5 Narratives]          │   ✓ Current Focus                            │
+│  │  [Enter →]               │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  🧬 LONG READS           │   Oxford Nanopore or PacBio. Lower accuracy, │
+│  │     (ONT/PacBio)         │   but 10kb+ reads for complex regions.       │
+│  │                          │                                               │
+│  │  [Coming Soon]           │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+│  ┌─────────────────────────┐                                               │
+│  │  🔀 HYBRID               │   Combine short + long reads for best of     │
+│  │     (Short + Long)       │   both: accuracy + contiguity.               │
+│  │                          │                                               │
+│  │  [Coming Soon]           │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+| Mode | Technology | Read Length | Accuracy | Best For | Status |
+|------|------------|-------------|----------|----------|--------|
+| **Short Reads** | Illumina | 150-300 bp | 99.9% | Routine analysis, SNP calling | **Active** |
+| Long Reads | ONT/PacBio | 10-100+ kb | 95-99% | Plasmids, repeats, structural variants | Planned |
+| Hybrid | Both | Mixed | Best | Complete genomes, complex regions | Planned |
+
+**Current Focus: Short Reads (Illumina)**
+
 ---
 
 ## UI Layout: Three-Panel Design
