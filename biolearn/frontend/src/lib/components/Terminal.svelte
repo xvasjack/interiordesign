@@ -397,6 +397,23 @@ Loading assembly graph: assembly.gfa
 	}
 
 	function handleInput(data: string) {
+		// Handle Ctrl+C first - needs to work even during execution
+		if (data === '\x03') {
+			if (isExecuting) {
+				// Cancel the running tool
+				isExecuting = false;
+			} else {
+				// Not executing - show ^C and new prompt
+				terminal.write('^C');
+				terminal.write('\r\n');
+				commandBuffer = '';
+				cursorPosition = 0;
+				historyIndex = -1;
+				writePrompt();
+			}
+			return;
+		}
+
 		if (isExecuting) return;
 
 		// Handle Enter
@@ -428,16 +445,6 @@ Loading assembly graph: assembly.gfa
 					terminal.write('\b');
 				}
 			}
-		}
-		// Handle Ctrl+C
-		else if (data === '\x03') {
-			terminal.write('^C');
-			commandBuffer = '';
-			cursorPosition = 0;
-			historyIndex = -1;
-			isExecuting = false;
-			terminalState.set({ isRunning: false, currentCommand: '', progress: 0, estimatedTime: 0 });
-			writePrompt();
 		}
 		// Handle Ctrl+L (clear screen)
 		else if (data === '\x0c') {
