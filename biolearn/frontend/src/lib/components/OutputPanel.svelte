@@ -116,29 +116,30 @@
 			const shapes: any[] = [];
 			const annotations: any[] = [];
 
-			// Use data coordinates for true circles
-			// Layout: circles in middle area, labels below
+			// Fixed positions - labels at same Y, circles above with bottom edge aligned
+			const labelY = 2.0;           // All labels at same Y
+			const circleBottomY = 3.2;    // All circle bottoms at same Y
+
 			components.forEach((comp: any, i: number) => {
 				// X position: spread across the plot
-				const xPos = i === 0 ? 2.5 : 7.5;
+				const xPos = i === 0 ? 3 : 7;
 
 				// Scale radius based on size
 				const relativeSize = comp.size / maxSize;
-				const radius = Math.max(0.6, 1.5 * Math.sqrt(relativeSize));
+				const radius = Math.max(0.5, 1.4 * Math.sqrt(relativeSize));
 
-				// Y center for circle
-				const yCenter = 5.5;
+				// Circle center: bottom edge at circleBottomY, so center is at circleBottomY + radius
+				const yCenter = circleBottomY + radius;
 
 				if (comp.circular) {
-					// Draw circular component as a ring using data coordinates
 					shapes.push({
 						type: 'circle',
 						xref: 'x',
 						yref: 'y',
 						x0: xPos - radius,
-						y0: yCenter - radius,
+						y0: circleBottomY,
 						x1: xPos + radius,
-						y1: yCenter + radius,
+						y1: circleBottomY + 2 * radius,
 						line: { color: comp.color, width: 4 },
 						fillcolor: 'rgba(255,255,255,0)'
 					});
@@ -155,10 +156,10 @@
 					});
 				}
 
-				// Label below circle using data coordinates
+				// Label at fixed Y position, centered under circle
 				annotations.push({
 					x: xPos,
-					y: yCenter - radius - 1.2,
+					y: labelY,
 					xref: 'x',
 					yref: 'y',
 					text: `<b>${comp.name}</b><br>${(comp.size / 1e6).toFixed(2)} Mb`,
@@ -184,7 +185,7 @@
 			// Node/edge stats at bottom
 			annotations.push({
 				x: 5,
-				y: 0.8,
+				y: 0.5,
 				xref: 'x',
 				yref: 'y',
 				text: `Nodes: ${stats.totalNodes?.toLocaleString() || 'N/A'} | Edges: ${stats.totalEdges?.toLocaleString() || 'N/A'}`,
