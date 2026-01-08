@@ -328,15 +328,15 @@ Loading assembly graph: assembly.gfa
 					'Quality': 'Excellent (complete circular genome)'
 				},
 				chartData: {
-					title: 'Assembly Graph - Component Sizes',
-					x: ['Chromosome', 'Plasmid 1'],
-					y: [4892156, 95234],
-					type: 'bar',
-					xLabel: 'Component',
-					yLabel: 'Size (bp)',
-					isAssemblyGraph: true,
+					title: 'Assembly Graph Visualization',
+					type: 'assemblyGraph',
+					components: [
+						{ name: 'Chromosome', size: 4892156, circular: true, color: '#3b82f6' },
+						{ name: 'Plasmid 1', size: 95234, circular: true, color: '#10b981' }
+					],
 					graphStats: {
-						components: 2,
+						totalNodes: 847,
+						totalEdges: 1203,
 						circular: 2,
 						deadEnds: 0,
 						quality: 'excellent'

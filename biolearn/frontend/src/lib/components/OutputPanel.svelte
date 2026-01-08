@@ -105,11 +105,114 @@
 			showlegend: false
 		};
 
-		if (chartData.type === 'bar') {
-			// Bar chart for trimmomatic, unicycler, bandage
-			const colors = chartData.isAssemblyGraph
-				? ['#3b82f6', '#10b981']  // Blue and green for assembly
-				: ['#10b981', '#f59e0b', '#f97316', '#ef4444'];  // Green, amber, orange, red for trimmomatic
+		if (chartData.type === 'assemblyGraph') {
+			// Assembly graph visualization - circular diagrams for complete genomes
+			const components = chartData.components || [];
+			const stats = chartData.graphStats || {};
+
+			// Calculate circle sizes based on component sizes (log scale for visibility)
+			const maxSize = Math.max(...components.map((c: any) => c.size));
+
+			// Position circles - large chromosome on left, smaller plasmids on right
+			let xPos = 0.25;
+			const shapes: any[] = [];
+			const annotations: any[] = [];
+
+			components.forEach((comp: any, i: number) => {
+				// Scale radius: chromosome gets 0.15, plasmids scaled proportionally (min 0.05)
+				const relativeSize = comp.size / maxSize;
+				const radius = Math.max(0.06, 0.18 * Math.sqrt(relativeSize));
+				const yPos = 0.5;
+
+				if (comp.circular) {
+					// Draw circular component as a ring (circle with hollow center)
+					shapes.push({
+						type: 'circle',
+						xref: 'paper',
+						yref: 'paper',
+						x0: xPos - radius,
+						y0: yPos - radius * 1.5,
+						x1: xPos + radius,
+						y1: yPos + radius * 1.5,
+						line: { color: comp.color, width: 8 },
+						fillcolor: 'rgba(255,255,255,0)'
+					});
+				} else {
+					// Draw linear component as a line/arc fragment
+					shapes.push({
+						type: 'line',
+						xref: 'paper',
+						yref: 'paper',
+						x0: xPos - radius,
+						y0: yPos,
+						x1: xPos + radius,
+						y1: yPos,
+						line: { color: comp.color, width: 6 }
+					});
+				}
+
+				// Add label below
+				annotations.push({
+					x: xPos,
+					y: yPos - radius * 1.5 - 0.12,
+					xref: 'paper',
+					yref: 'paper',
+					text: `<b>${comp.name}</b><br>${(comp.size / 1e6).toFixed(2)} Mb`,
+					showarrow: false,
+					font: { size: 12, color: '#374151' },
+					align: 'center'
+				});
+
+				xPos += 0.5;
+			});
+
+			// Add quality badge at top
+			const quality = stats.quality || 'unknown';
+			const qualityColor = quality === 'excellent' ? '#10b981' : quality === 'good' ? '#f59e0b' : '#ef4444';
+			annotations.push({
+				x: 0.5,
+				y: 0.95,
+				xref: 'paper',
+				yref: 'paper',
+				text: `<b>Quality: ${quality.toUpperCase()}</b> | ${stats.circular || 0} circular | ${stats.deadEnds || 0} dead ends`,
+				showarrow: false,
+				font: { size: 13, color: qualityColor }
+			});
+
+			// Add node/edge stats
+			annotations.push({
+				x: 0.5,
+				y: 0.08,
+				xref: 'paper',
+				yref: 'paper',
+				text: `Nodes: ${stats.totalNodes?.toLocaleString() || 'N/A'} | Edges: ${stats.totalEdges?.toLocaleString() || 'N/A'}`,
+				showarrow: false,
+				font: { size: 11, color: '#6b7280' }
+			});
+
+			layout = {
+				title: { text: chartData.title, font: { size: 16, color: '#1f2937' } },
+				xaxis: { visible: false, range: [0, 1] },
+				yaxis: { visible: false, range: [0, 1], scaleanchor: 'x' },
+				margin: { t: 50, r: 20, b: 40, l: 20 },
+				paper_bgcolor: 'transparent',
+				plot_bgcolor: '#fafafa',
+				shapes: shapes,
+				annotations: annotations,
+				showlegend: false
+			};
+
+			// Empty trace just to render the plot
+			traces.push({
+				x: [0],
+				y: [0],
+				type: 'scatter',
+				mode: 'markers',
+				marker: { size: 0.1, opacity: 0 }
+			});
+		} else if (chartData.type === 'bar') {
+			// Bar chart for trimmomatic, unicycler
+			const colors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
 
 			traces.push({
 				x: chartData.x,
@@ -125,21 +228,6 @@
 			});
 
 			layout.yaxis.rangemode = 'tozero';
-
-			// Add annotation for assembly graph quality
-			if (chartData.isAssemblyGraph && chartData.graphStats) {
-				const quality = chartData.graphStats.quality;
-				const qualityColor = quality === 'excellent' ? '#10b981' : quality === 'good' ? '#f59e0b' : '#ef4444';
-				layout.annotations = [{
-					x: 0.5,
-					y: 1.08,
-					xref: 'paper',
-					yref: 'paper',
-					text: `Quality: ${quality.toUpperCase()} | ${chartData.graphStats.circular} circular | ${chartData.graphStats.deadEnds} dead ends`,
-					showarrow: false,
-					font: { size: 12, color: qualityColor }
-				}];
-			}
 		} else {
 			// Line chart for FastQC quality scores
 			traces.push({
