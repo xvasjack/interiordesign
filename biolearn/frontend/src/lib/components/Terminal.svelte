@@ -1,13 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Terminal } from '@xterm/xterm';
-	import { FitAddon } from '@xterm/addon-fit';
-	import { WebLinksAddon } from '@xterm/addon-web-links';
-	import '@xterm/xterm/css/xterm.css';
 
 	let terminalContainer: HTMLDivElement;
-	let terminal: Terminal;
-	let fitAddon: FitAddon;
+	let terminal: any;
+	let fitAddon: any;
 	let resizeObserver: ResizeObserver;
 
 	// WebSocket connection for backend
@@ -105,7 +101,13 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		// Dynamic imports for client-side only (xterm doesn't support SSR)
+		const { Terminal } = await import('@xterm/xterm');
+		const { FitAddon } = await import('@xterm/addon-fit');
+		const { WebLinksAddon } = await import('@xterm/addon-web-links');
+		await import('@xterm/xterm/css/xterm.css');
+
 		terminal = new Terminal(terminalOptions);
 		fitAddon = new FitAddon();
 		const webLinksAddon = new WebLinksAddon();
