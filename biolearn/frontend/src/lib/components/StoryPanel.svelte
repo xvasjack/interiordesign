@@ -264,7 +264,7 @@
 										onerror={(e) => {
 											const target = e.currentTarget as HTMLImageElement;
 											target.onerror = null;
-											target.src = '/images/placeholder.png';
+											target.src = '/images/placeholder.svg';
 											target.parentElement?.classList.add('bg-gray-100');
 										}}
 									/>
