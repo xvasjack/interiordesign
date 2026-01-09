@@ -310,10 +310,13 @@
 		const isNanopore = inputFile.includes('_nanopore');
 		const isLongRead = isHiFi || isNanopore;
 
-		// Different stats for different samples/reads and technologies
-		const baseReads = isLongRead ? 245678 : 2456789;  // Long reads have fewer but longer reads
-		const sampleVariation = parseInt(sampleNum) * 12345;
-		const totalReads = baseReads + (sampleVariation % 50000);
+		// Realistic bacterial sequencing stats (~5 Mb genome, 60-100x coverage)
+		// HiFi: ~30k reads × 15kb = ~450 Mb (90x coverage)
+		// Nanopore: ~80k reads × 8kb = ~640 Mb (128x coverage)
+		// Illumina: ~2M reads × 150bp = ~300 Mb (60x coverage)
+		const baseReads = isHiFi ? 32456 : (isNanopore ? 78234 : 2012345);
+		const sampleVariation = parseInt(sampleNum) * 1234;
+		const totalReads = baseReads + (sampleVariation % 5000);
 		const gcContent = isR2 ? 51.8 : 52.3;
 		const adapterPercent = isR2 ? 2.8 : 3.2;
 
@@ -339,7 +342,7 @@ ${inputFile.padEnd(25)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBa
 				summary: {
 					'File': inputFile,
 					'Total Reads': totalReads.toLocaleString(),
-					'Total Bases': `${(totalBases / 1000000000).toFixed(2)} Gb`,
+					'Total Bases': `${(totalBases / 1000000).toFixed(1)} Mb`,
 					'Avg Read Length': `${readLength.toLocaleString()} bp`,
 					'GC Content': `${gcContent}%`,
 					'Q20 Bases': isLongRead ? '99.8%' : '97.2%',
