@@ -1595,6 +1595,35 @@ Loading assembly graph: assembly.gfa
 			}
 
 			// Check command has proper arguments
+			// Phase 1: QC and Read Processing
+			if (command === 'seqkit') {
+				// seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz
+				if (!args.includes('stats')) {
+					terminal.writeln(`\x1b[31mError: Missing subcommand\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: seqkit stats <file1.fastq.gz> <file2.fastq.gz>\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const inputFiles = args.filter(a => a.endsWith('.fastq.gz'));
+				if (inputFiles.length === 0) {
+					terminal.writeln(`\x1b[31mError: Missing input FASTQ files\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: seqkit stats <file1.fastq.gz> <file2.fastq.gz>\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Validate input files
+				for (const f of inputFiles) {
+					if (!isValidFileForTool('seqkit', f)) {
+						terminal.writeln(`\x1b[31mError: '${f}' is not a valid input for seqkit\x1b[0m`);
+						terminal.writeln(`\x1b[90mSeqkit requires raw FASTQ files: sample_01_R1.fastq.gz, sample_01_R2.fastq.gz\x1b[0m`);
+						writePrompt();
+						return;
+					}
+				}
+			}
+
 			if (command === 'fastqc') {
 				// Check for input file
 				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
@@ -1633,15 +1662,25 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'trimmomatic') {
+				const expectedCmd = 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36';
 				if (args.length < 5) {
-					terminal.writeln(`\x1b[31mUsage: trimmomatic PE -phred33 <R1.fq.gz> <R2.fq.gz> <output_files...> <options>\x1b[0m`);
-					terminal.writeln(`\x1b[90mThis tool requires paired-end input files and trimming parameters.\x1b[0m`);
+					terminal.writeln(`\x1b[31mError: Incomplete command\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: trimmomatic PE -phred33 <R1.fq.gz> <R2.fq.gz> <outputs...> ILLUMINACLIP:... SLIDINGWINDOW:... MINLEN:...\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				// Check PE mode and paired files
+				// Check PE mode
 				if (!args.includes('PE')) {
-					terminal.writeln(`\x1b[31mError: Trimmomatic requires 'PE' mode for paired-end reads\x1b[0m`);
+					terminal.writeln(`\x1b[31mError: Missing 'PE' mode for paired-end reads\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check -phred33
+				if (!args.includes('-phred33')) {
+					terminal.writeln(`\x1b[31mError: Missing '-phred33' quality encoding\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1657,7 +1696,30 @@ Loading assembly graph: assembly.gfa
 				if (invalidOutput) {
 					terminal.writeln(`\x1b[31mError: Invalid output path '${invalidOutput}'\x1b[0m`);
 					terminal.writeln(`\x1b[33mFor this training, output files must be in the 'trimmed/' folder\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: trimmed/sample_01_R1_paired.fq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check ILLUMINACLIP
+				const hasIlluminaclip = args.some(a => a.startsWith('ILLUMINACLIP:'));
+				if (!hasIlluminaclip) {
+					terminal.writeln(`\x1b[31mError: Missing ILLUMINACLIP adapter trimming parameter\x1b[0m`);
+					terminal.writeln(`\x1b[90mRequired: ILLUMINACLIP:TruSeq3-PE.fa:2:30:10\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check SLIDINGWINDOW
+				const hasSlidingwindow = args.some(a => a.startsWith('SLIDINGWINDOW:'));
+				if (!hasSlidingwindow) {
+					terminal.writeln(`\x1b[31mError: Missing SLIDINGWINDOW quality trimming parameter\x1b[0m`);
+					terminal.writeln(`\x1b[90mRequired: SLIDINGWINDOW:4:15\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check MINLEN
+				const hasMinlen = args.some(a => a.startsWith('MINLEN:'));
+				if (!hasMinlen) {
+					terminal.writeln(`\x1b[31mError: Missing MINLEN minimum length parameter\x1b[0m`);
+					terminal.writeln(`\x1b[90mRequired: MINLEN:36\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1747,12 +1809,12 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'quast') {
-				// Check for input file
+				// quast assembly/assembly.fasta -o quast_results/
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: quast assembly/assembly.fasta -o assembly\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: quast assembly/assembly.fasta -o assembly\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: quast assembly/assembly.fasta -o quast_results/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: quast assembly/assembly.fasta -o quast_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1762,15 +1824,30 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
+				// Check -o output directory
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -o quast_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'quast_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: quast_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
 
 			if (command === 'prokka') {
-				// Prokka: prokka assembly/assembly.fasta --outdir prokka_results --prefix sample_01
+				// prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta
+				const expectedCmd = 'prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: prokka assembly/assembly.fasta --outdir prokka_results --prefix sample_01\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: prokka assembly/assembly.fasta --outdir prokka_results --prefix sample_01\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1783,7 +1860,7 @@ Loading assembly graph: assembly.gfa
 				// Check output directory
 				if (!args.includes('--outdir')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --outdir prokka_results\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --outdir prokka_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1791,19 +1868,26 @@ Loading assembly graph: assembly.gfa
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
 				if (outDir !== 'prokka_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: prokka_results\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: prokka_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check prefix
+				if (!args.includes('--prefix')) {
+					terminal.writeln(`\x1b[31mError: Missing output file prefix (--prefix flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --prefix sample_01\x1b[0m`);
 					writePrompt();
 					return;
 				}
 			}
 
 			if (command === 'abricate') {
-				// Abricate: abricate assembly/assembly.fasta --db ncbi > results/amr_report.tsv
+				// abricate --db ncbi assembly/assembly.fasta -o abricate_results/
+				const expectedCmd = 'abricate --db ncbi assembly/assembly.fasta -o abricate_results/';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: abricate assembly/assembly.fasta --db ncbi --output results/amr_report.tsv\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: abricate assembly/assembly.fasta --db ncbi --output results/amr_report.tsv\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1817,33 +1901,33 @@ Loading assembly graph: assembly.gfa
 				if (!args.includes('--db')) {
 					terminal.writeln(`\x1b[31mError: Missing database (--db flag)\x1b[0m`);
 					terminal.writeln(`\x1b[90mAvailable databases: ncbi, card, resfinder, vfdb\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: abricate assembly/assembly.fasta --db ncbi --output results/amr_report.tsv\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				// Check output
-				if (!args.includes('--output') && !args.includes('-o')) {
-					terminal.writeln(`\x1b[31mError: Missing output file (--output flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --output results/amr_report.tsv\x1b[0m`);
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o abricate_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
-				const outFile = args[oIdx + 1];
-				if (!outFile || !outFile.startsWith('results/')) {
-					terminal.writeln(`\x1b[31mError: Invalid output path '${outFile || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, output must be in 'results/' folder\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: --output results/amr_report.tsv\x1b[0m`);
+				const oIdx = args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'abricate_results') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: abricate_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 			}
 
 			if (command === 'checkm') {
-				// CheckM: checkm lineage_wf assembly/ checkm_results/
+				// checkm lineage_wf assembly/ checkm_results/ -x fasta
+				const expectedCmd = 'checkm lineage_wf assembly/ checkm_results/ -x fasta';
 				if (!args.includes('lineage_wf')) {
-					terminal.writeln(`\x1b[31mUsage: checkm lineage_wf assembly/ checkm_results/\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: checkm lineage_wf assembly/ checkm_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mError: Missing 'lineage_wf' workflow command\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1851,7 +1935,7 @@ Loading assembly graph: assembly.gfa
 				const inputDir = args.find(a => a === 'assembly/' || a === 'assembly');
 				if (!inputDir) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly directory\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: checkm lineage_wf assembly/ checkm_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1859,13 +1943,28 @@ Loading assembly graph: assembly.gfa
 				const outDir = args.find(a => a.includes('checkm'));
 				if (!outDir) {
 					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: checkm_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: checkm_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (outDir !== 'checkm_results/' && outDir !== 'checkm_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${outDir}'\x1b[0m`);
 					terminal.writeln(`\x1b[33mFor this training, please use: checkm_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check -x fasta extension flag
+				if (!args.includes('-x')) {
+					terminal.writeln(`\x1b[31mError: Missing file extension flag (-x)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -x fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const xIdx = args.indexOf('-x');
+				const ext = args[xIdx + 1];
+				if (ext !== 'fasta') {
+					terminal.writeln(`\x1b[31mError: Invalid extension '${ext || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -x fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1939,12 +2038,12 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'mlst') {
-				// MLST: mlst assembly/assembly.fasta > mlst_results/mlst_report.tsv
+				// mlst assembly/assembly.fasta -o mlst_results/
+				const expectedCmd = 'mlst assembly/assembly.fasta -o mlst_results/';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: mlst assembly/assembly.fasta --output mlst_results/\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: mlst assembly/assembly.fasta --output mlst_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1955,13 +2054,13 @@ Loading assembly graph: assembly.gfa
 					return;
 				}
 				// Check output directory
-				if (!args.includes('--output') && !args.includes('-o')) {
-					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --output mlst_results/\x1b[0m`);
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o mlst_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
+				const oIdx = args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
 				if (outDir !== 'mlst_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
@@ -1973,11 +2072,20 @@ Loading assembly graph: assembly.gfa
 
 			// Phase 3: Plasmid Analysis
 			if (command === 'mob_recon') {
-				// MOB-suite: mob_recon -i assembly/assembly.fasta -o mob_recon_results/
-				const inputFile = args.find(a => a.endsWith('.fasta'));
-				if (!inputFile) {
-					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: mob_recon -i assembly/assembly.fasta -o mob_recon_results/\x1b[0m`);
+				// mob_recon -i assembly/assembly.fasta -o mob_recon_results/
+				const expectedCmd = 'mob_recon -i assembly/assembly.fasta -o mob_recon_results/';
+				// Check -i flag
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input file flag (-i)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const iIdx = args.indexOf('-i');
+				const inputFile = args[iIdx + 1];
+				if (!inputFile || !inputFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid input file after -i flag\x1b[0m`);
+					terminal.writeln(`\x1b[90mMOB-suite requires: -i assembly/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1987,9 +2095,10 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
+				// Check -o flag
 				if (!args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: -o mob_recon_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o mob_recon_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2004,11 +2113,12 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'platon') {
-				// Platon: platon assembly/assembly.fasta --output platon_results/
+				// platon assembly/assembly.fasta -o platon_results/
+				const expectedCmd = 'platon assembly/assembly.fasta -o platon_results/';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: platon assembly/assembly.fasta --output platon_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2018,13 +2128,13 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
-				if (!args.includes('--output') && !args.includes('-o')) {
-					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --output platon_results/\x1b[0m`);
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o platon_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
+				const oIdx = args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
 				if (outDir !== 'platon_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
@@ -2036,22 +2146,31 @@ Loading assembly graph: assembly.gfa
 
 			// Phase 4: Phylogenetics
 			if (command === 'snippy') {
-				// Snippy: snippy --ref reference.fasta --R1 trimmed/sample_01_R1_paired.fq.gz --R2 trimmed/sample_01_R2_paired.fq.gz --outdir snippy_results/
+				// snippy --ref reference.gbk --ctgs assembly/assembly.fasta --outdir snippy_results/
+				const expectedCmd = 'snippy --ref reference.gbk --ctgs assembly/assembly.fasta --outdir snippy_results/';
 				if (!args.includes('--ref')) {
 					terminal.writeln(`\x1b[31mError: Missing reference file (--ref flag)\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: snippy --ref reference.fasta --R1 R1.fq.gz --R2 R2.fq.gz --outdir snippy_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				if (!args.includes('--R1') || !args.includes('--R2')) {
-					terminal.writeln(`\x1b[31mError: Missing read files (--R1 and --R2 flags)\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: snippy --ref reference.fasta --R1 trimmed/sample_01_R1_paired.fq.gz --R2 trimmed/sample_01_R2_paired.fq.gz --outdir snippy_results/\x1b[0m`);
+				if (!args.includes('--ctgs')) {
+					terminal.writeln(`\x1b[31mError: Missing contigs file (--ctgs flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --ctgs assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const ctgsIdx = args.indexOf('--ctgs');
+				const ctgsFile = args[ctgsIdx + 1];
+				if (!ctgsFile || !ctgsFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Invalid contigs file after --ctgs flag\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: --ctgs assembly/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!args.includes('--outdir')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --outdir snippy_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --outdir snippy_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2066,18 +2185,11 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'roary') {
-				// Roary: roary -f roary_results/ prokka_results/*.gff
+				// roary -f roary_results/ -e -n -v prokka_results/*.gff
+				const expectedCmd = 'roary -f roary_results/ -e -n -v prokka_results/*.gff';
 				if (!args.includes('-f')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-f flag)\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: roary -f roary_results/ prokka_results/*.gff\x1b[0m`);
-					writePrompt();
-					return;
-				}
-				const gffFiles = args.filter(a => a.endsWith('.gff') || a.includes('*.gff'));
-				if (gffFiles.length === 0) {
-					terminal.writeln(`\x1b[31mError: Missing GFF annotation files\x1b[0m`);
-					terminal.writeln(`\x1b[90mRoary requires GFF files from prokka annotation\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: roary -f roary_results/ prokka_results/*.gff\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2089,13 +2201,41 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
+				// Check required flags
+				if (!args.includes('-e')) {
+					terminal.writeln(`\x1b[31mError: Missing -e flag (create core gene alignment)\x1b[0m`);
+					terminal.writeln(`\x1b[90mRequired: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-n')) {
+					terminal.writeln(`\x1b[31mError: Missing -n flag (fast core alignment with MAFFT)\x1b[0m`);
+					terminal.writeln(`\x1b[90mRequired: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-v')) {
+					terminal.writeln(`\x1b[31mError: Missing -v flag (verbose output)\x1b[0m`);
+					terminal.writeln(`\x1b[90mRequired: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const gffFiles = args.filter(a => a.endsWith('.gff') || a.includes('*.gff'));
+				if (gffFiles.length === 0) {
+					terminal.writeln(`\x1b[31mError: Missing GFF annotation files\x1b[0m`);
+					terminal.writeln(`\x1b[90mRoary requires GFF files from prokka annotation\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
 			}
 
 			if (command === 'iqtree') {
-				// IQ-TREE: iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 --prefix iqtree_results/core_alignment
+				// iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 -nt AUTO
+				const expectedCmd = 'iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 -nt AUTO';
 				if (!args.includes('-s')) {
 					terminal.writeln(`\x1b[31mError: Missing alignment file (-s flag)\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: iqtree -s roary_results/core_gene_alignment.aln --prefix iqtree_results/core_alignment\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2107,34 +2247,52 @@ Loading assembly graph: assembly.gfa
 					writePrompt();
 					return;
 				}
-				if (!args.includes('--prefix')) {
-					terminal.writeln(`\x1b[31mError: Missing output prefix (--prefix flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --prefix iqtree_results/core_alignment\x1b[0m`);
+				// Check -m model flag
+				if (!args.includes('-m')) {
+					terminal.writeln(`\x1b[31mError: Missing substitution model (-m flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -m GTR+G\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check -bb bootstrap flag
+				if (!args.includes('-bb')) {
+					terminal.writeln(`\x1b[31mError: Missing bootstrap replicates (-bb flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -bb 1000\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check -nt threads flag
+				if (!args.includes('-nt')) {
+					terminal.writeln(`\x1b[31mError: Missing threads flag (-nt)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -nt AUTO\x1b[0m`);
 					writePrompt();
 					return;
 				}
 			}
 
 			if (command === 'gubbins') {
-				// Gubbins: run_gubbins.py roary_results/core_gene_alignment.aln --prefix gubbins_results/clean
-				const alnFile = args.find(a => a.endsWith('.aln'));
-				if (!alnFile) {
-					terminal.writeln(`\x1b[31mError: Missing alignment file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: run_gubbins.py roary_results/core_gene_alignment.aln --prefix gubbins_results/clean\x1b[0m`);
+				// run_gubbins.py -p gubbins_results/clean roary_results/core_gene_alignment.aln
+				const expectedCmd = 'run_gubbins.py -p gubbins_results/clean roary_results/core_gene_alignment.aln';
+				// Check -p prefix flag
+				if (!args.includes('-p')) {
+					terminal.writeln(`\x1b[31mError: Missing output prefix (-p flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				if (!args.includes('--prefix')) {
-					terminal.writeln(`\x1b[31mError: Missing output prefix (--prefix flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --prefix gubbins_results/clean\x1b[0m`);
-					writePrompt();
-					return;
-				}
-				const pIdx = args.indexOf('--prefix');
+				const pIdx = args.indexOf('-p');
 				const prefix = args[pIdx + 1];
 				if (!prefix || !prefix.startsWith('gubbins_results/')) {
 					terminal.writeln(`\x1b[31mError: Invalid output prefix '${prefix || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: gubbins_results/clean\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -p gubbins_results/clean\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check alignment file
+				const alnFile = args.find(a => a.endsWith('.aln'));
+				if (!alnFile) {
+					terminal.writeln(`\x1b[31mError: Missing alignment file\x1b[0m`);
+					terminal.writeln(`\x1b[90mGubbins requires: roary_results/core_gene_alignment.aln\x1b[0m`);
 					writePrompt();
 					return;
 				}
