@@ -151,7 +151,7 @@
 					<!-- Storylines Dropdown -->
 					{#if selectedMode?.id === mode.id && mode.storylines}
 						<div class="absolute left-0 right-0 top-full z-10 mt-2 overflow-hidden rounded-xl border border-slate-700 bg-slate-800 shadow-2xl">
-							<div class="p-2">
+							<div class="p-2 max-h-72 overflow-y-auto">
 								<p class="mb-2 px-3 py-2 text-xs font-medium uppercase tracking-wider text-slate-500">
 									Choose a Storyline
 								</p>
