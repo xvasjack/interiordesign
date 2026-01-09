@@ -18,6 +18,7 @@
 		subtitle: 'WGS Analysis Pipeline',
 		organism: 'Klebsiella pneumoniae',
 		technology: 'illumina',
+		technologyLabel: 'Short Read (Illumina)',
 		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{
@@ -156,15 +157,20 @@
 <div class="h-full flex flex-col" style="display: flex; flex-direction: column; height: 100%;">
 	<!-- Header -->
 	<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 1.5rem; flex-shrink: 0;">
-		<div class="flex items-center gap-3 mb-2" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+		<div class="flex items-center gap-3 mb-2 flex-wrap" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
 			<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				WGS Analysis
 			</span>
+			{#if activeStoryline.technologyLabel}
+				<span class="px-3 py-1 rounded-full text-sm font-medium" style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: {activeStoryline.technologyLabel.includes('Long Read') ? 'rgba(168,85,247,0.9)' : 'rgba(59,130,246,0.9)'};">
+					{activeStoryline.technologyLabel}
+				</span>
+			{/if}
 			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(34,197,94,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				Phase {currentPhase()}
 			</span>
 			{#if activeStoryline.organism}
-				<span class="bg-purple-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(168,85,247,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
+				<span class="bg-amber-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(245,158,11,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 					{activeStoryline.organism}
 				</span>
 			{/if}

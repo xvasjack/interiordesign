@@ -6,7 +6,7 @@
 		title: string;
 		description: string;
 		icon: string;
-		storylines?: { id: string; title: string; description: string }[];
+		storylines?: { id: string; title: string; description: string; technologyLabel: string }[];
 		comingSoon?: boolean;
 	}
 
@@ -20,22 +20,38 @@
 				{
 					id: 'hospital',
 					title: 'Hospital Outbreak Investigation',
-					description: 'Investigate a Klebsiella pneumoniae AMR outbreak in ICU patients'
+					description: 'Investigate a Klebsiella pneumoniae AMR outbreak in ICU patients',
+					technologyLabel: 'Short Read (Illumina)'
 				},
 				{
 					id: 'plant',
 					title: 'Plant Pathogen Investigation',
-					description: 'Analyze citrus canker outbreak caused by Xanthomonas citri'
+					description: 'Analyze citrus canker outbreak caused by Xanthomonas citri',
+					technologyLabel: 'Short Read (Illumina)'
 				},
 				{
 					id: 'fish',
 					title: 'Fish Mortality Event',
-					description: 'Investigate mass fish deaths suspected to be Vibrio outbreak'
+					description: 'Investigate mass fish deaths suspected to be Vibrio outbreak',
+					technologyLabel: 'Short Read (Illumina)'
 				},
 				{
 					id: 'foodborne',
 					title: 'Food Poisoning Outbreak',
-					description: 'Trace Salmonella outbreak from restaurant to source'
+					description: 'Trace Salmonella outbreak from restaurant to source',
+					technologyLabel: 'Short Read (Illumina)'
+				},
+				{
+					id: 'wastewater',
+					title: 'Wastewater AMR Surveillance',
+					description: 'Track colistin resistance genes in environmental samples',
+					technologyLabel: 'Long Read (PacBio HiFi)'
+				},
+				{
+					id: 'clinical',
+					title: 'Clinical Rapid Diagnostics',
+					description: 'Same-day pathogen ID for critically ill patients',
+					technologyLabel: 'Long Read (Oxford Nanopore)'
 				}
 			]
 		},
@@ -149,11 +165,18 @@
 											: 'hover:bg-slate-700/50'}"
 									>
 										<div class="flex items-center justify-between">
-											<div>
-												<h4 class="font-medium text-white">{storyline.title}</h4>
+											<div class="flex-1">
+												<div class="flex items-center gap-2 mb-1">
+													<h4 class="font-medium text-white">{storyline.title}</h4>
+													<span class="rounded-full px-2 py-0.5 text-xs font-medium {storyline.technologyLabel.includes('Long Read')
+														? 'bg-purple-500/20 text-purple-300'
+														: 'bg-blue-500/20 text-blue-300'}">
+														{storyline.technologyLabel}
+													</span>
+												</div>
 												<p class="text-sm text-slate-400">{storyline.description}</p>
 											</div>
-											<svg class="h-5 w-5 text-slate-500 transition-transform {hoveredStoryline === storyline.id ? 'translate-x-1 text-emerald-400' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<svg class="h-5 w-5 text-slate-500 transition-transform flex-shrink-0 ml-2 {hoveredStoryline === storyline.id ? 'translate-x-1 text-emerald-400' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
 											</svg>
 										</div>
