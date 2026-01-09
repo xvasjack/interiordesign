@@ -155,11 +155,11 @@ function createPhase3Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 10: Genome Annotation',
 			text: `Annotate genes in the assembly.`,
-			command: 'prokka --outdir annotation/ --prefix sample_01 assembly/assembly.fasta',
+			command: 'prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta',
 			explanation: 'Prokka identifies CDS, tRNA, and rRNA features.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '--outdir annotation/', desc: 'Output directory' },
+				{ name: '--outdir prokka_results/', desc: 'Output directory' },
 				{ name: '--prefix sample_01', desc: 'Output file prefix' }
 			]
 		},
@@ -224,7 +224,7 @@ function createPhase4Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 15: Pan-genome Analysis',
 			text: `Analyze the pan-genome across isolates.`,
-			command: 'roary -f roary_results/ -e -n -v annotation/*.gff',
+			command: 'roary -f roary_results/ -e -n -v prokka_results/*.gff',
 			explanation: 'Roary identifies core and accessory genes.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [

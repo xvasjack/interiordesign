@@ -64,8 +64,8 @@
 			]
 		},
 		'prokka': {
-			'/data/outbreak_investigation': ['annotation/'],
-			'/data/outbreak_investigation/annotation': [
+			'/data/outbreak_investigation': ['prokka_results/'],
+			'/data/outbreak_investigation/prokka_results': [
 				'sample_01.gff', 'sample_01.gbk', 'sample_01.fna',
 				'sample_01.faa', 'sample_01.ffn', 'sample_01.txt'
 			]
@@ -500,7 +500,7 @@ Loading assembly graph: assembly.gfa
   Hypothetical proteins: 487 (10.8%)
   Proteins with function: 4,036 (89.2%)
 
-\x1b[33mOutput files written to: annotation/\x1b[0m
+\x1b[33mOutput files written to: prokka_results/\x1b[0m
 `,
 				summary: {
 					'Total Features': '4,644',
@@ -1489,7 +1489,7 @@ Loading assembly graph: assembly.gfa
 		'platon': ['assembly/assembly.fasta'],
 		// Phase 4: Phylogenetics
 		'snippy': ['trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'],
-		'roary': ['annotation/'],
+		'roary': ['prokka_results/'],
 		'iqtree': ['roary_results/core_gene_alignment.aln'],
 		'gubbins': ['roary_results/core_gene_alignment.aln']
 	};
@@ -1765,12 +1765,12 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'prokka') {
-				// Prokka: prokka assembly/assembly.fasta --outdir annotation --prefix sample_01
+				// Prokka: prokka assembly/assembly.fasta --outdir prokka_results --prefix sample_01
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: prokka assembly/assembly.fasta --outdir annotation --prefix sample_01\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: prokka assembly/assembly.fasta --outdir annotation --prefix sample_01\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: prokka assembly/assembly.fasta --outdir prokka_results --prefix sample_01\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: prokka assembly/assembly.fasta --outdir prokka_results --prefix sample_01\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1783,15 +1783,15 @@ Loading assembly graph: assembly.gfa
 				// Check output directory
 				if (!args.includes('--outdir')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --outdir annotation\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --outdir prokka_results\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const oIdx = args.indexOf('--outdir');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'annotation') {
+				if (outDir !== 'prokka_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: annotation\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: prokka_results\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2066,10 +2066,10 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'roary') {
-				// Roary: roary -f roary_results/ annotation/*.gff
+				// Roary: roary -f roary_results/ prokka_results/*.gff
 				if (!args.includes('-f')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-f flag)\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: roary -f roary_results/ annotation/*.gff\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: roary -f roary_results/ prokka_results/*.gff\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2077,7 +2077,7 @@ Loading assembly graph: assembly.gfa
 				if (gffFiles.length === 0) {
 					terminal.writeln(`\x1b[31mError: Missing GFF annotation files\x1b[0m`);
 					terminal.writeln(`\x1b[90mRoary requires GFF files from prokka annotation\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: roary -f roary_results/ annotation/*.gff\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: roary -f roary_results/ prokka_results/*.gff\x1b[0m`);
 					writePrompt();
 					return;
 				}
