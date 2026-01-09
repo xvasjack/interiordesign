@@ -224,10 +224,10 @@
 
 <svelte:window onclick={closeDropdown} />
 
-<div class="h-screen w-screen flex flex-col overflow-hidden">
+<div class="h-screen w-screen flex flex-col overflow-hidden" style="display: flex; flex-direction: column; height: 100vh; width: 100vw;">
 	<!-- Top Header Bar -->
-	<div class="h-10 bg-gray-800 flex items-center justify-between px-4 border-b border-gray-700">
-		<div class="flex items-center gap-2">
+	<div class="h-10 bg-gray-800 flex items-center justify-between px-4 border-b border-gray-700" style="display: flex; align-items: center; justify-content: space-between; height: 40px; flex-shrink: 0;">
+		<div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 0.5rem;">
 			<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
 				<span class="text-green-400 font-bold text-sm">BioLearn</span>
 			</a>
@@ -293,9 +293,9 @@
 	</div>
 
 	<!-- Main Content -->
-	<div class="flex-1 flex overflow-hidden">
+	<div class="flex-1 flex overflow-hidden" style="display: flex; flex: 1; overflow: hidden;">
 		<!-- Left Panel: Terminal + Output -->
-		<div id="left-panel" class="w-1/2 flex flex-col border-r border-gray-300">
+		<div id="left-panel" class="w-1/2 flex flex-col border-r border-gray-300" style="display: flex; flex-direction: column; width: 50%;">
 		<!-- Terminal -->
 		<div
 			class="terminal-panel overflow-hidden"
@@ -323,7 +323,7 @@
 	</div>
 
 		<!-- Right Panel: Story -->
-		<div class="w-1/2 story-panel overflow-auto">
+		<div class="w-1/2 story-panel overflow-auto" style="width: 50%; overflow: auto;">
 			<StoryPanel {storyline} />
 		</div>
 	</div>
