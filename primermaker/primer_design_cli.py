@@ -51,28 +51,59 @@ def get_user_input_interactive() -> dict:
     """Get parameters interactively from user"""
 
     print("\n" + "=" * 60)
-    print("STEP 1: Define Target Organisms")
+    print("STEP 1: Choose Search Mode")
     print("=" * 60)
 
-    print("\nEnter organism/species names (comma-separated)")
-    print("Examples:")
-    print("  - Escherichia coli, Salmonella enterica, Klebsiella pneumoniae")
-    print("  - Staphylococcus aureus, Staphylococcus epidermidis")
-    print("  - Homo sapiens, Mus musculus, Rattus norvegicus")
+    print("\nHow do you want to search for sequences?")
+    print("  1. Organism mode - Specify individual species names")
+    print("  2. Genus mode - Get multiple species under a genus")
+    print("     (e.g., 'Salmonella' -> gets S. enterica, S. typhimurium, etc.)")
 
-    organisms_input = input("\nOrganisms: ").strip()
-    organisms = [o.strip() for o in organisms_input.split(',') if o.strip()]
+    mode_choice = input("\nChoice [1]: ").strip() or "1"
+    use_genus_mode = mode_choice == "2"
 
-    if not organisms:
-        print("Error: At least one organism is required")
-        sys.exit(1)
+    if use_genus_mode:
+        print("\n" + "=" * 60)
+        print("STEP 2: Define Genus")
+        print("=" * 60)
+
+        print("\nEnter the genus name (e.g., Salmonella, Staphylococcus)")
+        genus = input("\nGenus: ").strip()
+
+        if not genus:
+            print("Error: Genus name is required")
+            sys.exit(1)
+
+        max_species = input("Max number of different species [50]: ").strip()
+        max_species = int(max_species) if max_species else 50
+
+        max_per_species = input("Max sequences per species [4]: ").strip()
+        max_per_species = int(max_per_species) if max_per_species else 4
+
+    else:
+        print("\n" + "=" * 60)
+        print("STEP 2: Define Target Organisms")
+        print("=" * 60)
+
+        print("\nEnter organism/species names (comma-separated)")
+        print("Examples:")
+        print("  - Escherichia coli, Salmonella enterica, Klebsiella pneumoniae")
+        print("  - Staphylococcus aureus, Staphylococcus epidermidis")
+        print("  - Homo sapiens, Mus musculus, Rattus norvegicus")
+
+        organisms_input = input("\nOrganisms: ").strip()
+        organisms = [o.strip() for o in organisms_input.split(',') if o.strip()]
+
+        if not organisms:
+            print("Error: At least one organism is required")
+            sys.exit(1)
 
     print("\n" + "=" * 60)
-    print("STEP 2: Specify Target Region")
+    print("STEP 3: Specify Target Region")
     print("=" * 60)
 
     print("\nCommon target regions:")
-    print("  - 16S rRNA (bacterial identification)")
+    print("  - 16S ribosomal RNA (bacterial identification)")
     print("  - ITS (fungal identification)")
     print("  - COI/CO1 (animal barcoding)")
     print("  - matK, rbcL (plant barcoding)")
@@ -87,7 +118,7 @@ def get_user_input_interactive() -> dict:
         region = None
 
     print("\n" + "=" * 60)
-    print("STEP 3: Sequence Range (Optional)")
+    print("STEP 4: Sequence Range (Optional)")
     print("=" * 60)
 
     print("\nSpecify a subsequence range to retrieve")
@@ -100,15 +131,15 @@ def get_user_input_interactive() -> dict:
     end = int(end_input) if end_input else None
 
     print("\n" + "=" * 60)
-    print("STEP 4: Database Selection")
+    print("STEP 5: Database Selection")
     print("=" * 60)
 
     print("\nSelect databases to search:")
-    print("  1. NCBI only")
+    print("  1. NCBI only (recommended)")
     print("  2. EMBL-EBI only")
-    print("  3. Both (recommended)")
+    print("  3. Both")
 
-    db_choice = input("\nChoice [3]: ").strip() or "3"
+    db_choice = input("\nChoice [1]: ").strip() or "1"
     databases = []
     if db_choice in ["1", "3"]:
         databases.append("ncbi")
@@ -116,11 +147,12 @@ def get_user_input_interactive() -> dict:
         databases.append("embl")
 
     print("\n" + "=" * 60)
-    print("STEP 5: Primer Parameters")
+    print("STEP 6: Primer Parameters")
     print("=" * 60)
 
-    max_seqs = input("Max sequences per organism [5]: ").strip()
-    max_seqs = int(max_seqs) if max_seqs else 5
+    if not use_genus_mode:
+        max_seqs = input("Max sequences per organism [5]: ").strip()
+        max_seqs = int(max_seqs) if max_seqs else 5
 
     tm_min = input("Minimum Tm (C) [55]: ").strip()
     tm_min = float(tm_min) if tm_min else 55.0
@@ -141,28 +173,49 @@ def get_user_input_interactive() -> dict:
     product_max = int(product_max) if product_max else 500
 
     print("\n" + "=" * 60)
-    print("STEP 6: Output Options")
+    print("STEP 7: Output Options")
     print("=" * 60)
 
     output_dir = input("Output directory [./primer_results]: ").strip()
     output_dir = output_dir if output_dir else "./primer_results"
 
-    return {
-        'organisms': organisms,
-        'gene': gene,
-        'region': region,
-        'start': start,
-        'end': end,
-        'databases': databases,
-        'max_seqs': max_seqs,
-        'tm_min': tm_min,
-        'tm_max': tm_max,
-        'primer_min': primer_min,
-        'primer_max': primer_max,
-        'product_min': product_min,
-        'product_max': product_max,
-        'output_dir': output_dir
-    }
+    if use_genus_mode:
+        return {
+            'mode': 'genus',
+            'genus': genus,
+            'max_species': max_species,
+            'max_per_species': max_per_species,
+            'gene': gene,
+            'region': region,
+            'start': start,
+            'end': end,
+            'databases': databases,
+            'tm_min': tm_min,
+            'tm_max': tm_max,
+            'primer_min': primer_min,
+            'primer_max': primer_max,
+            'product_min': product_min,
+            'product_max': product_max,
+            'output_dir': output_dir
+        }
+    else:
+        return {
+            'mode': 'organism',
+            'organisms': organisms,
+            'gene': gene,
+            'region': region,
+            'start': start,
+            'end': end,
+            'databases': databases,
+            'max_seqs': max_seqs,
+            'tm_min': tm_min,
+            'tm_max': tm_max,
+            'primer_min': primer_min,
+            'primer_max': primer_max,
+            'product_min': product_min,
+            'product_max': product_max,
+            'output_dir': output_dir
+        }
 
 
 def run_pipeline(params: dict) -> dict:
