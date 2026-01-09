@@ -150,6 +150,61 @@
 				'recombination_predictions.gff', 'clean.core.aln',
 				'clean.final_tree.tre', 'clean.summary.txt'
 			]
+		},
+		// New tools
+		'busco': {
+			'/data/outbreak_investigation': ['busco_results/'],
+			'/data/outbreak_investigation/busco_results': [
+				'short_summary.specific.bacteria_odb10.busco_results.txt',
+				'full_table.tsv', 'missing_busco_list.tsv', 'run_bacteria_odb10/'
+			]
+		},
+		'plasmidfinder': {
+			'/data/outbreak_investigation': ['plasmidfinder_results/'],
+			'/data/outbreak_investigation/plasmidfinder_results': [
+				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
+			]
+		},
+		'resfinder': {
+			'/data/outbreak_investigation': ['resfinder_results/'],
+			'/data/outbreak_investigation/resfinder_results': [
+				'ResFinder_results_tab.txt', 'ResFinder_results.txt',
+				'pheno_table.txt', 'PointFinder_results.txt'
+			]
+		},
+		'virulencefinder': {
+			'/data/outbreak_investigation': ['virulencefinder_results/'],
+			'/data/outbreak_investigation/virulencefinder_results': [
+				'results_tab.tsv', 'Virulence_genes.fsa', 'data.json'
+			]
+		},
+		'integron_finder': {
+			'/data/outbreak_investigation': ['integron_results/'],
+			'/data/outbreak_investigation/integron_results': [
+				'Results_Integron_Finder_assembly/assembly.integrons',
+				'Results_Integron_Finder_assembly/assembly.summary'
+			]
+		},
+		'isescan': {
+			'/data/outbreak_investigation': ['isescan_results/'],
+			'/data/outbreak_investigation/isescan_results': [
+				'assembly.fasta.is.fna', 'assembly.fasta.orf.fna',
+				'assembly.fasta.is.tsv', 'assembly.fasta.sum'
+			]
+		},
+		// PacBio hybrid tools
+		'NanoPlot': {
+			'/data/outbreak_investigation': ['nanoplot_results/'],
+			'/data/outbreak_investigation/nanoplot_results': [
+				'NanoPlot-report.html', 'NanoStats.txt',
+				'LengthvsQualityScatterPlot_dot.png', 'WeightedHistogramReadlength.png'
+			]
+		},
+		'filtlong': {
+			'/data/outbreak_investigation': ['filtered/'],
+			'/data/outbreak_investigation/filtered': [
+				'sample_01_filtered.fastq.gz'
+			]
 		}
 	};
 
@@ -1199,6 +1254,441 @@ Loading assembly graph: assembly.gfa
 					{ name: 'clean.core.aln', type: 'aln', size: '3.4 MB' },
 					{ name: 'clean.final_tree.tre', type: 'nwk', size: '312 B' },
 					{ name: 'clean.summary.txt', type: 'txt', size: '2.1 KB' }
+				]
+			},
+			// New tools
+			'busco': {
+				output: `\x1b[36mBUSCO v5.5.0\x1b[0m
+[2024-01-15 13:15:00] INFO: Starting BUSCO assessment
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Mode: genome
+  Lineage: bacteria_odb10 (124 BUSCOs)
+
+\x1b[36mRunning BUSCO pipeline...\x1b[0m
+  Searching for single-copy orthologs...
+  Running Augustus gene predictor...
+  Classifying BUSCOs...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  BUSCO ASSESSMENT RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  C:99.2%[S:99.2%,D:0.0%],F:0.0%,M:0.8%,n:124
+
+  \x1b[32m123 Complete BUSCOs (99.2%)\x1b[0m
+     123 Complete and single-copy
+     0 Complete and duplicated
+  \x1b[33m0 Fragmented BUSCOs (0.0%)\x1b[0m
+  \x1b[31m1 Missing BUSCOs (0.8%)\x1b[0m
+  124 Total BUSCO groups searched
+
+\x1b[32m✓ Assembly completeness: EXCELLENT\x1b[0m
+`,
+				summary: {
+					'Complete BUSCOs': '123 (99.2%)',
+					'Single-copy': '123',
+					'Duplicated': '0',
+					'Fragmented': '0 (0.0%)',
+					'Missing': '1 (0.8%)',
+					'Total': '124',
+					'Quality': 'EXCELLENT'
+				},
+				chartData: {
+					title: 'BUSCO Assessment',
+					x: ['Complete', 'Fragmented', 'Missing'],
+					y: [123, 0, 1],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'BUSCOs'
+				},
+				files: [
+					{ name: 'short_summary.specific.bacteria_odb10.txt', type: 'txt', size: '1.2 KB' },
+					{ name: 'full_table.tsv', type: 'tsv', size: '12 KB' },
+					{ name: 'missing_busco_list.tsv', type: 'tsv', size: '128 B' }
+				]
+			},
+			'plasmidfinder': {
+				output: `\x1b[36mPlasmidFinder v2.1.6\x1b[0m
+[2024-01-15 13:20:00] INFO: Starting plasmid replicon typing
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+
+\x1b[36mSearching replicon databases...\x1b[0m
+  Enterobacteriaceae replicons...
+  Gram-positive replicons...
+  Custom database...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PLASMIDFINDER RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[33mReplicons detected: 2\x1b[0m
+
+  1. IncFIB(K)
+     Identity: 98.56%
+     Coverage: 100%
+     Contig: contig_2 (95,234 bp)
+
+  2. IncFII(K)
+     Identity: 99.12%
+     Coverage: 100%
+     Contig: contig_2 (95,234 bp)
+
+\x1b[31m⚠ IncF plasmids are associated with high AMR gene carriage\x1b[0m
+`,
+				summary: {
+					'Replicons Found': '2',
+					'IncFIB(K)': '98.56% identity',
+					'IncFII(K)': '99.12% identity',
+					'Plasmid Size': '95,234 bp',
+					'Risk Level': 'High (IncF family)'
+				},
+				chartData: {
+					title: 'Replicon Identity',
+					x: ['IncFIB(K)', 'IncFII(K)'],
+					y: [98.56, 99.12],
+					type: 'bar',
+					xLabel: 'Replicon',
+					yLabel: 'Identity (%)'
+				},
+				files: [
+					{ name: 'results_tab.tsv', type: 'tsv', size: '1.5 KB' },
+					{ name: 'Hit_in_genome_seq.fsa', type: 'fasta', size: '2.3 KB' }
+				]
+			},
+			'resfinder': {
+				output: `\x1b[36mResFinder v4.3.2\x1b[0m
+[2024-01-15 13:25:00] INFO: Starting resistance gene detection
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Database: ResFinder (Acquired resistance genes)
+
+\x1b[36mSearching databases...\x1b[0m
+  Aminoglycoside resistance...
+  Beta-lactam resistance...
+  Quinolone resistance...
+  Tetracycline resistance...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  RESFINDER RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[31mResistance genes detected: 6\x1b[0m
+
+  \x1b[33mBeta-lactams:\x1b[0m
+    blaCTX-M-15 (ESBL) - 100% identity
+    blaOXA-1 - 99.8% identity
+    blaTEM-1B - 100% identity
+
+  \x1b[33mAminoglycosides:\x1b[0m
+    aac(6')-Ib-cr - 99.5% identity
+    aadA1 - 100% identity
+
+  \x1b[33mTetracyclines:\x1b[0m
+    tet(A) - 99.9% identity
+
+  \x1b[31m⚠ CRITICAL: ESBL producer (blaCTX-M-15)\x1b[0m
+  \x1b[33mNote: tet(A) and blaTEM-1B on plasmid contig\x1b[0m
+`,
+				summary: {
+					'Total Genes': '6',
+					'Beta-lactams': '3 genes',
+					'Aminoglycosides': '2 genes',
+					'Tetracyclines': '1 gene',
+					'ESBL Status': 'POSITIVE (CTX-M-15)',
+					'Risk': 'CRITICAL'
+				},
+				chartData: {
+					title: 'Resistance Gene Distribution',
+					x: ['Beta-lactams', 'Aminoglycosides', 'Tetracyclines'],
+					y: [3, 2, 1],
+					type: 'bar',
+					xLabel: 'Drug Class',
+					yLabel: 'Genes Found'
+				},
+				files: [
+					{ name: 'ResFinder_results_tab.txt', type: 'txt', size: '3.2 KB' },
+					{ name: 'ResFinder_results.txt', type: 'txt', size: '8.5 KB' },
+					{ name: 'pheno_table.txt', type: 'txt', size: '1.8 KB' }
+				]
+			},
+			'virulencefinder': {
+				output: `\x1b[36mVirulenceFinder v2.0.4\x1b[0m
+[2024-01-15 13:30:00] INFO: Starting virulence gene detection
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+  Database: Virulence factors database
+
+\x1b[36mSearching virulence databases...\x1b[0m
+  Adhesins...
+  Toxins...
+  Secretion systems...
+  Iron acquisition...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  VIRULENCEFINDER RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[33mVirulence genes detected: 8\x1b[0m
+
+  \x1b[33mAdhesins:\x1b[0m
+    fimH - Type 1 fimbriae (100%)
+    papA - P fimbriae (98.7%)
+
+  \x1b[33mToxins:\x1b[0m
+    hlyA - Alpha-hemolysin (99.2%)
+    cnf1 - Cytotoxic necrotizing factor (98.9%)
+
+  \x1b[33mIron acquisition:\x1b[0m
+    iutA - Aerobactin receptor (100%)
+    fyuA - Yersiniabactin receptor (99.5%)
+
+  \x1b[33mCapsule:\x1b[0m
+    kpsM - Capsule synthesis (99.8%)
+    kpsT - Capsule transport (100%)
+
+\x1b[31m⚠ Hypervirulent strain profile detected\x1b[0m
+`,
+				summary: {
+					'Virulence Genes': '8',
+					'Adhesins': '2 (fimH, papA)',
+					'Toxins': '2 (hlyA, cnf1)',
+					'Iron Acquisition': '2 (iutA, fyuA)',
+					'Capsule': '2 (kpsM, kpsT)',
+					'Profile': 'Hypervirulent'
+				},
+				chartData: {
+					title: 'Virulence Factor Categories',
+					x: ['Adhesins', 'Toxins', 'Iron acquisition', 'Capsule'],
+					y: [2, 2, 2, 2],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'Genes Found'
+				},
+				files: [
+					{ name: 'results_tab.tsv', type: 'tsv', size: '2.4 KB' },
+					{ name: 'Virulence_genes.fsa', type: 'fasta', size: '12 KB' }
+				]
+			},
+			'integron_finder': {
+				output: `\x1b[36mIntegronFinder v2.0.2\x1b[0m
+[2024-01-15 13:35:00] INFO: Starting integron detection
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+
+\x1b[36mSearching for integrons...\x1b[0m
+  Detecting integrases (intI)...
+  Finding attC sites...
+  Identifying gene cassettes...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  INTEGRONFINDER RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[33mIntegrons detected: 1\x1b[0m
+
+  \x1b[33mClass 1 integron (contig_2: 12,345-18,567)\x1b[0m
+    Size: 6,222 bp
+    Integrase: intI1 (100% identity)
+    Gene cassettes: 3
+      1. aadA1 - Aminoglycoside resistance
+      2. dfrA17 - Trimethoprim resistance
+      3. aadA5 - Aminoglycoside resistance
+    attC sites: 3 (conserved)
+
+\x1b[31m⚠ Class 1 integrons are mobile - high transfer risk\x1b[0m
+\x1b[33mNote: Located on plasmid contig - potential for HGT\x1b[0m
+`,
+				summary: {
+					'Integrons Found': '1',
+					'Type': 'Class 1 (clinical)',
+					'Location': 'Plasmid',
+					'Gene Cassettes': '3',
+					'AMR Genes': 'aadA1, dfrA17, aadA5',
+					'Transfer Risk': 'HIGH'
+				},
+				chartData: {
+					title: 'Integron Structure',
+					x: ['intI1', 'aadA1', 'dfrA17', 'aadA5'],
+					y: [1, 1, 1, 1],
+					type: 'bar',
+					xLabel: 'Gene',
+					yLabel: 'Present'
+				},
+				files: [
+					{ name: 'assembly.integrons', type: 'txt', size: '3.5 KB' },
+					{ name: 'assembly.summary', type: 'txt', size: '1.2 KB' }
+				]
+			},
+			'isescan': {
+				output: `\x1b[36mISEScan v1.7.2.3\x1b[0m
+[2024-01-15 13:40:00] INFO: Starting IS element detection
+
+\x1b[36mInput:\x1b[0m
+  Assembly: assembly/assembly.fasta
+
+\x1b[36mSearching for IS elements...\x1b[0m
+  HMM search for transposases...
+  TIR detection...
+  IS family classification...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  ISESCAN RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  \x1b[33mIS elements detected: 23\x1b[0m
+
+  \x1b[33mBy family:\x1b[0m
+    IS3: 8 copies
+    IS1: 5 copies
+    IS26: 4 copies
+    IS6: 3 copies
+    ISAs1: 2 copies
+    IS110: 1 copy
+
+  \x1b[33mDistribution:\x1b[0m
+    Chromosome: 15 IS elements
+    Plasmid: 8 IS elements
+
+\x1b[31m⚠ IS26 is associated with AMR gene mobilization\x1b[0m
+\x1b[33mNote: High IS density on plasmid suggests active recombination\x1b[0m
+`,
+				summary: {
+					'Total IS Elements': '23',
+					'IS Families': '6',
+					'Chromosomal': '15',
+					'Plasmid': '8',
+					'Most Common': 'IS3 (8 copies)',
+					'AMR-associated': 'IS26 (4 copies)'
+				},
+				chartData: {
+					title: 'IS Element Distribution',
+					x: ['IS3', 'IS1', 'IS26', 'IS6', 'ISAs1', 'IS110'],
+					y: [8, 5, 4, 3, 2, 1],
+					type: 'bar',
+					xLabel: 'IS Family',
+					yLabel: 'Copy Number'
+				},
+				files: [
+					{ name: 'assembly.fasta.is.tsv', type: 'tsv', size: '5.6 KB' },
+					{ name: 'assembly.fasta.sum', type: 'txt', size: '1.8 KB' }
+				]
+			},
+			// PacBio hybrid tools
+			'NanoPlot': {
+				output: `\x1b[36mNanoPlot v1.42.0\x1b[0m
+[2024-01-15 14:00:00] INFO: Processing PacBio HiFi reads
+
+\x1b[36mInput:\x1b[0m
+  File: sample_01_pacbio.fastq.gz
+  Platform: PacBio HiFi
+
+\x1b[36mGenerating statistics...\x1b[0m
+  Calculating read lengths...
+  Assessing quality scores...
+  Creating visualizations...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  NANOPLOT STATISTICS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  General summary:
+    Total reads: 245,678
+    Total bases: 3,567,890,123 (3.57 Gb)
+    Mean read length: 14,523 bp
+    Median read length: 13,456 bp
+    Read length N50: 15,234 bp
+
+  Quality summary:
+    Mean read quality: Q32.4
+    Median read quality: Q33.1
+    >Q20: 99.8%
+    >Q30: 98.2%
+
+\x1b[32m✓ HiFi quality confirmed (>Q20 for 99.8% reads)\x1b[0m
+\x1b[33mTip: Use filtlong to remove low-quality outliers\x1b[0m
+`,
+				summary: {
+					'Total Reads': '245,678',
+					'Total Bases': '3.57 Gb',
+					'Mean Length': '14,523 bp',
+					'N50': '15,234 bp',
+					'Mean Quality': 'Q32.4',
+					'>Q20 Reads': '99.8%'
+				},
+				chartData: {
+					title: 'Read Length Distribution',
+					x: ['<5kb', '5-10kb', '10-15kb', '15-20kb', '>20kb'],
+					y: [12345, 45678, 89012, 67890, 30753],
+					type: 'bar',
+					xLabel: 'Read Length Range',
+					yLabel: 'Number of Reads'
+				},
+				files: [
+					{ name: 'NanoPlot-report.html', type: 'html', size: '2.3 MB' },
+					{ name: 'NanoStats.txt', type: 'txt', size: '1.5 KB' },
+					{ name: 'LengthvsQualityScatterPlot_dot.png', type: 'png', size: '890 KB' }
+				]
+			},
+			'filtlong': {
+				output: `\x1b[36mFiltlong v0.2.1\x1b[0m
+[2024-01-15 14:05:00] INFO: Filtering long reads
+
+\x1b[36mInput:\x1b[0m
+  File: sample_01_pacbio.fastq.gz
+  Reads: 245,678
+
+\x1b[36mFilter settings:\x1b[0m
+  --min_length 5000
+  --min_mean_q 20
+
+\x1b[36mFiltering reads...\x1b[0m
+  Calculating quality scores...
+  Applying length filter...
+  Applying quality filter...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  FILTLONG RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Input reads:    245,678
+  Output reads:   234,567 (95.5% retained)
+
+  Filtered out:
+    Too short (<5kb): 8,234 reads
+    Low quality (<Q20): 2,877 reads
+
+  Output statistics:
+    Total bases: 3,412,345,678 (3.41 Gb)
+    Mean length: 14,548 bp
+    Mean quality: Q33.2
+
+\x1b[32m✓ Filtering complete - high-quality reads retained\x1b[0m
+`,
+				summary: {
+					'Input Reads': '245,678',
+					'Output Reads': '234,567 (95.5%)',
+					'Short Filtered': '8,234',
+					'Quality Filtered': '2,877',
+					'Output Bases': '3.41 Gb',
+					'Mean Quality': 'Q33.2'
+				},
+				chartData: {
+					title: 'Filtering Results',
+					x: ['Retained', 'Too Short', 'Low Quality'],
+					y: [234567, 8234, 2877],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'Reads'
+				},
+				files: [
+					{ name: 'sample_01_filtered.fastq.gz', type: 'fastq', size: '3.2 GB' }
 				]
 			}
 		};
@@ -2299,6 +2789,219 @@ Loading assembly graph: assembly.gfa
 				}
 			}
 
+			// =========== NEW TOOLS ===========
+
+			if (command === 'busco') {
+				// busco -i assembly/assembly.fasta -o busco_results/ -m genome -l bacteria_odb10
+				const expectedCmd = 'busco -i assembly/assembly.fasta -o busco_results/ -m genome -l bacteria_odb10';
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const iIdx = args.indexOf('-i');
+				const inputFile = args[iIdx + 1];
+				if (!inputFile || !inputFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid input file\x1b[0m`);
+					terminal.writeln(`\x1b[90mBUSCO requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o busco_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-m')) {
+					terminal.writeln(`\x1b[31mError: Missing mode flag (-m)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -m genome\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-l')) {
+					terminal.writeln(`\x1b[31mError: Missing lineage database (-l flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -l bacteria_odb10\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'plasmidfinder') {
+				// plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_results/
+				const expectedCmd = 'plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_results/';
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const iIdx = args.indexOf('-i');
+				const inputFile = args[iIdx + 1];
+				if (!inputFile || !inputFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid input file\x1b[0m`);
+					terminal.writeln(`\x1b[90mPlasmidFinder requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o plasmidfinder_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'resfinder') {
+				// resfinder -i assembly/assembly.fasta -o resfinder_results/ -db_res
+				const expectedCmd = 'resfinder -i assembly/assembly.fasta -o resfinder_results/ -db_res';
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const iIdx = args.indexOf('-i');
+				const inputFile = args[iIdx + 1];
+				if (!inputFile || !inputFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid input file\x1b[0m`);
+					terminal.writeln(`\x1b[90mResFinder requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o resfinder_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-db_res')) {
+					terminal.writeln(`\x1b[31mError: Missing database flag (-db_res)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -db_res (use resistance database)\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'virulencefinder') {
+				// virulencefinder -i assembly/assembly.fasta -o virulencefinder_results/
+				const expectedCmd = 'virulencefinder -i assembly/assembly.fasta -o virulencefinder_results/';
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const iIdx = args.indexOf('-i');
+				const inputFile = args[iIdx + 1];
+				if (!inputFile || !inputFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid input file\x1b[0m`);
+					terminal.writeln(`\x1b[90mVirulenceFinder requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o virulencefinder_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'integron_finder') {
+				// integron_finder assembly/assembly.fasta --outdir integron_results/
+				const expectedCmd = 'integron_finder assembly/assembly.fasta --outdir integron_results/';
+				const inputFile = args.find(a => a.endsWith('.fasta'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--outdir')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --outdir integron_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'isescan') {
+				// isescan --seqfile assembly/assembly.fasta --output isescan_results/
+				const expectedCmd = 'isescan --seqfile assembly/assembly.fasta --output isescan_results/';
+				if (!args.includes('--seqfile')) {
+					terminal.writeln(`\x1b[31mError: Missing sequence file (--seqfile flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const sIdx = args.indexOf('--seqfile');
+				const seqFile = args[sIdx + 1];
+				if (!seqFile || !seqFile.endsWith('.fasta')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid sequence file\x1b[0m`);
+					terminal.writeln(`\x1b[90mISEScan requires: assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--output')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --output isescan_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			// PacBio/Long-read tools
+			if (command === 'NanoPlot') {
+				// NanoPlot --fastq sample_01_pacbio.fastq.gz -o nanoplot_results/
+				const expectedCmd = 'NanoPlot --fastq sample_01_pacbio.fastq.gz -o nanoplot_results/';
+				if (!args.includes('--fastq')) {
+					terminal.writeln(`\x1b[31mError: Missing input file (--fastq flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const fIdx = args.indexOf('--fastq');
+				const fastqFile = args[fIdx + 1];
+				if (!fastqFile || !fastqFile.endsWith('.fastq.gz')) {
+					terminal.writeln(`\x1b[31mError: Missing or invalid FASTQ file\x1b[0m`);
+					terminal.writeln(`\x1b[90mNanoPlot requires: sample_01_pacbio.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o nanoplot_results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'filtlong') {
+				// filtlong --min_length 5000 --min_mean_q 20 sample_01_pacbio.fastq.gz > filtered/sample_01_filtered.fastq.gz
+				const expectedCmd = 'filtlong --min_length 5000 --min_mean_q 20 sample_01_pacbio.fastq.gz > filtered/sample_01_filtered.fastq.gz';
+				if (!args.includes('--min_length')) {
+					terminal.writeln(`\x1b[31mError: Missing minimum length (--min_length flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--min_mean_q')) {
+					terminal.writeln(`\x1b[31mError: Missing minimum quality (--min_mean_q flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --min_mean_q 20\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const fastqFile = args.find(a => a.endsWith('.fastq.gz') && !a.includes('filtered'));
+				if (!fastqFile) {
+					terminal.writeln(`\x1b[31mError: Missing input FASTQ file\x1b[0m`);
+					terminal.writeln(`\x1b[90mFiltlong requires: sample_01_pacbio.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
 			await executeBioTool(command, args, cmd);
 			return;
 		}
@@ -2336,21 +3039,31 @@ Loading assembly graph: assembly.gfa
 		terminal.writeln('  \x1b[1;33mPhase 2 - QC & Analysis:\x1b[0m');
 		terminal.writeln('  \x1b[32mquast\x1b[0m           Assembly QC (~20s)');
 		terminal.writeln('  \x1b[32mcheckm\x1b[0m          Genome completeness (~30s)');
+		terminal.writeln('  \x1b[32mbusco\x1b[0m           BUSCO completeness (~45s)');
 		terminal.writeln('  \x1b[32mconfindr\x1b[0m        Contamination detection (~15s)');
 		terminal.writeln('  \x1b[32mprokka\x1b[0m          Genome annotation (~1-2min)');
 		terminal.writeln('  \x1b[32mbakta\x1b[0m           Gene annotation (~1-2min)');
 		terminal.writeln('  \x1b[32mabricate\x1b[0m        AMR screening (~10s)');
+		terminal.writeln('  \x1b[32mresfinder\x1b[0m       Detailed AMR detection (~15s)');
+		terminal.writeln('  \x1b[32mvirulencefinder\x1b[0m Virulence genes (~15s)');
 		terminal.writeln('  \x1b[32mmlst\x1b[0m            Sequence typing (~5s)');
 		terminal.writeln('');
-		terminal.writeln('  \x1b[1;33mPhase 3 - Plasmid Analysis:\x1b[0m');
+		terminal.writeln('  \x1b[1;33mPhase 3 - Plasmid & Mobile Elements:\x1b[0m');
 		terminal.writeln('  \x1b[32mmob_recon\x1b[0m       Plasmid reconstruction (~30s)');
 		terminal.writeln('  \x1b[32mplaton\x1b[0m          Plasmid detection (~20s)');
+		terminal.writeln('  \x1b[32mplasmidfinder\x1b[0m   Replicon typing (~10s)');
+		terminal.writeln('  \x1b[32mintegron_finder\x1b[0m Integron detection (~30s)');
+		terminal.writeln('  \x1b[32misescan\x1b[0m         IS element detection (~45s)');
 		terminal.writeln('');
 		terminal.writeln('  \x1b[1;33mPhase 4 - Phylogenetics:\x1b[0m');
 		terminal.writeln('  \x1b[32msnippy\x1b[0m          Variant calling (~1min)');
 		terminal.writeln('  \x1b[32mroary\x1b[0m           Pan-genome analysis (~2-4min)');
 		terminal.writeln('  \x1b[32miqtree\x1b[0m          Phylogenetic tree (~1-3min)');
 		terminal.writeln('  \x1b[32mgubbins\x1b[0m         Recombination detection (~2-5min)');
+		terminal.writeln('');
+		terminal.writeln('  \x1b[1;33mLong-read Tools (PacBio Hybrid):\x1b[0m');
+		terminal.writeln('  \x1b[32mNanoPlot\x1b[0m        Long-read QC (~30s)');
+		terminal.writeln('  \x1b[32mfiltlong\x1b[0m        Long-read filtering (~20s)');
 		terminal.writeln('');
 		terminal.writeln('\x1b[1;36mKeyboard Shortcuts:\x1b[0m');
 		terminal.writeln('');

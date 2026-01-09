@@ -220,7 +220,10 @@ export const blockedCommands = new Set([
 // Bioinformatics tools
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
-	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'confindr',
-	'prokka', 'bakta', 'abricate', 'mlst', 'mob_recon', 'platon',
-	'snippy', 'roary', 'iqtree', 'gubbins'
+	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'busco', 'confindr',
+	'prokka', 'bakta', 'abricate', 'resfinder', 'virulencefinder', 'mlst',
+	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
+	'snippy', 'roary', 'iqtree', 'gubbins',
+	// Long-read tools
+	'NanoPlot', 'filtlong'
 ]);

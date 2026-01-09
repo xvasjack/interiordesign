@@ -9,6 +9,7 @@
 	let completedSteps = $state<Set<number>>(new Set());
 	let userCurrentDir = $state('/data/outbreak_investigation');
 	let isFinished = $state(false);
+	let selectedDecision = $state<string | null>(null);
 
 	// Default storyline if none provided
 	const defaultStoryline: Storyline = {
@@ -16,6 +17,7 @@
 		title: 'Hospital Outbreak Investigation',
 		subtitle: 'WGS Analysis Pipeline',
 		organism: 'Klebsiella pneumoniae',
+		technology: 'illumina',
 		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{
@@ -99,8 +101,12 @@
 	function canProceed(stepIndex: number): boolean {
 		const section = activeStoryline.sections[stepIndex];
 		// Phase headers and non-task sections don't need completion
-		if (section?.type === 'phase' || section?.type === 'intro' || section?.type === 'context' || section?.type === 'complete') {
+		if (section?.type === 'phase' || section?.type === 'intro' || section?.type === 'context' || section?.type === 'complete' || section?.type === 'alert' || section?.type === 'image') {
 			return true;
+		}
+		// Decision sections require a selection to proceed
+		if (section?.type === 'decision') {
+			return selectedDecision !== null;
 		}
 		if (stepIndex <= 1) return true;
 		// For task steps, check if previous task step is completed
@@ -133,6 +139,12 @@
 	function handleFinish() {
 		isFinished = true;
 		goto('/');
+	}
+
+	function handleDecision(optionId: string) {
+		selectedDecision = optionId;
+		// Auto-advance to next step when a decision is made
+		nextStep();
 	}
 
 	// Check if we're at the complete section
@@ -208,6 +220,55 @@
 									Finished - Return to Home
 								</button>
 							</div>
+						</div>
+					{:else if section.type === 'alert'}
+						<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r">
+							{#if section.title}
+								<h3 class="font-bold text-red-800 mb-2">{section.title}</h3>
+							{/if}
+							<p class="text-red-700 whitespace-pre-line">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
+						</div>
+					{:else if section.type === 'decision'}
+						<div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r">
+							{#if section.title}
+								<h3 class="font-bold text-purple-800 mb-2">{section.title}</h3>
+							{/if}
+							<p class="text-purple-700 mb-4">{section.text}</p>
+							{#if section.options}
+								<div class="space-y-3">
+									{#each section.options as option}
+										<button
+											onclick={() => handleDecision(option.id)}
+											class="w-full text-left p-4 rounded-lg border-2 transition-all duration-200 {selectedDecision === option.id ? 'border-purple-600 bg-purple-100' : 'border-gray-200 bg-white hover:border-purple-400 hover:bg-purple-50'}"
+										>
+											<div class="font-semibold text-gray-800">{option.label}</div>
+											<div class="text-sm text-gray-600 mt-1">{option.description}</div>
+										</button>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{:else if section.type === 'image'}
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+							{#if section.title}
+								<h3 class="font-semibold text-gray-800 mb-2">{section.title}</h3>
+							{/if}
+							{#if section.imageUrl}
+								<div class="rounded-lg overflow-hidden mb-3 bg-gray-200">
+									<img
+										src={section.imageUrl}
+										alt={section.imageAlt || section.title || 'Storyline image'}
+										class="w-full h-auto object-cover"
+										onerror={(e) => {
+											const target = e.currentTarget as HTMLImageElement;
+											target.onerror = null;
+											target.src = '/images/placeholder.png';
+											target.parentElement?.classList.add('bg-gray-100');
+										}}
+									/>
+								</div>
+							{/if}
+							<p class="text-gray-600 text-sm italic">{section.text}</p>
 						</div>
 					{:else if section.type === 'task'}
 						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" class:border-green-400={completedSteps.has(i)} class:bg-green-50={completedSteps.has(i)}>
