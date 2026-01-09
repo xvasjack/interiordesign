@@ -302,34 +302,45 @@
 		const sampleNum = sampleMatch ? sampleMatch[1] : '01';
 		const sampleName = `sample_${sampleNum}`;
 
-		// Different stats for different samples/reads
-		const baseReads = 2456789;
+		// Detect sequencing technology from file name
+		const isHiFi = inputFile.includes('_hifi');
+		const isNanopore = inputFile.includes('_nanopore');
+		const isLongRead = isHiFi || isNanopore;
+
+		// Different stats for different samples/reads and technologies
+		const baseReads = isLongRead ? 245678 : 2456789;  // Long reads have fewer but longer reads
 		const sampleVariation = parseInt(sampleNum) * 12345;
 		const totalReads = baseReads + (sampleVariation % 50000);
 		const gcContent = isR2 ? 51.8 : 52.3;
 		const adapterPercent = isR2 ? 2.8 : 3.2;
 
+		// Read length varies by technology
+		const readLength = isHiFi ? 14523 : (isNanopore ? 8234 : 150);
+		const minLen = isHiFi ? 1234 : (isNanopore ? 456 : 150);
+		const maxLen = isHiFi ? 45678 : (isNanopore ? 32456 : 150);
+		const totalBases = totalReads * readLength;
+
 		const outputs: Record<string, any> = {
 			'seqkit': {
 				output: `\x1b[32m[INFO]\x1b[0m Processing ${inputFile}...
 file                      format  type   num_seqs      sum_len  min_len  avg_len  max_len
-${inputFile.padEnd(25)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${(totalReads * 150).toLocaleString()}      150      150      150
+${inputFile.padEnd(25)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
 
 \x1b[32m[INFO]\x1b[0m Summary Statistics:
   Total reads:     ${totalReads.toLocaleString()}
-  Total bases:     ${(totalReads * 150).toLocaleString()}
+  Total bases:     ${totalBases.toLocaleString()}
   GC content:      ${gcContent}%
-  Q20 bases:       97.2%
-  Q30 bases:       93.8%
+  Q20 bases:       ${isLongRead ? '99.8' : '97.2'}%
+  Q30 bases:       ${isLongRead ? '98.2' : '93.8'}%
 `,
 				summary: {
 					'File': inputFile,
 					'Total Reads': totalReads.toLocaleString(),
-					'Total Bases': `${(totalReads * 150 / 1000000).toFixed(1)} Mb`,
-					'Read Length': '150 bp',
+					'Total Bases': `${(totalBases / 1000000000).toFixed(2)} Gb`,
+					'Avg Read Length': `${readLength.toLocaleString()} bp`,
 					'GC Content': `${gcContent}%`,
-					'Q20 Bases': '97.2%',
-					'Q30 Bases': '93.8%'
+					'Q20 Bases': isLongRead ? '99.8%' : '97.2%',
+					'Q30 Bases': isLongRead ? '98.2%' : '93.8%'
 				},
 				files: [{ name: 'seqkit_stats.txt', type: 'txt', size: '1.2 KB' }]
 			},
@@ -347,26 +358,26 @@ Analysis complete for ${inputFile}
 				summary: {
 					'File': inputFile,
 					'Total Sequences': totalReads.toLocaleString(),
-					'Sequence Length': '150 bp',
+					'Sequence Length': isLongRead ? `${minLen}-${maxLen} bp` : '150 bp',
 					'GC Content': `${gcContent}%`,
 					'Per Base Quality': 'PASS',
-					'Adapter Content': `WARNING (${adapterPercent}%)`,
+					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`,
 					'Overall Quality': 'PASS'
 				},
 				chartData: {
 					title: `Per Base Sequence Quality - ${inputFile}`,
-					positions: Array.from({ length: 150 }, (_, i) => i + 1),
-					scores: Array.from({ length: 150 }, (_, i) => {
-						const base = isR2 ? 31 : 32;
+					positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
+					scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
+						const base = isLongRead ? (isHiFi ? 33 : 18) : (isR2 ? 31 : 32);
 						const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
-						return base + (seed / 100) * 6 - (i > 130 ? (i - 130) * 0.3 : 0);
+						return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.1 : 0);
 					}),
 					xLabel: 'Position in read (bp)',
 					yLabel: 'Quality Score (Phred)'
 				},
 				files: [
-					{ name: `${sampleName}_${isR2 ? 'R2' : 'R1'}_fastqc.html`, type: 'html', size: '245 KB' },
-					{ name: `${sampleName}_${isR2 ? 'R2' : 'R1'}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
+					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.html`, type: 'html', size: '245 KB' },
+					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
 				]
 			},
 			'trimmomatic': {
