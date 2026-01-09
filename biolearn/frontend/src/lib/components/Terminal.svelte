@@ -3,6 +3,9 @@
 	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 
+	// Props
+	let { initialDir = '/data/outbreak_investigation' }: { initialDir?: string } = $props();
+
 	let terminalContainer: HTMLDivElement;
 	let terminal: any;
 	let fitAddon: any;
@@ -11,7 +14,7 @@
 	let stopUnsubscribe: () => void;
 	let cursorPosition = 0;  // Track cursor position for left/right arrow
 	let isExecuting = false;
-	let currentDir = '/data/outbreak_investigation';
+	let currentDir = initialDir;
 
 	// Command history for arrow up/down
 	let commandHistoryList: string[] = [];
@@ -2025,7 +2028,17 @@ Loading assembly graph: assembly.gfa
 	};
 
 	function writePrompt() {
-		const shortDir = currentDir.replace('/data/outbreak_investigation', '~');
+		// Shorten directory paths for display
+		let shortDir = currentDir
+			.replace('/data/outbreak_investigation', '~/outbreak')
+			.replace('/data/wastewater_surveillance', '~/wastewater')
+			.replace('/data/clinical_samples', '~/clinical')
+			.replace('/data/', '~/');
+		// If it's exactly the initial directory, show as ~
+		if (currentDir === initialDir) {
+			shortDir = '~' + currentDir.replace(initialDir, '').replace(/^\//, '');
+			if (shortDir === '~') shortDir = '~';
+		}
 		terminal.write(`\r\n\x1b[32mbiolearn\x1b[0m:\x1b[34m${shortDir}\x1b[0m$ `);
 	}
 
@@ -3513,7 +3526,7 @@ Loading assembly graph: assembly.gfa
 		const filesystem = getFilesystem();
 
 		if (args.length === 0 || args[0] === '~') {
-			currentDir = '/data/outbreak_investigation';
+			currentDir = initialDir;
 			currentDirectory.set(currentDir);
 			return;
 		}
@@ -3537,9 +3550,9 @@ Loading assembly graph: assembly.gfa
 				}
 			}
 			currentDir = parts.length > 0 ? '/' + parts.join('/') : '/data';
-			// Don't go above /data
+			// Don't go above /data - reset to initial directory
 			if (!currentDir.startsWith('/data')) {
-				currentDir = '/data/outbreak_investigation';
+				currentDir = initialDir;
 			}
 			currentDirectory.set(currentDir);
 			return;
@@ -3893,6 +3906,9 @@ Annotation identified 4,523 coding sequences.
 				isExecuting = false;
 			}
 		});
+
+		// Initialize the currentDirectory store with the initial directory
+		currentDirectory.set(initialDir);
 
 		// Welcome message
 		terminal.writeln('\x1b[1;36m╔═══════════════════════════════════════════════════════════╗\x1b[0m');

@@ -303,7 +303,7 @@
 			class="terminal-panel overflow-hidden"
 			style="height: {terminalHeight}%; min-height: 0; overflow: hidden; flex-shrink: 0;"
 		>
-			<Terminal />
+			<Terminal initialDir={storyline?.dataDir || '/data/outbreak_investigation'} />
 		</div>
 
 		<!-- Resize Handle -->

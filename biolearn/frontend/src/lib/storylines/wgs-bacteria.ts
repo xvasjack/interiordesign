@@ -20,6 +20,7 @@ export interface Storyline {
 	organism: string;
 	technology: 'illumina' | 'pacbio' | 'nanopore' | 'hybrid';
 	technologyLabel: string; // Display label like "Short Read (Illumina)" or "Long Read (PacBio)"
+	dataDir: string; // Initial directory for terminal (e.g., '/data/outbreak_investigation')
 	sections: StorylineSection[];
 	toolsUsed: string[];
 }
@@ -1046,6 +1047,7 @@ export const storylines: Record<string, Storyline> = {
 		organism: 'Klebsiella pneumoniae',
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'integron_finder', 'isescan'],
 		sections: [
 			{
@@ -1080,6 +1082,7 @@ export const storylines: Record<string, Storyline> = {
 		organism: 'Xanthomonas citri',
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder'],
 		sections: [
 			{
@@ -1121,6 +1124,7 @@ export const storylines: Record<string, Storyline> = {
 		organism: 'Vibrio vulnificus',
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder', 'NanoPlot', 'filtlong'],
 		sections: [
 			{
@@ -1414,6 +1418,7 @@ export const storylines: Record<string, Storyline> = {
 		organism: 'Salmonella enterica',
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'virulencefinder', 'integron_finder'],
 		sections: [
 			{
@@ -1451,6 +1456,7 @@ export const storylines: Record<string, Storyline> = {
 		organism: 'Escherichia coli (mcr-positive)',
 		technology: 'pacbio',
 		technologyLabel: 'Long Read (PacBio HiFi)',
+		dataDir: '/data/wastewater_surveillance',
 		toolsUsed: ['seqkit', 'NanoPlot', 'filtlong', 'flye', 'medaka', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'isescan', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder'],
 		sections: [
 			{
@@ -1526,6 +1532,7 @@ export const storylines: Record<string, Storyline> = {
 		organism: 'Pseudomonas aeruginosa',
 		technology: 'nanopore',
 		technologyLabel: 'Long Read (Oxford Nanopore)',
+		dataDir: '/data/clinical_samples',
 		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit'],
 		sections: [
 			{
