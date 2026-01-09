@@ -534,7 +534,7 @@ export const storylines: Record<string, Storyline> = {
 			},
 			{
 				type: 'context',
-				text: `Samples from all 3 patients have been sequenced using Illumina NovaSeq. Initial culture identified Klebsiella pneumoniae. Your task: Determine if this is a clonal outbreak, identify the resistance mechanisms, and trace the source.`,
+				text: `Samples from all 3 patients have been sequenced using an Illumina NovaSeq. Initial cultures identified Klebsiella pneumoniae. Your task is to determine if this is a clonal outbreak, identify the resistance mechanisms, and trace the source.`,
 				hint: null,
 				requiredDir: null
 			},

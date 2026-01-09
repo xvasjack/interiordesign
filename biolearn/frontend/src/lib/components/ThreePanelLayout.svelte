@@ -239,37 +239,39 @@
 		</div>
 
 		<!-- Files Dropdown -->
-		<div class="files-dropdown relative">
+		<div class="files-dropdown relative" style="position: relative;">
 			<button
 				class="flex items-center gap-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-sm text-white transition-colors"
+				style="display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.75rem; background: #374151; border-radius: 0.25rem; font-size: 0.875rem; color: white; border: none; cursor: pointer;"
 				onclick={() => filesDropdownOpen = !filesDropdownOpen}
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
 				</svg>
 				Output Files ({allGeneratedFiles.length})
-				<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 				</svg>
 			</button>
 
 			{#if filesDropdownOpen}
-				<div class="absolute right-0 top-full mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-auto">
+				<div class="absolute right-0 top-full mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-auto" style="position: absolute; right: 0; top: 100%; margin-top: 0.25rem; width: 18rem; background: white; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; z-index: 50; max-height: 24rem; overflow: auto;">
 					{#if allGeneratedFiles.length === 0}
-						<div class="p-4 text-gray-500 text-sm text-center">
+						<div class="p-4 text-gray-500 text-sm text-center" style="padding: 1rem; color: #6b7280; font-size: 0.875rem; text-align: center;">
 							No output files yet.<br/>
-							<span class="text-xs">Run a tool to generate files.</span>
+							<span class="text-xs" style="font-size: 0.75rem;">Run a tool to generate files.</span>
 						</div>
 					{:else}
-						<div class="p-2 bg-gray-50 border-b text-xs text-gray-600 font-medium">
+						<div class="p-2 bg-gray-50 border-b text-xs text-gray-600 font-medium" style="padding: 0.5rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; font-size: 0.75rem; color: #4b5563; font-weight: 500;">
 							{allGeneratedFiles.length} files generated
 						</div>
 						{#each allGeneratedFiles as file}
 							<button
 								class="w-full px-3 py-2 flex items-center gap-3 hover:bg-blue-50 text-left border-b border-gray-100 last:border-0"
+								style="width: 100%; padding: 0.5rem 0.75rem; display: flex; align-items: center; gap: 0.75rem; text-align: left; border-bottom: 1px solid #f3f4f6; background: white; border-left: none; border-right: none; border-top: none; cursor: pointer;"
 								onclick={() => viewFile(file)}
 							>
-								<span class="text-lg">
+								<span class="text-lg" style="font-size: 1.125rem;">
 									{#if file.type === 'html'}📄
 									{:else if file.type === 'png'}🖼️
 									{:else if file.type === 'zip'}📦
@@ -279,11 +281,11 @@
 									{:else if file.type === 'gfa'}🔗
 									{:else}📁{/if}
 								</span>
-								<div class="flex-1 min-w-0">
-									<p class="text-sm text-gray-800 truncate">{file.name}</p>
-									<p class="text-xs text-gray-500">{file.tool} • {file.type.toUpperCase()}</p>
+								<div class="flex-1 min-w-0" style="flex: 1; min-width: 0;">
+									<p class="text-sm text-gray-800 truncate" style="font-size: 0.875rem; color: #1f2937; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{file.name}</p>
+									<p class="text-xs text-gray-500" style="font-size: 0.75rem; color: #6b7280;">{file.tool} • {file.type.toUpperCase()}</p>
 								</div>
-								<span class="text-blue-500 text-xs">View</span>
+								<span class="text-blue-500 text-xs" style="color: #3b82f6; font-size: 0.75rem;">View</span>
 							</button>
 						{/each}
 					{/if}
