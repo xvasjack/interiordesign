@@ -59,7 +59,10 @@ function createPhase1Sections(): StorylineSection[] {
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: 'PE', desc: 'Paired-end mode' },
-				{ name: 'SLIDINGWINDOW:4:15', desc: 'Cut when 4bp window quality < 15' }
+				{ name: '-phred33', desc: 'Quality encoding' },
+				{ name: 'ILLUMINACLIP:...', desc: 'Adapter trimming' },
+				{ name: 'SLIDINGWINDOW:4:15', desc: 'Quality trimming' },
+				{ name: 'MINLEN:36', desc: 'Minimum length' }
 			]
 		},
 		{
@@ -128,7 +131,8 @@ function createPhase2Sections(): StorylineSection[] {
 			explanation: 'ABRicate identifies resistance genes from databases.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '--db ncbi', desc: 'Use NCBI database' }
+				{ name: '--db ncbi', desc: 'Use NCBI database' },
+				{ name: '-o abricate_results/', desc: 'Output directory' }
 			]
 		},
 		{
@@ -138,7 +142,9 @@ function createPhase2Sections(): StorylineSection[] {
 			command: 'mlst assembly/assembly.fasta -o mlst_results/',
 			explanation: 'MLST assigns sequence types for epidemiological tracking.',
 			requiredDir: '/data/outbreak_investigation',
-			parameters: []
+			parameters: [
+				{ name: '-o mlst_results/', desc: 'Output directory' }
+			]
 		}
 	];
 }
@@ -217,7 +223,8 @@ function createPhase4Sections(): StorylineSection[] {
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '--ref reference.gbk', desc: 'Reference genome' },
-				{ name: '--ctgs', desc: 'Query contigs' }
+				{ name: '--ctgs assembly/assembly.fasta', desc: 'Query contigs' },
+				{ name: '--outdir snippy_results/', desc: 'Output directory' }
 			]
 		},
 		{
@@ -228,8 +235,10 @@ function createPhase4Sections(): StorylineSection[] {
 			explanation: 'Roary identifies core and accessory genes.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
+				{ name: '-f roary_results/', desc: 'Output directory' },
 				{ name: '-e', desc: 'Create core gene alignment' },
-				{ name: '-n', desc: 'Fast alignment with MAFFT' }
+				{ name: '-n', desc: 'Fast alignment with MAFFT' },
+				{ name: '-v', desc: 'Verbose output' }
 			]
 		},
 		{
@@ -240,8 +249,10 @@ function createPhase4Sections(): StorylineSection[] {
 			explanation: 'IQ-TREE builds phylogenetic trees with bootstrap support.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
+				{ name: '-s roary_results/core_gene_alignment.aln', desc: 'Input alignment' },
 				{ name: '-m GTR+G', desc: 'Substitution model' },
-				{ name: '-bb 1000', desc: 'Bootstrap replicates' }
+				{ name: '-bb 1000', desc: 'Bootstrap replicates' },
+				{ name: '-nt AUTO', desc: 'Auto-detect threads' }
 			]
 		},
 		{
