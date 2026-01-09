@@ -33,6 +33,15 @@
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
 			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
 			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+		],
+		'/data/wastewater_surveillance': [
+			'sample_01_hifi.fastq.gz',
+			'sample_02_hifi.fastq.gz',
+			'reference.gbk'
+		],
+		'/data/clinical_samples': [
+			'sample_01_nanopore.fastq.gz',
+			'reference.gbk'
 		]
 	};
 
@@ -198,12 +207,61 @@
 			'/data/outbreak_investigation/nanoplot_results': [
 				'NanoPlot-report.html', 'NanoStats.txt',
 				'LengthvsQualityScatterPlot_dot.png', 'WeightedHistogramReadlength.png'
+			],
+			'/data/wastewater_surveillance': ['nanoplot_results/'],
+			'/data/wastewater_surveillance/nanoplot_results': [
+				'NanoPlot-report.html', 'NanoStats.txt',
+				'LengthvsQualityScatterPlot_dot.png', 'WeightedHistogramReadlength.png'
+			],
+			'/data/clinical_samples': ['nanoplot_results/'],
+			'/data/clinical_samples/nanoplot_results': [
+				'NanoPlot-report.html', 'NanoStats.txt',
+				'LengthvsQualityScatterPlot_dot.png', 'WeightedHistogramReadlength.png'
 			]
 		},
 		'filtlong': {
 			'/data/outbreak_investigation': ['filtered/'],
 			'/data/outbreak_investigation/filtered': [
 				'sample_01_filtered.fastq.gz'
+			],
+			'/data/wastewater_surveillance': ['filtered/'],
+			'/data/wastewater_surveillance/filtered': [
+				'sample_01_filtered.fastq.gz'
+			],
+			'/data/clinical_samples': ['filtered/'],
+			'/data/clinical_samples/filtered': [
+				'sample_01_filtered.fastq.gz'
+			]
+		},
+		'flye': {
+			'/data/wastewater_surveillance': ['assembly/'],
+			'/data/wastewater_surveillance/assembly': [
+				'assembly.fasta', 'assembly.gfa', 'assembly_info.txt', 'flye.log'
+			],
+			'/data/clinical_samples': ['assembly/'],
+			'/data/clinical_samples/assembly': [
+				'assembly.fasta', 'assembly.gfa', 'assembly_info.txt', 'flye.log'
+			]
+		},
+		'medaka_consensus': {
+			'/data/wastewater_surveillance': ['polished/'],
+			'/data/wastewater_surveillance/polished': [
+				'consensus.fasta', 'calls_to_draft.bam', 'calls_to_draft.bam.bai'
+			],
+			'/data/clinical_samples': ['polished/'],
+			'/data/clinical_samples/polished': [
+				'consensus.fasta', 'calls_to_draft.bam', 'calls_to_draft.bam.bai'
+			]
+		},
+		'porechop': {
+			'/data/clinical_samples': ['trimmed/'],
+			'/data/clinical_samples/trimmed': [
+				'sample_01_trimmed.fastq.gz'
+			]
+		},
+		'kraken2': {
+			'/data/clinical_samples': [
+				'kraken_report.txt', 'kraken_output.txt'
 			]
 		}
 	};
@@ -1583,11 +1641,11 @@ Loading assembly graph: assembly.gfa
 			// PacBio hybrid tools
 			'NanoPlot': {
 				output: `\x1b[36mNanoPlot v1.42.0\x1b[0m
-[2024-01-15 14:00:00] INFO: Processing PacBio HiFi reads
+[2024-01-15 14:00:00] INFO: Processing long reads
 
 \x1b[36mInput:\x1b[0m
-  File: sample_01_pacbio.fastq.gz
-  Platform: PacBio HiFi
+  File: {inputFile}
+  Platform: Long Read
 
 \x1b[36mGenerating statistics...\x1b[0m
   Calculating read lengths...
@@ -1641,7 +1699,7 @@ Loading assembly graph: assembly.gfa
 [2024-01-15 14:05:00] INFO: Filtering long reads
 
 \x1b[36mInput:\x1b[0m
-  File: sample_01_pacbio.fastq.gz
+  File: {inputFile}
   Reads: 245,678
 
 \x1b[36mFilter settings:\x1b[0m
@@ -1689,6 +1747,233 @@ Loading assembly graph: assembly.gfa
 				},
 				files: [
 					{ name: 'sample_01_filtered.fastq.gz', type: 'fastq', size: '3.2 GB' }
+				]
+			},
+			'flye': {
+				output: `\x1b[36mFlye v2.9.2\x1b[0m
+[2024-01-15 14:10:00] INFO: Starting long-read assembly
+
+\x1b[36mInput:\x1b[0m
+  Reads: filtered/sample_01_filtered.fastq.gz
+  Mode: {assemblyMode}
+  Threads: 8
+
+\x1b[36mAssembly pipeline:\x1b[0m
+  [1/7] Constructing repeat graph...
+  [2/7] Simplifying graph...
+  [3/7] Collapsing bubbles...
+  [4/7] Resolving repeats...
+  [5/7] Generating consensus...
+  [6/7] Polishing with reads...
+  [7/7] Writing output...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  FLYE ASSEMBLY RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Assembly statistics:
+    Total length: 5,234,567 bp
+    Contigs: 3
+    N50: 4,234,123 bp
+    Largest contig: 4,823,456 bp
+    GC content: 51.2%
+
+  Contig summary:
+    contig_1: 4,823,456 bp (chromosome)
+    contig_2: 345,678 bp (plasmid)
+    contig_3: 65,433 bp (plasmid)
+
+\x1b[32m✓ Assembly complete - circular contigs detected\x1b[0m
+\x1b[33mTip: Use medaka to polish the assembly\x1b[0m
+`,
+				summary: {
+					'Total Length': '5.23 Mb',
+					'Contigs': '3',
+					'N50': '4.23 Mb',
+					'Largest': '4.82 Mb',
+					'GC Content': '51.2%',
+					'Circular': '3/3'
+				},
+				chartData: {
+					title: 'Contig Size Distribution',
+					x: ['Chromosome', 'Plasmid 1', 'Plasmid 2'],
+					y: [4823456, 345678, 65433],
+					type: 'bar',
+					xLabel: 'Contig',
+					yLabel: 'Length (bp)'
+				},
+				files: [
+					{ name: 'assembly.fasta', type: 'fasta', size: '5.2 MB' },
+					{ name: 'assembly.gfa', type: 'gfa', size: '6.1 MB' },
+					{ name: 'assembly_info.txt', type: 'txt', size: '2.3 KB' },
+					{ name: 'flye.log', type: 'log', size: '156 KB' }
+				]
+			},
+			'medaka_consensus': {
+				output: `\x1b[36mMedaka v1.11.3\x1b[0m
+[2024-01-15 14:30:00] INFO: Starting assembly polishing
+
+\x1b[36mInput:\x1b[0m
+  Reads: filtered/sample_01_filtered.fastq.gz
+  Draft: assembly/assembly.fasta
+  Model: {medakaModel}
+
+\x1b[36mPolishing pipeline:\x1b[0m
+  [1/4] Aligning reads to draft...
+  [2/4] Running neural network inference...
+  [3/4] Calling consensus...
+  [4/4] Writing polished assembly...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  MEDAKA POLISHING RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Input assembly: 5,234,567 bp
+  Output assembly: 5,234,892 bp
+
+  Corrections made:
+    SNPs corrected: 1,234
+    Insertions: 567
+    Deletions: 432
+    Total edits: 2,233
+
+  Quality improvement:
+    Estimated accuracy: 99.987%
+    Q-score improvement: +8.4
+
+\x1b[32m✓ Polishing complete - assembly accuracy improved\x1b[0m
+\x1b[33mTip: Run BUSCO to verify assembly completeness\x1b[0m
+`,
+				summary: {
+					'Input Size': '5.23 Mb',
+					'Output Size': '5.23 Mb',
+					'SNPs Fixed': '1,234',
+					'Indels Fixed': '999',
+					'Est. Accuracy': '99.987%',
+					'Q Improvement': '+8.4'
+				},
+				chartData: {
+					title: 'Corrections by Type',
+					x: ['SNPs', 'Insertions', 'Deletions'],
+					y: [1234, 567, 432],
+					type: 'bar',
+					xLabel: 'Correction Type',
+					yLabel: 'Count'
+				},
+				files: [
+					{ name: 'consensus.fasta', type: 'fasta', size: '5.2 MB' },
+					{ name: 'calls_to_draft.bam', type: 'bam', size: '1.8 GB' },
+					{ name: 'calls_to_draft.bam.bai', type: 'bai', size: '2.1 MB' }
+				]
+			},
+			'porechop': {
+				output: `\x1b[36mPorechop v0.2.4\x1b[0m
+[2024-01-15 14:00:00] INFO: Trimming adapters from Nanopore reads
+
+\x1b[36mInput:\x1b[0m
+  File: sample_01_nanopore.fastq.gz
+  Reads: 156,789
+
+\x1b[36mAdapter detection:\x1b[0m
+  Scanning for known adapter sequences...
+  Checking for chimeric reads...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PORECHOP RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Adapter trimming:
+    Reads with adapters: 145,234 (92.6%)
+    Start adapters removed: 134,567
+    End adapters removed: 128,901
+    Middle adapters (split): 3,456
+
+  Chimera handling:
+    Chimeric reads split: 3,456
+    Additional reads created: 3,456
+
+  Output statistics:
+    Total output reads: 160,245
+    Mean read length: 8,234 bp
+
+\x1b[32m✓ Adapter trimming complete\x1b[0m
+\x1b[33mTip: Use filtlong to filter by quality and length\x1b[0m
+`,
+				summary: {
+					'Input Reads': '156,789',
+					'Reads w/Adapters': '92.6%',
+					'Start Trimmed': '134,567',
+					'End Trimmed': '128,901',
+					'Chimeras Split': '3,456',
+					'Output Reads': '160,245'
+				},
+				chartData: {
+					title: 'Adapter Locations',
+					x: ['Start Only', 'End Only', 'Both Ends', 'Middle (Chimera)'],
+					y: [45678, 32456, 63645, 3456],
+					type: 'bar',
+					xLabel: 'Adapter Location',
+					yLabel: 'Read Count'
+				},
+				files: [
+					{ name: 'sample_01_trimmed.fastq.gz', type: 'fastq', size: '1.2 GB' }
+				]
+			},
+			'kraken2': {
+				output: `\x1b[36mKraken2 v2.1.3\x1b[0m
+[2024-01-15 14:15:00] INFO: Taxonomic classification
+
+\x1b[36mInput:\x1b[0m
+  File: filtered/sample_01_filtered.fastq.gz
+  Database: standard
+  Threads: 8
+
+\x1b[36mClassifying reads...\x1b[0m
+  Loading database index...
+  Processing reads...
+  Generating report...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  KRAKEN2 CLASSIFICATION RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Classification summary:
+    Total sequences: 234,567
+    Classified: 231,234 (98.6%)
+    Unclassified: 3,333 (1.4%)
+
+  Top classifications:
+    Escherichia coli: 228,456 (97.4%)
+    Shigella flexneri: 2,123 (0.9%)
+    Klebsiella pneumoniae: 456 (0.2%)
+    Other: 199 (0.1%)
+
+  Species identification:
+    Primary: Escherichia coli
+    Confidence: 98.6%
+
+\x1b[32m✓ Species confirmed: E. coli\x1b[0m
+\x1b[33mNote: Minor contamination detected (< 2%)\x1b[0m
+`,
+				summary: {
+					'Total Reads': '234,567',
+					'Classified': '98.6%',
+					'Primary Species': 'E. coli',
+					'Confidence': '97.4%',
+					'Contamination': '< 2%',
+					'Unclassified': '1.4%'
+				},
+				chartData: {
+					title: 'Species Distribution',
+					x: ['E. coli', 'S. flexneri', 'K. pneumoniae', 'Other', 'Unclassified'],
+					y: [228456, 2123, 456, 199, 3333],
+					type: 'bar',
+					xLabel: 'Species',
+					yLabel: 'Read Count'
+				},
+				files: [
+					{ name: 'kraken_report.txt', type: 'txt', size: '45 KB' },
+					{ name: 'kraken_output.txt', type: 'txt', size: '12 MB' }
 				]
 			}
 		};
@@ -1959,7 +2244,10 @@ Loading assembly graph: assembly.gfa
 		'seqkit': [
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
 			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
+			// Long-read files
+			'sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz',
+			'sample_01_nanopore.fastq.gz'
 		],
 		'trimmomatic': [
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz'
@@ -1968,45 +2256,59 @@ Loading assembly graph: assembly.gfa
 			'trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'
 		],
 		'bandage': ['assembly/assembly.gfa'],
-		'prokka': ['assembly/assembly.fasta'],
-		'abricate': ['assembly/assembly.fasta'],
-		'quast': ['assembly/assembly.fasta'],
-		'checkm': ['assembly/'],
+		'prokka': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'abricate': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'quast': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'checkm': ['assembly/', 'polished/'],
 		'confindr': ['assembly/assembly.fasta'],
-		'bakta': ['assembly/assembly.fasta'],
-		'mlst': ['assembly/assembly.fasta'],
+		'bakta': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'mlst': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
 		// Phase 3: Plasmid Analysis
-		'mob_recon': ['assembly/assembly.fasta'],
-		'platon': ['assembly/assembly.fasta'],
+		'mob_recon': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'platon': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
 		// Phase 4: Phylogenetics
-		'snippy': ['assembly/assembly.fasta'],
+		'snippy': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
 		'roary': ['prokka_results/'],
 		'iqtree': ['roary_results/core_gene_alignment.aln'],
-		'gubbins': ['roary_results/core_gene_alignment.aln']
+		'gubbins': ['roary_results/core_gene_alignment.aln'],
+		// Long-read tools
+		'NanoPlot': ['sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz', 'sample_01_nanopore.fastq.gz'],
+		'filtlong': ['sample_01_hifi.fastq.gz', 'sample_01_nanopore.fastq.gz', 'trimmed/sample_01_trimmed.fastq.gz'],
+		'flye': ['filtered/sample_01_filtered.fastq.gz'],
+		'medaka_consensus': ['filtered/sample_01_filtered.fastq.gz', 'assembly/assembly.fasta'],
+		'porechop': ['sample_01_nanopore.fastq.gz'],
+		'kraken2': ['filtered/sample_01_filtered.fastq.gz']
 	};
 
-	// Tool requirements: directory
-	const toolRequirements: Record<string, { dir: string }> = {
-		'fastqc': { dir: '/data/outbreak_investigation' },
-		'seqkit': { dir: '/data/outbreak_investigation' },
-		'trimmomatic': { dir: '/data/outbreak_investigation' },
-		'unicycler': { dir: '/data/outbreak_investigation' },
-		'bandage': { dir: '/data/outbreak_investigation' },
-		'prokka': { dir: '/data/outbreak_investigation' },
-		'abricate': { dir: '/data/outbreak_investigation' },
-		'quast': { dir: '/data/outbreak_investigation' },
-		'checkm': { dir: '/data/outbreak_investigation' },
-		'confindr': { dir: '/data/outbreak_investigation' },
-		'bakta': { dir: '/data/outbreak_investigation' },
-		'mlst': { dir: '/data/outbreak_investigation' },
+	// Tool requirements: allowed directories
+	const toolRequirements: Record<string, { dirs: string[] }> = {
+		'fastqc': { dirs: ['/data/outbreak_investigation'] },
+		'seqkit': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'trimmomatic': { dirs: ['/data/outbreak_investigation'] },
+		'unicycler': { dirs: ['/data/outbreak_investigation'] },
+		'bandage': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'prokka': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'abricate': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'quast': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'checkm': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'confindr': { dirs: ['/data/outbreak_investigation'] },
+		'bakta': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'mlst': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Phase 3
-		'mob_recon': { dir: '/data/outbreak_investigation' },
-		'platon': { dir: '/data/outbreak_investigation' },
+		'mob_recon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'platon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Phase 4
-		'snippy': { dir: '/data/outbreak_investigation' },
-		'roary': { dir: '/data/outbreak_investigation' },
-		'iqtree': { dir: '/data/outbreak_investigation' },
-		'gubbins': { dir: '/data/outbreak_investigation' }
+		'snippy': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'roary': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'iqtree': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'gubbins': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		// Long-read tools
+		'NanoPlot': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'filtlong': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'flye': { dirs: ['/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'medaka_consensus': { dirs: ['/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'porechop': { dirs: ['/data/clinical_samples'] },
+		'kraken2': { dirs: ['/data/clinical_samples'] }
 	};
 
 	// Check if file is valid for a tool
@@ -2076,11 +2378,11 @@ Loading assembly graph: assembly.gfa
 			const req = toolRequirements[command];
 
 			// Check directory requirement
-			if (req && currentDir !== req.dir) {
-				const shortDir = req.dir.replace('/data/outbreak_investigation', '~');
-				terminal.writeln(`\x1b[31mError: ${command} must be run from ${shortDir}\x1b[0m`);
-				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace('/data/outbreak_investigation', '~')}\x1b[0m`);
-				terminal.writeln(`\x1b[90mUse 'cd ${shortDir}' to navigate there first.\x1b[0m`);
+			if (req && !req.dirs.includes(currentDir)) {
+				const shortDirs = req.dirs.map(d => d.replace('/data/', '~/')).join(' or ');
+				terminal.writeln(`\x1b[31mError: ${command} must be run from ${shortDirs}\x1b[0m`);
+				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace('/data/', '~/')}\x1b[0m`);
+				terminal.writeln(`\x1b[90mUse 'cd' to navigate to the correct directory first.\x1b[0m`);
 				writePrompt();
 				return;
 			}
@@ -2954,11 +3256,10 @@ Loading assembly graph: assembly.gfa
 
 			// PacBio/Long-read tools
 			if (command === 'NanoPlot') {
-				// NanoPlot --fastq sample_01_pacbio.fastq.gz -o nanoplot_results/
-				const expectedCmd = 'NanoPlot --fastq sample_01_pacbio.fastq.gz -o nanoplot_results/';
+				// NanoPlot --fastq sample_01_hifi.fastq.gz -o nanoplot_results/
 				if (!args.includes('--fastq')) {
 					terminal.writeln(`\x1b[31mError: Missing input file (--fastq flag)\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: NanoPlot --fastq <input.fastq.gz> -o nanoplot_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2966,7 +3267,7 @@ Loading assembly graph: assembly.gfa
 				const fastqFile = args[fIdx + 1];
 				if (!fastqFile || !fastqFile.endsWith('.fastq.gz')) {
 					terminal.writeln(`\x1b[31mError: Missing or invalid FASTQ file\x1b[0m`);
-					terminal.writeln(`\x1b[90mNanoPlot requires: sample_01_pacbio.fastq.gz\x1b[0m`);
+					terminal.writeln(`\x1b[90mNanoPlot requires a .fastq.gz file (e.g., sample_01_hifi.fastq.gz or sample_01_nanopore.fastq.gz)\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2979,24 +3280,109 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'filtlong') {
-				// filtlong --min_length 5000 --min_mean_q 20 sample_01_pacbio.fastq.gz > filtered/sample_01_filtered.fastq.gz
-				const expectedCmd = 'filtlong --min_length 5000 --min_mean_q 20 sample_01_pacbio.fastq.gz > filtered/sample_01_filtered.fastq.gz';
+				// filtlong --min_length 5000 --min_mean_q 20 sample_01_hifi.fastq.gz | gzip > filtered/sample_01_filtered.fastq.gz
 				if (!args.includes('--min_length')) {
 					terminal.writeln(`\x1b[31mError: Missing minimum length (--min_length flag)\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: filtlong --min_length <len> --min_mean_q <qual> <input.fastq.gz>\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				if (!args.includes('--min_mean_q')) {
-					terminal.writeln(`\x1b[31mError: Missing minimum quality (--min_mean_q flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mRequired: --min_mean_q 20\x1b[0m`);
+				if (!args.includes('--min_mean_q') && !args.includes('--keep_percent')) {
+					terminal.writeln(`\x1b[31mError: Missing quality filter (--min_mean_q or --keep_percent flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --min_mean_q 20 or --keep_percent 90\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const fastqFile = args.find(a => a.endsWith('.fastq.gz') && !a.includes('filtered'));
 				if (!fastqFile) {
 					terminal.writeln(`\x1b[31mError: Missing input FASTQ file\x1b[0m`);
-					terminal.writeln(`\x1b[90mFiltlong requires: sample_01_pacbio.fastq.gz\x1b[0m`);
+					terminal.writeln(`\x1b[90mFiltlong requires: sample_01_hifi.fastq.gz, sample_01_nanopore.fastq.gz, or trimmed/sample_01_trimmed.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'flye') {
+				// flye --pacbio-hifi filtered/sample_01_filtered.fastq.gz -o assembly/ --threads 8
+				// flye --nano-hq filtered/sample_01_filtered.fastq.gz -o assembly/ --threads 8
+				if (!args.includes('--pacbio-hifi') && !args.includes('--nano-hq') && !args.includes('--nano-raw')) {
+					terminal.writeln(`\x1b[31mError: Missing read type flag\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: flye --pacbio-hifi <reads.fastq.gz> -o assembly/\x1b[0m`);
+					terminal.writeln(`\x1b[90mOr: flye --nano-hq <reads.fastq.gz> -o assembly/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input FASTQ file\x1b[0m`);
+					terminal.writeln(`\x1b[90mFlye requires filtered reads: filtered/sample_01_filtered.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: flye --pacbio-hifi filtered/sample_01_filtered.fastq.gz -o assembly/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'medaka_consensus') {
+				// medaka_consensus -i filtered/sample_01_filtered.fastq.gz -d assembly/assembly.fasta -o polished/ -m r941_min_hac_g507
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input reads (-i flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: medaka_consensus -i <reads.fastq.gz> -d <assembly.fasta> -o polished/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-d')) {
+					terminal.writeln(`\x1b[31mError: Missing draft assembly (-d flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mMedaka requires: -d assembly/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: medaka_consensus -i reads.fq.gz -d assembly.fasta -o polished/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'porechop') {
+				// porechop -i sample_01_nanopore.fastq.gz -o trimmed/sample_01_trimmed.fastq.gz
+				if (!args.includes('-i')) {
+					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: porechop -i <input.fastq.gz> -o <output.fastq.gz>\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('-o')) {
+					terminal.writeln(`\x1b[31mError: Missing output file (-o flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: porechop -i sample_01_nanopore.fastq.gz -o trimmed/sample_01_trimmed.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'kraken2') {
+				// kraken2 --db standard --threads 8 --report kraken_report.txt filtered/sample_01_filtered.fastq.gz > kraken_output.txt
+				if (!args.includes('--db')) {
+					terminal.writeln(`\x1b[31mError: Missing database (--db flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: kraken2 --db standard --report <report.txt> <input.fastq.gz>\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				if (!args.includes('--report')) {
+					terminal.writeln(`\x1b[31mError: Missing report file (--report flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: kraken2 --db standard --report kraken_report.txt reads.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
+				if (!inputFile) {
+					terminal.writeln(`\x1b[31mError: Missing input FASTQ file\x1b[0m`);
+					terminal.writeln(`\x1b[90mKraken2 requires: filtered/sample_01_filtered.fastq.gz\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3061,9 +3447,13 @@ Loading assembly graph: assembly.gfa
 		terminal.writeln('  \x1b[32miqtree\x1b[0m          Phylogenetic tree (~1-3min)');
 		terminal.writeln('  \x1b[32mgubbins\x1b[0m         Recombination detection (~2-5min)');
 		terminal.writeln('');
-		terminal.writeln('  \x1b[1;33mLong-read Tools (PacBio Hybrid):\x1b[0m');
+		terminal.writeln('  \x1b[1;33mLong-read Tools (PacBio/Nanopore):\x1b[0m');
 		terminal.writeln('  \x1b[32mNanoPlot\x1b[0m        Long-read QC (~30s)');
+		terminal.writeln('  \x1b[32mporechop\x1b[0m        Adapter trimming (~30s)');
 		terminal.writeln('  \x1b[32mfiltlong\x1b[0m        Long-read filtering (~20s)');
+		terminal.writeln('  \x1b[32mkraken2\x1b[0m         Species identification (~1min)');
+		terminal.writeln('  \x1b[32mflye\x1b[0m            Long-read assembly (~3-6min)');
+		terminal.writeln('  \x1b[32mmedaka_consensus\x1b[0m Assembly polishing (~2-4min)');
 		terminal.writeln('');
 		terminal.writeln('\x1b[1;36mKeyboard Shortcuts:\x1b[0m');
 		terminal.writeln('');

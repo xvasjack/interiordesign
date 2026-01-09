@@ -194,7 +194,14 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'snippy': { min: 60, max: 120 },
 	'roary': { min: 120, max: 240 },
 	'iqtree': { min: 60, max: 180 },
-	'gubbins': { min: 120, max: 300 }
+	'gubbins': { min: 120, max: 300 },
+	// Long-read tools
+	'NanoPlot': { min: 20, max: 45 },
+	'filtlong': { min: 15, max: 30 },
+	'flye': { min: 180, max: 360 },  // 3-6 minutes
+	'medaka_consensus': { min: 120, max: 240 },  // 2-4 minutes
+	'porechop': { min: 20, max: 45 },
+	'kraken2': { min: 30, max: 60 }
 };
 
 // Get random execution time for a tool
@@ -225,5 +232,5 @@ export const bioTools = new Set([
 	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
 	'snippy', 'roary', 'iqtree', 'gubbins',
 	// Long-read tools
-	'NanoPlot', 'filtlong'
+	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2'
 ]);
