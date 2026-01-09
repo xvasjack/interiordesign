@@ -190,15 +190,28 @@ def run_pipeline(params: dict) -> dict:
 
     fetcher = SequenceFetcher()
 
-    sequences = fetcher.fetch_from_all_databases(
-        organisms=params['organisms'],
-        gene=params.get('gene'),
-        region=params.get('region'),
-        max_per_organism=params['max_seqs'],
-        start=params.get('start'),
-        stop=params.get('end'),
-        databases=params['databases']
-    )
+    # Check if using genus mode or organism mode
+    if params.get('mode') == 'genus':
+        sequences = fetcher.fetch_by_genus(
+            genus=params['genus'],
+            gene=params.get('gene'),
+            region=params.get('region'),
+            max_species=params['max_species'],
+            max_per_species=params['max_per_species'],
+            start=params.get('start'),
+            stop=params.get('end'),
+            databases=params['databases']
+        )
+    else:
+        sequences = fetcher.fetch_from_all_databases(
+            organisms=params.get('organisms', []),
+            gene=params.get('gene'),
+            region=params.get('region'),
+            max_per_organism=params.get('max_seqs', 5),
+            start=params.get('start'),
+            stop=params.get('end'),
+            databases=params['databases']
+        )
 
     if not sequences:
         print("\nNo sequences found. Try different search terms.")
@@ -380,12 +393,20 @@ Examples:
   # Interactive mode
   python primer_design_cli.py --interactive
 
-  # Command line mode
+  # Command line mode - specific organisms
   python primer_design_cli.py \\
     --organisms "Escherichia coli,Salmonella enterica,Klebsiella pneumoniae" \\
     --gene "16S rRNA" \\
     --max-seqs 5 \\
     --output ./my_primers
+
+  # Genus mode - multiple species under a genus
+  python primer_design_cli.py \\
+    --genus "Salmonella" \\
+    --gene "16S rRNA" \\
+    --max-species 50 \\
+    --max-per-species 4 \\
+    --output ./salmonella_primers
 
   # With sequence range
   python primer_design_cli.py \\
@@ -399,6 +420,12 @@ Examples:
                         help="Run in interactive mode")
     parser.add_argument('--organisms', '-o', type=str,
                         help="Comma-separated list of organism names")
+    parser.add_argument('--genus', type=str,
+                        help="Genus name to search (e.g., 'Salmonella')")
+    parser.add_argument('--max-species', type=int, default=50,
+                        help="Max different species under genus (default: 50)")
+    parser.add_argument('--max-per-species', type=int, default=4,
+                        help="Max sequences per species (default: 4)")
     parser.add_argument('--gene', '-g', type=str,
                         help="Gene name to search for")
     parser.add_argument('--region', '-r', type=str,
@@ -410,7 +437,7 @@ Examples:
     parser.add_argument('--databases', '-d', type=str, default="ncbi,embl",
                         help="Databases to search (ncbi,embl)")
     parser.add_argument('--max-seqs', type=int, default=5,
-                        help="Maximum sequences per organism")
+                        help="Maximum sequences per organism (non-genus mode)")
     parser.add_argument('--tm-min', type=float, default=55.0,
                         help="Minimum Tm (C)")
     parser.add_argument('--tm-max', type=float, default=65.0,
@@ -430,10 +457,32 @@ Examples:
 
     print_banner()
 
-    if args.interactive or not args.organisms:
+    if args.interactive or (not args.organisms and not args.genus):
         params = get_user_input_interactive()
-    else:
+    elif args.genus:
+        # Genus mode
         params = {
+            'mode': 'genus',
+            'genus': args.genus,
+            'max_species': args.max_species,
+            'max_per_species': args.max_per_species,
+            'gene': args.gene,
+            'region': args.region,
+            'start': args.start,
+            'end': args.end,
+            'databases': [d.strip() for d in args.databases.split(',')],
+            'tm_min': args.tm_min,
+            'tm_max': args.tm_max,
+            'primer_min': args.primer_min,
+            'primer_max': args.primer_max,
+            'product_min': args.product_min,
+            'product_max': args.product_max,
+            'output_dir': args.output
+        }
+    else:
+        # Organism mode
+        params = {
+            'mode': 'organism',
             'organisms': [o.strip() for o in args.organisms.split(',')],
             'gene': args.gene,
             'region': args.region,
@@ -454,11 +503,20 @@ Examples:
     print("\n" + "=" * 60)
     print("PARAMETERS CONFIRMED")
     print("=" * 60)
-    print(f"  Organisms:      {', '.join(params['organisms'])}")
+
+    if params.get('mode') == 'genus':
+        print(f"  Mode:           Genus-based")
+        print(f"  Genus:          {params['genus']}")
+        print(f"  Max species:    {params['max_species']}")
+        print(f"  Max/species:    {params['max_per_species']}")
+    else:
+        print(f"  Mode:           Organism-based")
+        print(f"  Organisms:      {', '.join(params.get('organisms', []))}")
+        print(f"  Max sequences:  {params.get('max_seqs', 5)} per organism")
+
     print(f"  Gene/Region:    {params.get('gene', 'Any')} / {params.get('region', 'Any')}")
     print(f"  Range:          {params.get('start', 'Full')} - {params.get('end', 'Full')}")
     print(f"  Databases:      {', '.join(params['databases'])}")
-    print(f"  Max sequences:  {params['max_seqs']} per organism")
     print(f"  Tm range:       {params['tm_min']}-{params['tm_max']} C")
     print(f"  Primer length:  {params['primer_min']}-{params['primer_max']} bp")
     print(f"  Product size:   {params['product_min']}-{params['product_max']} bp")

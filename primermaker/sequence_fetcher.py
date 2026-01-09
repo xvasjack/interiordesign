@@ -366,6 +366,192 @@ class SequenceFetcher:
         print(f"Found {len(accessions)} sequences, fetching...")
         return self.fetch_embl_sequences(accessions, start=start, stop=stop)
 
+    # ==================== Genus-based Methods ====================
+
+    def search_species_under_genus(
+        self,
+        genus: str,
+        max_species: int = 50,
+        gene: Optional[str] = None
+    ) -> List[str]:
+        """
+        Search for different species under a genus.
+
+        Args:
+            genus: Genus name (e.g., "Salmonella")
+            max_species: Maximum number of different species to return
+            gene: Gene name to filter by (optional)
+
+        Returns:
+            List of unique species names
+        """
+        print(f"Searching for species under genus: {genus}...")
+
+        # Search NCBI taxonomy for species under this genus
+        query = f'"{genus}"[Organism]'
+        if gene:
+            query += f' AND "{gene}"[Gene Name]'
+
+        params = {
+            'db': 'nucleotide',
+            'term': query,
+            'retmax': max_species * 20,  # Fetch more to find unique species
+            'retmode': 'json',
+            'email': self.email,
+            'usehistory': 'y'
+        }
+        if self.api_key:
+            params['api_key'] = self.api_key
+
+        url = f"{self.NCBI_BASE_URL}/esearch.fcgi?{urllib.parse.urlencode(params)}"
+
+        try:
+            response = self._make_request(url)
+            data = json.loads(response)
+
+            if 'esearchresult' not in data or 'idlist' not in data['esearchresult']:
+                return []
+
+            id_list = data['esearchresult']['idlist']
+            if not id_list:
+                return []
+
+            # Fetch summaries to extract organism names
+            species_set = set()
+            batch_size = 100
+
+            for i in range(0, len(id_list), batch_size):
+                if len(species_set) >= max_species:
+                    break
+
+                batch = id_list[i:i+batch_size]
+                summary_params = {
+                    'db': 'nucleotide',
+                    'id': ','.join(batch),
+                    'retmode': 'json',
+                    'email': self.email
+                }
+                if self.api_key:
+                    summary_params['api_key'] = self.api_key
+
+                summary_url = f"{self.NCBI_BASE_URL}/esummary.fcgi?{urllib.parse.urlencode(summary_params)}"
+
+                try:
+                    summary_response = self._make_request(summary_url)
+                    summary_data = json.loads(summary_response)
+
+                    if 'result' in summary_data:
+                        for uid in batch:
+                            if uid in summary_data['result']:
+                                record = summary_data['result'][uid]
+                                organism = record.get('organism', '')
+                                if organism and organism.lower().startswith(genus.lower()):
+                                    species_set.add(organism)
+                                    if len(species_set) >= max_species:
+                                        break
+                except Exception as e:
+                    print(f"Error fetching summaries: {e}")
+                    continue
+
+            species_list = list(species_set)[:max_species]
+            print(f"Found {len(species_list)} unique species under {genus}")
+            return species_list
+
+        except Exception as e:
+            print(f"Error searching for species: {e}")
+            return []
+
+    def fetch_by_genus(
+        self,
+        genus: str,
+        gene: Optional[str] = None,
+        region: Optional[str] = None,
+        max_species: int = 50,
+        max_per_species: int = 4,
+        start: Optional[int] = None,
+        stop: Optional[int] = None,
+        databases: List[str] = None
+    ) -> List[SequenceRecord]:
+        """
+        Fetch sequences for multiple species under a genus.
+
+        Example:
+            fetch_by_genus("Salmonella", gene="16S rRNA", max_species=50, max_per_species=4)
+            - Gets up to 50 different Salmonella species
+            - Gets up to 4 sequences per species
+
+        Args:
+            genus: Genus name (e.g., "Salmonella")
+            gene: Gene name to search for (optional)
+            region: Genomic region (optional)
+            max_species: Maximum number of different species (default: 50)
+            max_per_species: Maximum sequences per species (default: 4)
+            start: Start position (optional)
+            stop: Stop position (optional)
+            databases: List of databases ('ncbi', 'embl', or both)
+
+        Returns:
+            List of SequenceRecord objects
+        """
+        if databases is None:
+            databases = ['ncbi', 'embl']
+
+        # First, find species under this genus
+        species_list = self.search_species_under_genus(genus, max_species, gene)
+
+        if not species_list:
+            print(f"No species found under genus {genus}")
+            return []
+
+        print(f"\n{'='*60}")
+        print(f"FETCHING SEQUENCES BY GENUS")
+        print(f"{'='*60}")
+        print(f"Genus:            {genus}")
+        print(f"Species found:    {len(species_list)}")
+        print(f"Max per species:  {max_per_species}")
+        print(f"Gene/Region:      {gene or 'Any'} / {region or 'Any'}")
+        print(f"{'='*60}\n")
+
+        all_records = []
+        species_counts = {}
+
+        for i, species in enumerate(species_list, 1):
+            print(f"\n[{i}/{len(species_list)}] {species}")
+
+            species_records = []
+
+            if 'ncbi' in databases:
+                ncbi_records = self.fetch_ncbi_by_organism(
+                    species, gene, region, max_per_species, start, stop
+                )
+                species_records.extend(ncbi_records)
+
+            if 'embl' in databases and len(species_records) < max_per_species:
+                remaining = max_per_species - len(species_records)
+                embl_records = self.fetch_embl_by_organism(
+                    species, gene, region, remaining, start, stop
+                )
+                species_records.extend(embl_records)
+
+            # Limit to max_per_species
+            species_records = species_records[:max_per_species]
+            species_counts[species] = len(species_records)
+            all_records.extend(species_records)
+
+            print(f"  -> Retrieved {len(species_records)} sequences")
+
+        # Print summary
+        print(f"\n{'='*60}")
+        print(f"SUMMARY")
+        print(f"{'='*60}")
+        print(f"Total species:    {len(species_counts)}")
+        print(f"Total sequences:  {len(all_records)}")
+        print(f"\nSequences per species:")
+        for species, count in sorted(species_counts.items()):
+            print(f"  {species}: {count}")
+
+        return all_records
+
     # ==================== Combined Methods ====================
 
     def fetch_from_all_databases(
