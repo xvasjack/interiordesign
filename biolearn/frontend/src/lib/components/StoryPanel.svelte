@@ -153,10 +153,10 @@
 	);
 </script>
 
-<div class="h-full flex flex-col">
+<div class="h-full flex flex-col" style="display: flex; flex-direction: column; height: 100%;">
 	<!-- Header -->
-	<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
-		<div class="flex items-center gap-3 mb-2">
+	<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 1.5rem; flex-shrink: 0;">
+		<div class="flex items-center gap-3 mb-2" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
 			<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
 				WGS Analysis
 			</span>
@@ -174,21 +174,21 @@
 	</div>
 
 	<!-- Progress Bar -->
-	<div class="bg-gray-100 px-6 py-3 border-b border-gray-200">
-		<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+	<div class="bg-gray-100 px-6 py-3 border-b border-gray-200" style="background: #f3f4f6; padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; flex-shrink: 0;">
+		<div class="flex items-center justify-between text-sm text-gray-600 mb-2" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">
 			<span>Progress</span>
 			<span>Step {currentStep + 1} of {activeStoryline.sections.length}</span>
 		</div>
-		<div class="w-full bg-gray-200 rounded-full h-2">
+		<div class="w-full bg-gray-200 rounded-full h-2" style="width: 100%; background: #e5e7eb; border-radius: 9999px; height: 0.5rem;">
 			<div
 				class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-				style="width: {((currentStep + 1) / activeStoryline.sections.length) * 100}%"
+				style="width: {((currentStep + 1) / activeStoryline.sections.length) * 100}%; background: #2563eb; height: 0.5rem; border-radius: 9999px; transition: all 0.3s;"
 			></div>
 		</div>
 	</div>
 
 	<!-- Content -->
-	<div class="flex-1 overflow-auto p-6">
+	<div class="flex-1 overflow-auto p-6" style="flex: 1; overflow: auto; padding: 1.5rem; min-height: 0;">
 		{#each activeStoryline.sections as section, i}
 			{#if i <= currentStep}
 				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep && section.type !== 'phase'}>
@@ -348,7 +348,7 @@
 	</div>
 
 	<!-- Navigation -->
-	<div class="border-t border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
+	<div class="border-t border-gray-200 bg-gray-50 p-4 flex justify-between items-center" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-top: 1px solid #e5e7eb; flex-shrink: 0;">
 		<button
 			class="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 			disabled={currentStep === 0}
@@ -356,7 +356,7 @@
 		>
 			Previous
 		</button>
-		<div class="flex gap-1 overflow-x-auto max-w-[200px]">
+		<div class="flex gap-1 overflow-x-auto max-w-[200px]" style="display: flex; gap: 0.25rem; overflow-x: auto; max-width: 200px;">
 			{#each activeStoryline.sections as section, i}
 				{#if section.type === 'phase'}
 					<div class="w-1 h-3 bg-indigo-400 rounded-full mx-1"></div>

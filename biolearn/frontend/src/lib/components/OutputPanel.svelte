@@ -390,7 +390,7 @@
 	<div class="flex-1 overflow-auto p-4" style="flex: 1; overflow: auto; padding: 1rem;">
 		{#if isLoading}
 			<!-- Loading State -->
-			<div class="h-full flex flex-col items-center justify-center text-gray-500">
+			<div class="h-full flex flex-col items-center justify-center text-gray-500" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
 				<div class="mb-4">
 					<svg class="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -419,8 +419,8 @@
 			</div>
 		{:else if !currentOutput}
 			<!-- Empty State -->
-			<div class="h-full flex flex-col items-center justify-center text-gray-400">
-				<svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="h-full flex flex-col items-center justify-center text-gray-400" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #9ca3af;">
+				<svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 64px; height: 64px; margin-bottom: 16px;">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 				</svg>
 				<p class="text-lg font-medium">No output yet</p>
