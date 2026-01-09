@@ -341,9 +341,9 @@
 	}
 </script>
 
-<div class="h-full flex flex-col bg-gray-50">
+<div class="h-full flex flex-col bg-gray-50" style="display: flex; flex-direction: column; height: 100%; background: #f9fafb;">
 	<!-- Tabs -->
-	<div class="flex border-b bg-white">
+	<div class="flex border-b bg-white" style="display: flex; border-bottom: 1px solid #e5e7eb; background: white;">
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
 			class:text-blue-600={activeTab === 'chart'}
@@ -387,7 +387,7 @@
 	</div>
 
 	<!-- Content -->
-	<div class="flex-1 overflow-auto p-4">
+	<div class="flex-1 overflow-auto p-4" style="flex: 1; overflow: auto; padding: 1rem;">
 		{#if isLoading}
 			<!-- Loading State -->
 			<div class="h-full flex flex-col items-center justify-center text-gray-500">

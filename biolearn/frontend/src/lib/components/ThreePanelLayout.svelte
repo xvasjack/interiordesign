@@ -293,13 +293,13 @@
 	</div>
 
 	<!-- Main Content -->
-	<div class="flex-1 flex overflow-hidden" style="display: flex; flex: 1; overflow: hidden;">
+	<div class="flex-1 flex overflow-hidden" style="display: flex; flex: 1; overflow: hidden; height: calc(100% - 40px); min-height: 0;">
 		<!-- Left Panel: Terminal + Output -->
-		<div id="left-panel" class="w-1/2 flex flex-col border-r border-gray-300" style="display: flex; flex-direction: column; width: 50%;">
+		<div id="left-panel" class="w-1/2 flex flex-col border-r border-gray-300" style="display: flex; flex-direction: column; width: 50%; height: 100%; min-height: 0;">
 		<!-- Terminal -->
 		<div
 			class="terminal-panel overflow-hidden"
-			style="height: {terminalHeight}%"
+			style="height: {terminalHeight}%; min-height: 0; overflow: hidden; flex-shrink: 0;"
 		>
 			<Terminal />
 		</div>
@@ -307,6 +307,7 @@
 		<!-- Resize Handle -->
 		<div
 			class="h-1 bg-gray-600 cursor-row-resize hover:bg-blue-500 transition-colors"
+			style="height: 4px; background: #4b5563; cursor: row-resize; flex-shrink: 0;"
 			onmousedown={startResize}
 			role="separator"
 			aria-orientation="horizontal"
@@ -315,15 +316,15 @@
 
 		<!-- Output Panel -->
 		<div
-			class="output-panel flex-1 overflow-auto"
-			style="height: {100 - terminalHeight}%"
+			class="output-panel overflow-auto"
+			style="height: {100 - terminalHeight}%; min-height: 0; overflow: auto; flex: 1;"
 		>
 			<OutputPanel />
 		</div>
 	</div>
 
 		<!-- Right Panel: Story -->
-		<div class="w-1/2 story-panel overflow-auto" style="width: 50%; overflow: auto;">
+		<div class="w-1/2 story-panel overflow-auto" style="width: 50%; height: 100%; overflow: auto;">
 			<StoryPanel {storyline} />
 		</div>
 	</div>
