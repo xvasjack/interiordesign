@@ -71,13 +71,14 @@
 			]
 		},
 		'abricate': {
-			'/data/outbreak_investigation': ['results/'],
-			'/data/outbreak_investigation/results': [
+			'/data/outbreak_investigation': ['abricate_results/'],
+			'/data/outbreak_investigation/abricate_results': [
 				'amr_report.tsv', 'amr_summary.txt'
 			]
 		},
 		'quast': {
-			'/data/outbreak_investigation/assembly': [
+			'/data/outbreak_investigation': ['quast_results/'],
+			'/data/outbreak_investigation/quast_results': [
 				'quast_report.html', 'quast_report.tsv'
 			]
 		},
@@ -1488,7 +1489,7 @@ Loading assembly graph: assembly.gfa
 		'mob_recon': ['assembly/assembly.fasta'],
 		'platon': ['assembly/assembly.fasta'],
 		// Phase 4: Phylogenetics
-		'snippy': ['trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'],
+		'snippy': ['assembly/assembly.fasta'],
 		'roary': ['prokka_results/'],
 		'iqtree': ['roary_results/core_gene_alignment.aln'],
 		'gubbins': ['roary_results/core_gene_alignment.aln']
