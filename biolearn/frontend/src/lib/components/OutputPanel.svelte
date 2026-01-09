@@ -343,43 +343,31 @@
 
 <div class="h-full flex flex-col bg-gray-50" style="display: flex; flex-direction: column; height: 100%; background: #f9fafb;">
 	<!-- Tabs -->
-	<div class="flex border-b bg-white" style="display: flex; border-bottom: 1px solid #e5e7eb; background: white;">
+	<div class="flex border-b bg-white" style="display: flex; border-bottom: 1px solid #e5e7eb; background: white; flex-shrink: 0;">
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
-			class:text-blue-600={activeTab === 'chart'}
-			class:border-b-2={activeTab === 'chart'}
-			class:border-blue-600={activeTab === 'chart'}
-			class:text-gray-600={activeTab !== 'chart'}
+			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'chart' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'chart' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'chart')}
 		>
 			📊 Chart
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
-			class:text-blue-600={activeTab === 'table'}
-			class:border-b-2={activeTab === 'table'}
-			class:border-blue-600={activeTab === 'table'}
-			class:text-gray-600={activeTab !== 'table'}
+			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'table' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'table' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'table')}
 		>
 			📋 Summary
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
-			class:text-blue-600={activeTab === 'files'}
-			class:border-b-2={activeTab === 'files'}
-			class:border-blue-600={activeTab === 'files'}
-			class:text-gray-600={activeTab !== 'files'}
+			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'files' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'files' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'files')}
 		>
 			📁 Files
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
-			class:text-blue-600={activeTab === 'notes'}
-			class:border-b-2={activeTab === 'notes'}
-			class:border-blue-600={activeTab === 'notes'}
-			class:text-gray-600={activeTab !== 'notes'}
+			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'notes' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'notes' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'notes')}
 		>
 			📝 Notes

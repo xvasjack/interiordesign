@@ -351,6 +351,7 @@
 	<div class="border-t border-gray-200 bg-gray-50 p-4 flex justify-between items-center" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-top: 1px solid #e5e7eb; flex-shrink: 0;">
 		<button
 			class="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+			style="padding: 0.5rem 1rem; color: #4b5563; background: transparent; border: none; border-radius: 0.25rem; cursor: pointer; font-size: inherit;"
 			disabled={currentStep === 0}
 			onclick={prevStep}
 		>
@@ -359,15 +360,11 @@
 		<div class="flex gap-1 overflow-x-auto max-w-[200px]" style="display: flex; gap: 0.25rem; overflow-x: auto; max-width: 200px;">
 			{#each activeStoryline.sections as section, i}
 				{#if section.type === 'phase'}
-					<div class="w-1 h-3 bg-indigo-400 rounded-full mx-1"></div>
+					<div class="w-1 h-3 bg-indigo-400 rounded-full mx-1" style="width: 4px; height: 12px; background: #818cf8; border-radius: 9999px; margin: 0 4px;"></div>
 				{:else}
 					<button
 						class="w-2 h-2 rounded-full transition-colors flex-shrink-0"
-						class:bg-blue-600={i <= currentStep && canProceed(i)}
-						class:bg-green-500={completedSteps.has(i)}
-						class:bg-gray-300={i > currentStep || !canProceed(i)}
-						class:cursor-pointer={canProceed(i)}
-						class:cursor-not-allowed={!canProceed(i)}
+						style="width: 8px; height: 8px; border-radius: 9999px; border: none; flex-shrink: 0; cursor: pointer; background: {i <= currentStep ? '#2563eb' : '#d1d5db'};"
 						onclick={() => goToStep(i)}
 						aria-label="Go to step {i + 1}"
 						disabled={!canProceed(i)}
@@ -379,12 +376,14 @@
 			<button
 				onclick={handleFinish}
 				class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+				style="padding: 0.5rem 1rem; background: #16a34a; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: inherit;"
 			>
 				Finished
 			</button>
 		{:else}
 			<button
 				class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+				style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: inherit;"
 				disabled={currentStep >= activeStoryline.sections.length - 1 || !canProceed(currentStep + 1)}
 				onclick={nextStep}
 			>
