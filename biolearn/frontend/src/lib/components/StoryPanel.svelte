@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
 	import type { Storyline, StorylineSection } from '$lib/storylines/wgs-bacteria';
 
@@ -7,85 +8,53 @@
 	let currentStep = $state(0);
 	let completedSteps = $state<Set<number>>(new Set());
 	let userCurrentDir = $state('/data/outbreak_investigation');
+	let isFinished = $state(false);
 
 	// Default storyline if none provided
 	const defaultStoryline: Storyline = {
 		id: 'default',
 		title: 'Hospital Outbreak Investigation',
 		subtitle: 'WGS Analysis Pipeline',
-		phase: 'Phase 1: Quality Control',
+		organism: 'Klebsiella pneumoniae',
 		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{
 				type: 'intro',
-				text: `UM Medical Centre Saturday Report: 5 patients in the ICU did not respond to antibiotics, suspected to have developed antimicrobial resistance within the past 72 hours.`,
+				text: `UM Medical Centre Saturday Report: 5 patients in the ICU did not respond to antibiotics.`,
 				hint: null,
 				requiredDir: null
 			},
 			{
 				type: 'context',
-				text: `Samples were collected and sent for whole genome sequencing. Data has been released to you. Your task is to analyze the bacterial genomes to determine if this is an outbreak and identify the source.`,
+				text: `Samples were collected and sent for whole genome sequencing. Your task is to analyze the data.`,
 				hint: null,
 				requiredDir: null
 			},
 			{
 				type: 'task',
 				title: 'Step 1: Quality Control',
-				text: `Check the quality of raw sequencing data (FASTQ files).`,
-				command: 'fastqc sample_01_R1.fastq.gz -o qc_reports/',
-				explanation: 'FastQC generates quality reports for raw sequence data. Try running this for R2 as well!',
+				text: `Check the quality of raw sequencing data.`,
+				command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o qc_reports/',
+				explanation: 'FastQC generates quality reports for raw sequence data.',
 				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'sample_01_R1.fastq.gz', desc: 'Input FASTQ file (forward reads)' },
-					{ name: '-o qc_reports/', desc: 'Output directory for QC reports' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 2: Read Trimming',
-				text: `Remove adapter sequences and low-quality bases from reads.`,
-				command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
-				explanation: 'Trimmomatic cleans reads by removing adapters and trimming poor-quality bases',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'PE', desc: 'Paired-end mode (R1 + R2 reads)' },
-					{ name: '-phred33', desc: 'Quality score encoding (standard Illumina)' },
-					{ name: 'ILLUMINACLIP:TruSeq3-PE.fa:2:30:10', desc: 'Remove Illumina adapters (seed=2, palindrome=30, simple=10)' },
-					{ name: 'SLIDINGWINDOW:4:15', desc: 'Cut when 4bp window average quality < 15' },
-					{ name: 'MINLEN:36', desc: 'Drop reads shorter than 36bp' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 3: Genome Assembly',
-				text: `Assemble cleaned reads into contiguous sequences (contigs).`,
-				command: 'unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly/',
-				explanation: 'Unicycler assembles bacterial genomes and can circularize chromosomes and plasmids',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-1', desc: 'Forward reads (R1) input file' },
-					{ name: '-2', desc: 'Reverse reads (R2) input file' },
-					{ name: '-o assembly/', desc: 'Output directory for assembly results' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 4: Visualize Assembly Graph',
-				text: `Visualize the assembly graph to understand genome structure and identify repeat regions.`,
-				command: 'bandage image assembly/assembly.gfa assembly/assembly_graph.png',
-				explanation: 'Bandage creates visual representations of assembly graphs, showing how contigs connect',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'image', desc: 'Bandage command to generate image output' },
-					{ name: 'assembly/assembly.gfa', desc: 'Input assembly graph file (GFA format)' },
-					{ name: 'assembly/assembly_graph.png', desc: 'Output image file' }
-				]
+				parameters: []
 			}
 		]
 	};
 
 	// Use provided storyline or default
 	const activeStoryline = $derived(storyline ?? defaultStoryline);
+
+	// Get current phase from the current section
+	const currentPhase = $derived(() => {
+		for (let i = currentStep; i >= 0; i--) {
+			const section = activeStoryline.sections[i];
+			if (section.type === 'phase' && section.phase) {
+				return section.phase;
+			}
+		}
+		return 1;
+	});
 
 	// Subscribe to current directory
 	currentDirectory.subscribe(dir => {
@@ -104,7 +73,7 @@
 					completedSteps.add(index);
 				}
 				// Also check for specific tools
-				if (section.command.includes('mob_recon') && cmds.includes('mob_suite')) {
+				if (section.command.includes('mob_recon') && cmds.includes('mob_recon')) {
 					completedSteps.add(index);
 				}
 				if (section.command.includes('run_gubbins') && cmds.includes('gubbins')) {
@@ -128,10 +97,17 @@
 
 	// Check if user can proceed to next step
 	function canProceed(stepIndex: number): boolean {
-		if (stepIndex <= 1) return true; // Intro and context are always visible
+		const section = activeStoryline.sections[stepIndex];
+		// Phase headers and non-task sections don't need completion
+		if (section?.type === 'phase' || section?.type === 'intro' || section?.type === 'context' || section?.type === 'complete') {
+			return true;
+		}
+		if (stepIndex <= 1) return true;
 		// For task steps, check if previous task step is completed
 		const prevTaskIndex = stepIndex - 1;
 		if (prevTaskIndex <= 1) return true;
+		const prevSection = activeStoryline.sections[prevTaskIndex];
+		if (prevSection?.type !== 'task') return true;
 		return completedSteps.has(prevTaskIndex);
 	}
 
@@ -153,6 +129,16 @@
 			currentStep = index;
 		}
 	}
+
+	function handleFinish() {
+		isFinished = true;
+		goto('/');
+	}
+
+	// Check if we're at the complete section
+	const isAtComplete = $derived(
+		activeStoryline.sections[currentStep]?.type === 'complete'
+	);
 </script>
 
 <div class="h-full flex flex-col">
@@ -163,8 +149,13 @@
 				WGS Analysis
 			</span>
 			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium">
-				{activeStoryline.phase}
+				Phase {currentPhase()}
 			</span>
+			{#if activeStoryline.organism}
+				<span class="bg-purple-500/80 px-3 py-1 rounded-full text-sm font-medium">
+					{activeStoryline.organism}
+				</span>
+			{/if}
 		</div>
 		<h1 class="text-2xl font-bold">{activeStoryline.title}</h1>
 		<p class="text-blue-100 mt-1">{activeStoryline.subtitle}</p>
@@ -182,26 +173,41 @@
 				style="width: {((currentStep + 1) / activeStoryline.sections.length) * 100}%"
 			></div>
 		</div>
-		<!-- Tools used -->
-		<div class="mt-2 flex flex-wrap gap-1">
-			{#each activeStoryline.toolsUsed as tool}
-				<span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">{tool}</span>
-			{/each}
-		</div>
 	</div>
 
 	<!-- Content -->
 	<div class="flex-1 overflow-auto p-6">
 		{#each activeStoryline.sections as section, i}
 			{#if i <= currentStep}
-				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep}>
+				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep && section.type !== 'phase'}>
 					{#if section.type === 'intro'}
 						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r">
-							<p class="text-gray-700 leading-relaxed font-medium">{section.text}</p>
+							<p class="text-gray-700 leading-relaxed font-medium whitespace-pre-line">{section.text}</p>
 						</div>
 					{:else if section.type === 'context'}
 						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
-							<p class="text-gray-700">{section.text}</p>
+							<p class="text-gray-700 whitespace-pre-line">{section.text}</p>
+						</div>
+					{:else if section.type === 'phase'}
+						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md">
+							<h2 class="text-lg font-bold">{section.title}</h2>
+							<p class="text-indigo-100 text-sm mt-1">{section.text}</p>
+						</div>
+					{:else if section.type === 'complete'}
+						<div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg">
+							<div class="text-center mb-4">
+								<span class="text-4xl">Completed!</span>
+							</div>
+							<h2 class="text-xl font-bold text-center">{section.title}</h2>
+							<p class="text-green-100 mt-4 whitespace-pre-line">{section.text}</p>
+							<div class="mt-6 text-center">
+								<button
+									onclick={handleFinish}
+									class="px-8 py-3 bg-white text-green-600 font-bold rounded-lg hover:bg-green-50 transition-colors shadow-md"
+								>
+									Finished - Return to Home
+								</button>
+							</div>
 						</div>
 					{:else if section.type === 'task'}
 						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" class:border-green-400={completedSteps.has(i)} class:bg-green-50={completedSteps.has(i)}>
@@ -220,7 +226,7 @@
 								{#if section.requiredDir && !isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
 									<div class="bg-amber-50 border border-amber-300 rounded p-3 mb-3">
 										<div class="flex items-start gap-2">
-											<span class="text-amber-500">Warning</span>
+											<span class="text-amber-500 font-medium">Warning</span>
 											<div class="flex-1">
 												<p class="text-amber-800 text-sm font-medium">Wrong directory</p>
 												<p class="text-amber-700 text-sm">
@@ -272,7 +278,7 @@
 		{/each}
 
 		<!-- Next step locked message -->
-		{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1)}
+		{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1) && !isAtComplete}
 			<div class="text-center py-4 text-gray-500 border-t border-dashed">
 				<span class="text-lg">Locked</span>
 				<p class="text-sm mt-1">Execute the current command to unlock the next step</p>
@@ -289,33 +295,45 @@
 		>
 			Previous
 		</button>
-		<div class="flex gap-2">
-			{#each activeStoryline.sections as _, i}
-				<button
-					class="w-3 h-3 rounded-full transition-colors"
-					class:bg-blue-600={i <= currentStep && canProceed(i)}
-					class:bg-green-500={completedSteps.has(i)}
-					class:bg-gray-300={i > currentStep || !canProceed(i)}
-					class:cursor-pointer={canProceed(i)}
-					class:cursor-not-allowed={!canProceed(i)}
-					class:hover:scale-110={canProceed(i)}
-					onclick={() => goToStep(i)}
-					aria-label="Go to step {i + 1}"
-					disabled={!canProceed(i)}
-				></button>
+		<div class="flex gap-1 overflow-x-auto max-w-[200px]">
+			{#each activeStoryline.sections as section, i}
+				{#if section.type === 'phase'}
+					<div class="w-1 h-3 bg-indigo-400 rounded-full mx-1"></div>
+				{:else}
+					<button
+						class="w-2 h-2 rounded-full transition-colors flex-shrink-0"
+						class:bg-blue-600={i <= currentStep && canProceed(i)}
+						class:bg-green-500={completedSteps.has(i)}
+						class:bg-gray-300={i > currentStep || !canProceed(i)}
+						class:cursor-pointer={canProceed(i)}
+						class:cursor-not-allowed={!canProceed(i)}
+						onclick={() => goToStep(i)}
+						aria-label="Go to step {i + 1}"
+						disabled={!canProceed(i)}
+					></button>
+				{/if}
 			{/each}
 		</div>
-		<button
-			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-			disabled={currentStep >= activeStoryline.sections.length - 1 || !canProceed(currentStep + 1)}
-			onclick={nextStep}
-		>
-			{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1)}
-				Locked
-			{:else}
-				Next
-			{/if}
-		</button>
+		{#if isAtComplete}
+			<button
+				onclick={handleFinish}
+				class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+			>
+				Finished
+			</button>
+		{:else}
+			<button
+				class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+				disabled={currentStep >= activeStoryline.sections.length - 1 || !canProceed(currentStep + 1)}
+				onclick={nextStep}
+			>
+				{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1)}
+					Locked
+				{:else}
+					Next
+				{/if}
+			</button>
+		{/if}
 	</div>
 </div>
 

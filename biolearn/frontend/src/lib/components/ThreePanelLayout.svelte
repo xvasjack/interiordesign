@@ -123,7 +123,7 @@
 			{ name: 'mlst_report.tsv', type: 'tsv' }
 		],
 		// Phase 3: Plasmid Analysis
-		'mob_suite': [
+		'mob_recon': [
 			{ name: 'plasmid_report.tsv', type: 'tsv' },
 			{ name: 'chromosome.fasta', type: 'fasta' },
 			{ name: 'plasmid_AA001.fasta', type: 'fasta' },

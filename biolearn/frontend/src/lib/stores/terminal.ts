@@ -189,7 +189,7 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'bakta': { min: 60, max: 120 },  // Similar to prokka
 	'abricate': { min: 5, max: 15 },
 	'mlst': { min: 3, max: 8 },
-	'mob_suite': { min: 30, max: 60 },
+	'mob_recon': { min: 30, max: 60 },
 	'platon': { min: 20, max: 45 },
 	'snippy': { min: 60, max: 120 },
 	'roary': { min: 120, max: 240 },
@@ -221,6 +221,6 @@ export const blockedCommands = new Set([
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
 	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'confindr',
-	'prokka', 'bakta', 'abricate', 'mlst', 'mob_suite', 'platon',
+	'prokka', 'bakta', 'abricate', 'mlst', 'mob_recon', 'platon',
 	'snippy', 'roary', 'iqtree', 'gubbins'
 ]);

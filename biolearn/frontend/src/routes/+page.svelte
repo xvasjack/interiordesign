@@ -18,29 +18,24 @@
 			icon: '🧬',
 			storylines: [
 				{
-					id: 'outbreak',
+					id: 'hospital',
 					title: 'Hospital Outbreak Investigation',
-					description: 'Investigate a Klebsiella pneumoniae outbreak using WGS data'
+					description: 'Investigate a Klebsiella pneumoniae AMR outbreak in ICU patients'
 				},
 				{
-					id: 'amr',
-					title: 'AMR Surveillance',
-					description: 'Track antimicrobial resistance genes across isolates'
+					id: 'plant',
+					title: 'Plant Pathogen Investigation',
+					description: 'Analyze citrus canker outbreak caused by Xanthomonas citri'
 				},
 				{
-					id: 'plasmid',
-					title: 'Plasmid Tracking',
-					description: 'Identify and characterize mobile genetic elements'
+					id: 'fish',
+					title: 'Fish Mortality Event',
+					description: 'Investigate mass fish deaths suspected to be Vibrio outbreak'
 				},
 				{
-					id: 'phylogenetics',
-					title: 'Phylogenetic Analysis',
-					description: 'Build evolutionary trees and analyze population structure'
-				},
-				{
-					id: 'complete',
-					title: 'Complete Pipeline',
-					description: 'Full WGS analysis from raw reads to publication-ready results'
+					id: 'foodborne',
+					title: 'Food Poisoning Outbreak',
+					description: 'Trace Salmonella outbreak from restaurant to source'
 				}
 			]
 		},

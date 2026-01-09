@@ -94,8 +94,8 @@
 			]
 		},
 		'bakta': {
-			'/data/outbreak_investigation': ['bakta_annotation/'],
-			'/data/outbreak_investigation/bakta_annotation': [
+			'/data/outbreak_investigation': ['bakta_results/'],
+			'/data/outbreak_investigation/bakta_results': [
 				'sample_01.gff3', 'sample_01.gbff', 'sample_01.fna',
 				'sample_01.faa', 'sample_01.tsv', 'sample_01.json'
 			]
@@ -107,9 +107,9 @@
 			]
 		},
 		// Phase 3: Plasmid Analysis
-		'mob_suite': {
-			'/data/outbreak_investigation': ['mob_suite_results/'],
-			'/data/outbreak_investigation/mob_suite_results': [
+		'mob_recon': {
+			'/data/outbreak_investigation': ['mob_recon_results/'],
+			'/data/outbreak_investigation/mob_recon_results': [
 				'plasmid_report.tsv', 'chromosome.fasta', 'plasmid_AA001.fasta',
 				'mobtyper_results.txt', 'contig_report.txt'
 			]
@@ -729,7 +729,7 @@ Loading assembly graph: assembly.gfa
   Hypothetical proteins: 521 (11.3%)
   Proteins with function: 4,102 (88.7%)
 
-\x1b[33mOutput files written to: bakta_annotation/\x1b[0m
+\x1b[33mOutput files written to: bakta_results/\x1b[0m
 `,
 				summary: {
 					'Total Features': '4,823',
@@ -820,7 +820,7 @@ Loading assembly graph: assembly.gfa
 				]
 			},
 			// Phase 3: Plasmid Analysis
-			'mob_suite': {
+			'mob_recon': {
 				output: `\x1b[36mMOB-suite v3.1.4\x1b[0m
 [2024-01-15 12:00:00] INFO: Starting plasmid reconstruction
 
@@ -1485,7 +1485,7 @@ Loading assembly graph: assembly.gfa
 		'bakta': ['assembly/assembly.fasta'],
 		'mlst': ['assembly/assembly.fasta'],
 		// Phase 3: Plasmid Analysis
-		'mob_suite': ['assembly/assembly.fasta'],
+		'mob_recon': ['assembly/assembly.fasta'],
 		'platon': ['assembly/assembly.fasta'],
 		// Phase 4: Phylogenetics
 		'snippy': ['trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'],
@@ -1509,7 +1509,7 @@ Loading assembly graph: assembly.gfa
 		'bakta': { dir: '/data/outbreak_investigation' },
 		'mlst': { dir: '/data/outbreak_investigation' },
 		// Phase 3
-		'mob_suite': { dir: '/data/outbreak_investigation' },
+		'mob_recon': { dir: '/data/outbreak_investigation' },
 		'platon': { dir: '/data/outbreak_investigation' },
 		// Phase 4
 		'snippy': { dir: '/data/outbreak_investigation' },
@@ -1906,12 +1906,12 @@ Loading assembly graph: assembly.gfa
 			}
 
 			if (command === 'bakta') {
-				// Bakta: bakta assembly/assembly.fasta --output bakta_annotation/
+				// Bakta: bakta assembly/assembly.fasta --output bakta_results/
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bakta assembly/assembly.fasta --output bakta_annotation/\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bakta assembly/assembly.fasta --output bakta_annotation/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bakta assembly/assembly.fasta --output bakta_results/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bakta assembly/assembly.fasta --output bakta_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1924,15 +1924,15 @@ Loading assembly graph: assembly.gfa
 				// Check output directory
 				if (!args.includes('--output') && !args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (--output flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: --output bakta_annotation/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --output bakta_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const oIdx = args.includes('--output') ? args.indexOf('--output') : args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'bakta_annotation') {
+				if (outDir !== 'bakta_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: bakta_annotation/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: bakta_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -1972,32 +1972,32 @@ Loading assembly graph: assembly.gfa
 			}
 
 			// Phase 3: Plasmid Analysis
-			if (command === 'mob_suite') {
-				// MOB-suite: mob_recon -i assembly/assembly.fasta -o mob_suite_results/
+			if (command === 'mob_recon') {
+				// MOB-suite: mob_recon -i assembly/assembly.fasta -o mob_recon_results/
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: mob_recon -i assembly/assembly.fasta -o mob_suite_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: mob_recon -i assembly/assembly.fasta -o mob_recon_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				if (!isValidFileForTool('mob_suite', inputFile)) {
-					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for mob_suite\x1b[0m`);
+				if (!isValidFileForTool('mob_recon', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for mob_recon\x1b[0m`);
 					terminal.writeln(`\x1b[90mMOB-suite requires: assembly/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: -o mob_suite_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -o mob_recon_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const oIdx = args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'mob_suite_results') {
+				if (outDir !== 'mob_recon_results') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: mob_suite_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: mob_recon_results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -2184,7 +2184,7 @@ Loading assembly graph: assembly.gfa
 		terminal.writeln('  \x1b[32mmlst\x1b[0m            Sequence typing (~5s)');
 		terminal.writeln('');
 		terminal.writeln('  \x1b[1;33mPhase 3 - Plasmid Analysis:\x1b[0m');
-		terminal.writeln('  \x1b[32mmob_suite\x1b[0m       Plasmid reconstruction (~30s)');
+		terminal.writeln('  \x1b[32mmob_recon\x1b[0m       Plasmid reconstruction (~30s)');
 		terminal.writeln('  \x1b[32mplaton\x1b[0m          Plasmid detection (~20s)');
 		terminal.writeln('');
 		terminal.writeln('  \x1b[1;33mPhase 4 - Phylogenetics:\x1b[0m');
