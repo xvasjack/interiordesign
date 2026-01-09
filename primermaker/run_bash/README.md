@@ -5,9 +5,20 @@
 ```bash
 chmod +x *.sh
 
-./1_fetch_sequences.sh    # Fetch from NCBI
-./2_align_sequences.sh    # Align sequences
-./3_design_primers.sh     # Design primers
+./1_fetch_sequences.sh           # Fetch from NCBI
+./2_align_sequences.sh           # Align sequences
+./3_design_primers.sh            # Design primers (built-in)
+./3_design_primers_primer3.sh    # Design primers (Primer3 - recommended)
+```
+
+## Install Primer3 (Recommended)
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install primer3
+
+# Conda
+conda install -c bioconda primer3
 ```
 
 ## Output Files
@@ -17,7 +28,9 @@ chmod +x *.sh
 | `sequences.fasta` | Raw sequences from NCBI |
 | `alignment.fasta` | Aligned sequences |
 | `conserved_regions.txt` | Conserved regions found |
-| `primers.txt` | Designed primers with Tm & efficiency |
+| `primers.txt` | Designed primers (built-in) |
+| `primer3_input.txt` | Primer3 input file |
+| `primer3_output.txt` | Primer3 full output |
 
 ---
 
@@ -39,13 +52,20 @@ chmod +x *.sh
 | **ClustalW** | Classic, widely cited | Outdated, slow, less accurate |
 | **Built-in** | No dependencies, always works | Basic algorithm, less accurate |
 
+### Primer Design Tools
+
+| Tool | Advantages | Disadvantages |
+|------|------------|---------------|
+| **Primer3** | Gold standard, accurate Tm, checks dimers/hairpins | Requires installation |
+| **Built-in** | No dependencies, simple | Less comprehensive checks |
+
 ### Tm Calculation Methods
 
 | Method | Advantages | Disadvantages |
 |--------|------------|---------------|
-| **Nearest-Neighbor** | Most accurate, thermodynamic basis | Complex calculation |
+| **Primer3 (SantaLucia)** | Most accurate, salt-corrected | Requires Primer3 |
+| **Nearest-Neighbor** | Accurate, thermodynamic basis | Complex calculation |
 | **Wallace Rule** | Simple (2AT + 4GC) | Only for short oligos (<14bp) |
-| **Basic Formula** | Fast | Less accurate for long primers |
 
 ### Primer Design Approach
 
