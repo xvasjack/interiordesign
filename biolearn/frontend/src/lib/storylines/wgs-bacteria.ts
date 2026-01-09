@@ -518,7 +518,7 @@ function createPacBioHybridSections(): StorylineSection[] {
 // PACBIO HIFI LONG-READ WORKFLOW SECTIONS
 // ============================================
 
-function createPacBioPhase1Sections(): StorylineSection[] {
+function createPacBioPhase1Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -532,7 +532,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 			text: `Check the PacBio HiFi sequencing data statistics.`,
 			command: 'seqkit stats sample_01_hifi.fastq.gz',
 			explanation: 'SeqKit provides quick statistics including read count and N50 length.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: 'stats', desc: 'Generate sequence statistics' }
 			]
@@ -543,7 +543,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 			text: `Generate comprehensive quality plots for HiFi reads.`,
 			command: 'NanoPlot --fastq sample_01_hifi.fastq.gz -o nanoplot_results/ --plots hex dot',
 			explanation: 'NanoPlot creates visualizations of read length and quality distributions.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--fastq', desc: 'Input FASTQ file' },
 				{ name: '-o nanoplot_results/', desc: 'Output directory' },
@@ -556,7 +556,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 			text: `Remove low-quality and short reads.`,
 			command: 'filtlong --min_length 5000 --min_mean_q 20 sample_01_hifi.fastq.gz | gzip > filtered/sample_01_filtered.fastq.gz',
 			explanation: 'Filtlong filters reads by length and quality for optimal assembly.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--min_length 5000', desc: 'Minimum read length (bp)' },
 				{ name: '--min_mean_q 20', desc: 'Minimum mean quality score' }
@@ -568,7 +568,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 			text: `Assemble filtered reads using Flye optimized for HiFi data.`,
 			command: 'flye --pacbio-hifi filtered/sample_01_filtered.fastq.gz -o assembly/ --threads 8',
 			explanation: 'Flye produces high-quality assemblies optimized for long reads.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--pacbio-hifi', desc: 'PacBio HiFi read mode' },
 				{ name: '-o assembly/', desc: 'Output directory' },
@@ -581,7 +581,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 			text: `Examine the assembly graph for circular chromosomes.`,
 			command: 'bandage image assembly/assembly.gfa assembly/assembly_graph.png --lengths',
 			explanation: 'Bandage visualizes assembly graphs; circular contigs indicate complete chromosomes.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: 'image', desc: 'Generate image output' },
 				{ name: '--lengths', desc: 'Show contig lengths' }
@@ -593,7 +593,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 			text: `Polish the assembly to correct remaining errors.`,
 			command: 'medaka_consensus -i filtered/sample_01_filtered.fastq.gz -d assembly/assembly.fasta -o polished/ -m r941_min_hac_g507',
 			explanation: 'Medaka uses neural networks to polish long-read assemblies.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-i', desc: 'Input reads' },
 				{ name: '-d', desc: 'Draft assembly' },
@@ -604,7 +604,7 @@ function createPacBioPhase1Sections(): StorylineSection[] {
 	];
 }
 
-function createLongReadPhase2Sections(): StorylineSection[] {
+function createLongReadPhase2Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -618,7 +618,7 @@ function createLongReadPhase2Sections(): StorylineSection[] {
 			text: `Assess assembly quality and completeness.`,
 			command: 'quast polished/consensus.fasta -o quast_results/',
 			explanation: 'QUAST provides N50, total length, and contig statistics.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-o quast_results/', desc: 'Output directory' }
 			]
@@ -629,7 +629,7 @@ function createLongReadPhase2Sections(): StorylineSection[] {
 			text: `Check genome completeness using marker genes.`,
 			command: 'checkm lineage_wf polished/ checkm_results/ -x fasta',
 			explanation: 'CheckM estimates completeness and contamination.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: 'lineage_wf', desc: 'Full CheckM workflow' },
 				{ name: '-x fasta', desc: 'File extension' }
@@ -641,7 +641,7 @@ function createLongReadPhase2Sections(): StorylineSection[] {
 			text: `Validate completeness with universal single-copy orthologs.`,
 			command: 'busco -i polished/consensus.fasta -o busco_results/ -m genome -l bacteria_odb10',
 			explanation: 'BUSCO checks for conserved genes expected in all bacteria.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-m genome', desc: 'Genome mode' },
 				{ name: '-l bacteria_odb10', desc: 'Bacteria database' }
@@ -653,7 +653,7 @@ function createLongReadPhase2Sections(): StorylineSection[] {
 			text: `Screen for antimicrobial resistance genes.`,
 			command: 'abricate --db ncbi polished/consensus.fasta -o abricate_results/',
 			explanation: 'ABRicate identifies resistance genes from databases.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--db ncbi', desc: 'Use NCBI database' },
 				{ name: '-o abricate_results/', desc: 'Output directory' }
@@ -665,7 +665,7 @@ function createLongReadPhase2Sections(): StorylineSection[] {
 			text: `Determine the sequence type.`,
 			command: 'mlst polished/consensus.fasta -o mlst_results/',
 			explanation: 'MLST assigns sequence types for epidemiological tracking.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-o mlst_results/', desc: 'Output directory' }
 			]
@@ -673,7 +673,7 @@ function createLongReadPhase2Sections(): StorylineSection[] {
 	];
 }
 
-function createLongReadPhase3Sections(): StorylineSection[] {
+function createLongReadPhase3Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -687,7 +687,7 @@ function createLongReadPhase3Sections(): StorylineSection[] {
 			text: `Annotate genes in the polished assembly.`,
 			command: 'prokka --outdir prokka_results/ --prefix sample_01 polished/consensus.fasta',
 			explanation: 'Prokka identifies CDS, tRNA, and rRNA features.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--outdir prokka_results/', desc: 'Output directory' },
 				{ name: '--prefix sample_01', desc: 'Output file prefix' }
@@ -699,7 +699,7 @@ function createLongReadPhase3Sections(): StorylineSection[] {
 			text: `Get comprehensive annotations with Bakta.`,
 			command: 'bakta polished/consensus.fasta --output bakta_results/',
 			explanation: 'Bakta provides rich functional annotations.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--output bakta_results/', desc: 'Output directory' }
 			]
@@ -710,7 +710,7 @@ function createLongReadPhase3Sections(): StorylineSection[] {
 			text: `Identify and characterize plasmids from the complete assembly.`,
 			command: 'mob_recon -i polished/consensus.fasta -o mob_recon_results/',
 			explanation: 'MOB-suite reconstructs plasmids with high accuracy on complete genomes.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-i', desc: 'Input assembly' },
 				{ name: '-o mob_recon_results/', desc: 'Output directory' }
@@ -722,7 +722,7 @@ function createLongReadPhase3Sections(): StorylineSection[] {
 			text: `Identify plasmid replicon types.`,
 			command: 'plasmidfinder -i polished/consensus.fasta -o plasmidfinder_results/',
 			explanation: 'PlasmidFinder detects plasmid replicons for typing.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-i', desc: 'Input assembly' },
 				{ name: '-o plasmidfinder_results/', desc: 'Output directory' }
@@ -734,7 +734,7 @@ function createLongReadPhase3Sections(): StorylineSection[] {
 			text: `Identify insertion sequences in the complete genome.`,
 			command: 'isescan --seqfile polished/consensus.fasta --output isescan_results/',
 			explanation: 'ISEScan finds IS elements that facilitate gene mobility.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--seqfile', desc: 'Input assembly' },
 				{ name: '--output isescan_results/', desc: 'Output directory' }
@@ -743,7 +743,7 @@ function createLongReadPhase3Sections(): StorylineSection[] {
 	];
 }
 
-function createLongReadPhase4Sections(): StorylineSection[] {
+function createLongReadPhase4Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -757,7 +757,7 @@ function createLongReadPhase4Sections(): StorylineSection[] {
 			text: `Call SNPs against the reference genome.`,
 			command: 'snippy --ref reference.gbk --ctgs polished/consensus.fasta --outdir snippy_results/',
 			explanation: 'Snippy identifies SNPs, insertions, and deletions.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--ref reference.gbk', desc: 'Reference genome' },
 				{ name: '--ctgs', desc: 'Query contigs' },
@@ -770,7 +770,7 @@ function createLongReadPhase4Sections(): StorylineSection[] {
 			text: `Analyze the pan-genome across isolates.`,
 			command: 'roary -f roary_results/ -e -n -v prokka_results/*.gff',
 			explanation: 'Roary identifies core and accessory genes.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-f roary_results/', desc: 'Output directory' },
 				{ name: '-e', desc: 'Create core gene alignment' },
@@ -783,7 +783,7 @@ function createLongReadPhase4Sections(): StorylineSection[] {
 			text: `Build a maximum-likelihood phylogenetic tree.`,
 			command: 'iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 -nt AUTO',
 			explanation: 'IQ-TREE builds phylogenetic trees with bootstrap support.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-s', desc: 'Input alignment' },
 				{ name: '-m GTR+G', desc: 'Substitution model' },
@@ -796,7 +796,7 @@ function createLongReadPhase4Sections(): StorylineSection[] {
 			text: `Remove recombination for cleaner phylogeny.`,
 			command: 'run_gubbins.py -p gubbins_results/clean roary_results/core_gene_alignment.aln',
 			explanation: 'Gubbins identifies recombination regions for removal.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-p gubbins_results/clean', desc: 'Output prefix' }
 			]
@@ -808,7 +808,7 @@ function createLongReadPhase4Sections(): StorylineSection[] {
 // NANOPORE LONG-READ WORKFLOW SECTIONS
 // ============================================
 
-function createNanoporePhase1Sections(): StorylineSection[] {
+function createNanoporePhase1Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -822,7 +822,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Check the Nanopore sequencing data statistics.`,
 			command: 'seqkit stats sample_01_nanopore.fastq.gz',
 			explanation: 'SeqKit provides quick statistics about sequencing files.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: 'stats', desc: 'Generate sequence statistics' }
 			]
@@ -833,7 +833,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Assess read quality and length distribution.`,
 			command: 'NanoPlot --fastq sample_01_nanopore.fastq.gz -o nanoplot_results/ --plots kde hex',
 			explanation: 'NanoPlot creates visualizations showing quality vs. read length.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--fastq', desc: 'Input FASTQ file' },
 				{ name: '-o nanoplot_results/', desc: 'Output directory' },
@@ -846,7 +846,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Remove adapters and chimeric reads.`,
 			command: 'porechop -i sample_01_nanopore.fastq.gz -o trimmed/sample_01_trimmed.fastq.gz',
 			explanation: 'Porechop removes sequencing adapters from Nanopore reads.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-i', desc: 'Input FASTQ file' },
 				{ name: '-o', desc: 'Output trimmed file' }
@@ -858,7 +858,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Filter reads by quality and length.`,
 			command: 'filtlong --min_length 1000 --keep_percent 90 trimmed/sample_01_trimmed.fastq.gz | gzip > filtered/sample_01_filtered.fastq.gz',
 			explanation: 'Filtlong removes the lowest quality reads.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--min_length 1000', desc: 'Minimum read length' },
 				{ name: '--keep_percent 90', desc: 'Keep top 90% by quality' }
@@ -870,7 +870,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Rapidly identify species using k-mer classification.`,
 			command: 'kraken2 --db standard --threads 8 --report kraken_report.txt filtered/sample_01_filtered.fastq.gz > kraken_output.txt',
 			explanation: 'Kraken2 provides rapid taxonomic classification for species ID.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--db standard', desc: 'Standard Kraken2 database' },
 				{ name: '--threads 8', desc: 'Number of threads' },
@@ -883,7 +883,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Assemble filtered reads with Flye.`,
 			command: 'flye --nano-hq filtered/sample_01_filtered.fastq.gz -o assembly/ --threads 8',
 			explanation: 'Flye produces high-quality assemblies from Nanopore data.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--nano-hq', desc: 'High-quality Nanopore mode (Q20+)' },
 				{ name: '-o assembly/', desc: 'Output directory' },
@@ -896,7 +896,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Polish assembly with Medaka for improved accuracy.`,
 			command: 'medaka_consensus -i filtered/sample_01_filtered.fastq.gz -d assembly/assembly.fasta -o polished/ -m r941_min_sup_g507',
 			explanation: 'Medaka uses neural networks to improve assembly accuracy.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-i', desc: 'Input reads' },
 				{ name: '-d', desc: 'Draft assembly' },
@@ -910,7 +910,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 			text: `Examine the assembly graph structure.`,
 			command: 'bandage image assembly/assembly.gfa assembly/assembly_graph.png --lengths',
 			explanation: 'Bandage visualizes assembly completeness and structure.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: 'image', desc: 'Generate image output' },
 				{ name: '--lengths', desc: 'Show contig lengths' }
@@ -919,7 +919,7 @@ function createNanoporePhase1Sections(): StorylineSection[] {
 	];
 }
 
-function createNanoporePhase2Sections(): StorylineSection[] {
+function createNanoporePhase2Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -933,7 +933,7 @@ function createNanoporePhase2Sections(): StorylineSection[] {
 			text: `Assess assembly quality metrics.`,
 			command: 'quast polished/consensus.fasta -o quast_results/',
 			explanation: 'QUAST provides key assembly statistics.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-o quast_results/', desc: 'Output directory' }
 			]
@@ -944,7 +944,7 @@ function createNanoporePhase2Sections(): StorylineSection[] {
 			text: `Screen for resistance genes directly from reads.`,
 			command: 'abricate --db resfinder polished/consensus.fasta -o abricate_results/',
 			explanation: 'ABRicate rapidly identifies resistance genes.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--db resfinder', desc: 'Use ResFinder database' },
 				{ name: '-o abricate_results/', desc: 'Output directory' }
@@ -956,7 +956,7 @@ function createNanoporePhase2Sections(): StorylineSection[] {
 			text: `Determine sequence type for epidemiology.`,
 			command: 'mlst polished/consensus.fasta -o mlst_results/',
 			explanation: 'MLST provides immediate epidemiological context.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-o mlst_results/', desc: 'Output directory' }
 			]
@@ -967,7 +967,7 @@ function createNanoporePhase2Sections(): StorylineSection[] {
 			text: `Screen for virulence factors.`,
 			command: 'abricate --db vfdb polished/consensus.fasta -o virulence_results/',
 			explanation: 'VFDB database contains curated virulence factors.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--db vfdb', desc: 'Use VFDB database' },
 				{ name: '-o virulence_results/', desc: 'Output directory' }
@@ -976,7 +976,7 @@ function createNanoporePhase2Sections(): StorylineSection[] {
 	];
 }
 
-function createNanoporePhase3Sections(): StorylineSection[] {
+function createNanoporePhase3Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -990,7 +990,7 @@ function createNanoporePhase3Sections(): StorylineSection[] {
 			text: `Annotate the polished assembly.`,
 			command: 'prokka --outdir prokka_results/ --prefix sample_01 polished/consensus.fasta',
 			explanation: 'Prokka provides comprehensive gene annotations.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--outdir prokka_results/', desc: 'Output directory' },
 				{ name: '--prefix sample_01', desc: 'Output prefix' }
@@ -1002,7 +1002,7 @@ function createNanoporePhase3Sections(): StorylineSection[] {
 			text: `Get comprehensive functional annotations.`,
 			command: 'bakta polished/consensus.fasta --output bakta_results/',
 			explanation: 'Bakta provides rich functional and taxonomic annotations.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '--output bakta_results/', desc: 'Output directory' }
 			]
@@ -1013,7 +1013,7 @@ function createNanoporePhase3Sections(): StorylineSection[] {
 			text: `Identify plasmids in the assembly.`,
 			command: 'mob_recon -i polished/consensus.fasta -o mob_recon_results/',
 			explanation: 'MOB-suite reconstructs and types plasmids.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: '-i', desc: 'Input assembly' },
 				{ name: '-o mob_recon_results/', desc: 'Output directory' }
@@ -1025,7 +1025,7 @@ function createNanoporePhase3Sections(): StorylineSection[] {
 			text: `Detect DNA methylation patterns (if available).`,
 			command: 'modkit pileup sample_01_nanopore.bam methylation_results/ --ref polished/consensus.fasta',
 			explanation: 'Modkit detects base modifications from Nanopore signal data.',
-			requiredDir: '/data/outbreak_investigation',
+			requiredDir: dataDir,
 			parameters: [
 				{ name: 'pileup', desc: 'Generate methylation pileup' },
 				{ name: '--ref', desc: 'Reference genome' }
@@ -1472,26 +1472,26 @@ export const storylines: Record<string, Storyline> = {
 				hint: null,
 				requiredDir: null
 			},
-			...createPacBioPhase1Sections(),
+			...createPacBioPhase1Sections('/data/wastewater_surveillance'),
 			{
 				type: 'alert',
 				title: 'Assembly Result',
 				text: `**PacBio HiFi Assembly Successful**\n\nYour long-read assembly produced a complete, closed genome:\n• 1 circular chromosome (4.9 Mb)\n• 2 complete circular plasmids (IncI2: 65 kb, IncX4: 35 kb)\n• N50: 4.9 Mb (chromosome-level)\n\n**Advantage of long reads:** Unlike short-read assembly, we have resolved the complete plasmid sequences, allowing us to determine exactly which plasmid carries the mcr gene and analyze its transfer potential.`
 			},
-			...createLongReadPhase2Sections(),
+			...createLongReadPhase2Sections('/data/wastewater_surveillance'),
 			{
 				type: 'alert',
 				title: 'Critical Finding: mcr-1 Detected',
 				text: `**AMR Screening Result:**\n\nmcr-1 gene detected on the IncI2 plasmid (pMCR-65kb)\n\n**Why this matters:**\n• mcr-1 confers resistance to colistin, a last-resort antibiotic\n• IncI2 plasmids are highly conjugative (easily transferred between bacteria)\n• This plasmid type has been associated with global mcr-1 spread\n\nContinue analysis to understand the transmission context...`
 			},
-			...createLongReadPhase3Sections(),
+			...createLongReadPhase3Sections('/data/wastewater_surveillance'),
 			{
 				type: 'task',
 				title: 'Step 17: Detailed mcr Analysis',
 				text: `Analyze the genetic context of the mcr gene.`,
 				command: 'resfinder -i polished/consensus.fasta -o resfinder_results/ -db_res -l 0.9 -t 0.8',
 				explanation: 'ResFinder provides detailed resistance gene context and variants.',
-				requiredDir: '/data/outbreak_investigation',
+				requiredDir: '/data/wastewater_surveillance',
 				parameters: [
 					{ name: '-db_res', desc: 'Use resistance database' },
 					{ name: '-l 0.9', desc: 'Minimum coverage 90%' },
@@ -1504,13 +1504,13 @@ export const storylines: Record<string, Storyline> = {
 				text: `Assess conjugation potential of the mcr-carrying plasmid.`,
 				command: 'mob_typer -i mob_recon_results/plasmid_pMCR.fasta -o mob_typer_results/',
 				explanation: 'MOB-typer predicts plasmid mobility and host range.',
-				requiredDir: '/data/outbreak_investigation',
+				requiredDir: '/data/wastewater_surveillance',
 				parameters: [
 					{ name: '-i', desc: 'Input plasmid sequence' },
 					{ name: '-o mob_typer_results/', desc: 'Output directory' }
 				]
 			},
-			...createLongReadPhase4Sections(),
+			...createLongReadPhase4Sections('/data/wastewater_surveillance'),
 			...createPhase5Placeholder(),
 			{
 				type: 'complete',
@@ -1547,26 +1547,26 @@ export const storylines: Record<string, Storyline> = {
 				hint: null,
 				requiredDir: null
 			},
-			...createNanoporePhase1Sections(),
+			...createNanoporePhase1Sections('/data/clinical_samples'),
 			{
 				type: 'alert',
 				title: 'Rapid Species Identification',
 				text: `**Kraken2 Classification Result (15 minutes):**\n\n• **Species:** Pseudomonas aeruginosa (98.7% reads classified)\n• **Confidence:** High (>95% agreement across k-mers)\n\n**Clinical Significance:**\nP. aeruginosa is an opportunistic pathogen notorious for:\n• Intrinsic resistance to many antibiotics\n• Ability to acquire additional resistance mechanisms\n• Biofilm formation in burn wounds\n• High mortality in bacteremic patients\n\nContinue analysis for resistance gene detection...`
 			},
-			...createNanoporePhase2Sections(),
+			...createNanoporePhase2Sections('/data/clinical_samples'),
 			{
 				type: 'alert',
 				title: 'Critical AMR Alert',
 				text: `**Resistance Gene Detection (2 hours):**\n\n**Detected resistance mechanisms:**\n• blaVIM-2: Metallo-β-lactamase (carbapenem resistance)\n• aac(6')-Ib: Aminoglycoside resistance\n• Chromosomal oprD mutation: Imipenem resistance\n\n**Predicted Resistance Profile:**\n• Carbapenems: RESISTANT (meropenem, imipenem)\n• Aminoglycosides: RESISTANT (gentamicin, tobramycin)\n• Fluoroquinolones: Likely SUSCEPTIBLE\n• Colistin: Likely SUSCEPTIBLE\n\n**Immediate Clinical Recommendation:**\n⚠️ Avoid carbapenems and aminoglycosides\n✓ Consider colistin + fluoroquinolone combination pending confirmatory susceptibility testing`
 			},
-			...createNanoporePhase3Sections(),
+			...createNanoporePhase3Sections('/data/clinical_samples'),
 			{
 				type: 'task',
 				title: 'Step 17: Resistance Gene Context',
 				text: `Analyze the genetic environment of resistance genes.`,
 				command: 'abricate --db card polished/consensus.fasta -o card_results/',
 				explanation: 'CARD database provides detailed resistance mechanism annotations.',
-				requiredDir: '/data/outbreak_investigation',
+				requiredDir: '/data/clinical_samples',
 				parameters: [
 					{ name: '--db card', desc: 'Use CARD database' },
 					{ name: '-o card_results/', desc: 'Output directory' }
@@ -1578,7 +1578,7 @@ export const storylines: Record<string, Storyline> = {
 				text: `Check for integron-associated resistance.`,
 				command: 'integron_finder polished/consensus.fasta --outdir integron_results/',
 				explanation: 'IntegronFinder detects gene cassettes that may carry additional resistance genes.',
-				requiredDir: '/data/outbreak_investigation',
+				requiredDir: '/data/clinical_samples',
 				parameters: [
 					{ name: '--outdir integron_results/', desc: 'Output directory' }
 				]
@@ -1595,7 +1595,7 @@ export const storylines: Record<string, Storyline> = {
 				text: `Compare sequence type with known outbreak strains.`,
 				command: 'mlst polished/consensus.fasta -o mlst_results/',
 				explanation: 'MLST helps identify if this strain matches known outbreak clusters.',
-				requiredDir: '/data/outbreak_investigation',
+				requiredDir: '/data/clinical_samples',
 				parameters: [
 					{ name: '-o mlst_results/', desc: 'Output directory' }
 				]
@@ -1610,7 +1610,7 @@ export const storylines: Record<string, Storyline> = {
 				text: `Create a summary report for the clinical team.`,
 				command: 'summary_report --input polished/consensus.fasta --amr abricate_results/ --mlst mlst_results/ -o clinical_report/',
 				explanation: 'Generates a clinical summary for immediate use by the care team.',
-				requiredDir: '/data/outbreak_investigation',
+				requiredDir: '/data/clinical_samples',
 				parameters: [
 					{ name: '--input', desc: 'Assembly file' },
 					{ name: '--amr', desc: 'AMR results directory' },
