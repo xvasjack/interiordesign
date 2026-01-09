@@ -283,13 +283,13 @@ export const storylines: Record<string, Storyline> = {
 		sections: [
 			{
 				type: 'intro',
-				text: `URGENT - UM Medical Centre Saturday Report:\n\n5 patients in the ICU did not respond to last-line antibiotics. All patients developed severe infections within the past 72 hours. Infection control suspects a nosocomial outbreak.`,
+				text: `URGENT - UM Medical Centre Saturday Report:\n\n3 patients in the ICU did not respond to last-line antibiotics. All patients developed severe infections within the past 72 hours. Infection control suspects a nosocomial outbreak.`,
 				hint: null,
 				requiredDir: null
 			},
 			{
 				type: 'context',
-				text: `Samples from all 5 patients have been sequenced using Illumina NovaSeq. Initial culture identified Klebsiella pneumoniae from all samples. Your task: Determine if this is a clonal outbreak, identify the resistance mechanisms, and trace the source.`,
+				text: `Samples from all 3 patients have been sequenced using Illumina NovaSeq. Initial culture identified Klebsiella pneumoniae from all samples. Your task: Determine if this is a clonal outbreak, identify the resistance mechanisms, and trace the source.`,
 				hint: null,
 				requiredDir: null
 			},
