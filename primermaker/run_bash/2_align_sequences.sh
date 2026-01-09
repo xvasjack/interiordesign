@@ -1,34 +1,21 @@
 #!/bin/bash
-# Step 2: Align sequences
+# Step 2: Align sequences using MAFFT
 # Usage: ./2_align_sequences.sh
+#
+# Requires: mafft (sudo apt-get install mafft)
 
-cd "$(dirname "$0")/.."
+INPUT="sequences.fasta"
+OUTPUT="alignment.fasta"
 
-python3 -c "
-from sequence_fetcher import SequenceFetcher
-from aligner import SequenceAligner
+# Check mafft
+if ! command -v mafft &> /dev/null; then
+    echo "ERROR: mafft not installed"
+    echo "Install: sudo apt-get install mafft"
+    exit 1
+fi
 
-# Load sequences
-fetcher = SequenceFetcher()
-with open('run_bash/sequences.fasta', 'r') as f:
-    sequences = fetcher._parse_fasta(f.read(), 'file')
+echo "Aligning sequences..."
+mafft --auto --quiet "$INPUT" > "$OUTPUT"
 
-print(f'Loaded {len(sequences)} sequences')
-
-# Align (uses MAFFT if available, otherwise built-in)
-aligner = SequenceAligner(tool='mafft')
-aligned, fasta = aligner.align(sequences, 'run_bash/alignment.fasta')
-
-# Find conserved regions
-regions = aligner.find_conserved_regions(aligned, min_conservation=0.8, min_length=18)
-print(f'Found {len(regions)} conserved regions')
-
-# Save regions info
-with open('run_bash/conserved_regions.txt', 'w') as f:
-    for i, r in enumerate(regions, 1):
-        f.write(f'{i}. Position {r.start}-{r.end}, Conservation: {r.conservation_score:.1%}\n')
-        f.write(f'   Sequence: {r.consensus_sequence}\n\n')
-
-print('Saved alignment to run_bash/alignment.fasta')
-print('Saved regions to run_bash/conserved_regions.txt')
-"
+echo "Saved alignment to $OUTPUT"
+echo "Sequences aligned: $(grep -c '^>' $OUTPUT)"

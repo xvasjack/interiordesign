@@ -2,22 +2,32 @@
 # Step 1: Fetch sequences from NCBI
 # Usage: ./1_fetch_sequences.sh
 
-cd "$(dirname "$0")/.."
+# === EDIT THESE PARAMETERS ===
+GENUS="Salmonella"
+GENE="16S ribosomal RNA"
+MAX_SEQS=20
+OUTPUT="sequences.fasta"
+# =============================
 
-python3 -c "
-from sequence_fetcher import SequenceFetcher
+echo "Fetching $GENUS $GENE sequences from NCBI..."
 
-fetcher = SequenceFetcher()
+# Search NCBI
+QUERY="${GENUS}[Organism]+AND+${GENE}[Gene Name]"
+QUERY=$(echo "$QUERY" | sed 's/ /+/g')
 
-# EDIT THESE PARAMETERS:
-sequences = fetcher.fetch_by_genus(
-    genus='Salmonella',           # Change genus here
-    gene='16S ribosomal RNA',     # Change gene here
-    max_species=50,               # Max different species
-    max_per_species=4,            # Max sequences per species
-    databases=['ncbi']
-)
+# Get IDs
+IDS=$(curl -s "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nucleotide&term=${QUERY}&retmax=${MAX_SEQS}&retmode=json" | grep -oP '"idlist":\["\K[^"]+' | tr ',' '\n' | head -${MAX_SEQS})
 
-fetcher.save_to_fasta(sequences, 'run_bash/sequences.fasta')
-print(f'Saved {len(sequences)} sequences to run_bash/sequences.fasta')
-"
+if [ -z "$IDS" ]; then
+    echo "No sequences found!"
+    exit 1
+fi
+
+ID_LIST=$(echo $IDS | tr ' ' ',')
+echo "Found IDs: $ID_LIST"
+
+# Fetch sequences
+curl -s "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=${ID_LIST}&rettype=fasta&retmode=text" > "$OUTPUT"
+
+COUNT=$(grep -c "^>" "$OUTPUT")
+echo "Saved $COUNT sequences to $OUTPUT"

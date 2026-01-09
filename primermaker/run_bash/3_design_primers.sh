@@ -1,38 +1,51 @@
 #!/bin/bash
-# Step 3: Design primers
+# Step 3: Design primers using Primer3
 # Usage: ./3_design_primers.sh
+#
+# Requires: primer3 (sudo apt-get install primer3)
 
-cd "$(dirname "$0")/.."
+INPUT="alignment.fasta"
 
-python3 -c "
-from sequence_fetcher import SequenceFetcher
-from aligner import SequenceAligner
-from primer_designer import PrimerDesigner
+# Check primer3
+if ! command -v primer3_core &> /dev/null; then
+    echo "ERROR: primer3 not installed"
+    echo "Install: sudo apt-get install primer3"
+    exit 1
+fi
 
-# Load and align sequences
-fetcher = SequenceFetcher()
-with open('run_bash/sequences.fasta', 'r') as f:
-    sequences = fetcher._parse_fasta(f.read(), 'file')
+# Get consensus sequence (first sequence from alignment, remove gaps)
+TEMPLATE=$(grep -v "^>" "$INPUT" | head -20 | tr -d '\n' | tr -d '-' | head -c 1000)
 
-aligner = SequenceAligner(tool='mafft')
-aligned, _ = aligner.align(sequences)
-regions = aligner.find_conserved_regions(aligned, min_conservation=0.8)
+echo "Template length: ${#TEMPLATE} bp"
 
-# Design primers
-designer = PrimerDesigner(
-    tm_min=55.0,
-    tm_max=65.0,
-    primer_min_length=18,
-    primer_max_length=25
-)
+# Create Primer3 input
+cat > primer3_input.txt << EOF
+SEQUENCE_ID=primer_design
+SEQUENCE_TEMPLATE=$TEMPLATE
+PRIMER_TASK=generic
+PRIMER_PICK_LEFT_PRIMER=1
+PRIMER_PICK_RIGHT_PRIMER=1
+PRIMER_OPT_SIZE=20
+PRIMER_MIN_SIZE=18
+PRIMER_MAX_SIZE=25
+PRIMER_OPT_TM=60.0
+PRIMER_MIN_TM=55.0
+PRIMER_MAX_TM=65.0
+PRIMER_MIN_GC=40.0
+PRIMER_MAX_GC=60.0
+PRIMER_PRODUCT_SIZE_RANGE=100-500
+PRIMER_NUM_RETURN=5
+=
+EOF
 
-primers = designer.design_primers(regions, aligned, max_primers=10)
-pairs = designer.design_primer_pairs(regions, aligned, max_pairs=5)
+echo "Running Primer3..."
+primer3_core < primer3_input.txt > primer3_output.txt
 
-# Save results
-with open('run_bash/primers.txt', 'w') as f:
-    f.write(designer.format_results(primers=primers, pairs=pairs))
-
-print(designer.format_results(primers=primers[:5], pairs=pairs[:3]))
-print('\nFull results saved to run_bash/primers.txt')
-"
+# Display results
+echo ""
+echo "========== RESULTS =========="
+grep -E "PRIMER_(LEFT|RIGHT)_[0-9]+_SEQUENCE" primer3_output.txt
+grep -E "PRIMER_(LEFT|RIGHT)_[0-9]+_TM" primer3_output.txt
+grep -E "PRIMER_PAIR_[0-9]+_PRODUCT_SIZE" primer3_output.txt
+echo ""
+echo "Full output: primer3_output.txt"
