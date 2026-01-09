@@ -193,15 +193,15 @@
 			{#if i <= currentStep}
 				<div class="mb-6 animate-fade-in" style="margin-bottom: 1.5rem; opacity: {i < currentStep && section.type !== 'phase' ? '0.5' : '1'};">
 					{#if section.type === 'intro'}
-						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r" style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
+						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r" style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
 							<p class="text-gray-700 leading-relaxed font-medium whitespace-pre-line" style="color: #374151; line-height: 1.625; font-weight: 500; white-space: pre-line;">{section.text}</p>
 						</div>
 					{:else if section.type === 'context'}
-						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
+						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
 							<p class="text-gray-700 whitespace-pre-line" style="color: #374151; white-space: pre-line;">{section.text}</p>
 						</div>
 					{:else if section.type === 'phase'}
-						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md" style="background: linear-gradient(to right, #6366f1, #9333ea); color: white; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md" style="background: linear-gradient(to right, #6366f1, #9333ea); color: white; padding: 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
 							<h2 class="text-lg font-bold" style="font-size: 1.125rem; font-weight: 700;">{section.title}</h2>
 							<p class="text-indigo-100 text-sm mt-1" style="color: #e0e7ff; font-size: 0.875rem; margin-top: 0.25rem;">{section.text}</p>
 						</div>
@@ -223,14 +223,14 @@
 							</div>
 						</div>
 					{:else if section.type === 'alert'}
-						<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r" style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
+						<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r" style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
 							{#if section.title}
 								<h3 class="font-bold text-red-800 mb-2" style="font-weight: 700; color: #991b1b; margin-bottom: 0.5rem;">{section.title}</h3>
 							{/if}
 							<p class="text-red-700 whitespace-pre-line" style="color: #b91c1c; white-space: pre-line;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
 						</div>
 					{:else if section.type === 'decision'}
-						<div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r" style="background: #faf5ff; border-left: 4px solid #a855f7; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
+						<div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r" style="background: #faf5ff; border-left: 4px solid #a855f7; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
 							{#if section.title}
 								<h3 class="font-bold text-purple-800 mb-2" style="font-weight: 700; color: #6b21a8; margin-bottom: 0.5rem;">{section.title}</h3>
 							{/if}
@@ -250,7 +250,7 @@
 							{/if}
 						</div>
 					{:else if section.type === 'image'}
-						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb;">
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" style="background: #f9fafb; border-radius: 0.5rem; padding: 1.25rem; border: 1px solid #e5e7eb;">
 							{#if section.title}
 								<h3 class="font-semibold text-gray-800 mb-2" style="font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">{section.title}</h3>
 							{/if}
@@ -273,7 +273,7 @@
 							<p class="text-gray-600 text-sm italic" style="color: #4b5563; font-size: 0.875rem; font-style: italic;">{section.text}</p>
 						</div>
 					{:else if section.type === 'task'}
-						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" style="background: {completedSteps.has(i) ? '#f0fdf4' : '#f9fafb'}; border-radius: 0.5rem; padding: 1rem; border: 1px solid {completedSteps.has(i) ? '#4ade80' : '#e5e7eb'};">
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" style="background: {completedSteps.has(i) ? '#f0fdf4' : '#f9fafb'}; border-radius: 0.5rem; padding: 1.25rem; border: 1px solid {completedSteps.has(i) ? '#4ade80' : '#e5e7eb'};">
 							<div class="flex items-center justify-between mb-2" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
 								{#if section.title}
 									<h3 class="font-semibold text-gray-800" style="font-weight: 600; color: #1f2937;">{section.title}</h3>
