@@ -1092,7 +1092,7 @@ export const storylines: Record<string, Storyline> = {
 				type: 'image',
 				title: 'Disease Symptoms',
 				text: 'Citrus canker lesions on infected orange fruit and leaves. Note the raised, corky lesions with characteristic yellow halos - a hallmark of Xanthomonas citri infection.',
-				imageUrl: '/images/citrus_canker.jpg',
+				imageUrl: '/images/citrus_canker.svg',
 				imageAlt: 'Citrus canker lesions showing raised brown/tan lesions with yellow halos on orange fruit and leaves'
 			},
 			{
@@ -1133,7 +1133,7 @@ export const storylines: Record<string, Storyline> = {
 				type: 'image',
 				title: 'Affected Fish',
 				text: 'Fish showing clinical signs of Vibrio infection including skin ulcerations, hemorrhaging around fins, and necrotic lesions. These symptoms are characteristic of vibriosis in aquaculture settings.',
-				imageUrl: '/images/vibrio_fish.jpg',
+				imageUrl: '/images/vibrio_fish.svg',
 				imageAlt: 'Affected fish showing skin ulcerations, hemorrhaging, and necrotic lesions typical of Vibrio infection'
 			},
 			{
@@ -1463,7 +1463,7 @@ export const storylines: Record<string, Storyline> = {
 				type: 'image',
 				title: 'Wastewater Treatment Facility',
 				text: 'Aerial view of the municipal wastewater treatment plant where AMR surveillance sampling is conducted. Understanding resistance gene flow through wastewater systems helps predict and prevent clinical outbreaks.',
-				imageUrl: '/images/wastewater_plant.jpg',
+				imageUrl: '/images/wastewater_plant.svg',
 				imageAlt: 'Aerial view of wastewater treatment facility with settling ponds and processing buildings'
 			},
 			{
@@ -1538,7 +1538,7 @@ export const storylines: Record<string, Storyline> = {
 				type: 'image',
 				title: 'Oxford Nanopore MinION Sequencer',
 				text: 'The portable MinION device enables rapid, real-time sequencing at the point of care. Results can be obtained within hours rather than days, enabling faster clinical decision-making.',
-				imageUrl: '/images/minion_sequencer.jpg',
+				imageUrl: '/images/minion_sequencer.svg',
 				imageAlt: 'Oxford Nanopore MinION portable sequencing device connected to a laptop'
 			},
 			{
