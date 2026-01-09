@@ -157,20 +157,20 @@
 	<!-- Header -->
 	<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 1.5rem; flex-shrink: 0;">
 		<div class="flex items-center gap-3 mb-2" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-			<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+			<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				WGS Analysis
 			</span>
-			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium">
+			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(34,197,94,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				Phase {currentPhase()}
 			</span>
 			{#if activeStoryline.organism}
-				<span class="bg-purple-500/80 px-3 py-1 rounded-full text-sm font-medium">
+				<span class="bg-purple-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(168,85,247,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 					{activeStoryline.organism}
 				</span>
 			{/if}
 		</div>
-		<h1 class="text-2xl font-bold">{activeStoryline.title}</h1>
-		<p class="text-blue-100 mt-1">{activeStoryline.subtitle}</p>
+		<h1 class="text-2xl font-bold" style="font-size: 1.5rem; font-weight: 700;">{activeStoryline.title}</h1>
+		<p class="text-blue-100 mt-1" style="color: #dbeafe; margin-top: 0.25rem;">{activeStoryline.subtitle}</p>
 	</div>
 
 	<!-- Progress Bar -->
@@ -191,74 +191,76 @@
 	<div class="flex-1 overflow-auto p-6" style="flex: 1; overflow: auto; padding: 1.5rem; min-height: 0;">
 		{#each activeStoryline.sections as section, i}
 			{#if i <= currentStep}
-				<div class="mb-6 animate-fade-in" class:opacity-50={i < currentStep && section.type !== 'phase'}>
+				<div class="mb-6 animate-fade-in" style="margin-bottom: 1.5rem; opacity: {i < currentStep && section.type !== 'phase' ? '0.5' : '1'};">
 					{#if section.type === 'intro'}
-						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r">
-							<p class="text-gray-700 leading-relaxed font-medium whitespace-pre-line">{section.text}</p>
+						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r" style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
+							<p class="text-gray-700 leading-relaxed font-medium whitespace-pre-line" style="color: #374151; line-height: 1.625; font-weight: 500; white-space: pre-line;">{section.text}</p>
 						</div>
 					{:else if section.type === 'context'}
-						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
-							<p class="text-gray-700 whitespace-pre-line">{section.text}</p>
+						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
+							<p class="text-gray-700 whitespace-pre-line" style="color: #374151; white-space: pre-line;">{section.text}</p>
 						</div>
 					{:else if section.type === 'phase'}
-						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md">
-							<h2 class="text-lg font-bold">{section.title}</h2>
-							<p class="text-indigo-100 text-sm mt-1">{section.text}</p>
+						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md" style="background: linear-gradient(to right, #6366f1, #9333ea); color: white; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+							<h2 class="text-lg font-bold" style="font-size: 1.125rem; font-weight: 700;">{section.title}</h2>
+							<p class="text-indigo-100 text-sm mt-1" style="color: #e0e7ff; font-size: 0.875rem; margin-top: 0.25rem;">{section.text}</p>
 						</div>
 					{:else if section.type === 'complete'}
-						<div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg">
-							<div class="text-center mb-4">
-								<span class="text-4xl">Completed!</span>
+						<div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg" style="background: linear-gradient(to right, #22c55e, #059669); color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+							<div class="text-center mb-4" style="text-align: center; margin-bottom: 1rem;">
+								<span class="text-4xl" style="font-size: 2.25rem;">Completed!</span>
 							</div>
-							<h2 class="text-xl font-bold text-center">{section.title}</h2>
-							<p class="text-green-100 mt-4 whitespace-pre-line">{section.text}</p>
-							<div class="mt-6 text-center">
+							<h2 class="text-xl font-bold text-center" style="font-size: 1.25rem; font-weight: 700; text-align: center;">{section.title}</h2>
+							<p class="text-green-100 mt-4 whitespace-pre-line" style="color: #dcfce7; margin-top: 1rem; white-space: pre-line;">{section.text}</p>
+							<div class="mt-6 text-center" style="margin-top: 1.5rem; text-align: center;">
 								<button
 									onclick={handleFinish}
 									class="px-8 py-3 bg-white text-green-600 font-bold rounded-lg hover:bg-green-50 transition-colors shadow-md"
+									style="padding: 0.75rem 2rem; background: white; color: #16a34a; font-weight: 700; border-radius: 0.5rem; border: none; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"
 								>
 									Finished - Return to Home
 								</button>
 							</div>
 						</div>
 					{:else if section.type === 'alert'}
-						<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r">
+						<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r" style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
 							{#if section.title}
-								<h3 class="font-bold text-red-800 mb-2">{section.title}</h3>
+								<h3 class="font-bold text-red-800 mb-2" style="font-weight: 700; color: #991b1b; margin-bottom: 0.5rem;">{section.title}</h3>
 							{/if}
-							<p class="text-red-700 whitespace-pre-line">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
+							<p class="text-red-700 whitespace-pre-line" style="color: #b91c1c; white-space: pre-line;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
 						</div>
 					{:else if section.type === 'decision'}
-						<div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r">
+						<div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r" style="background: #faf5ff; border-left: 4px solid #a855f7; padding: 1rem; border-radius: 0 0.25rem 0.25rem 0;">
 							{#if section.title}
-								<h3 class="font-bold text-purple-800 mb-2">{section.title}</h3>
+								<h3 class="font-bold text-purple-800 mb-2" style="font-weight: 700; color: #6b21a8; margin-bottom: 0.5rem;">{section.title}</h3>
 							{/if}
-							<p class="text-purple-700 mb-4">{section.text}</p>
+							<p class="text-purple-700 mb-4" style="color: #7c3aed; margin-bottom: 1rem;">{section.text}</p>
 							{#if section.options}
-								<div class="space-y-3">
+								<div class="space-y-3" style="display: flex; flex-direction: column; gap: 0.75rem;">
 									{#each section.options as option}
 										<button
 											onclick={() => handleDecision(option.id)}
-											class="w-full text-left p-4 rounded-lg border-2 transition-all duration-200 {selectedDecision === option.id ? 'border-purple-600 bg-purple-100' : 'border-gray-200 bg-white hover:border-purple-400 hover:bg-purple-50'}"
+											style="width: 100%; text-align: left; padding: 1rem; border-radius: 0.5rem; border: 2px solid {selectedDecision === option.id ? '#9333ea' : '#e5e7eb'}; background: {selectedDecision === option.id ? '#f3e8ff' : 'white'}; cursor: pointer; transition: all 0.2s;"
 										>
-											<div class="font-semibold text-gray-800">{option.label}</div>
-											<div class="text-sm text-gray-600 mt-1">{option.description}</div>
+											<div class="font-semibold text-gray-800" style="font-weight: 600; color: #1f2937;">{option.label}</div>
+											<div class="text-sm text-gray-600 mt-1" style="font-size: 0.875rem; color: #4b5563; margin-top: 0.25rem;">{option.description}</div>
 										</button>
 									{/each}
 								</div>
 							{/if}
 						</div>
 					{:else if section.type === 'image'}
-						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb;">
 							{#if section.title}
-								<h3 class="font-semibold text-gray-800 mb-2">{section.title}</h3>
+								<h3 class="font-semibold text-gray-800 mb-2" style="font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">{section.title}</h3>
 							{/if}
 							{#if section.imageUrl}
-								<div class="rounded-lg overflow-hidden mb-3 bg-gray-200">
+								<div class="rounded-lg overflow-hidden mb-3 bg-gray-200" style="border-radius: 0.5rem; overflow: hidden; margin-bottom: 0.75rem; background: #e5e7eb;">
 									<img
 										src={section.imageUrl}
 										alt={section.imageAlt || section.title || 'Storyline image'}
 										class="w-full h-auto object-cover"
+										style="width: 100%; height: auto; object-fit: cover;"
 										onerror={(e) => {
 											const target = e.currentTarget as HTMLImageElement;
 											target.onerror = null;
@@ -268,58 +270,58 @@
 									/>
 								</div>
 							{/if}
-							<p class="text-gray-600 text-sm italic">{section.text}</p>
+							<p class="text-gray-600 text-sm italic" style="color: #4b5563; font-size: 0.875rem; font-style: italic;">{section.text}</p>
 						</div>
 					{:else if section.type === 'task'}
-						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" class:border-green-400={completedSteps.has(i)} class:bg-green-50={completedSteps.has(i)}>
-							<div class="flex items-center justify-between mb-2">
+						<div class="bg-gray-50 rounded-lg p-4 border border-gray-200" style="background: {completedSteps.has(i) ? '#f0fdf4' : '#f9fafb'}; border-radius: 0.5rem; padding: 1rem; border: 1px solid {completedSteps.has(i) ? '#4ade80' : '#e5e7eb'};">
+							<div class="flex items-center justify-between mb-2" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
 								{#if section.title}
-									<h3 class="font-semibold text-gray-800">{section.title}</h3>
+									<h3 class="font-semibold text-gray-800" style="font-weight: 600; color: #1f2937;">{section.title}</h3>
 								{/if}
 								{#if completedSteps.has(i)}
-									<span class="text-green-600 text-sm font-medium">Completed</span>
+									<span class="text-green-600 text-sm font-medium" style="color: #16a34a; font-size: 0.875rem; font-weight: 500;">Completed</span>
 								{/if}
 							</div>
-							<p class="text-gray-700 mb-3">{section.text}</p>
+							<p class="text-gray-700 mb-3" style="color: #374151; margin-bottom: 0.75rem;">{section.text}</p>
 
 							{#if section.command}
 								<!-- Directory check warning -->
 								{#if section.requiredDir && !isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
-									<div class="bg-amber-50 border border-amber-300 rounded p-3 mb-3">
-										<div class="flex items-start gap-2">
-											<span class="text-amber-500 font-medium">Warning</span>
-											<div class="flex-1">
-												<p class="text-amber-800 text-sm font-medium">Wrong directory</p>
-												<p class="text-amber-700 text-sm">
-													You are in <code class="bg-amber-100 px-1 rounded">{getShortDir(userCurrentDir)}</code>
+									<div class="bg-amber-50 border border-amber-300 rounded p-3 mb-3" style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.25rem; padding: 0.75rem; margin-bottom: 0.75rem;">
+										<div class="flex items-start gap-2" style="display: flex; align-items: flex-start; gap: 0.5rem;">
+											<span class="text-amber-500 font-medium" style="color: #f59e0b; font-weight: 500;">Warning</span>
+											<div class="flex-1" style="flex: 1;">
+												<p class="text-amber-800 text-sm font-medium" style="color: #92400e; font-size: 0.875rem; font-weight: 500;">Wrong directory</p>
+												<p class="text-amber-700 text-sm" style="color: #b45309; font-size: 0.875rem;">
+													You are in <code class="bg-amber-100 px-1 rounded" style="background: #fef3c7; padding: 0 0.25rem; border-radius: 0.25rem;">{getShortDir(userCurrentDir)}</code>
 												</p>
-												<p class="text-amber-700 text-sm mt-1">Return to the project directory first:</p>
-												<div class="bg-gray-900 rounded p-2 mt-1 font-mono text-sm">
-													<code class="text-yellow-400">cd ~</code>
+												<p class="text-amber-700 text-sm mt-1" style="color: #b45309; font-size: 0.875rem; margin-top: 0.25rem;">Return to the project directory first:</p>
+												<div class="bg-gray-900 rounded p-2 mt-1 font-mono text-sm" style="background: #111827; border-radius: 0.25rem; padding: 0.5rem; margin-top: 0.25rem; font-family: monospace; font-size: 0.875rem;">
+													<code class="text-yellow-400" style="color: #facc15;">cd ~</code>
 												</div>
 											</div>
 										</div>
 									</div>
 								{:else if section.requiredDir && isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
-									<div class="flex items-center gap-2 text-green-600 text-sm mb-2">
+									<div class="flex items-center gap-2 text-green-600 text-sm mb-2" style="display: flex; align-items: center; gap: 0.5rem; color: #16a34a; font-size: 0.875rem; margin-bottom: 0.5rem;">
 										<span>OK</span>
 										<span>You are in the correct directory (~)</span>
 									</div>
 								{/if}
 
-								<div class="bg-gray-900 rounded p-3 font-mono text-sm overflow-x-auto mb-3">
-									<div class="text-gray-400 text-xs mb-1">Command:</div>
-									<code class="text-green-400 whitespace-pre-wrap break-all">{section.command}</code>
+								<div class="bg-gray-900 rounded p-3 font-mono text-sm overflow-x-auto mb-3" style="background: #111827; border-radius: 0.25rem; padding: 0.75rem; font-family: monospace; font-size: 0.875rem; overflow-x: auto; margin-bottom: 0.75rem;">
+									<div class="text-gray-400 text-xs mb-1" style="color: #9ca3af; font-size: 0.75rem; margin-bottom: 0.25rem;">Command:</div>
+									<code class="text-green-400 whitespace-pre-wrap break-all" style="color: #4ade80; white-space: pre-wrap; word-break: break-all;">{section.command}</code>
 								</div>
 
 								{#if section.parameters && section.parameters.length > 0}
-									<div class="bg-white rounded border border-gray-200 p-3 mb-3">
-										<div class="text-xs font-semibold text-gray-500 uppercase mb-2">Parameter Reference</div>
-										<dl class="space-y-1 text-sm">
+									<div class="bg-white rounded border border-gray-200 p-3 mb-3" style="background: white; border-radius: 0.25rem; border: 1px solid #e5e7eb; padding: 0.75rem; margin-bottom: 0.75rem;">
+										<div class="text-xs font-semibold text-gray-500 uppercase mb-2" style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.5rem;">Parameter Reference</div>
+										<dl class="space-y-1 text-sm" style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem;">
 											{#each section.parameters as param}
-												<div class="flex">
-													<dt class="font-mono text-blue-600 min-w-[180px] flex-shrink-0">{param.name}</dt>
-													<dd class="text-gray-600">{param.desc}</dd>
+												<div class="flex" style="display: flex;">
+													<dt class="font-mono text-blue-600 min-w-[180px] flex-shrink-0" style="font-family: monospace; color: #2563eb; min-width: 180px; flex-shrink: 0;">{param.name}</dt>
+													<dd class="text-gray-600" style="color: #4b5563;">{param.desc}</dd>
 												</div>
 											{/each}
 										</dl>
@@ -327,7 +329,7 @@
 								{/if}
 
 								{#if section.explanation}
-									<p class="text-gray-500 text-sm italic">
+									<p class="text-gray-500 text-sm italic" style="color: #6b7280; font-size: 0.875rem; font-style: italic;">
 										Info: {section.explanation}
 									</p>
 								{/if}
@@ -340,9 +342,9 @@
 
 		<!-- Next step locked message -->
 		{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1) && !isAtComplete}
-			<div class="text-center py-4 text-gray-500 border-t border-dashed">
-				<span class="text-lg">Locked</span>
-				<p class="text-sm mt-1">Execute the current command to unlock the next step</p>
+			<div class="text-center py-4 text-gray-500 border-t border-dashed" style="text-align: center; padding: 1rem 0; color: #6b7280; border-top: 1px dashed #d1d5db;">
+				<span class="text-lg" style="font-size: 1.125rem;">Locked</span>
+				<p class="text-sm mt-1" style="font-size: 0.875rem; margin-top: 0.25rem;">Execute the current command to unlock the next step</p>
 			</div>
 		{/if}
 	</div>
