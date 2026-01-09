@@ -204,7 +204,7 @@
 						</div>
 					{:else if section.type === 'context'}
 						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
-							<p class="text-gray-700 whitespace-pre-line" style="color: #374151; white-space: pre-line;">{section.text}</p>
+							<p class="text-gray-700 whitespace-pre-line" style="color: #374151; white-space: pre-line;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
 						</div>
 					{:else if section.type === 'phase'}
 						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md" style="background: linear-gradient(to right, #6366f1, #9333ea); color: white; padding: 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
@@ -217,7 +217,7 @@
 								<span class="text-4xl" style="font-size: 2.25rem;">Completed!</span>
 							</div>
 							<h2 class="text-xl font-bold text-center" style="font-size: 1.25rem; font-weight: 700; text-align: center;">{section.title}</h2>
-							<p class="text-green-100 mt-4 whitespace-pre-line" style="color: #dcfce7; margin-top: 1rem; white-space: pre-line;">{section.text}</p>
+							<p class="text-green-100 mt-4 whitespace-pre-line" style="color: #dcfce7; margin-top: 1rem; white-space: pre-line;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
 							<div class="mt-6 text-center" style="margin-top: 1.5rem; text-align: center;">
 								<button
 									onclick={handleFinish}
