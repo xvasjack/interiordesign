@@ -12,7 +12,7 @@ Designs primers from conserved regions with:
 import math
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
-from .aligner import ConservedRegion, AlignedSequence
+from aligner import ConservedRegion, AlignedSequence
 
 
 @dataclass

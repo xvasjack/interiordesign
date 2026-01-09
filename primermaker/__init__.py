@@ -9,10 +9,10 @@ A comprehensive tool for designing primers across multiple species:
 """
 
 __version__ = "1.0.0"
-__author__ = "BioLearn"
+__author__ = "PrimerMaker"
 
-from .sequence_fetcher import SequenceFetcher
-from .aligner import SequenceAligner
-from .primer_designer import PrimerDesigner
+from sequence_fetcher import SequenceFetcher
+from aligner import SequenceAligner
+from primer_designer import PrimerDesigner
 
 __all__ = ["SequenceFetcher", "SequenceAligner", "PrimerDesigner"]

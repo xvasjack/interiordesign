@@ -11,7 +11,7 @@ import tempfile
 import shutil
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
-from .sequence_fetcher import SequenceRecord
+from sequence_fetcher import SequenceRecord
 
 
 @dataclass
@@ -482,7 +482,7 @@ class SequenceAligner:
 # Example usage
 if __name__ == "__main__":
     # Test with sample sequences
-    from .sequence_fetcher import SequenceRecord
+    from sequence_fetcher import SequenceRecord
 
     test_sequences = [
         SequenceRecord("seq1", "Species A", "Test", "ATGCGATCGATCGATCGATCGATCG", "test"),

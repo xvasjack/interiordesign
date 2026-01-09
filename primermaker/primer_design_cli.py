@@ -20,12 +20,12 @@ import json
 from datetime import datetime
 from typing import List, Optional
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from primer_design.sequence_fetcher import SequenceFetcher, SequenceRecord
-from primer_design.aligner import SequenceAligner
-from primer_design.primer_designer import PrimerDesigner
+from sequence_fetcher import SequenceFetcher, SequenceRecord
+from aligner import SequenceAligner
+from primer_designer import PrimerDesigner
 
 
 def print_banner():
