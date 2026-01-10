@@ -88,7 +88,7 @@
 	}
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+<div class="homepage-scroll h-screen overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
 	<!-- Header -->
 	<header class="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
 		<div class="mx-auto max-w-7xl px-6 py-6">
@@ -298,23 +298,24 @@
 </div>
 
 <style>
-	/* Page-level scrollbar */
-	:global(html) {
-		scrollbar-width: thin;
-		scrollbar-color: rgb(100 116 139) rgb(30 41 59);
-	}
-	:global(body)::-webkit-scrollbar {
+	/* Homepage scrollbar */
+	.homepage-scroll::-webkit-scrollbar {
 		width: 10px;
 	}
-	:global(body)::-webkit-scrollbar-track {
+	.homepage-scroll::-webkit-scrollbar-track {
 		background: rgb(30 41 59);
 	}
-	:global(body)::-webkit-scrollbar-thumb {
+	.homepage-scroll::-webkit-scrollbar-thumb {
 		background: rgb(100 116 139);
 		border-radius: 5px;
 	}
-	:global(body)::-webkit-scrollbar-thumb:hover {
+	.homepage-scroll::-webkit-scrollbar-thumb:hover {
 		background: rgb(148 163 184);
+	}
+	/* Firefox */
+	.homepage-scroll {
+		scrollbar-width: thin;
+		scrollbar-color: rgb(100 116 139) rgb(30 41 59);
 	}
 
 	/* Custom scrollbar for storylines dropdown */
