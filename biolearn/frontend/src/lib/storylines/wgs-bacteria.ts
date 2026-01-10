@@ -418,17 +418,275 @@ function createFishAdditionalTools(): StorylineSection[] {
 	];
 }
 
-function createPhase5Placeholder(): StorylineSection[] {
+function createPhase5RVisualization(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
-			title: 'Phase 5: Reporting (Coming Soon)',
-			text: 'Generate publication-ready reports and visualizations using R.',
+			title: 'Phase 5: R Visualization & Reporting',
+			text: 'Create publication-ready figures and generate comprehensive reports using R.',
 			phase: 5
 		},
 		{
 			type: 'context',
-			text: `Phase 5 will include:\n- R/RMarkdown report generation\n- Publication-quality figures with ggplot2\n- Interactive visualizations with ggtree\n- Automated report templates\n\nThis phase is currently under development.`
+			text: `Now we'll use R packages to create publication-quality visualizations:\n\n• **ggtree** - Phylogenetic tree visualization\n• **pheatmap** - AMR gene heatmaps\n• **ggplot2** - Pan-genome pie charts\n• **RMarkdown** - Automated report generation\n\nThese tools integrate the bioinformatics results into figures suitable for publications and clinical reports.`
+		},
+		{
+			type: 'task',
+			title: 'Step R1: Phylogenetic Tree Visualization',
+			text: `Create a publication-quality phylogenetic tree.`,
+			command: 'ggtree iqtree_results/core_snps.treefile -o r_results/',
+			explanation: 'ggtree creates annotated phylogenetic trees with bootstrap values and metadata.',
+			requiredDir: dataDir,
+			parameters: [
+				{ name: 'treefile', desc: 'Input Newick tree' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R2: AMR Gene Heatmap',
+			text: `Generate an AMR presence/absence heatmap.`,
+			command: 'amr_heatmap abricate_results/amr_summary.tsv -o r_results/',
+			explanation: 'pheatmap creates clustered heatmaps showing resistance patterns across samples.',
+			requiredDir: dataDir,
+			parameters: [
+				{ name: 'amr_summary.tsv', desc: 'ABRicate output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R3: Pan-genome Visualization',
+			text: `Create a pan-genome pie chart showing core vs accessory genes.`,
+			command: 'pangenome_plot roary_results/gene_presence_absence.csv -o r_results/',
+			explanation: 'ggplot2 creates pie charts showing the proportion of core, soft-core, shell, and cloud genes.',
+			requiredDir: dataDir,
+			parameters: [
+				{ name: 'gene_presence_absence.csv', desc: 'Roary output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R4: Generate Investigation Report',
+			text: `Compile all results into an HTML report.`,
+			command: 'generate_report -o r_results/outbreak_report.html',
+			explanation: 'RMarkdown compiles phylogenetic, AMR, and epidemiological data into a comprehensive report.',
+			requiredDir: dataDir,
+			parameters: [
+				{ name: '-o', desc: 'Output HTML file' }
+			]
+		}
+	];
+}
+
+function createPhase5Wastewater(): StorylineSection[] {
+	return [
+		{
+			type: 'phase',
+			title: 'Phase 5: R Visualization & Reporting',
+			text: 'Create publication-ready figures focusing on plasmid AMR spread.',
+			phase: 5
+		},
+		{
+			type: 'context',
+			text: `For environmental AMR surveillance, visualization is critical:\n\n• **Circular plasmid maps** - Show mcr gene location and transfer potential\n• **AMR heatmaps** - Compare resistance across treatment stages\n• **Phylogenetic trees** - Track strain relationships\n• **Reports** - Document findings for regulatory agencies`
+		},
+		{
+			type: 'task',
+			title: 'Step R1: Phylogenetic Tree Visualization',
+			text: `Create a phylogenetic tree of mcr-positive isolates.`,
+			command: 'ggtree iqtree_results/core_snps.treefile -o r_results/',
+			explanation: 'ggtree visualizes evolutionary relationships between resistant isolates.',
+			requiredDir: '/data/wastewater_surveillance',
+			parameters: [
+				{ name: 'treefile', desc: 'Input Newick tree' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R2: AMR Gene Heatmap',
+			text: `Generate a heatmap comparing resistance profiles.`,
+			command: 'amr_heatmap abricate_results/amr_summary.tsv -o r_results/',
+			explanation: 'Compare AMR profiles between influent and effluent isolates.',
+			requiredDir: '/data/wastewater_surveillance',
+			parameters: [
+				{ name: 'amr_summary.tsv', desc: 'ABRicate output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R3: Circular Plasmid Map',
+			text: `Create circular maps of resistance plasmids.`,
+			command: 'plasmid_circular mob_recon_results/plasmid_report.tsv -o r_results/',
+			explanation: 'circlize creates circular genome plots showing AMR genes on plasmids.',
+			requiredDir: '/data/wastewater_surveillance',
+			parameters: [
+				{ name: 'plasmid_report.tsv', desc: 'MOB-recon plasmid data' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R4: Pan-genome Analysis Plot',
+			text: `Visualize the pan-genome composition.`,
+			command: 'pangenome_plot roary_results/gene_presence_absence.csv -o r_results/',
+			explanation: 'Show core vs accessory genome content across isolates.',
+			requiredDir: '/data/wastewater_surveillance',
+			parameters: [
+				{ name: 'gene_presence_absence.csv', desc: 'Roary output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R5: Generate Surveillance Report',
+			text: `Compile findings into a regulatory report.`,
+			command: 'generate_report -o r_results/outbreak_report.html',
+			explanation: 'RMarkdown generates a comprehensive environmental surveillance report.',
+			requiredDir: '/data/wastewater_surveillance',
+			parameters: [
+				{ name: '-o', desc: 'Output HTML file' }
+			]
+		}
+	];
+}
+
+function createPhase5Clinical(): StorylineSection[] {
+	return [
+		{
+			type: 'phase',
+			title: 'Phase 5: R Visualization & Reporting',
+			text: 'Generate clinical reports and methylation analysis.',
+			phase: 5
+		},
+		{
+			type: 'context',
+			text: `Clinical diagnostics benefit from rapid visualization:\n\n• **AMR heatmaps** - Quick resistance profile overview\n• **Methylation analysis** - Nanopore-detected DNA modifications\n• **Phylogenetic trees** - Outbreak cluster visualization\n• **Clinical reports** - Actionable summaries for care teams`
+		},
+		{
+			type: 'task',
+			title: 'Step R1: Phylogenetic Tree',
+			text: `Visualize relationships with other clinical isolates.`,
+			command: 'ggtree iqtree_results/core_snps.treefile -o r_results/',
+			explanation: 'ggtree shows phylogenetic relationships with outbreak annotations.',
+			requiredDir: '/data/clinical_samples',
+			parameters: [
+				{ name: 'treefile', desc: 'Input Newick tree' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R2: AMR Gene Heatmap',
+			text: `Generate an AMR profile heatmap.`,
+			command: 'amr_heatmap abricate_results/amr_summary.tsv -o r_results/',
+			explanation: 'Visualize resistance gene presence for antibiotic guidance.',
+			requiredDir: '/data/clinical_samples',
+			parameters: [
+				{ name: 'amr_summary.tsv', desc: 'ABRicate output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R3: Methylation Analysis',
+			text: `Visualize DNA methylation patterns from Nanopore data.`,
+			command: 'methylation_plot methylation_results/pileup.bed -o r_results/',
+			explanation: 'karyoploteR creates methylation density plots along the genome.',
+			requiredDir: '/data/clinical_samples',
+			parameters: [
+				{ name: 'pileup.bed', desc: 'Methylation pileup from modkit' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R4: Generate Clinical Report',
+			text: `Compile a clinical summary report.`,
+			command: 'generate_report -o r_results/outbreak_report.html',
+			explanation: 'RMarkdown generates a clinical report for the care team.',
+			requiredDir: '/data/clinical_samples',
+			parameters: [
+				{ name: '-o', desc: 'Output HTML file' }
+			]
+		}
+	];
+}
+
+function createPhase5Fish(): StorylineSection[] {
+	return [
+		{
+			type: 'phase',
+			title: 'Phase 5: R Visualization & Reporting',
+			text: 'Analyze environmental correlations and generate reports.',
+			phase: 5
+		},
+		{
+			type: 'context',
+			text: `Fish mortality investigations benefit from:\n\n• **Temperature-virulence correlation** - Link environmental factors to disease\n• **AMR heatmaps** - Track resistance patterns\n• **Phylogenetic trees** - Identify outbreak clusters\n• **Reports** - Document findings for aquaculture management`
+		},
+		{
+			type: 'task',
+			title: 'Step R1: Phylogenetic Tree',
+			text: `Visualize strain relationships across facilities.`,
+			command: 'ggtree iqtree_results/core_snps.treefile -o r_results/',
+			explanation: 'ggtree shows evolutionary relationships between isolates.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: 'treefile', desc: 'Input Newick tree' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R2: AMR Gene Heatmap',
+			text: `Generate an AMR profile heatmap.`,
+			command: 'amr_heatmap abricate_results/amr_summary.tsv -o r_results/',
+			explanation: 'pheatmap visualizes resistance patterns across facilities.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: 'amr_summary.tsv', desc: 'ABRicate output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R3: Temperature-Virulence Correlation',
+			text: `Analyze the relationship between water temperature and virulence.`,
+			command: 'temp_correlation virulence_data.csv environmental_data.csv -o r_results/',
+			explanation: 'ggpubr creates scatter plots showing temperature vs mortality correlation.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: 'virulence_data.csv', desc: 'Virulence gene expression data' },
+				{ name: 'environmental_data.csv', desc: 'Water temperature data' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R4: Pan-genome Plot',
+			text: `Visualize the pan-genome across isolates.`,
+			command: 'pangenome_plot roary_results/gene_presence_absence.csv -o r_results/',
+			explanation: 'ggplot2 creates pie charts of core vs accessory genes.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: 'gene_presence_absence.csv', desc: 'Roary output file' },
+				{ name: '-o r_results/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step R5: Generate Investigation Report',
+			text: `Compile findings into a comprehensive report.`,
+			command: 'generate_report -o r_results/outbreak_report.html',
+			explanation: 'RMarkdown generates a report for aquaculture management.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '-o', desc: 'Output HTML file' }
+			]
 		}
 	];
 }
@@ -1048,7 +1306,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
 		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'integron_finder', 'isescan'],
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'integron_finder', 'isescan', 'ggtree', 'amr_heatmap', 'pangenome_plot', 'generate_report'],
 		sections: [
 			{
 				type: 'intro',
@@ -1067,7 +1325,7 @@ export const storylines: Record<string, Storyline> = {
 			...createIlluminaPhase3Sections(),
 			...createIlluminaPhase4Sections(),
 			...createHospitalAdditionalTools(),
-			...createPhase5Placeholder(),
+			...createPhase5RVisualization(),
 			{
 				type: 'complete',
 				title: 'Analysis Complete',
@@ -1083,7 +1341,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
 		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder'],
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder', 'ggtree', 'amr_heatmap', 'pangenome_plot', 'generate_report'],
 		sections: [
 			{
 				type: 'intro',
@@ -1109,7 +1367,7 @@ export const storylines: Record<string, Storyline> = {
 			...createIlluminaPhase3Sections(),
 			...createIlluminaPhase4Sections(),
 			...createPlantAdditionalTools(),
-			...createPhase5Placeholder(),
+			...createPhase5RVisualization(),
 			{
 				type: 'complete',
 				title: 'Analysis Complete',
@@ -1125,7 +1383,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
 		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder', 'NanoPlot', 'filtlong'],
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder', 'NanoPlot', 'filtlong', 'ggtree', 'amr_heatmap', 'temp_correlation', 'pangenome_plot', 'generate_report'],
 		sections: [
 			{
 				type: 'intro',
@@ -1403,7 +1661,7 @@ export const storylines: Record<string, Storyline> = {
 					{ name: '-nt AUTO', desc: 'Auto-detect threads' }
 				]
 			},
-			...createPhase5Placeholder(),
+			...createPhase5Fish(),
 			{
 				type: 'complete',
 				title: 'Analysis Complete (Preliminary)',
@@ -1419,7 +1677,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
 		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'virulencefinder', 'integron_finder'],
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'virulencefinder', 'integron_finder', 'ggtree', 'amr_heatmap', 'pangenome_plot', 'generate_report'],
 		sections: [
 			{
 				type: 'intro',
@@ -1438,7 +1696,7 @@ export const storylines: Record<string, Storyline> = {
 			...createIlluminaPhase3Sections(),
 			...createIlluminaPhase4Sections(),
 			...createFoodborneAdditionalTools(),
-			...createPhase5Placeholder(),
+			...createPhase5RVisualization(),
 			{
 				type: 'complete',
 				title: 'Analysis Complete',
@@ -1457,7 +1715,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'pacbio',
 		technologyLabel: 'Long Read (PacBio HiFi)',
 		dataDir: '/data/wastewater_surveillance',
-		toolsUsed: ['seqkit', 'NanoPlot', 'filtlong', 'flye', 'medaka', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'isescan', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder'],
+		toolsUsed: ['seqkit', 'NanoPlot', 'filtlong', 'flye', 'medaka', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'isescan', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'ggtree', 'amr_heatmap', 'plasmid_circular', 'pangenome_plot', 'generate_report'],
 		sections: [
 			{
 				type: 'intro',
@@ -1517,7 +1775,7 @@ export const storylines: Record<string, Storyline> = {
 				]
 			},
 			...createLongReadPhase4Sections('/data/wastewater_surveillance'),
-			...createPhase5Placeholder(),
+			...createPhase5Wastewater(),
 			{
 				type: 'complete',
 				title: 'Analysis Complete',
@@ -1533,7 +1791,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'nanopore',
 		technologyLabel: 'Long Read (Oxford Nanopore)',
 		dataDir: '/data/clinical_samples',
-		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit'],
+		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit', 'ggtree', 'amr_heatmap', 'methylation_plot', 'generate_report'],
 		sections: [
 			{
 				type: 'intro',
@@ -1624,7 +1882,7 @@ export const storylines: Record<string, Storyline> = {
 					{ name: '-o clinical_report/', desc: 'Output directory' }
 				]
 			},
-			...createPhase5Placeholder(),
+			...createPhase5Clinical(),
 			{
 				type: 'complete',
 				title: 'Analysis Complete',
