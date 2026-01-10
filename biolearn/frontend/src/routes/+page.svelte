@@ -298,6 +298,25 @@
 </div>
 
 <style>
+	/* Page-level scrollbar */
+	:global(html) {
+		scrollbar-width: thin;
+		scrollbar-color: rgb(100 116 139) rgb(30 41 59);
+	}
+	:global(body)::-webkit-scrollbar {
+		width: 10px;
+	}
+	:global(body)::-webkit-scrollbar-track {
+		background: rgb(30 41 59);
+	}
+	:global(body)::-webkit-scrollbar-thumb {
+		background: rgb(100 116 139);
+		border-radius: 5px;
+	}
+	:global(body)::-webkit-scrollbar-thumb:hover {
+		background: rgb(148 163 184);
+	}
+
 	/* Custom scrollbar for storylines dropdown */
 	.storyline-scroll::-webkit-scrollbar {
 		width: 8px;
