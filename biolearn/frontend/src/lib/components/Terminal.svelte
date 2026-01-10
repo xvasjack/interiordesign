@@ -2165,7 +2165,7 @@ blaTEM-1            1         1         1         1
 				chartData: {
 					title: 'AMR Gene Presence/Absence',
 					type: 'heatmap',
-					genes: ['blaCTX-M-15', 'tet(A)', 'blaSHV-12', 'aac(6\\')-Ib', 'sul1', 'dfrA17', 'qnrS1', 'blaTEM-1'],
+					genes: ['blaCTX-M-15', 'tet(A)', 'blaSHV-12', "aac(6')-Ib", 'sul1', 'dfrA17', 'qnrS1', 'blaTEM-1'],
 					samples: ['sample_01', 'sample_02', 'sample_03', 'reference'],
 					matrix: [[1,1,1,0], [1,1,0,0], [0,1,1,0], [1,1,1,0], [1,0,1,0], [1,1,0,0], [0,0,1,0], [1,1,1,1]]
 				},
