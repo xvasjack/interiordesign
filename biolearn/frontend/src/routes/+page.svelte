@@ -60,7 +60,26 @@
 			title: 'Amplicon Bacteria',
 			description: '16S rRNA gene sequencing for microbiome analysis',
 			icon: '🦠',
-			comingSoon: true
+			storylines: [
+				{
+					id: 'gut',
+					title: 'Gut Microbiome Study',
+					description: 'Compare IBD patients vs healthy controls using 16S sequencing',
+					technologyLabel: 'Short Read (Illumina)'
+				},
+				{
+					id: 'soil',
+					title: 'Beneficial Soil Bacteria',
+					description: 'Find plant growth-promoting bacteria in compost samples',
+					technologyLabel: 'Short Read (Illumina)'
+				},
+				{
+					id: 'water',
+					title: 'Water Contamination',
+					description: 'Track fecal contamination sources in water supply',
+					technologyLabel: 'Short Read (Illumina)'
+				}
+			]
 		},
 		{
 			id: 'rna-seq',
