@@ -151,7 +151,7 @@
 					<!-- Storylines Dropdown -->
 					{#if selectedMode?.id === mode.id && mode.storylines}
 						<div class="absolute left-0 right-0 top-full z-10 mt-2 overflow-hidden rounded-xl border border-slate-700 bg-slate-800 shadow-2xl">
-							<div class="storyline-scroll p-2 max-h-72 overflow-y-auto">
+							<div class="storyline-scroll p-2 max-h-60 overflow-y-auto">
 								<p class="mb-2 px-3 py-2 text-xs font-medium uppercase tracking-wider text-slate-500">
 									Choose a Storyline
 								</p>
@@ -300,22 +300,23 @@
 <style>
 	/* Custom scrollbar for storylines dropdown */
 	.storyline-scroll::-webkit-scrollbar {
-		width: 6px;
+		width: 8px;
 	}
 	.storyline-scroll::-webkit-scrollbar-track {
-		background: rgb(30 41 59 / 0.5);
-		border-radius: 3px;
+		background: rgb(51 65 85);
+		border-radius: 4px;
+		margin: 4px;
 	}
 	.storyline-scroll::-webkit-scrollbar-thumb {
-		background: rgb(71 85 105);
-		border-radius: 3px;
+		background: rgb(100 116 139);
+		border-radius: 4px;
 	}
 	.storyline-scroll::-webkit-scrollbar-thumb:hover {
-		background: rgb(100 116 139);
+		background: rgb(148 163 184);
 	}
 	/* Firefox */
 	.storyline-scroll {
 		scrollbar-width: thin;
-		scrollbar-color: rgb(71 85 105) rgb(30 41 59 / 0.5);
+		scrollbar-color: rgb(100 116 139) rgb(51 65 85);
 	}
 </style>
