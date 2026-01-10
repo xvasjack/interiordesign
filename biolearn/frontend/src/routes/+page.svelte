@@ -191,63 +191,61 @@
 
 		<!-- Generating PDF Report Section -->
 		<div class="mt-16">
-			<div class="rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-800/30 p-8">
-				<div class="flex items-start gap-6">
-					<div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 text-3xl">
-						📄
+			<div class="mb-6 text-center">
+				<h3 class="mb-2 text-2xl font-bold text-white">Generating PDF Reports with R</h3>
+				<p class="text-slate-400">
+					Learn how to create publication-ready PDF reports from your bioinformatics analysis. Choose a template below.
+				</p>
+			</div>
+
+			<div class="grid gap-6 md:grid-cols-3">
+				<!-- WGS Bacteria Report -->
+				<a href="/reports/wgs-bacteria" class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-6 transition-all hover:border-emerald-500/50 hover:bg-slate-800/50">
+					<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10 text-2xl">
+						🧬
 					</div>
-					<div class="flex-1">
-						<h3 class="mb-2 text-xl font-semibold text-white">Generating PDF Reports with R</h3>
-						<p class="mb-4 text-slate-400">
-							Learn how to create publication-ready PDF reports from your bioinformatics analysis using R and RMarkdown.
-						</p>
-
-						<div class="space-y-4">
-							<div class="rounded-lg bg-slate-900/50 p-4">
-								<h4 class="mb-2 text-sm font-medium text-emerald-400">1. Install Required Packages</h4>
-								<pre class="overflow-x-auto text-sm text-slate-300"><code># In R console
-install.packages(c("rmarkdown", "knitr", "ggplot2", "pheatmap", "ggtree"))</code></pre>
-							</div>
-
-							<div class="rounded-lg bg-slate-900/50 p-4">
-								<h4 class="mb-2 text-sm font-medium text-emerald-400">2. Create RMarkdown Document (report.Rmd)</h4>
-								<pre class="overflow-x-auto text-sm text-slate-300"><code>---
-title: "WGS Analysis Report"
-output: pdf_document
----
-
-```&#123;r setup, include=FALSE&#125;
-library(ggplot2)
-library(pheatmap)
-```
-
-## Assembly Statistics
-```&#123;r&#125;
-# Read QUAST results
-stats &lt;- read.csv("quast_results/report.tsv", sep="\t")
-knitr::kable(stats)
-```
-
-## AMR Gene Heatmap
-```&#123;r&#125;
-amr &lt;- read.csv("abricate_results/summary.tsv", sep="\t")
-pheatmap(amr_matrix, main="AMR Gene Presence")
-```</code></pre>
-							</div>
-
-							<div class="rounded-lg bg-slate-900/50 p-4">
-								<h4 class="mb-2 text-sm font-medium text-emerald-400">3. Generate PDF</h4>
-								<pre class="overflow-x-auto text-sm text-slate-300"><code># In R console or terminal
-rmarkdown::render("report.Rmd", output_format = "pdf_document")</code></pre>
-							</div>
-						</div>
-
-						<p class="mt-4 text-sm text-slate-500">
-							<span class="text-yellow-400">Tip:</span> You'll need LaTeX installed for PDF output.
-							Use <code class="rounded bg-slate-700 px-1">tinytex::install_tinytex()</code> in R for a lightweight installation.
-						</p>
+					<h4 class="mb-2 font-semibold text-white group-hover:text-emerald-400">WGS Bacteria Report</h4>
+					<p class="mb-3 text-sm text-slate-400">
+						Assembly stats, AMR heatmaps, phylogenetic trees, and MLST results for bacterial genome analysis.
+					</p>
+					<div class="flex flex-wrap gap-2">
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">QUAST</span>
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">ABRicate</span>
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">ggtree</span>
 					</div>
-				</div>
+				</a>
+
+				<!-- Amplicon Sequencing Report -->
+				<a href="/reports/amplicon" class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-6 transition-all hover:border-purple-500/50 hover:bg-slate-800/50">
+					<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 text-2xl">
+						🦠
+					</div>
+					<h4 class="mb-2 font-semibold text-white group-hover:text-purple-400">16S/Amplicon Report</h4>
+					<p class="mb-3 text-sm text-slate-400">
+						Alpha/beta diversity, taxonomic bar plots, and differential abundance for microbiome studies.
+					</p>
+					<div class="flex flex-wrap gap-2">
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">phyloseq</span>
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">vegan</span>
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">DESeq2</span>
+					</div>
+				</a>
+
+				<!-- RNA-seq Report -->
+				<a href="/reports/rnaseq" class="group rounded-xl border border-slate-700/50 bg-slate-800/30 p-6 transition-all hover:border-blue-500/50 hover:bg-slate-800/50">
+					<div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 text-2xl">
+						📊
+					</div>
+					<h4 class="mb-2 font-semibold text-white group-hover:text-blue-400">RNA-Seq Report</h4>
+					<p class="mb-3 text-sm text-slate-400">
+						Differential expression, volcano plots, heatmaps, and pathway enrichment analysis.
+					</p>
+					<div class="flex flex-wrap gap-2">
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">DESeq2</span>
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">EnhancedVolcano</span>
+						<span class="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-300">clusterProfiler</span>
+					</div>
+				</a>
 			</div>
 		</div>
 
