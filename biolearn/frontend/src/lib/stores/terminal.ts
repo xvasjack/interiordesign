@@ -201,15 +201,7 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'flye': { min: 180, max: 360 },  // 3-6 minutes
 	'medaka_consensus': { min: 120, max: 240 },  // 2-4 minutes
 	'porechop': { min: 20, max: 45 },
-	'kraken2': { min: 30, max: 60 },
-	// R visualization tools
-	'ggtree': { min: 15, max: 30 },
-	'amr_heatmap': { min: 10, max: 20 },
-	'pangenome_plot': { min: 15, max: 25 },
-	'generate_report': { min: 30, max: 60 },
-	'plasmid_circular': { min: 20, max: 35 },
-	'methylation_plot': { min: 25, max: 45 },
-	'temp_correlation': { min: 15, max: 30 }
+	'kraken2': { min: 30, max: 60 }
 };
 
 // Get random execution time for a tool
@@ -240,8 +232,5 @@ export const bioTools = new Set([
 	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
 	'snippy', 'roary', 'iqtree', 'gubbins',
 	// Long-read tools
-	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2',
-	// R visualization tools
-	'ggtree', 'amr_heatmap', 'pangenome_plot', 'generate_report',
-	'plasmid_circular', 'methylation_plot', 'temp_correlation'
+	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2'
 ]);

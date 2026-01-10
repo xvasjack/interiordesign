@@ -189,6 +189,68 @@
 			{/each}
 		</div>
 
+		<!-- Generating PDF Report Section -->
+		<div class="mt-16">
+			<div class="rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-800/30 p-8">
+				<div class="flex items-start gap-6">
+					<div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 text-3xl">
+						📄
+					</div>
+					<div class="flex-1">
+						<h3 class="mb-2 text-xl font-semibold text-white">Generating PDF Reports with R</h3>
+						<p class="mb-4 text-slate-400">
+							Learn how to create publication-ready PDF reports from your bioinformatics analysis using R and RMarkdown.
+						</p>
+
+						<div class="space-y-4">
+							<div class="rounded-lg bg-slate-900/50 p-4">
+								<h4 class="mb-2 text-sm font-medium text-emerald-400">1. Install Required Packages</h4>
+								<pre class="overflow-x-auto text-sm text-slate-300"><code># In R console
+install.packages(c("rmarkdown", "knitr", "ggplot2", "pheatmap", "ggtree"))</code></pre>
+							</div>
+
+							<div class="rounded-lg bg-slate-900/50 p-4">
+								<h4 class="mb-2 text-sm font-medium text-emerald-400">2. Create RMarkdown Document (report.Rmd)</h4>
+								<pre class="overflow-x-auto text-sm text-slate-300"><code>---
+title: "WGS Analysis Report"
+output: pdf_document
+---
+
+```&#123;r setup, include=FALSE&#125;
+library(ggplot2)
+library(pheatmap)
+```
+
+## Assembly Statistics
+```&#123;r&#125;
+# Read QUAST results
+stats &lt;- read.csv("quast_results/report.tsv", sep="\t")
+knitr::kable(stats)
+```
+
+## AMR Gene Heatmap
+```&#123;r&#125;
+amr &lt;- read.csv("abricate_results/summary.tsv", sep="\t")
+pheatmap(amr_matrix, main="AMR Gene Presence")
+```</code></pre>
+							</div>
+
+							<div class="rounded-lg bg-slate-900/50 p-4">
+								<h4 class="mb-2 text-sm font-medium text-emerald-400">3. Generate PDF</h4>
+								<pre class="overflow-x-auto text-sm text-slate-300"><code># In R console or terminal
+rmarkdown::render("report.Rmd", output_format = "pdf_document")</code></pre>
+							</div>
+						</div>
+
+						<p class="mt-4 text-sm text-slate-500">
+							<span class="text-yellow-400">Tip:</span> You'll need LaTeX installed for PDF output.
+							Use <code class="rounded bg-slate-700 px-1">tinytex::install_tinytex()</code> in R for a lightweight installation.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Features Section -->
 		<div class="mt-16 grid gap-8 md:grid-cols-3">
 			<div class="rounded-xl border border-slate-700/50 bg-slate-800/30 p-6">
