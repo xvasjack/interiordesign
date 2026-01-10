@@ -82,11 +82,11 @@ This report presents differential gene expression analysis from RNA-seq data, co
 
 ```&#123;r load-data&#125;
 # Load count matrix and sample information
-# counts <- read.csv("counts_matrix.csv", row.names = 1)
-# coldata <- read.csv("sample_info.csv", row.names = 1)
+# counts &lt;- read.csv("counts_matrix.csv", row.names = 1)
+# coldata &lt;- read.csv("sample_info.csv", row.names = 1)
 
 # Example: Create DESeq2 object
-# dds <- DESeqDataSetFromMatrix(countData = counts,
+# dds &lt;- DESeqDataSetFromMatrix(countData = counts,
 #                               colData = coldata,
 #                               design = ~ condition)
 ```
@@ -95,14 +95,14 @@ This report presents differential gene expression analysis from RNA-seq data, co
 
 ```&#123;r sample-summary&#125;
 # Display sample information
-coldata %>%
-  group_by(condition) %>%
+coldata %&gt;%
+  group_by(condition) %&gt;%
   summarise(
     n = n(),
     `Total Reads (M)` = mean(total_reads / 1e6),
     `Mapped %` = mean(mapped_percent)
-  ) %>%
-  kable(caption = "Sample Summary by Condition") %>%
+  ) %&gt;%
+  kable(caption = "Sample Summary by Condition") %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -112,11 +112,11 @@ coldata %>%
 
 ```&#123;r library-size, fig.width=10, fig.height=5&#125;
 # Plot library sizes
-lib_sizes <- data.frame(
+lib_sizes &lt;- data.frame(
   Sample = colnames(counts),
   Reads = colSums(counts) / 1e6
 )
-lib_sizes <- merge(lib_sizes, coldata, by.x = "Sample", by.y = "row.names")
+lib_sizes &lt;- merge(lib_sizes, coldata, by.x = "Sample", by.y = "row.names")
 
 ggplot(lib_sizes, aes(x = Sample, y = Reads, fill = condition)) +
   geom_bar(stat = "identity") +
@@ -131,11 +131,11 @@ ggplot(lib_sizes, aes(x = Sample, y = Reads, fill = condition)) +
 
 ```&#123;r pca-plot, fig.width=8, fig.height=6&#125;
 # Variance stabilizing transformation
-vsd <- vst(dds, blind = FALSE)
+vsd &lt;- vst(dds, blind = FALSE)
 
 # PCA
-pcaData <- plotPCA(vsd, intgroup = "condition", returnData = TRUE)
-percentVar <- round(100 * attr(pcaData, "percentVar"))
+pcaData &lt;- plotPCA(vsd, intgroup = "condition", returnData = TRUE)
+percentVar &lt;- round(100 * attr(pcaData, "percentVar"))
 
 ggplot(pcaData, aes(x = PC1, y = PC2, color = condition)) +
   geom_point(size = 4, alpha = 0.8) +
@@ -151,11 +151,11 @@ ggplot(pcaData, aes(x = PC1, y = PC2, color = condition)) +
 
 ```&#123;r correlation-heatmap, fig.width=8, fig.height=8&#125;
 # Sample distance matrix
-sampleDists <- dist(t(assay(vsd)))
-sampleDistMatrix <- as.matrix(sampleDists)
+sampleDists &lt;- dist(t(assay(vsd)))
+sampleDistMatrix &lt;- as.matrix(sampleDists)
 
 # Annotation
-annotation_col <- data.frame(
+annotation_col &lt;- data.frame(
   Condition = coldata$condition,
   row.names = rownames(coldata)
 )
@@ -172,9 +172,9 @@ pheatmap(sampleDistMatrix,
 
 ```&#123;r deseq2-analysis&#125;
 # Run DESeq2
-dds <- DESeq(dds)
-res <- results(dds, contrast = c("condition", "treatment", "control"))
-res <- res[order(res$padj), ]
+dds &lt;- DESeq(dds)
+res &lt;- results(dds, contrast = c("condition", "treatment", "control"))
+res &lt;- res[order(res$padj), ]
 
 # Summary
 summary(res)
@@ -184,15 +184,15 @@ summary(res)
 
 ```&#123;r de-summary&#125;
 # Count significant genes
-sig_up <- sum(res$padj < 0.05 & res$log2FoldChange > 1, na.rm = TRUE)
-sig_down <- sum(res$padj < 0.05 & res$log2FoldChange < -1, na.rm = TRUE)
+sig_up &lt;- sum(res$padj &lt; 0.05 &amp; res$log2FoldChange &gt; 1, na.rm = TRUE)
+sig_down &lt;- sum(res$padj &lt; 0.05 &amp; res$log2FoldChange &lt; -1, na.rm = TRUE)
 
 data.frame(
-  Category = c("Total Genes", "Upregulated (padj<0.05, LFC>1)",
-               "Downregulated (padj<0.05, LFC<-1)", "Not Significant"),
+  Category = c("Total Genes", "Upregulated (padj&lt;0.05, LFC&gt;1)",
+               "Downregulated (padj&lt;0.05, LFC&lt;-1)", "Not Significant"),
   Count = c(nrow(res), sig_up, sig_down, nrow(res) - sig_up - sig_down)
-) %>%
-  kable(caption = "Differential Expression Summary") %>%
+) %&gt;%
+  kable(caption = "Differential Expression Summary") %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -225,22 +225,22 @@ plotMA(res, ylim = c(-5, 5), main = "MA Plot: Log2 Fold Change vs Mean Expressio
 
 ```&#123;r top-genes&#125;
 # Top 20 genes by adjusted p-value
-res_df <- as.data.frame(res) %>%
-  filter(!is.na(padj)) %>%
-  arrange(padj) %>%
+res_df &lt;- as.data.frame(res) %&gt;%
+  filter(!is.na(padj)) %&gt;%
+  arrange(padj) %&gt;%
   head(20)
 
-res_df %>%
-  select(baseMean, log2FoldChange, pvalue, padj) %>%
+res_df %&gt;%
+  select(baseMean, log2FoldChange, pvalue, padj) %&gt;%
   mutate(
     baseMean = round(baseMean, 1),
     log2FoldChange = round(log2FoldChange, 2),
     pvalue = format.pval(pvalue, digits = 2),
     padj = format.pval(padj, digits = 2)
-  ) %>%
+  ) %&gt;%
   kable(caption = "Top 20 Differentially Expressed Genes",
-        col.names = c("Base Mean", "Log2 FC", "P-value", "Adjusted P")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+        col.names = c("Base Mean", "Log2 FC", "P-value", "Adjusted P")) %&gt;%
+  kable_styling(bootstrap_options = c("striped", "hover")) %&gt;%
   scroll_box(height = "400px")
 ```
 
@@ -248,12 +248,12 @@ res_df %>%
 
 ```&#123;r expression-heatmap, fig.width=10, fig.height=12&#125;
 # Select top 50 genes by variance
-topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 50)
-mat <- assay(vsd)[topVarGenes, ]
-mat <- mat - rowMeans(mat)  # Center rows
+topVarGenes &lt;- head(order(rowVars(assay(vsd)), decreasing = TRUE), 50)
+mat &lt;- assay(vsd)[topVarGenes, ]
+mat &lt;- mat - rowMeans(mat)  # Center rows
 
 # Annotation
-annotation_col <- data.frame(
+annotation_col &lt;- data.frame(
   Condition = coldata$condition,
   row.names = rownames(coldata)
 )
@@ -274,18 +274,18 @@ pheatmap(mat,
 
 ```&#123;r go-enrichment, fig.width=10, fig.height=8&#125;
 # Get significant genes
-sig_genes <- rownames(res)[which(res$padj < 0.05 & abs(res$log2FoldChange) > 1)]
+sig_genes &lt;- rownames(res)[which(res$padj &lt; 0.05 &amp; abs(res$log2FoldChange) &gt; 1)]
 
 # Convert to Entrez IDs (assuming rownames are gene symbols)
-entrez_ids <- mapIds(org.Hs.eg.db,
+entrez_ids &lt;- mapIds(org.Hs.eg.db,
                      keys = sig_genes,
                      column = "ENTREZID",
                      keytype = "SYMBOL",
                      multiVals = "first")
-entrez_ids <- na.omit(entrez_ids)
+entrez_ids &lt;- na.omit(entrez_ids)
 
 # GO enrichment
-ego <- enrichGO(gene = entrez_ids,
+ego &lt;- enrichGO(gene = entrez_ids,
                 OrgDb = org.Hs.eg.db,
                 ont = "BP",
                 pAdjustMethod = "BH",
@@ -299,18 +299,18 @@ dotplot(ego, showCategory = 15, title = "GO Biological Process Enrichment")
 ## GO Terms Table
 
 ```&#123;r go-table&#125;
-ego_df <- as.data.frame(ego) %>%
-  head(15) %>%
+ego_df &lt;- as.data.frame(ego) %&gt;%
+  head(15) %&gt;%
   select(Description, GeneRatio, pvalue, p.adjust, Count)
 
-ego_df %>%
+ego_df %&gt;%
   mutate(
     pvalue = format.pval(pvalue, digits = 2),
     p.adjust = format.pval(p.adjust, digits = 2)
-  ) %>%
+  ) %&gt;%
   kable(caption = "Top 15 Enriched GO Terms (Biological Process)",
-        col.names = c("GO Term", "Gene Ratio", "P-value", "Adj. P", "Count")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+        col.names = c("GO Term", "Gene Ratio", "P-value", "Adj. P", "Count")) %&gt;%
+  kable_styling(bootstrap_options = c("striped", "hover")) %&gt;%
   scroll_box(height = "400px")
 ```
 
@@ -318,7 +318,7 @@ ego_df %>%
 
 ```&#123;r kegg-enrichment, fig.width=10, fig.height=8&#125;
 # KEGG enrichment
-ekegg <- enrichKEGG(gene = entrez_ids,
+ekegg &lt;- enrichKEGG(gene = entrez_ids,
                     organism = 'hsa',
                     pvalueCutoff = 0.05)
 
@@ -337,18 +337,18 @@ emapplot(pairwise_termsim(ego), showCategory = 20)
 
 ```&#123;r gene-profiles, fig.width=10, fig.height=6&#125;
 # Plot expression of top 6 genes
-top6 <- rownames(res_df)[1:6]
+top6 &lt;- rownames(res_df)[1:6]
 
 # Get normalized counts
-norm_counts <- counts(dds, normalized = TRUE)
+norm_counts &lt;- counts(dds, normalized = TRUE)
 
 # Prepare data for plotting
-plot_data <- data.frame(
+plot_data &lt;- data.frame(
   Sample = rep(colnames(norm_counts), length(top6)),
   Gene = rep(top6, each = ncol(norm_counts)),
   Expression = as.vector(t(norm_counts[top6, ]))
 )
-plot_data <- merge(plot_data, coldata, by.x = "Sample", by.y = "row.names")
+plot_data &lt;- merge(plot_data, coldata, by.x = "Sample", by.y = "row.names")
 
 ggplot(plot_data, aes(x = condition, y = log2(Expression + 1), fill = condition)) +
   geom_boxplot(alpha = 0.7) +

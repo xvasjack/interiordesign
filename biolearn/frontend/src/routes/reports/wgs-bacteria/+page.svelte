@@ -80,13 +80,13 @@ This report summarizes the whole genome sequencing analysis of bacterial isolate
 
 ```&#123;r quast&#125;
 # Read QUAST results
-quast <- read.delim("quast_results/report.tsv", header = TRUE)
+quast &lt;- read.delim("quast_results/report.tsv", header = TRUE)
 
 # Display key metrics
-quast %>%
-  select(Assembly, `Total.length`, `# contigs`, N50, `GC (%)`) %>%
+quast %&gt;%
+  select(Assembly, `Total.length`, `# contigs`, N50, `GC (%)`) %&gt;%
   kable(col.names = c("Sample", "Total Length (bp)", "Contigs", "N50", "GC%"),
-        caption = "Assembly Statistics") %>%
+        caption = "Assembly Statistics") %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -107,13 +107,13 @@ ggplot(quast, aes(x = Assembly, y = N50 / 1000)) +
 
 ```&#123;r amr-table&#125;
 # Read ABRicate results
-amr <- read.delim("abricate_results/summary.tsv", header = TRUE)
+amr &lt;- read.delim("abricate_results/summary.tsv", header = TRUE)
 
-amr %>%
-  select(FILE, GENE, `%COVERAGE`, `%IDENTITY`, PRODUCT) %>%
+amr %&gt;%
+  select(FILE, GENE, `%COVERAGE`, `%IDENTITY`, PRODUCT) %&gt;%
   kable(col.names = c("Sample", "Gene", "Coverage%", "Identity%", "Product"),
-        caption = "Detected AMR Genes") %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+        caption = "Detected AMR Genes") %&gt;%
+  kable_styling(bootstrap_options = c("striped", "hover")) %&gt;%
   scroll_box(height = "400px")
 ```
 
@@ -121,12 +121,12 @@ amr %>%
 
 ```&#123;r amr-heatmap, fig.width=10, fig.height=8&#125;
 # Create presence/absence matrix
-amr_matrix <- amr %>%
-  mutate(present = 1) %>%
-  select(FILE, GENE, present) %>%
-  distinct() %>%
-  pivot_wider(names_from = GENE, values_from = present, values_fill = 0) %>%
-  column_to_rownames("FILE") %>%
+amr_matrix &lt;- amr %&gt;%
+  mutate(present = 1) %&gt;%
+  select(FILE, GENE, present) %&gt;%
+  distinct() %&gt;%
+  pivot_wider(names_from = GENE, values_from = present, values_fill = 0) %&gt;%
+  column_to_rownames("FILE") %&gt;%
   as.matrix()
 
 # Generate heatmap
@@ -142,12 +142,12 @@ pheatmap(amr_matrix,
 # MLST Results
 
 ```&#123;r mlst&#125;
-mlst <- read.delim("mlst_results/mlst.tsv", header = FALSE,
+mlst &lt;- read.delim("mlst_results/mlst.tsv", header = FALSE,
                    col.names = c("File", "Scheme", "ST", paste0("Allele", 1:7)))
 
-mlst %>%
-  select(File, Scheme, ST) %>%
-  kable(caption = "Multi-Locus Sequence Typing Results") %>%
+mlst %&gt;%
+  select(File, Scheme, ST) %&gt;%
+  kable(caption = "Multi-Locus Sequence Typing Results") %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -155,7 +155,7 @@ mlst %>%
 
 ```&#123;r phylo-tree, fig.width=10, fig.height=8&#125;
 # Read tree file
-tree <- read.tree("iqtree_results/core_snps.treefile")
+tree &lt;- read.tree("iqtree_results/core_snps.treefile")
 
 # Plot with ggtree
 ggtree(tree, layout = "rectangular") +
@@ -170,7 +170,7 @@ ggtree(tree, layout = "rectangular") +
 
 ```&#123;r pangenome, fig.width=8, fig.height=6&#125;
 # Read Roary summary
-pangenome <- data.frame(
+pangenome &lt;- data.frame(
   Category = c("Core", "Soft-core", "Shell", "Cloud"),
   Genes = c(3987, 312, 489, 446)  # Replace with actual values
 )

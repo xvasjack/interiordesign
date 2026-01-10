@@ -79,7 +79,7 @@ This report presents the analysis of 16S rRNA gene sequencing data for microbiom
 
 ```&#123;r load-data&#125;
 # Load phyloseq object (from QIIME2, DADA2, or mothur)
-# ps <- readRDS("phyloseq_object.rds")
+# ps &lt;- readRDS("phyloseq_object.rds")
 
 # Example: Create sample phyloseq for demonstration
 # Replace with your actual data loading code
@@ -89,15 +89,15 @@ This report presents the analysis of 16S rRNA gene sequencing data for microbiom
 
 ```&#123;r sample-summary&#125;
 # Sample data summary
-sample_data(ps) %>%
-  as.data.frame() %>%
-  group_by(Group) %>%
+sample_data(ps) %&gt;%
+  as.data.frame() %&gt;%
+  group_by(Group) %&gt;%
   summarise(
     n = n(),
     `Mean Reads` = mean(TotalReads),
     `SD Reads` = sd(TotalReads)
-  ) %>%
-  kable(caption = "Sample Summary by Group") %>%
+  ) %&gt;%
+  kable(caption = "Sample Summary by Group") %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -109,9 +109,9 @@ Alpha diversity measures the diversity within each sample.
 
 ```&#123;r alpha-diversity, fig.width=10, fig.height=6&#125;
 # Calculate alpha diversity metrics
-alpha_div <- estimate_richness(ps, measures = c("Observed", "Shannon", "Simpson", "Chao1"))
-alpha_div$SampleID <- rownames(alpha_div)
-alpha_div <- merge(alpha_div, sample_data(ps), by.x = "SampleID", by.y = "row.names")
+alpha_div &lt;- estimate_richness(ps, measures = c("Observed", "Shannon", "Simpson", "Chao1"))
+alpha_div$SampleID &lt;- rownames(alpha_div)
+alpha_div &lt;- merge(alpha_div, sample_data(ps), by.x = "SampleID", by.y = "row.names")
 
 # Plot Shannon diversity
 ggplot(alpha_div, aes(x = Group, y = Shannon, fill = Group)) +
@@ -127,15 +127,15 @@ ggplot(alpha_div, aes(x = Group, y = Shannon, fill = Group)) +
 
 ```&#123;r alpha-stats&#125;
 # Kruskal-Wallis test for Shannon diversity
-kruskal_result <- kruskal.test(Shannon ~ Group, data = alpha_div)
+kruskal_result &lt;- kruskal.test(Shannon ~ Group, data = alpha_div)
 
 data.frame(
   Test = "Kruskal-Wallis",
   Metric = "Shannon",
   Statistic = round(kruskal_result$statistic, 3),
   `P-value` = format.pval(kruskal_result$p.value, digits = 3)
-) %>%
-  kable(caption = "Alpha Diversity Statistical Test") %>%
+) %&gt;%
+  kable(caption = "Alpha Diversity Statistical Test") %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -147,10 +147,10 @@ Beta diversity measures the diversity between samples.
 
 ```&#123;r beta-diversity, fig.width=10, fig.height=8&#125;
 # Calculate Bray-Curtis distance
-bray_dist <- phyloseq::distance(ps, method = "bray")
+bray_dist &lt;- phyloseq::distance(ps, method = "bray")
 
 # PCoA ordination
-pcoa <- ordinate(ps, method = "PCoA", distance = bray_dist)
+pcoa &lt;- ordinate(ps, method = "PCoA", distance = bray_dist)
 
 # Plot
 plot_ordination(ps, pcoa, color = "Group") +
@@ -165,11 +165,11 @@ plot_ordination(ps, pcoa, color = "Group") +
 ```&#123;r permanova&#125;
 # PERMANOVA test
 set.seed(123)
-permanova <- adonis2(bray_dist ~ Group, data = as(sample_data(ps), "data.frame"))
+permanova &lt;- adonis2(bray_dist ~ Group, data = as(sample_data(ps), "data.frame"))
 
-permanova %>%
-  as.data.frame() %>%
-  kable(caption = "PERMANOVA Results", digits = 4) %>%
+permanova %&gt;%
+  as.data.frame() %&gt;%
+  kable(caption = "PERMANOVA Results", digits = 4) %&gt;%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
@@ -179,11 +179,11 @@ permanova %>%
 
 ```&#123;r taxonomy-phylum, fig.width=12, fig.height=6&#125;
 # Aggregate to phylum level
-ps_phylum <- tax_glom(ps, taxrank = "Phylum")
-ps_phylum_rel <- transform_sample_counts(ps_phylum, function(x) x / sum(x) * 100)
+ps_phylum &lt;- tax_glom(ps, taxrank = "Phylum")
+ps_phylum_rel &lt;- transform_sample_counts(ps_phylum, function(x) x / sum(x) * 100)
 
 # Melt for plotting
-phylum_df <- psmelt(ps_phylum_rel)
+phylum_df &lt;- psmelt(ps_phylum_rel)
 
 # Plot
 ggplot(phylum_df, aes(x = Sample, y = Abundance, fill = Phylum)) +
@@ -200,12 +200,12 @@ ggplot(phylum_df, aes(x = Sample, y = Abundance, fill = Phylum)) +
 
 ```&#123;r taxonomy-heatmap, fig.width=12, fig.height=10&#125;
 # Top 20 genera
-ps_genus <- tax_glom(ps, taxrank = "Genus")
-top20 <- names(sort(taxa_sums(ps_genus), decreasing = TRUE)[1:20])
-ps_top20 <- prune_taxa(top20, ps_genus)
+ps_genus &lt;- tax_glom(ps, taxrank = "Genus")
+top20 &lt;- names(sort(taxa_sums(ps_genus), decreasing = TRUE)[1:20])
+ps_top20 &lt;- prune_taxa(top20, ps_genus)
 
 # Transform to relative abundance
-ps_top20_rel <- transform_sample_counts(ps_top20, function(x) x / sum(x) * 100)
+ps_top20_rel &lt;- transform_sample_counts(ps_top20, function(x) x / sum(x) * 100)
 
 # Create heatmap
 plot_heatmap(ps_top20_rel, taxa.label = "Genus", sample.label = "SampleID",
@@ -221,35 +221,35 @@ plot_heatmap(ps_top20_rel, taxa.label = "Genus", sample.label = "SampleID",
 library(DESeq2)
 
 # Convert to DESeq2 object
-diagdds <- phyloseq_to_deseq2(ps, ~ Group)
-diagdds <- DESeq(diagdds, test = "Wald", fitType = "parametric")
+diagdds &lt;- phyloseq_to_deseq2(ps, ~ Group)
+diagdds &lt;- DESeq(diagdds, test = "Wald", fitType = "parametric")
 
 # Get results
-res <- results(diagdds, cooksCutoff = FALSE)
-res_df <- as.data.frame(res) %>%
-  filter(!is.na(padj)) %>%
-  arrange(padj) %>%
+res &lt;- results(diagdds, cooksCutoff = FALSE)
+res_df &lt;- as.data.frame(res) %&gt;%
+  filter(!is.na(padj)) %&gt;%
+  arrange(padj) %&gt;%
   head(20)
 
-res_df %>%
-  select(baseMean, log2FoldChange, pvalue, padj) %>%
+res_df %&gt;%
+  select(baseMean, log2FoldChange, pvalue, padj) %&gt;%
   kable(caption = "Top Differentially Abundant Taxa (DESeq2)",
-        digits = c(1, 2, 4, 4)) %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+        digits = c(1, 2, 4, 4)) %&gt;%
+  kable_styling(bootstrap_options = c("striped", "hover")) %&gt;%
   scroll_box(height = "400px")
 ```
 
 # Core Microbiome
 
 ```&#123;r core-microbiome, fig.width=10, fig.height=6&#125;
-# Identify core microbiome (present in >50% of samples at >0.1% abundance)
-core_taxa <- core_members(ps, detection = 0.001, prevalence = 0.5)
+# Identify core microbiome (present in &gt;50% of samples at &gt;0.1% abundance)
+core_taxa &lt;- core_members(ps, detection = 0.001, prevalence = 0.5)
 
 cat("Number of core taxa:", length(core_taxa), "\n")
 
 # Plot core abundance
-core_ps <- prune_taxa(core_taxa, ps)
-core_ps_rel <- transform_sample_counts(core_ps, function(x) x / sum(x) * 100)
+core_ps &lt;- prune_taxa(core_taxa, ps)
+core_ps_rel &lt;- transform_sample_counts(core_ps, function(x) x / sum(x) * 100)
 
 plot_bar(core_ps_rel, fill = "Genus") +
   labs(title = "Core Microbiome Composition",
