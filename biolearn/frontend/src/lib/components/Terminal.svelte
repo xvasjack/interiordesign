@@ -45,6 +45,27 @@
 		'/data/clinical_samples': [
 			'sample_01_nanopore.fastq.gz',
 			'reference.gbk'
+		],
+		// Amplicon/16S data directories
+		'/data/gut_microbiome': [
+			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz',
+			'IBD_02_R1.fastq.gz', 'IBD_02_R2.fastq.gz',
+			'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz',
+			'Control_02_R1.fastq.gz', 'Control_02_R2.fastq.gz',
+			'manifest.tsv', 'metadata.tsv'
+		],
+		'/data/soil_microbiome': [
+			'Thermo_01_R1.fastq.gz', 'Thermo_01_R2.fastq.gz',
+			'Vermi_01_R1.fastq.gz', 'Vermi_01_R2.fastq.gz',
+			'Bokashi_01_R1.fastq.gz', 'Bokashi_01_R2.fastq.gz',
+			'manifest.tsv', 'metadata.tsv'
+		],
+		'/data/water_samples': [
+			'Municipal_R1.fastq.gz', 'Municipal_R2.fastq.gz',
+			'Well_R1.fastq.gz', 'Well_R2.fastq.gz',
+			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz',
+			'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz',
+			'manifest.tsv', 'metadata.tsv', 'source-metadata.tsv'
 		]
 	};
 
@@ -265,6 +286,73 @@
 		'kraken2': {
 			'/data/clinical_samples': [
 				'kraken_report.txt', 'kraken_output.txt'
+			]
+		},
+		// Amplicon/16S tools
+		'cutadapt': {
+			'/data/gut_microbiome': ['trimmed/'],
+			'/data/gut_microbiome/trimmed': [
+				'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz',
+				'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz'
+			],
+			'/data/soil_microbiome': ['trimmed/'],
+			'/data/soil_microbiome/trimmed': [
+				'Thermo_01_R1.fastq.gz', 'Thermo_01_R2.fastq.gz',
+				'Vermi_01_R1.fastq.gz', 'Vermi_01_R2.fastq.gz'
+			],
+			'/data/water_samples': ['trimmed/'],
+			'/data/water_samples/trimmed': [
+				'Municipal_R1.fastq.gz', 'Municipal_R2.fastq.gz',
+				'Well_R1.fastq.gz', 'Well_R2.fastq.gz'
+			]
+		},
+		'qiime': {
+			'/data/gut_microbiome': [
+				'demux.qza', 'demux.qzv', 'table.qza', 'rep-seqs.qza',
+				'denoising-stats.qza', 'taxonomy.qza', 'rooted-tree.qza',
+				'table-filtered.qza', 'core-metrics-results/'
+			],
+			'/data/gut_microbiome/core-metrics-results': [
+				'shannon_vector.qza', 'bray_curtis_distance_matrix.qza',
+				'bray_curtis_pcoa_results.qza', 'weighted_unifrac_pcoa_results.qza'
+			],
+			'/data/soil_microbiome': [
+				'demux.qza', 'demux.qzv', 'table.qza', 'rep-seqs.qza',
+				'denoising-stats.qza', 'taxonomy.qza', 'rooted-tree.qza',
+				'table-filtered.qza', 'core-metrics-results/', 'pgpb-table.qza'
+			],
+			'/data/soil_microbiome/core-metrics-results': [
+				'shannon_vector.qza', 'bray_curtis_distance_matrix.qza',
+				'bray_curtis_pcoa_results.qza', 'weighted_unifrac_pcoa_results.qza'
+			],
+			'/data/water_samples': [
+				'demux.qza', 'demux.qzv', 'table.qza', 'rep-seqs.qza',
+				'denoising-stats.qza', 'taxonomy.qza', 'rooted-tree.qza',
+				'table-filtered.qza', 'core-metrics-results/', 'fecal-indicators.qza', 'pathogens.qza'
+			],
+			'/data/water_samples/core-metrics-results': [
+				'shannon_vector.qza', 'bray_curtis_distance_matrix.qza',
+				'bray_curtis_pcoa_results.qza', 'weighted_unifrac_pcoa_results.qza'
+			]
+		},
+		'biom': {
+			'/data/gut_microbiome': ['exported/'],
+			'/data/gut_microbiome/exported': [
+				'feature-table.biom', 'feature-table.tsv', 'taxonomy.tsv'
+			],
+			'/data/soil_microbiome': ['exported/'],
+			'/data/soil_microbiome/exported': [
+				'feature-table.biom', 'feature-table.tsv', 'taxonomy.tsv'
+			],
+			'/data/water_samples': ['exported/'],
+			'/data/water_samples/exported': [
+				'feature-table.biom', 'feature-table.tsv', 'taxonomy.tsv'
+			]
+		},
+		'sourcetracker2': {
+			'/data/water_samples': ['sourcetracker_results/'],
+			'/data/water_samples/sourcetracker_results': [
+				'mixing_proportions.txt', 'full_results.txt'
 			]
 		}
 	};
@@ -1992,6 +2080,198 @@ Loading assembly graph: assembly.gfa
 					{ name: 'kraken_report.txt', type: 'txt', size: '45 KB' },
 					{ name: 'kraken_output.txt', type: 'txt', size: '12 MB' }
 				]
+			},
+			// Amplicon/16S tools
+			'cutadapt': {
+				output: `\x1b[36mCutadapt v4.4\x1b[0m
+Processing paired-end reads...
+
+Forward primer: GTGCCAGCMGCCGCGGTAA (515F)
+Reverse primer: GGACTACHVGGGTWTCTAAT (806R)
+
+\x1b[36mTrimming statistics:\x1b[0m
+  Total read pairs processed: 245,678
+  Read 1 with adapter: 243,234 (99.0%)
+  Read 2 with adapter: 242,987 (98.9%)
+  Pairs written: 241,234 (98.2%)
+  Pairs too short: 4,444 (1.8%)
+
+\x1b[36mBase pairs:\x1b[0m
+  Input: 73,703,400 bp
+  Output: 60,308,500 bp (81.8%)
+  Quality-trimmed: 1,234,567 bp
+
+\x1b[32m✓ Primer trimming complete\x1b[0m
+`,
+				summary: {
+					'Read Pairs': '245,678',
+					'Pairs Written': '241,234 (98.2%)',
+					'Pairs Too Short': '4,444 (1.8%)',
+					'Forward Primer': '515F (99.0% matched)',
+					'Reverse Primer': '806R (98.9% matched)',
+					'Quality': 'PASS'
+				},
+				chartData: {
+					title: 'Primer Trimming Results',
+					x: ['Pairs Written', 'Too Short', 'No Adapter'],
+					y: [241234, 4444, 1000],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'Read Pairs'
+				},
+				files: [
+					{ name: 'trimmed/sample_R1.fastq.gz', type: 'fastq', size: '89 MB' },
+					{ name: 'trimmed/sample_R2.fastq.gz', type: 'fastq', size: '87 MB' }
+				]
+			},
+			'qiime': {
+				output: `\x1b[36mQIIME 2 version 2024.2\x1b[0m
+Running QIIME 2 pipeline...
+
+\x1b[36mImporting data...\x1b[0m
+  Samples: 40
+  Sequences per sample: 24,567 (avg)
+
+\x1b[36mDADA2 denoising...\x1b[0m
+  Input sequences: 982,680
+  Filtered sequences: 956,234 (97.3%)
+  Denoised sequences: 945,678 (98.9%)
+  Merged sequences: 923,456 (97.6%)
+  Non-chimeric: 912,345 (98.8%)
+  ASVs generated: 2,847
+
+\x1b[36mTaxonomy assignment...\x1b[0m
+  Classifier: SILVA 138.1
+  Confidence threshold: 0.7
+  Assigned taxonomy: 2,734 ASVs (96.0%)
+
+\x1b[36mDiversity analysis...\x1b[0m
+  Alpha diversity: Shannon, Simpson, Chao1, Faith PD
+  Beta diversity: Bray-Curtis, Jaccard, UniFrac
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  QIIME 2 ANALYSIS COMPLETE\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+\x1b[32m✓ Feature table: table.qza (2,847 features x 40 samples)\x1b[0m
+\x1b[32m✓ Representative sequences: rep-seqs.qza\x1b[0m
+\x1b[32m✓ Taxonomy: taxonomy.qza\x1b[0m
+\x1b[32m✓ Phylogenetic tree: rooted-tree.qza\x1b[0m
+
+\x1b[33mTip: View results with 'qiime tools view <artifact>.qzv'\x1b[0m
+`,
+				summary: {
+					'Total ASVs': '2,847',
+					'Total Samples': '40',
+					'Non-chimeric Reads': '912,345 (98.8%)',
+					'Taxonomy Assigned': '96.0%',
+					'Database': 'SILVA 138.1',
+					'Status': 'COMPLETE'
+				},
+				chartData: {
+					title: 'DADA2 Read Processing',
+					x: ['Input', 'Filtered', 'Denoised', 'Merged', 'Non-chimeric'],
+					y: [982680, 956234, 945678, 923456, 912345],
+					type: 'bar',
+					xLabel: 'Processing Step',
+					yLabel: 'Read Count'
+				},
+				files: [
+					{ name: 'table.qza', type: 'qza', size: '2.3 MB' },
+					{ name: 'rep-seqs.qza', type: 'qza', size: '456 KB' },
+					{ name: 'taxonomy.qza', type: 'qza', size: '789 KB' },
+					{ name: 'rooted-tree.qza', type: 'qza', size: '1.2 MB' }
+				]
+			},
+			'biom': {
+				output: `\x1b[36mBIOM-format v2.1.15\x1b[0m
+Converting BIOM to TSV format...
+
+\x1b[36mInput:\x1b[0m feature-table.biom
+\x1b[36mOutput:\x1b[0m feature-table.tsv
+
+\x1b[36mTable summary:\x1b[0m
+  Number of samples: 40
+  Number of features: 2,847
+  Total observations: 912,345
+  Sparsity: 67.3%
+
+\x1b[32m✓ Conversion complete\x1b[0m
+  Output: exported/feature-table.tsv
+`,
+				summary: {
+					'Samples': '40',
+					'Features (ASVs)': '2,847',
+					'Total Observations': '912,345',
+					'Sparsity': '67.3%',
+					'Format': 'TSV'
+				},
+				files: [
+					{ name: 'feature-table.tsv', type: 'tsv', size: '1.8 MB' }
+				]
+			},
+			'sourcetracker2': {
+				output: `\x1b[36mSourceTracker2 v2.0.1\x1b[0m
+Gibbs sampling for source tracking...
+
+\x1b[36mSources defined:\x1b[0m
+  - Human fecal
+  - Cattle fecal
+  - Environmental
+
+\x1b[36mSinks analyzed:\x1b[0m
+  - Municipal water
+  - Well water
+  - Agricultural runoff
+  - Reference stream
+
+\x1b[36mRunning Gibbs sampler...\x1b[0m
+  Burn-in: 100 iterations
+  Draws: 10 per sink
+  Restarts: 5
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  SOURCE TRACKING RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Well water:
+    Cattle: 78.2% ± 3.4%
+    Human: 15.3% ± 2.1%
+    Environmental: 4.2% ± 1.8%
+    Unknown: 2.3% ± 0.9%
+
+  Agricultural runoff:
+    Cattle: 92.1% ± 2.8%
+    Human: 3.4% ± 1.2%
+    Environmental: 3.1% ± 1.5%
+    Unknown: 1.4% ± 0.6%
+
+  Municipal (treated):
+    Environmental: 87.3% ± 4.2%
+    Unknown: 12.7% ± 4.2%
+
+\x1b[32m✓ Source tracking complete\x1b[0m
+\x1b[33mNote: High cattle contribution detected in well water\x1b[0m
+`,
+				summary: {
+					'Well - Cattle': '78.2%',
+					'Well - Human': '15.3%',
+					'Runoff - Cattle': '92.1%',
+					'Municipal - Environmental': '87.3%',
+					'Primary Contamination': 'Cattle fecal'
+				},
+				chartData: {
+					title: 'Source Contributions to Well Water',
+					x: ['Cattle', 'Human', 'Environmental', 'Unknown'],
+					y: [78.2, 15.3, 4.2, 2.3],
+					type: 'bar',
+					xLabel: 'Source',
+					yLabel: 'Contribution (%)'
+				},
+				files: [
+					{ name: 'mixing_proportions.txt', type: 'txt', size: '12 KB' },
+					{ name: 'full_results.txt', type: 'txt', size: '156 KB' }
+				]
 			}
 		};
 
@@ -2036,6 +2316,9 @@ Loading assembly graph: assembly.gfa
 			.replace('/data/outbreak_investigation', '~/outbreak')
 			.replace('/data/wastewater_surveillance', '~/wastewater')
 			.replace('/data/clinical_samples', '~/clinical')
+			.replace('/data/gut_microbiome', '~/gut')
+			.replace('/data/soil_microbiome', '~/soil')
+			.replace('/data/water_samples', '~/water')
 			.replace('/data/', '~/');
 		// If it's exactly the initial directory, show as ~
 		if (currentDir === initialDir) {
@@ -2266,7 +2549,14 @@ Loading assembly graph: assembly.gfa
 		'fastqc': [
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
 			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
+			// Amplicon files
+			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz', 'IBD_02_R1.fastq.gz', 'IBD_02_R2.fastq.gz',
+			'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz', 'Control_02_R1.fastq.gz', 'Control_02_R2.fastq.gz',
+			'Thermo_01_R1.fastq.gz', 'Thermo_01_R2.fastq.gz', 'Vermi_01_R1.fastq.gz', 'Vermi_01_R2.fastq.gz',
+			'Bokashi_01_R1.fastq.gz', 'Bokashi_01_R2.fastq.gz',
+			'Municipal_R1.fastq.gz', 'Municipal_R2.fastq.gz', 'Well_R1.fastq.gz', 'Well_R2.fastq.gz',
+			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'seqkit': [
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
@@ -2274,7 +2564,14 @@ Loading assembly graph: assembly.gfa
 			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
 			// Long-read files
 			'sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz',
-			'sample_01_nanopore.fastq.gz'
+			'sample_01_nanopore.fastq.gz',
+			// Amplicon files
+			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz', 'IBD_02_R1.fastq.gz', 'IBD_02_R2.fastq.gz',
+			'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz', 'Control_02_R1.fastq.gz', 'Control_02_R2.fastq.gz',
+			'Thermo_01_R1.fastq.gz', 'Thermo_01_R2.fastq.gz', 'Vermi_01_R1.fastq.gz', 'Vermi_01_R2.fastq.gz',
+			'Bokashi_01_R1.fastq.gz', 'Bokashi_01_R2.fastq.gz',
+			'Municipal_R1.fastq.gz', 'Municipal_R2.fastq.gz', 'Well_R1.fastq.gz', 'Well_R2.fastq.gz',
+			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'trimmomatic': [
 			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz'
@@ -2304,13 +2601,26 @@ Loading assembly graph: assembly.gfa
 		'flye': ['filtered/sample_01_filtered.fastq.gz'],
 		'medaka_consensus': ['filtered/sample_01_filtered.fastq.gz', 'assembly/assembly.fasta'],
 		'porechop': ['sample_01_nanopore.fastq.gz'],
-		'kraken2': ['filtered/sample_01_filtered.fastq.gz']
+		'kraken2': ['filtered/sample_01_filtered.fastq.gz'],
+		// Amplicon/16S tools
+		'cutadapt': [
+			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz', 'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz',
+			'Thermo_01_R1.fastq.gz', 'Thermo_01_R2.fastq.gz', 'Vermi_01_R1.fastq.gz', 'Vermi_01_R2.fastq.gz',
+			'Municipal_R1.fastq.gz', 'Municipal_R2.fastq.gz', 'Well_R1.fastq.gz', 'Well_R2.fastq.gz'
+		],
+		'qiime': [
+			'manifest.tsv', 'metadata.tsv', 'demux.qza', 'table.qza', 'rep-seqs.qza', 'taxonomy.qza',
+			'table-filtered.qza', 'rooted-tree.qza', 'core-metrics-results/'
+		],
+		'biom': ['exported/feature-table.biom'],
+		'sourcetracker2': ['exported/feature-table.biom', 'source-metadata.tsv']
 	};
 
 	// Tool requirements: allowed directories
 	const toolRequirements: Record<string, { dirs: string[] }> = {
-		'fastqc': { dirs: ['/data/outbreak_investigation'] },
-		'seqkit': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'fastqc': { dirs: ['/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'seqkit': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'multiqc': { dirs: ['/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
 		'trimmomatic': { dirs: ['/data/outbreak_investigation'] },
 		'unicycler': { dirs: ['/data/outbreak_investigation'] },
 		'bandage': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
@@ -2335,7 +2645,12 @@ Loading assembly graph: assembly.gfa
 		'flye': { dirs: ['/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'medaka_consensus': { dirs: ['/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'porechop': { dirs: ['/data/clinical_samples'] },
-		'kraken2': { dirs: ['/data/clinical_samples'] }
+		'kraken2': { dirs: ['/data/clinical_samples'] },
+		// Amplicon/16S tools
+		'cutadapt': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'qiime': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'biom': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'sourcetracker2': { dirs: ['/data/water_samples'] }
 	};
 
 	// Check if file is valid for a tool
@@ -3410,6 +3725,48 @@ Loading assembly graph: assembly.gfa
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input FASTQ file\x1b[0m`);
 					terminal.writeln(`\x1b[90mKraken2 requires: filtered/sample_01_filtered.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			// Amplicon/16S tools
+			if (command === 'cutadapt') {
+				// cutadapt -g PRIMER -G PRIMER -o output_R1 -p output_R2 input_R1 input_R2
+				if (!args.includes('-g') && !args.includes('-G')) {
+					terminal.writeln(`\x1b[31mError: Missing primer sequence (-g/-G flag)\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: cutadapt -g GTGCCAGCMGCCGCGGTAA -G GGACTACHVGGGTWTCTAAT -o trimmed/R1.fq.gz -p trimmed/R2.fq.gz R1.fastq.gz R2.fastq.gz\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'qiime') {
+				// QIIME2 has many subcommands - just validate that there's a subcommand
+				if (args.length === 0) {
+					terminal.writeln(`\x1b[31mError: Missing QIIME2 subcommand\x1b[0m`);
+					terminal.writeln(`\x1b[90mAvailable: tools, dada2, feature-classifier, taxa, diversity, phylogeny, etc.\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: qiime dada2 denoise-paired --i-demultiplexed-seqs demux.qza ...\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'biom') {
+				// biom convert -i input.biom -o output.tsv --to-tsv
+				if (args.length === 0 || !args.includes('convert')) {
+					terminal.writeln(`\x1b[31mError: Missing BIOM subcommand\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: biom convert -i feature-table.biom -o feature-table.tsv --to-tsv\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			if (command === 'sourcetracker2') {
+				// sourcetracker2 gibbs --table-path table.biom --metadata-path metadata.tsv ...
+				if (args.length === 0) {
+					terminal.writeln(`\x1b[31mError: Missing SourceTracker2 subcommand\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: sourcetracker2 gibbs --table-path feature-table.biom --metadata-path source-metadata.tsv --output-dir results/\x1b[0m`);
 					writePrompt();
 					return;
 				}
