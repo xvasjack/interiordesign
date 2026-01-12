@@ -18,7 +18,7 @@ export interface Storyline {
 	title: string;
 	subtitle: string;
 	organism: string;
-	technology: 'illumina' | 'pacbio' | 'nanopore' | 'hybrid';
+	technology: 'illumina' | 'pacbio' | 'nanopore' | 'hybrid' | 'r-report';
 	technologyLabel: string; // Display label like "Short Read (Illumina)" or "Long Read (PacBio)"
 	dataDir: string; // Initial directory for terminal (e.g., '/data/outbreak_investigation')
 	sections: StorylineSection[];

@@ -18,6 +18,9 @@
 		storyline?: Storyline | null;
 	} = $props();
 
+	// Check if this is a report page based on storyline technology
+	const isReportPage = $derived(storyline?.technology === 'r-report');
+
 	let terminalHeight = $state(70); // percentage
 	let isResizing = $state(false);
 	let filesDropdownOpen = $state(false);
@@ -321,7 +324,7 @@
 			class="output-panel overflow-auto"
 			style="height: {100 - terminalHeight}%; min-height: 0; overflow: auto; flex: 1;"
 		>
-			<OutputPanel />
+			<OutputPanel {isReportPage} />
 		</div>
 	</div>
 

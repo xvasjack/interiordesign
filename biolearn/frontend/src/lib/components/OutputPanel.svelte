@@ -2,6 +2,8 @@
 	import { onMount, tick } from 'svelte';
 	import { outputData, terminalState, fileNotes, stopSignal } from '$lib/stores/terminal';
 
+	let { isReportPage = false }: { isReportPage?: boolean } = $props();
+
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
 	let currentOutput = $state<any>(null);
@@ -27,9 +29,9 @@
 		}
 	});
 
-	// Auto-switch to report tab when PDF is generated
+	// Auto-switch to report tab when PDF is generated (only on report pages)
 	$effect(() => {
-		if (currentOutput?.isPdfReport) {
+		if (isReportPage && currentOutput?.isPdfReport) {
 			activeTab = 'report';
 		}
 	});
@@ -380,7 +382,7 @@
 		>
 			📝 Notes
 		</button>
-		{#if currentOutput?.isPdfReport}
+		{#if isReportPage && currentOutput?.isPdfReport}
 			<button
 				class="px-4 py-2 text-sm font-medium transition-colors"
 				style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'report' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'report' ? '#2563eb' : '#4b5563'};"
@@ -536,7 +538,7 @@
 				</div>
 			{/if}
 		{:else if activeTab === 'report'}
-			{#if currentOutput?.isPdfReport}
+			{#if isReportPage && currentOutput?.isPdfReport}
 				<div class="bg-white rounded-lg shadow-lg border overflow-hidden" style="max-height: 100%; overflow: auto;">
 					<!-- PDF Header -->
 					<div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4" style="background: linear-gradient(to right, #dc2626, #b91c1c); color: white; padding: 1rem;">
@@ -662,7 +664,7 @@
 	</div>
 
 	<!-- Full PDF Modal -->
-	{#if showPdfModal && currentOutput?.isPdfReport}
+	{#if showPdfModal && isReportPage && currentOutput?.isPdfReport}
 		<div
 			style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 2rem;"
 			onclick={() => showPdfModal = false}

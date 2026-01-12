@@ -19,6 +19,7 @@
 		organism: 'Klebsiella pneumoniae',
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{

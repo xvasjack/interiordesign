@@ -8,6 +8,12 @@ export interface OutputData {
 	summary?: Record<string, string>;
 	chartData?: any;
 	files?: Array<{ name: string; type: string; size: string }>;
+	// PDF report specific fields
+	isPdfReport?: boolean;
+	pdfTitle?: string | null;
+	pdfPages?: number | null;
+	pdfSize?: string | null;
+	pdfSections?: Array<{ title: string; figures: number }> | null;
 }
 
 export interface TerminalState {

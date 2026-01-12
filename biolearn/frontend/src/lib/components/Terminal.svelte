@@ -4400,10 +4400,30 @@ Annotation identified 4,523 coding sequences.
 				pdfSize: isPdfReport ? `${(Math.random() * 1.5 + 1).toFixed(1)} MB` : null,
 				pdfSections: isPdfReport ? (
 					fullCmd.includes('microbiome_report')
-						? ['Alpha Diversity (Taxa)', 'Beta Diversity (Taxa)', 'Functional Pathway Analysis', 'Function Heatmap (KO/EC)', 'Differential Abundance', 'Taxonomic Composition']
+						? [
+							{ title: 'Alpha Diversity (Taxa)', figures: 2 },
+							{ title: 'Beta Diversity (Taxa)', figures: 1 },
+							{ title: 'Functional Pathway Analysis', figures: 2 },
+							{ title: 'Function Heatmap (KO/EC)', figures: 1 },
+							{ title: 'Differential Abundance', figures: 2 },
+							{ title: 'Taxonomic Composition', figures: 1 }
+						]
 						: fullCmd.includes('wgs_report')
-						? ['Assembly Statistics', 'AMR Gene Analysis', 'MLST Typing', 'Phylogenetic Tree', 'Plasmid Analysis']
-						: ['Quality Control', 'PCA Analysis', 'Differential Expression', 'Volcano Plot', 'Expression Heatmap', 'Pathway Enrichment']
+						? [
+							{ title: 'Assembly Statistics', figures: 1 },
+							{ title: 'AMR Gene Analysis', figures: 2 },
+							{ title: 'MLST Typing', figures: 1 },
+							{ title: 'Phylogenetic Tree', figures: 1 },
+							{ title: 'Plasmid Analysis', figures: 1 }
+						]
+						: [
+							{ title: 'Quality Control', figures: 2 },
+							{ title: 'PCA Analysis', figures: 1 },
+							{ title: 'Differential Expression', figures: 2 },
+							{ title: 'Volcano Plot', figures: 1 },
+							{ title: 'Expression Heatmap', figures: 1 },
+							{ title: 'Pathway Enrichment', figures: 2 }
+						]
 				) : null
 			});
 
