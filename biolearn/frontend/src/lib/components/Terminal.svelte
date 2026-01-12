@@ -546,6 +546,39 @@ Analysis complete for ${inputFile}
 					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
 				]
 			},
+			'multiqc': {
+				output: `\x1b[34m/// \x1b[0m\x1b[1mMultiQC\x1b[0m 🔍 | v1.14
+\x1b[34m/// \x1b[0m
+
+\x1b[32m[INFO]\x1b[0m     multiqc : This is MultiQC v1.14
+\x1b[32m[INFO]\x1b[0m     search_modules : Searching qc_reports/ for analysis results
+\x1b[32m[INFO]\x1b[0m     fastqc : Found 8 reports
+\x1b[32m[INFO]\x1b[0m     write_results : Compiling report
+\x1b[32m[INFO]\x1b[0m     write_results : Report written to multiqc_report.html
+\x1b[32m[INFO]\x1b[0m     write_results : Data exported to multiqc_data/
+\x1b[32m[INFO]\x1b[0m     multiqc : MultiQC complete
+`,
+				summary: {
+					'FastQC Reports': '8 samples',
+					'Mean Quality Score': '34.2',
+					'Mean GC Content': '52.1%',
+					'Samples Passing': '8/8 (100%)',
+					'Adapter Content': 'Low (<5%)',
+					'Report Generated': 'multiqc_report.html'
+				},
+				chartData: {
+					title: 'Mean Quality Scores Across Samples',
+					x: ['Sample 1', 'Sample 2', 'Sample 3', 'Sample 4', 'Sample 5', 'Sample 6', 'Sample 7', 'Sample 8'],
+					y: [34.5, 33.8, 34.2, 34.1, 33.9, 34.3, 34.0, 34.4],
+					type: 'bar',
+					xLabel: 'Sample',
+					yLabel: 'Mean Quality Score'
+				},
+				files: [
+					{ name: 'multiqc_report.html', type: 'html', size: '1.4 MB' },
+					{ name: 'multiqc_data/', type: 'dir', size: '156 KB' }
+				]
+			},
 			'trimmomatic': {
 				// Fixed math: 2,456,789 = 2,394,012 + 34,567 + 19,876 + 8,334 = 2,456,789 ✓
 				output: `TrimmomaticPE: Started with arguments:
