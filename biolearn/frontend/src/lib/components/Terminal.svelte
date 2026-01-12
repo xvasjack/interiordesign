@@ -2853,7 +2853,9 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const fileName = fileMatch[1];
 				terminal.writeln(`\x1b[32m✓ Created ${fileName}\x1b[0m`);
 				terminal.writeln(`\x1b[90mR Markdown document ready for compilation\x1b[0m`);
-				// Add the file to created files list
+				// Add 'cat' to executed commands so the step gets marked complete
+				executedCommands.update(cmds => [...cmds, 'cat']);
+				// Also mark Rscript as executed for file creation tracking
 				executedCommands.update(cmds => [...cmds, 'Rscript']);
 				writePrompt();
 				return;
