@@ -110,7 +110,33 @@
 			'/data/outbreak_investigation/qc_reports': [
 				'sample_01_R1_fastqc.html', 'sample_01_R1_fastqc.zip',
 				'sample_01_R2_fastqc.html', 'sample_01_R2_fastqc.zip'
+			],
+			// Amplicon directories
+			'/data/gut_microbiome': ['qc_reports/'],
+			'/data/gut_microbiome/qc_reports': [
+				'IBD_01_R1_fastqc.html', 'IBD_01_R1_fastqc.zip',
+				'IBD_01_R2_fastqc.html', 'IBD_01_R2_fastqc.zip',
+				'Control_01_R1_fastqc.html', 'Control_01_R1_fastqc.zip',
+				'Control_01_R2_fastqc.html', 'Control_01_R2_fastqc.zip'
+			],
+			'/data/soil_microbiome': ['qc_reports/'],
+			'/data/soil_microbiome/qc_reports': [
+				'Thermo_01_R1_fastqc.html', 'Thermo_01_R1_fastqc.zip',
+				'Thermo_01_R2_fastqc.html', 'Thermo_01_R2_fastqc.zip',
+				'Vermi_01_R1_fastqc.html', 'Vermi_01_R1_fastqc.zip'
+			],
+			'/data/water_samples': ['qc_reports/'],
+			'/data/water_samples/qc_reports': [
+				'Municipal_R1_fastqc.html', 'Municipal_R1_fastqc.zip',
+				'Municipal_R2_fastqc.html', 'Municipal_R2_fastqc.zip',
+				'Well_R1_fastqc.html', 'Well_R1_fastqc.zip'
 			]
+		},
+		'multiqc': {
+			'/data/outbreak_investigation': ['multiqc_report.html', 'multiqc_data/'],
+			'/data/gut_microbiome': ['multiqc_report.html', 'multiqc_data/'],
+			'/data/soil_microbiome': ['multiqc_report.html', 'multiqc_data/'],
+			'/data/water_samples': ['multiqc_report.html', 'multiqc_data/']
 		},
 		'trimmomatic': {
 			'/data/outbreak_investigation': ['trimmed/'],
