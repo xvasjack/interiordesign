@@ -66,6 +66,28 @@
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz',
 			'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz',
 			'manifest.tsv', 'metadata.tsv', 'source-metadata.tsv'
+		],
+		// R Report directories - pre-populated with analysis results
+		'/data/wgs_report': [
+			'quast_results/', 'abricate_results/', 'mlst_results/', 'iqtree_results/'
+		],
+		'/data/wgs_report/quast_results': [
+			'report.tsv', 'report.html'
+		],
+		'/data/wgs_report/abricate_results': [
+			'summary.tsv'
+		],
+		'/data/wgs_report/mlst_results': [
+			'mlst.tsv'
+		],
+		'/data/wgs_report/iqtree_results': [
+			'core_snps.treefile', 'core_snps.log'
+		],
+		'/data/amplicon_report': [
+			'phyloseq_object.rds', 'metadata.csv'
+		],
+		'/data/rnaseq_report': [
+			'counts_matrix.csv', 'sample_info.csv', 'deseq2_results.rds'
 		]
 	};
 
@@ -353,6 +375,18 @@
 			'/data/water_samples': ['sourcetracker_results/'],
 			'/data/water_samples/sourcetracker_results': [
 				'mixing_proportions.txt', 'full_results.txt'
+			]
+		},
+		// R/RMarkdown tools
+		'Rscript': {
+			'/data/wgs_report': [
+				'wgs_report.Rmd', 'wgs_report.pdf'
+			],
+			'/data/amplicon_report': [
+				'microbiome_report.Rmd', 'microbiome_report.pdf'
+			],
+			'/data/rnaseq_report': [
+				'rnaseq_report.Rmd', 'rnaseq_report.pdf'
 			]
 		}
 	};
@@ -2272,6 +2306,85 @@ Gibbs sampling for source tracking...
 					{ name: 'mixing_proportions.txt', type: 'txt', size: '12 KB' },
 					{ name: 'full_results.txt', type: 'txt', size: '156 KB' }
 				]
+			},
+			// R/RMarkdown tools
+			'Rscript': {
+				output: `\x1b[36mR version 4.3.2 (2023-10-31) -- "Eye Holes"\x1b[0m
+
+\x1b[36mExecuting R script...\x1b[0m
+
+${fullCmd.includes('install.packages') ? `Installing packages from CRAN...
+  - Checking dependencies
+  - Downloading packages
+  - Installing packages to /usr/local/lib/R/site-library
+
+\x1b[32m✓ Packages installed successfully\x1b[0m` : ''}${fullCmd.includes('BiocManager::install') ? `Installing Bioconductor packages...
+  - Checking BiocManager version
+  - Resolving dependencies
+  - Downloading from Bioconductor
+
+\x1b[32m✓ Bioconductor packages installed successfully\x1b[0m` : ''}${fullCmd.includes('tinytex') ? `Installing TinyTeX...
+  - Downloading TinyTeX bundle
+  - Extracting to ~/Library/TinyTeX
+  - Setting up PATH
+
+\x1b[32m✓ TinyTeX installed successfully\x1b[0m` : ''}${fullCmd.includes('read.delim') || fullCmd.includes('read.csv') ? `Loading data file...
+  - Reading file into data frame
+  - Parsing columns
+
+Data preview:
+  Sample1  Sample2  Sample3
+1   1234     5678     9012
+2   3456     7890     1234
+3   5678     9012     3456
+
+\x1b[32m✓ Data loaded successfully\x1b[0m` : ''}${fullCmd.includes('readRDS') ? `Loading R object from file...
+  - Reading phyloseq/DESeq2 object
+
+Object summary:
+  - Class: phyloseq/DESeqDataSet
+  - Samples: 24
+  - Features: 4,523
+
+\x1b[32m✓ R object loaded successfully\x1b[0m` : ''}${fullCmd.includes('pheatmap') || fullCmd.includes('ggplot') || fullCmd.includes('ggtree') || fullCmd.includes('EnhancedVolcano') ? `Generating visualization...
+  - Setting up graphics device
+  - Rendering plot
+  - Applying theme and styling
+
+\x1b[32m✓ Plot generated successfully\x1b[0m
+\x1b[33mNote: Plot displayed in output panel\x1b[0m` : ''}${fullCmd.includes('kable') ? `Generating formatted table...
+  - Applying styling options
+  - Formatting for PDF output
+
+\x1b[32m✓ Table generated successfully\x1b[0m` : ''}${fullCmd.includes('rmarkdown::render') ? `Rendering R Markdown document...
+  - Parsing YAML header
+  - Knitting code chunks
+  - Running LaTeX compilation
+  - Generating PDF output
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  PDF REPORT GENERATED SUCCESSFULLY\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+Output: ${fullCmd.includes('wgs_report') ? 'wgs_report.pdf' : (fullCmd.includes('microbiome_report') ? 'microbiome_report.pdf' : 'rnaseq_report.pdf')}
+Pages: ${Math.floor(Math.random() * 5) + 8}
+Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
+
+\x1b[32m✓ Report compilation complete\x1b[0m` : ''}
+`,
+				summary: fullCmd.includes('rmarkdown::render') ? {
+					'Status': 'Complete',
+					'Output': fullCmd.includes('wgs_report') ? 'wgs_report.pdf' : (fullCmd.includes('microbiome_report') ? 'microbiome_report.pdf' : 'rnaseq_report.pdf'),
+					'Pages': `${Math.floor(Math.random() * 5) + 8}`,
+					'Size': `${(Math.random() * 2 + 1).toFixed(1)} MB`
+				} : {
+					'Status': 'Complete',
+					'R Version': '4.3.2',
+					'Output': 'Success'
+				},
+				files: fullCmd.includes('rmarkdown::render') ? [
+					{ name: fullCmd.includes('wgs_report') ? 'wgs_report.pdf' : (fullCmd.includes('microbiome_report') ? 'microbiome_report.pdf' : 'rnaseq_report.pdf'), type: 'pdf', size: `${(Math.random() * 2 + 1).toFixed(1)} MB` }
+				] : []
 			}
 		};
 
@@ -2319,6 +2432,9 @@ Gibbs sampling for source tracking...
 			.replace('/data/gut_microbiome', '~/gut')
 			.replace('/data/soil_microbiome', '~/soil')
 			.replace('/data/water_samples', '~/water')
+			.replace('/data/wgs_report', '~/wgs_report')
+			.replace('/data/amplicon_report', '~/amplicon_report')
+			.replace('/data/rnaseq_report', '~/rnaseq_report')
 			.replace('/data/', '~/');
 		// If it's exactly the initial directory, show as ~
 		if (currentDir === initialDir) {
@@ -2613,7 +2729,13 @@ Gibbs sampling for source tracking...
 			'table-filtered.qza', 'rooted-tree.qza', 'core-metrics-results/'
 		],
 		'biom': ['exported/feature-table.biom'],
-		'sourcetracker2': ['exported/feature-table.biom', 'source-metadata.tsv']
+		'sourcetracker2': ['exported/feature-table.biom', 'source-metadata.tsv'],
+		// R/RMarkdown tools
+		'Rscript': [
+			'quast_results/report.tsv', 'abricate_results/summary.tsv', 'mlst_results/mlst.tsv',
+			'iqtree_results/core_snps.treefile', 'phyloseq_object.rds', 'metadata.csv',
+			'counts_matrix.csv', 'sample_info.csv', 'deseq2_results.rds'
+		]
 	};
 
 	// Tool requirements: allowed directories
@@ -2650,7 +2772,9 @@ Gibbs sampling for source tracking...
 		'cutadapt': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
 		'qiime': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
 		'biom': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
-		'sourcetracker2': { dirs: ['/data/water_samples'] }
+		'sourcetracker2': { dirs: ['/data/water_samples'] },
+		// R/RMarkdown tools
+		'Rscript': { dirs: ['/data/wgs_report', '/data/amplicon_report', '/data/rnaseq_report'] }
 	};
 
 	// Check if file is valid for a tool
@@ -2707,6 +2831,21 @@ Gibbs sampling for source tracking...
 			handleCd(args);
 			writePrompt();
 			return;
+		}
+
+		// Handle heredoc syntax for creating R Markdown files: cat > file.Rmd << 'EOF'
+		if (command === 'cat' && cmd.includes('>') && cmd.includes("<<")) {
+			// This is a heredoc command for creating a file - simulate success
+			const fileMatch = cmd.match(/>\s*(\S+\.Rmd)/);
+			if (fileMatch) {
+				const fileName = fileMatch[1];
+				terminal.writeln(`\x1b[32m✓ Created ${fileName}\x1b[0m`);
+				terminal.writeln(`\x1b[90mR Markdown document ready for compilation\x1b[0m`);
+				// Add the file to created files list
+				executedCommands.update(cmds => [...cmds, 'Rscript']);
+				writePrompt();
+				return;
+			}
 		}
 
 		if (command === 'cat' || command === 'head' || command === 'tail') {
@@ -3767,6 +3906,17 @@ Gibbs sampling for source tracking...
 				if (args.length === 0) {
 					terminal.writeln(`\x1b[31mError: Missing SourceTracker2 subcommand\x1b[0m`);
 					terminal.writeln(`\x1b[90mExample: sourcetracker2 gibbs --table-path feature-table.biom --metadata-path source-metadata.tsv --output-dir results/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
+			// R/RMarkdown tools
+			if (command === 'Rscript') {
+				// Rscript -e "R code here"
+				if (!args.includes('-e')) {
+					terminal.writeln(`\x1b[31mError: Missing -e flag for R expression\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: Rscript -e "install.packages('ggplot2')"\x1b[0m`);
 					writePrompt();
 					return;
 				}

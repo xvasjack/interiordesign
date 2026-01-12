@@ -206,7 +206,9 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'cutadapt': { min: 15, max: 30 },
 	'qiime': { min: 30, max: 120 },  // Varies by subcommand
 	'biom': { min: 3, max: 8 },
-	'sourcetracker2': { min: 60, max: 180 }
+	'sourcetracker2': { min: 60, max: 180 },
+	// R/RMarkdown tools
+	'Rscript': { min: 5, max: 30 }  // Varies by script complexity
 };
 
 // Get random execution time for a tool
@@ -239,5 +241,7 @@ export const bioTools = new Set([
 	// Long-read tools
 	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2',
 	// Amplicon/16S tools
-	'cutadapt', 'qiime', 'biom', 'sourcetracker2'
+	'cutadapt', 'qiime', 'biom', 'sourcetracker2',
+	// R/RMarkdown tools
+	'Rscript'
 ]);
