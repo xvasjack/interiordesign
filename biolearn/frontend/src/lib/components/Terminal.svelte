@@ -4381,13 +4381,30 @@ Annotation identified 4,523 coding sequences.
 			});
 
 			// Update output panel with results
+			const isPdfReport = fullCmd.includes('rmarkdown::render');
+			const pdfTitle = fullCmd.includes('microbiome_report') ? '16S Microbiome Analysis Report' :
+							 fullCmd.includes('wgs_report') ? 'WGS Bacteria Analysis Report' :
+							 fullCmd.includes('rnaseq_report') ? 'RNA-Seq Analysis Report' : 'Analysis Report';
+
 			outputData.set({
 				type: tool,
 				title: `${tool.charAt(0).toUpperCase() + tool.slice(1)} Results`,
 				tool: fullCmd,
 				summary: toolData.summary,
 				chartData: toolData.chartData,
-				files: toolData.files
+				files: toolData.files,
+				// PDF report specific fields
+				isPdfReport: isPdfReport,
+				pdfTitle: isPdfReport ? pdfTitle : null,
+				pdfPages: isPdfReport ? Math.floor(Math.random() * 5) + 8 : null,
+				pdfSize: isPdfReport ? `${(Math.random() * 1.5 + 1).toFixed(1)} MB` : null,
+				pdfSections: isPdfReport ? (
+					fullCmd.includes('microbiome_report')
+						? ['Alpha Diversity (Taxa)', 'Beta Diversity (Taxa)', 'Functional Pathway Analysis', 'Function Heatmap (KO/EC)', 'Differential Abundance', 'Taxonomic Composition']
+						: fullCmd.includes('wgs_report')
+						? ['Assembly Statistics', 'AMR Gene Analysis', 'MLST Typing', 'Phylogenetic Tree', 'Plasmid Analysis']
+						: ['Quality Control', 'PCA Analysis', 'Differential Expression', 'Volcano Plot', 'Expression Heatmap', 'Pathway Enrichment']
+				) : null
 			});
 
 			terminal.writeln('');
