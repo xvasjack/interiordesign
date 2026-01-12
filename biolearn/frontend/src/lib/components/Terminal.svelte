@@ -2796,6 +2796,51 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		return validFiles.some(f => f === filename || f.endsWith(filename) || filename.endsWith(f.split('/').pop() || ''));
 	}
 
+	// Expand glob patterns (like *.fastq.gz) based on current directory files
+	function expandGlobPattern(pattern: string): string[] {
+		// If not a glob pattern, return as-is
+		if (!pattern.includes('*') && !pattern.includes('?')) {
+			return [pattern];
+		}
+
+		// Get files in current directory
+		const dirFiles = getFilesForDirectory(currentDir);
+
+		// Convert glob pattern to regex
+		const regexPattern = pattern
+			.replace(/\./g, '\\.')
+			.replace(/\*/g, '.*')
+			.replace(/\?/g, '.');
+		const regex = new RegExp(`^${regexPattern}$`);
+
+		// Filter matching files
+		const matches = dirFiles.filter(f => regex.test(f));
+		return matches.length > 0 ? matches : [pattern]; // Return original if no matches
+	}
+
+	// Get files for a directory (combines base and tool outputs)
+	function getFilesForDirectory(dir: string): string[] {
+		const files: string[] = [];
+
+		// Add base filesystem files
+		if (baseFilesystem[dir]) {
+			files.push(...baseFilesystem[dir]);
+		}
+
+		// Add tool-created files
+		const execCmds = get(executedCommands);
+		for (const [tool, outputs] of Object.entries(toolCreatedFiles)) {
+			if (outputs[dir]) {
+				// Check if tool was executed
+				if (execCmds.includes(tool)) {
+					files.push(...outputs[dir]);
+				}
+			}
+		}
+
+		return [...new Set(files)]; // Remove duplicates
+	}
+
 	async function executeCommand(cmd: string) {
 		const parts = cmd.trim().split(/\s+/);
 		const command = parts[0];
@@ -2889,23 +2934,44 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				if (!args.includes('stats')) {
 					terminal.writeln(`\x1b[31mError: Missing subcommand\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: seqkit stats <file1.fastq.gz> <file2.fastq.gz>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: seqkit stats *.fastq.gz (supports wildcards)\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				const inputFiles = args.filter(a => a.endsWith('.fastq.gz'));
+
+				// Get raw input patterns (may include wildcards)
+				const inputPatterns = args.filter(a => a.endsWith('.fastq.gz') || a.includes('*'));
+
+				// Expand glob patterns
+				let inputFiles: string[] = [];
+				for (const pattern of inputPatterns) {
+					const expanded = expandGlobPattern(pattern);
+					inputFiles.push(...expanded);
+				}
+
+				// Filter to only .fastq.gz files
+				inputFiles = inputFiles.filter(f => f.endsWith('.fastq.gz'));
+
 				if (inputFiles.length === 0) {
+					const availableFiles = getFilesForDirectory(currentDir).filter(f => f.endsWith('.fastq.gz'));
 					terminal.writeln(`\x1b[31mError: Missing input FASTQ files\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: seqkit stats <file1.fastq.gz> <file2.fastq.gz>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz\x1b[0m`);
+					if (availableFiles.length > 0) {
+						terminal.writeln(`\x1b[90mAvailable files: ${availableFiles.slice(0, 4).join(', ')}${availableFiles.length > 4 ? '...' : ''}\x1b[0m`);
+						terminal.writeln(`\x1b[90mTip: Use 'seqkit stats *.fastq.gz' to process all FASTQ files\x1b[0m`);
+					}
 					writePrompt();
 					return;
 				}
+
 				// Validate input files
 				for (const f of inputFiles) {
 					if (!isValidFileForTool('seqkit', f)) {
+						const availableFiles = getFilesForDirectory(currentDir).filter(f => f.endsWith('.fastq.gz'));
 						terminal.writeln(`\x1b[31mError: '${f}' is not a valid input for seqkit\x1b[0m`);
-						terminal.writeln(`\x1b[90mSeqkit requires raw FASTQ files: sample_01_R1.fastq.gz, sample_01_R2.fastq.gz\x1b[0m`);
+						if (availableFiles.length > 0) {
+							terminal.writeln(`\x1b[90mAvailable files: ${availableFiles.slice(0, 4).join(', ')}${availableFiles.length > 4 ? '...' : ''}\x1b[0m`);
+						}
 						writePrompt();
 						return;
 					}
