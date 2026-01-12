@@ -2979,28 +2979,50 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'fastqc') {
-				// Check for input file
-				const inputFile = args.find(a => a.endsWith('.fastq.gz'));
-				if (!inputFile) {
+				// Get raw input patterns (may include wildcards)
+				const inputPatterns = args.filter(a => a.endsWith('.fastq.gz') || (a.includes('*') && !a.startsWith('-')));
+
+				// Expand glob patterns
+				let inputFiles: string[] = [];
+				for (const pattern of inputPatterns) {
+					const expanded = expandGlobPattern(pattern);
+					inputFiles.push(...expanded);
+				}
+
+				// Filter to only .fastq.gz files
+				inputFiles = inputFiles.filter(f => f.endsWith('.fastq.gz'));
+
+				if (inputFiles.length === 0) {
+					const availableFiles = getFilesForDirectory(currentDir).filter(f => f.endsWith('.fastq.gz'));
 					terminal.writeln(`\x1b[31mError: Missing input file\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+					if (availableFiles.length > 0) {
+						terminal.writeln(`\x1b[90mAvailable files: ${availableFiles.slice(0, 4).join(', ')}${availableFiles.length > 4 ? '...' : ''}\x1b[0m`);
+						terminal.writeln(`\x1b[90mTip: Use 'fastqc *.fastq.gz -o qc_reports/' to process all files\x1b[0m`);
+					}
 					writePrompt();
 					return;
 				}
-				// Check file is valid for this tool
-				if (!isValidFileForTool('fastqc', inputFile)) {
-					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for fastqc\x1b[0m`);
-					terminal.writeln(`\x1b[90mFastQC requires raw sequencing files: sample_01_R1.fastq.gz, sample_01_R2.fastq.gz, etc.\x1b[0m`);
-					writePrompt();
-					return;
+
+				// Validate input files
+				for (const f of inputFiles) {
+					if (!isValidFileForTool('fastqc', f)) {
+						const availableFiles = getFilesForDirectory(currentDir).filter(f => f.endsWith('.fastq.gz'));
+						terminal.writeln(`\x1b[31mError: '${f}' is not a valid input for fastqc\x1b[0m`);
+						if (availableFiles.length > 0) {
+							terminal.writeln(`\x1b[90mAvailable files: ${availableFiles.slice(0, 4).join(', ')}${availableFiles.length > 4 ? '...' : ''}\x1b[0m`);
+						}
+						writePrompt();
+						return;
+					}
 				}
+
 				// Check for -o flag with output directory
 				const oIndex = args.indexOf('-o');
 				if (oIndex === -1 || !args[oIndex + 1]) {
 					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o qc_reports/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3009,7 +3031,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				if (outputDir !== 'qc_reports') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIndex + 1]}'\x1b[0m`);
 					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: qc_reports\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc sample_01_R1.fastq.gz -o qc_reports/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o qc_reports/\x1b[0m`);
 					writePrompt();
 					return;
 				}
