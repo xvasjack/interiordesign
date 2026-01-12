@@ -84,7 +84,19 @@
 			'core_snps.treefile', 'core_snps.log'
 		],
 		'/data/amplicon_report': [
-			'phyloseq_object.rds', 'metadata.csv'
+			'phyloseq_object.rds', 'metadata.csv', 'picrust2_output/'
+		],
+		'/data/amplicon_report/picrust2_output': [
+			'KO_metagenome_out/', 'pathways_out/', 'EC_metagenome_out/', 'metacyc_hierarchy.tsv'
+		],
+		'/data/amplicon_report/picrust2_output/KO_metagenome_out': [
+			'pred_metagenome_unstrat.tsv', 'pred_metagenome_strat.tsv'
+		],
+		'/data/amplicon_report/picrust2_output/pathways_out': [
+			'path_abun_unstrat.tsv', 'path_abun_strat.tsv'
+		],
+		'/data/amplicon_report/picrust2_output/EC_metagenome_out': [
+			'pred_metagenome_unstrat.tsv'
 		],
 		'/data/rnaseq_report': [
 			'counts_matrix.csv', 'sample_info.csv', 'deseq2_results.rds'
