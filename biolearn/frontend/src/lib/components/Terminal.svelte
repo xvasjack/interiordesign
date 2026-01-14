@@ -4543,20 +4543,127 @@ Command: unicycler -1 sample_01_R1_paired.fq.gz -2 sample_01_R2_paired.fq.gz -o 
 2024-01-15 10:24:15 - Running SPAdes assembly
 2024-01-15 10:35:23 - SPAdes assembly complete
 ...`,
-		// FastQC HTML (simplified)
+		// FastQC HTML (realistic format)
 		'_fastqc.html': `<!DOCTYPE html>
 <html>
-<head><title>FastQC Report</title></head>
+<head>
+<title>FastQC Report</title>
+<style type="text/css">
+body { font-family: Arial, Helvetica, sans-serif; padding: 10px; }
+h1 { font-size: 2em; color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+h2 { font-size: 1.4em; color: #006699; margin-top: 20px; border-bottom: 1px solid #006699; }
+table { border-collapse: collapse; margin: 10px 0; }
+table.summary { width: 100%; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ddd; }
+th { background-color: #006699; color: white; }
+tr:nth-child(even) { background-color: #f9f9f9; }
+.pass { color: #00aa00; font-weight: bold; }
+.warn { color: #ff9900; font-weight: bold; }
+.fail { color: #ff0000; font-weight: bold; }
+.module { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+.header h1 { color: white; border-bottom: none; margin: 0; }
+img.chart { max-width: 800px; border: 1px solid #ddd; margin: 10px 0; }
+</style>
+</head>
 <body>
-<h1>FastQC Report - sample_01_R1</h1>
+<div class="header">
+<h1>FastQC Report</h1>
+<p>Generated: 2024-01-15 10:30:45</p>
+</div>
+
+<div class="module">
+<h2>Summary</h2>
+<table class="summary">
+<tr><td class="pass">PASS</td><td>Basic Statistics</td></tr>
+<tr><td class="pass">PASS</td><td>Per base sequence quality</td></tr>
+<tr><td class="pass">PASS</td><td>Per tile sequence quality</td></tr>
+<tr><td class="pass">PASS</td><td>Per sequence quality scores</td></tr>
+<tr><td class="pass">PASS</td><td>Per base sequence content</td></tr>
+<tr><td class="pass">PASS</td><td>Per sequence GC content</td></tr>
+<tr><td class="pass">PASS</td><td>Per base N content</td></tr>
+<tr><td class="pass">PASS</td><td>Sequence Length Distribution</td></tr>
+<tr><td class="pass">PASS</td><td>Sequence Duplication Levels</td></tr>
+<tr><td class="pass">PASS</td><td>Overrepresented sequences</td></tr>
+<tr><td class="warn">WARN</td><td>Adapter Content</td></tr>
+</table>
+</div>
+
+<div class="module">
 <h2>Basic Statistics</h2>
 <table>
-  <tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
-  <tr><td>Total Sequences</td><td>2,456,789</td></tr>
-  <tr><td>Sequence length</td><td>150</td></tr>
-  <tr><td>%GC</td><td>52</td></tr>
+<tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+<tr><td>File type</td><td>Conventional base calls</td></tr>
+<tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
+<tr><td>Total Sequences</td><td>2,013,579</td></tr>
+<tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
+<tr><td>Sequence length</td><td>150</td></tr>
+<tr><td>%GC</td><td>52</td></tr>
 </table>
-...`,
+</div>
+
+<div class="module">
+<h2>Per base sequence quality</h2>
+<p>Quality scores across all bases (Sanger / Illumina 1.9 encoding).</p>
+<p><em>Chart showing quality scores typically >30 across read positions, with slight decline at 3' end.</em></p>
+</div>
+
+<div class="module">
+<h2>Per sequence quality scores</h2>
+<p>Quality score distribution over all sequences.</p>
+<p>Mean Sequence Quality: 36.2</p>
+</div>
+
+<div class="module">
+<h2>Per base sequence content</h2>
+<p>Proportion of each base position for which each nucleotide has been called.</p>
+</div>
+
+<div class="module">
+<h2>Per sequence GC content</h2>
+<p>GC content distribution over all sequences. Peak at 52% GC (typical for K. pneumoniae).</p>
+</div>
+
+<div class="module">
+<h2>Sequence Length Distribution</h2>
+<p>Distribution of sequence lengths. All sequences are 150bp.</p>
+</div>
+
+<div class="module">
+<h2>Sequence Duplication Levels</h2>
+<p>Relative level of duplication for each sequence.</p>
+<table>
+<tr><th>Duplication Level</th><th>% of Library</th></tr>
+<tr><td>1</td><td>85.2%</td></tr>
+<tr><td>2</td><td>8.3%</td></tr>
+<tr><td>3</td><td>3.1%</td></tr>
+<tr><td>>10</td><td>3.4%</td></tr>
+</table>
+</div>
+
+<div class="module">
+<h2>Overrepresented sequences</h2>
+<p>No overrepresented sequences found.</p>
+</div>
+
+<div class="module">
+<h2>Adapter Content</h2>
+<p>Cumulative percentage of reads with adapter sequences.</p>
+<table>
+<tr><th>Adapter</th><th>% at 150bp</th></tr>
+<tr><td>Illumina Universal Adapter</td><td>3.2%</td></tr>
+<tr><td>Illumina Small RNA 3' Adapter</td><td>0.1%</td></tr>
+<tr><td>Illumina Small RNA 5' Adapter</td><td>0.0%</td></tr>
+<tr><td>Nextera Transposase Sequence</td><td>0.0%</td></tr>
+</table>
+</div>
+
+<footer style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em;">
+<p>Produced by FastQC (version 0.12.1)</p>
+</footer>
+</body>
+</html>`,
 		// TSV report
 		'.tsv': `#Sample	Total_Reads	Mapped_Reads	Coverage	GC_Content
 sample_01	2456789	2394012	97.44	52.3
