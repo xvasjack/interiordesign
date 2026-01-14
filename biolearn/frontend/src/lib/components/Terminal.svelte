@@ -123,8 +123,8 @@
 				'SRR36708862_1_fastqc.html', 'SRR36708862_1_fastqc.zip',
 				'SRR36708862_2_fastqc.html', 'SRR36708862_2_fastqc.zip'
 			],
-			'/data/outbreak_investigation': ['qc_reports/'],
-			'/data/outbreak_investigation/qc_reports': [
+			'/data/outbreak_investigation': ['o2_fastqc/'],
+			'/data/outbreak_investigation/o2_fastqc': [
 				'patient_01_R1_fastqc.html', 'patient_01_R1_fastqc.zip',
 				'patient_01_R2_fastqc.html', 'patient_01_R2_fastqc.zip',
 				'patient_02_R1_fastqc.html', 'patient_02_R1_fastqc.zip',

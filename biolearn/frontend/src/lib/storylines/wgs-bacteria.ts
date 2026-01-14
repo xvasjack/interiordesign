@@ -1453,11 +1453,11 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 2: Quality Control',
 				text: `Generate quality reports for raw reads.`,
-				command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o qc_reports/',
+				command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o o2_fastqc/',
 				explanation: 'FastQC identifies quality issues before assembly.',
 				requiredDir: '/data/outbreak_investigation',
 				parameters: [
-					{ name: '-o qc_reports/', desc: 'Output directory' }
+					{ name: '-o o2_fastqc/', desc: 'Output directory' }
 				]
 			},
 			{
