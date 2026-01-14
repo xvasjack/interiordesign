@@ -1145,7 +1145,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'context',
 				text: `<strong>Sample Information:</strong>
 
-<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Accession</td><td>SRR36708862</td></tr><tr><td>Organism</td><td><em>Klebsiella pneumoniae</em></td></tr><tr><td>Platform</td><td>Illumina NovaSeq 6000</td></tr><tr><td>Read Length</td><td>2 × 150 bp (paired-end)</td></tr><tr><td>Expected Genome</td><td>~5.5 Mb</td></tr></tbody></table>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>NCBI Accession</td><td>SRR36708862</td></tr><tr><td>Organism</td><td><em>Klebsiella pneumoniae</em></td></tr><tr><td>Platform</td><td>Illumina NovaSeq 6000</td></tr><tr><td>Read Length</td><td>2 × 150 bp (paired-end)</td></tr><tr><td>Expected Genome</td><td>~5.5 Mb</td></tr></tbody></table>
 
 <strong>Learning Objectives:</strong>
 <ol><li>Assess raw sequencing data quality</li><li>Trim adapters and low-quality bases</li><li>Assemble reads into contigs</li><li>Evaluate assembly quality</li><li>Screen for antimicrobial resistance genes</li><li>Annotate the genome</li></ol>`,
