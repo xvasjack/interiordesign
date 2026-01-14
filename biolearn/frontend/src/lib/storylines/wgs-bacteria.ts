@@ -1105,10 +1105,10 @@ export const storylines: Record<string, Storyline> = {
 		title: 'Fish Mortality Event',
 		subtitle: 'Suspected Vibrio Outbreak',
 		organism: 'Vibrio vulnificus',
-		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
+		technology: 'hybrid',
+		technologyLabel: 'Hybrid (Illumina + ONT)',
 		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder', 'NanoPlot', 'filtlong'],
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'NanoPlot', 'filtlong', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder'],
 		sections: [
 			{
 				type: 'intro',
@@ -1438,7 +1438,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'pacbio',
 		technologyLabel: 'Long Read (PacBio HiFi)',
 		dataDir: '/data/wastewater_surveillance',
-		toolsUsed: ['seqkit', 'NanoPlot', 'filtlong', 'flye', 'medaka', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'isescan', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder'],
+		toolsUsed: ['seqkit', 'pbmarkdup', 'ccs', 'hifiasm', 'flye', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'isescan', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder'],
 		sections: [
 			{
 				type: 'intro',
@@ -1511,7 +1511,7 @@ export const storylines: Record<string, Storyline> = {
 		subtitle: 'Same-Day Pathogen Identification',
 		organism: 'Pseudomonas aeruginosa',
 		technology: 'nanopore',
-		technologyLabel: 'Long Read (Oxford Nanopore)',
+		technologyLabel: 'Long Read (ONT)',
 		dataDir: '/data/clinical_samples',
 		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit'],
 		sections: [

@@ -244,8 +244,10 @@ export const bioTools = new Set([
 	'prokka', 'bakta', 'abricate', 'resfinder', 'virulencefinder', 'mlst',
 	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
 	'snippy', 'roary', 'iqtree', 'gubbins',
-	// Long-read tools
+	// Long-read tools (ONT)
 	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2',
+	// Long-read tools (PacBio HiFi)
+	'pbmarkdup', 'ccs', 'hifiasm',
 	// Amplicon/16S tools
 	'cutadapt', 'qiime', 'biom', 'sourcetracker2',
 	// R/RMarkdown tools
