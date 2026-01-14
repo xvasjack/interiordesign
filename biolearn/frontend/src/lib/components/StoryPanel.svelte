@@ -86,10 +86,16 @@
 		completedSteps = new Set(completedSteps);
 	});
 
+	// Normalize path for comparison (trim whitespace, remove trailing slashes)
+	function normalizePath(path: string): string {
+		return path.trim().replace(/\/+$/, '').replace(/\/+/g, '/');
+	}
+
 	// Check if user is in the correct directory for a task
 	function isInCorrectDir(requiredDir: string | null | undefined): boolean {
 		if (!requiredDir) return true;
-		return userCurrentDir === requiredDir;
+		// Normalize both paths to handle edge cases (trailing slashes, whitespace)
+		return normalizePath(userCurrentDir) === normalizePath(requiredDir);
 	}
 
 	// Get short directory name for display

@@ -3471,6 +3471,9 @@ Annotation identified 4,523 coding sequences.
 		const { WebLinksAddon } = await import('@xterm/addon-web-links');
 		await import('@xterm/xterm/css/xterm.css');
 
+		// Sync the store with the initial directory to ensure StoryPanel is in sync
+		currentDirectory.set(currentDir);
+
 		terminal = new Terminal(terminalOptions);
 		fitAddon = new FitAddon();
 		const webLinksAddon = new WebLinksAddon();
