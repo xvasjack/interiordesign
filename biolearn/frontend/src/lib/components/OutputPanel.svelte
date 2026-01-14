@@ -370,13 +370,6 @@
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
-			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'files' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'files' ? '#2563eb' : '#4b5563'};"
-			onclick={() => (activeTab = 'files')}
-		>
-			📁 Files
-		</button>
-		<button
-			class="px-4 py-2 text-sm font-medium transition-colors"
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'notes' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'notes' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'notes')}
 		>
@@ -462,47 +455,6 @@
 			{:else}
 				<div class="h-full flex items-center justify-center text-gray-400">
 					<p>No summary data available</p>
-				</div>
-			{/if}
-		{:else if activeTab === 'files'}
-			{#if currentOutput.files && currentOutput.files.length > 0}
-				<div class="bg-white rounded-lg shadow-sm border">
-					<div class="px-4 py-3 border-b">
-						<h3 class="font-semibold text-gray-800">Generated Files</h3>
-					</div>
-					<ul class="divide-y">
-						{#each currentOutput.files as file}
-							<li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
-								<div class="flex items-center gap-3">
-									<span class="text-2xl">{file.type === 'html' ? '📄' : file.type === 'zip' ? '📦' : '📁'}</span>
-									<div>
-										<p class="font-medium text-gray-800">{file.name}</p>
-										<p class="text-sm text-gray-500">{file.type.toUpperCase()} • {file.size}</p>
-									</div>
-								</div>
-								<div class="flex gap-2">
-									{#if file.type === 'html'}
-										<button
-											class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded text-sm font-medium transition-colors"
-											onclick={() => viewFile(file)}
-										>
-											View
-										</button>
-									{/if}
-									<button
-										class="px-3 py-1 text-green-600 hover:bg-green-50 rounded text-sm font-medium transition-colors"
-										onclick={() => downloadFile(file)}
-									>
-										Download
-									</button>
-								</div>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{:else}
-				<div class="h-full flex items-center justify-center text-gray-400">
-					<p>No files generated</p>
 				</div>
 			{/if}
 		{:else if activeTab === 'notes'}

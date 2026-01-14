@@ -608,29 +608,37 @@
 		const maxLen = isHiFi ? 45678 : (isNanopore ? 32456 : 150);
 		const totalBases = totalReads * readLength;
 
+		// Generate file names for paired-end reads
+		const file1 = inputFile.replace('_R2', '_R1').replace('_2.fastq', '_1.fastq');
+		const file2 = inputFile.replace('_R1', '_R2').replace('_1.fastq', '_2.fastq');
+		const totalBasesAll = totalBases * 2;
+
 		const outputs: Record<string, any> = {
 			'seqkit': {
-				output: `\x1b[32m[INFO]\x1b[0m Processing ${inputFile}...
-file                      format  type   num_seqs      sum_len  min_len  avg_len  max_len
-${inputFile.padEnd(25)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
+				output: `\x1b[32m[INFO]\x1b[0m Processing files...
+file                           format  type   num_seqs      sum_len  min_len  avg_len  max_len
+${file1.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
+${file2.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
 
 \x1b[32m[INFO]\x1b[0m Summary Statistics:
-  Total reads:     ${totalReads.toLocaleString()}
-  Total bases:     ${totalBases.toLocaleString()}
+  Total reads:     ${(totalReads * 2).toLocaleString()} (${totalReads.toLocaleString()} pairs)
+  Total bases:     ${totalBasesAll.toLocaleString()}
   GC content:      ${gcContent}%
   Q20 bases:       ${isLongRead ? '99.8' : '97.2'}%
   Q30 bases:       ${isLongRead ? '98.2' : '93.8'}%
 `,
 				summary: {
-					'File': inputFile,
-					'Total Reads': totalReads.toLocaleString(),
-					'Total Bases': `${(totalBases / 1000000).toFixed(1)} Mb`,
+					'Forward Reads (R1)': file1,
+					'Reverse Reads (R2)': file2,
+					'Reads per File': totalReads.toLocaleString(),
+					'Total Read Pairs': totalReads.toLocaleString(),
+					'Total Bases': `${(totalBasesAll / 1000000).toFixed(1)} Mb`,
 					'Avg Read Length': `${readLength.toLocaleString()} bp`,
 					'GC Content': `${gcContent}%`,
 					'Q20 Bases': isLongRead ? '99.8%' : '97.2%',
 					'Q30 Bases': isLongRead ? '98.2%' : '93.8%'
 				},
-				files: [{ name: 'seqkit_stats.txt', type: 'txt', size: '1.2 KB' }]
+				files: []
 			},
 			'fastqc': {
 				output: `Started analysis of ${inputFile}
