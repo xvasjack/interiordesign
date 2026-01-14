@@ -1175,11 +1175,11 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 2: Quality Control Report',
 				text: `Generate detailed quality reports to identify any issues with the sequencing data.`,
-				command: 'fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o fastqc_output/',
+				command: 'fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o o2_fastqc/',
 				explanation: 'FastQC analyzes per-base quality scores, GC content, adapter contamination, and other quality metrics.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
-					{ name: '-o fastqc_output/', desc: 'Output directory for reports' }
+					{ name: '-o o2_fastqc/', desc: 'Output directory for reports' }
 				]
 			},
 			{

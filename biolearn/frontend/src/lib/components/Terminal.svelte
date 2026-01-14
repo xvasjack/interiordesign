@@ -118,8 +118,8 @@
 		},
 		'fastqc': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['fastqc_output/'],
-			'/data/kpneumoniae_demo/fastqc_output': [
+			'/data/kpneumoniae_demo': ['o2_fastqc/'],
+			'/data/kpneumoniae_demo/o2_fastqc': [
 				'SRR36708862_1_fastqc.html', 'SRR36708862_1_fastqc.zip',
 				'SRR36708862_2_fastqc.html', 'SRR36708862_2_fastqc.zip'
 			],
