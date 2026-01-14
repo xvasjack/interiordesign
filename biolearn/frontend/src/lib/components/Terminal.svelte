@@ -3185,35 +3185,25 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					return;
 				}
 
-				// STRICT MODE: Trial scenario requires exact command
+				// STRICT MODE: Trial scenario requires output redirection
 				if (currentDir === '/data/kpneumoniae_demo') {
 					const hasRedirect = args.includes('>');
 					const outputFile = hasRedirect ? args[args.indexOf('>') + 1] : null;
-					const inputFiles = args.filter(a => a.endsWith('.fastq.gz') && !a.includes('*'));
-					const hasWildcard = args.some(a => a.includes('*'));
-
-					// Check for exact command match
-					const expectedFiles = ['SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz'];
-					const hasCorrectFiles = expectedFiles.every(f => inputFiles.includes(f)) && inputFiles.length === 2;
 					const hasCorrectOutput = outputFile === 'o1_seqkit.stats';
 
-					if (hasWildcard || !hasCorrectFiles || !hasRedirect || !hasCorrectOutput) {
+					// Output redirection is required - this teaches real-world practice
+					if (!hasRedirect || !hasCorrectOutput) {
 						terminal.writeln(`\x1b[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`);
-						terminal.writeln(`\x1b[33m⚠  Tutorial Mode: Please follow the exact command shown\x1b[0m`);
+						terminal.writeln(`\x1b[33m⚠  Tutorial Mode: Output file required\x1b[0m`);
 						terminal.writeln(`\x1b[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`);
 						terminal.writeln(``);
-						terminal.writeln(`\x1b[90mIn this tutorial, please type the command exactly as shown\x1b[0m`);
-						terminal.writeln(`\x1b[90min the right panel to ensure proper learning progression.\x1b[0m`);
+						terminal.writeln(`\x1b[90mIn real bioinformatics workflows, saving output to files is\x1b[0m`);
+						terminal.writeln(`\x1b[90messential for documentation and downstream analysis.\x1b[0m`);
 						terminal.writeln(``);
-						terminal.writeln(`\x1b[36mExpected command:\x1b[0m`);
+						terminal.writeln(`\x1b[36mPlease redirect output to a file:\x1b[0m`);
+						terminal.writeln(`\x1b[32m  seqkit stats *.fastq.gz > o1_seqkit.stats\x1b[0m`);
+						terminal.writeln(`\x1b[90m  or\x1b[0m`);
 						terminal.writeln(`\x1b[32m  seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats\x1b[0m`);
-						terminal.writeln(``);
-						if (hasWildcard) {
-							terminal.writeln(`\x1b[90mNote: Wildcards (*) are not allowed in this tutorial step.\x1b[0m`);
-						}
-						if (!hasRedirect || !hasCorrectOutput) {
-							terminal.writeln(`\x1b[90mNote: Output must be redirected to 'o1_seqkit.stats' file.\x1b[0m`);
-						}
 						writePrompt();
 						return;
 					}
