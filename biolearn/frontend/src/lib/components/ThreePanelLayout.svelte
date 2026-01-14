@@ -32,137 +32,131 @@
 		'sample_01_R1_fastqc.html': `<!DOCTYPE html>
 <html>
 <head>
-<title>FastQC Report - sample_01_R1</title>
+<title>SRR36708862_1.fastq.gz FastQC Report</title>
 <style type="text/css">
-body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
-.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-.header h1 { margin: 0; font-size: 1.8em; }
-.header p { margin: 5px 0 0 0; opacity: 0.9; }
-.module { background: white; margin: 15px 0; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-h2 { color: #006699; font-size: 1.3em; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #006699; }
-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-th { background: #006699; color: white; padding: 12px; text-align: left; }
-td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-tr:hover { background: #f5f9fc; }
-.pass { color: #22c55e; font-weight: bold; }
-.warn { color: #f59e0b; font-weight: bold; }
-.status-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; color: white; font-size: 12px; margin-right: 10px; }
-.status-pass { background: #22c55e; }
-.status-warn { background: #f59e0b; }
-.footer { margin-top: 30px; padding: 15px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Lucida Grande', Tahoma, Arial, sans-serif; font-size: 11px; }
+.header { background: #fff; border-bottom: 1px solid #ccc; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 24px; color: #b00; font-weight: normal; }
+.header-right { text-align: right; font-size: 12px; color: #333; }
+.container { display: flex; }
+.sidebar { width: 180px; background: #f5f5f5; border-right: 1px solid #ccc; min-height: calc(100vh - 50px); padding: 10px; }
+.sidebar h2 { font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+.sidebar ul { list-style: none; }
+.sidebar li { padding: 3px 0; }
+.sidebar a { color: #006; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.pass::before { content: "✓"; color: #0a0; font-weight: bold; }
+.warn::before { content: "!"; color: #c90; font-weight: bold; }
+.fail::before { content: "✗"; color: #c00; font-weight: bold; }
+.main { flex: 1; padding: 15px; }
+.module { margin-bottom: 30px; }
+.module h2 { font-size: 16px; color: #b00; margin-bottom: 10px; }
+table { border-collapse: collapse; margin: 10px 0; }
+th { background: #006; color: #fff; padding: 5px 15px; text-align: left; }
+td { padding: 5px 15px; border: 1px solid #ccc; }
+.chart-box { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; margin: 10px 0; }
+.chart-box p { color: #666; font-style: italic; }
+footer { border-top: 1px solid #ccc; padding: 10px; color: #666; font-size: 11px; }
 </style>
 </head>
 <body>
-<div class="header">
-<h1>FastQC Report</h1>
-<p>sample_01_R1.fastq.gz | Generated: 2024-01-15 10:30:45</p>
-</div>
-<div class="module">
-<h2>Summary</h2>
-<table>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Basic Statistics</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per tile sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence quality scores</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence GC content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Duplication Levels</td></tr>
-<tr><td><span class="status-icon status-warn">!</span><span class="warn">WARN</span></td><td>Adapter Content</td></tr>
-</table>
-</div>
-<div class="module">
-<h2>Basic Statistics</h2>
-<table>
-<tr><th>Measure</th><th>Value</th></tr>
-<tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+<div class="header"><h1>FastQC Report</h1><div class="header-right">Mon 13 Jan 2025<br><strong>SRR36708862_1.fastq.gz</strong></div></div>
+<div class="container">
+<div class="sidebar"><h2>Summary</h2><ul>
+<li><a class="pass">Basic Statistics</a></li>
+<li><a class="pass">Per base sequence quality</a></li>
+<li><a class="pass">Per tile sequence quality</a></li>
+<li><a class="pass">Per sequence quality scores</a></li>
+<li><a class="fail">Per base sequence content</a></li>
+<li><a class="warn">Per sequence GC content</a></li>
+<li><a class="pass">Per base N content</a></li>
+<li><a class="warn">Sequence Length Distribution</a></li>
+<li><a class="pass">Sequence Duplication Levels</a></li>
+<li><a class="pass">Overrepresented sequences</a></li>
+<li><a class="pass">Adapter Content</a></li>
+</ul></div>
+<div class="main">
+<div class="module"><h2>Basic Statistics</h2>
+<table><tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Filename</td><td>SRR36708862_1.fastq.gz</td></tr>
 <tr><td>File type</td><td>Conventional base calls</td></tr>
 <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
-<tr><td>Total Sequences</td><td>2,847,293</td></tr>
+<tr><td>Total Sequences</td><td>990478</td></tr>
+<tr><td>Total Bases</td><td>268.4 Mbp</td></tr>
 <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
-<tr><td>Sequence length</td><td>150</td></tr>
-<tr><td>%GC</td><td>52</td></tr>
-</table>
-</div>
-<div class="module">
-<h2>Per base sequence quality</h2>
-<p>Mean quality score: <strong>36.2</strong> (Excellent)</p>
-</div>
-<div class="module">
-<h2>Adapter Content</h2>
-<p style="color:#f59e0b;">⚠ Warning: 3.2% adapter content detected</p>
-<p style="color:#666;">Recommendation: Run Trimmomatic to remove adapters.</p>
-</div>
-<div class="footer">
-<p>Produced by <strong>FastQC</strong> version 0.12.1</p>
-</div>
-</body>
-</html>`,
+<tr><td>Sequence length</td><td>35-301</td></tr>
+<tr><td>%GC</td><td>56</td></tr></table></div>
+<div class="module"><h2>Per base sequence quality</h2><div class="chart-box"><p>Mean quality scores >Q30 across all positions with typical 3' end decline.</p></div></div>
+<div class="module"><h2>Per sequence quality scores</h2><div class="chart-box"><p>Peak at Q36-37 indicating high-quality sequencing.</p></div></div>
+<div class="module"><h2>Per sequence GC content</h2><div class="chart-box"><p>Peak at 56% GC matching K. pneumoniae expected range.</p></div></div>
+<div class="module"><h2>Adapter Content</h2><div class="chart-box"><p>Adapter content below 0.1% - no trimming required.</p></div></div>
+</div></div>
+<footer>Produced by FastQC (version 0.12.1)</footer>
+</body></html>`,
 		'sample_01_R2_fastqc.html': `<!DOCTYPE html>
 <html>
 <head>
-<title>FastQC Report - sample_01_R2</title>
+<title>SRR36708862_2.fastq.gz FastQC Report</title>
 <style type="text/css">
-body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
-.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-.header h1 { margin: 0; font-size: 1.8em; }
-.header p { margin: 5px 0 0 0; opacity: 0.9; }
-.module { background: white; margin: 15px 0; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-h2 { color: #006699; font-size: 1.3em; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #006699; }
-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-th { background: #006699; color: white; padding: 12px; text-align: left; }
-td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-tr:hover { background: #f5f9fc; }
-.pass { color: #22c55e; font-weight: bold; }
-.warn { color: #f59e0b; font-weight: bold; }
-.status-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; color: white; font-size: 12px; margin-right: 10px; }
-.status-pass { background: #22c55e; }
-.status-warn { background: #f59e0b; }
-.footer { margin-top: 30px; padding: 15px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Lucida Grande', Tahoma, Arial, sans-serif; font-size: 11px; }
+.header { background: #fff; border-bottom: 1px solid #ccc; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 24px; color: #b00; font-weight: normal; }
+.header-right { text-align: right; font-size: 12px; color: #333; }
+.container { display: flex; }
+.sidebar { width: 180px; background: #f5f5f5; border-right: 1px solid #ccc; min-height: calc(100vh - 50px); padding: 10px; }
+.sidebar h2 { font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+.sidebar ul { list-style: none; }
+.sidebar li { padding: 3px 0; }
+.sidebar a { color: #006; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.pass::before { content: "✓"; color: #0a0; font-weight: bold; }
+.warn::before { content: "!"; color: #c90; font-weight: bold; }
+.fail::before { content: "✗"; color: #c00; font-weight: bold; }
+.main { flex: 1; padding: 15px; }
+.module { margin-bottom: 30px; }
+.module h2 { font-size: 16px; color: #b00; margin-bottom: 10px; }
+table { border-collapse: collapse; margin: 10px 0; }
+th { background: #006; color: #fff; padding: 5px 15px; text-align: left; }
+td { padding: 5px 15px; border: 1px solid #ccc; }
+.chart-box { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; margin: 10px 0; }
+.chart-box p { color: #666; font-style: italic; }
+footer { border-top: 1px solid #ccc; padding: 10px; color: #666; font-size: 11px; }
 </style>
 </head>
 <body>
-<div class="header">
-<h1>FastQC Report</h1>
-<p>sample_01_R2.fastq.gz | Generated: 2024-01-15 10:31:02</p>
-</div>
-<div class="module">
-<h2>Summary</h2>
-<table>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Basic Statistics</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per tile sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence quality scores</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence GC content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Duplication Levels</td></tr>
-<tr><td><span class="status-icon status-warn">!</span><span class="warn">WARN</span></td><td>Adapter Content</td></tr>
-</table>
-</div>
-<div class="module">
-<h2>Basic Statistics</h2>
-<table>
-<tr><th>Measure</th><th>Value</th></tr>
-<tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr>
+<div class="header"><h1>FastQC Report</h1><div class="header-right">Mon 13 Jan 2025<br><strong>SRR36708862_2.fastq.gz</strong></div></div>
+<div class="container">
+<div class="sidebar"><h2>Summary</h2><ul>
+<li><a class="pass">Basic Statistics</a></li>
+<li><a class="pass">Per base sequence quality</a></li>
+<li><a class="pass">Per tile sequence quality</a></li>
+<li><a class="pass">Per sequence quality scores</a></li>
+<li><a class="fail">Per base sequence content</a></li>
+<li><a class="warn">Per sequence GC content</a></li>
+<li><a class="pass">Per base N content</a></li>
+<li><a class="warn">Sequence Length Distribution</a></li>
+<li><a class="pass">Sequence Duplication Levels</a></li>
+<li><a class="pass">Overrepresented sequences</a></li>
+<li><a class="pass">Adapter Content</a></li>
+</ul></div>
+<div class="main">
+<div class="module"><h2>Basic Statistics</h2>
+<table><tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Filename</td><td>SRR36708862_2.fastq.gz</td></tr>
 <tr><td>File type</td><td>Conventional base calls</td></tr>
 <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
-<tr><td>Total Sequences</td><td>2,847,293</td></tr>
+<tr><td>Total Sequences</td><td>990478</td></tr>
+<tr><td>Total Bases</td><td>265.8 Mbp</td></tr>
 <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
-<tr><td>Sequence length</td><td>150</td></tr>
-<tr><td>%GC</td><td>52</td></tr>
-</table>
-</div>
-<div class="module">
-<h2>Per base sequence quality</h2>
-<p>Mean quality score: <strong>35.8</strong> (Excellent)</p>
-</div>
-<div class="module">
-<h2>Adapter Content</h2>
-<p style="color:#f59e0b;">⚠ Warning: 2.8% adapter content detected</p>
-<p style="color:#666;">Recommendation: Run Trimmomatic to remove adapters.</p>
-</div>
-<div class="footer">
-<p>Produced by <strong>FastQC</strong> version 0.12.1</p>
-</div>
-</body>
-</html>`,
+<tr><td>Sequence length</td><td>35-301</td></tr>
+<tr><td>%GC</td><td>56</td></tr></table></div>
+<div class="module"><h2>Per base sequence quality</h2><div class="chart-box"><p>R2 reads show slightly lower quality at 3' end (normal for paired-end Illumina).</p></div></div>
+<div class="module"><h2>Per sequence quality scores</h2><div class="chart-box"><p>Peak at Q35-36 indicating high-quality sequencing.</p></div></div>
+<div class="module"><h2>Per sequence GC content</h2><div class="chart-box"><p>Peak at 56% GC consistent with K. pneumoniae.</p></div></div>
+<div class="module"><h2>Adapter Content</h2><div class="chart-box"><p>Adapter content below 0.1% - no trimming required.</p></div></div>
+</div></div>
+<footer>Produced by FastQC (version 0.12.1)</footer>
+</body></html>`,
 		'assembly.fasta': `>contig_1 length=4892156 depth=45.2x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_2 length=95234 depth=78.5x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234`,
 		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,

@@ -69,219 +69,292 @@
 		// SeqKit stats
 		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
 
-		// FastQC reports (realistic format)
+		// FastQC reports (realistic format matching actual FastQC output)
 		'sample_01_R1_fastqc.html': `<!DOCTYPE html>
 <html>
 <head>
-<title>FastQC Report - sample_01_R1</title>
+<title>SRR36708862_1.fastq.gz FastQC Report</title>
 <style type="text/css">
-body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
-.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-.header h1 { margin: 0; font-size: 1.8em; }
-.header p { margin: 5px 0 0 0; opacity: 0.9; }
-.module { background: white; margin: 15px 0; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-h2 { color: #006699; font-size: 1.3em; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #006699; }
-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-th { background: #006699; color: white; padding: 12px; text-align: left; }
-td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-tr:hover { background: #f5f9fc; }
-.pass { color: #22c55e; font-weight: bold; }
-.warn { color: #f59e0b; font-weight: bold; }
-.fail { color: #ef4444; font-weight: bold; }
-.status-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; color: white; font-size: 12px; margin-right: 10px; }
-.status-pass { background: #22c55e; }
-.status-warn { background: #f59e0b; }
-.footer { margin-top: 30px; padding: 15px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Lucida Grande', Tahoma, Arial, sans-serif; font-size: 11px; }
+.header { background: #fff; border-bottom: 1px solid #ccc; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 24px; color: #b00; font-weight: normal; }
+.header h1::before { content: "🔬"; margin-right: 5px; }
+.header-right { text-align: right; font-size: 12px; color: #333; }
+.container { display: flex; }
+.sidebar { width: 180px; background: #f5f5f5; border-right: 1px solid #ccc; min-height: calc(100vh - 50px); padding: 10px; }
+.sidebar h2 { font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+.sidebar ul { list-style: none; }
+.sidebar li { padding: 3px 0; }
+.sidebar a { color: #006; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.sidebar a:hover { text-decoration: underline; }
+.pass::before { content: "✓"; color: #0a0; font-weight: bold; }
+.warn::before { content: "!"; color: #c90; font-weight: bold; background: #fc0; border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+.fail::before { content: "✗"; color: #fff; font-weight: bold; background: #c00; border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+.main { flex: 1; padding: 15px; }
+.module { margin-bottom: 30px; }
+.module h2 { font-size: 16px; color: #b00; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+table { border-collapse: collapse; margin: 10px 0; }
+th { background: #006; color: #fff; padding: 5px 15px; text-align: left; }
+td { padding: 5px 15px; border: 1px solid #ccc; }
+tr:nth-child(even) { background: #f9f9f9; }
+.chart-placeholder { background: linear-gradient(180deg, #0f0 0%, #ff0 50%, #f00 100%); height: 200px; margin: 10px 0; border: 1px solid #ccc; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; color: #333; font-size: 10px; }
+.chart-box { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; margin: 10px 0; }
+.chart-box p { color: #666; font-style: italic; }
+footer { border-top: 1px solid #ccc; padding: 10px; text-align: left; color: #666; font-size: 11px; }
+footer a { color: #006; }
 </style>
 </head>
 <body>
 <div class="header">
 <h1>FastQC Report</h1>
-<p>sample_01_R1.fastq.gz | Generated: 2024-01-15 10:30:45</p>
+<div class="header-right">Mon 13 Jan 2025<br><strong>SRR36708862_1.fastq.gz</strong></div>
 </div>
-
-<div class="module">
+<div class="container">
+<div class="sidebar">
 <h2>Summary</h2>
-<table>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Basic Statistics</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per tile sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence quality scores</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence GC content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base N content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Length Distribution</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Duplication Levels</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Overrepresented sequences</td></tr>
-<tr><td><span class="status-icon status-warn">!</span><span class="warn">WARN</span></td><td>Adapter Content</td></tr>
-</table>
+<ul>
+<li><a href="#basic" class="pass">Basic Statistics</a></li>
+<li><a href="#quality" class="pass">Per base sequence quality</a></li>
+<li><a href="#tile" class="pass">Per tile sequence quality</a></li>
+<li><a href="#seqqual" class="pass">Per sequence quality scores</a></li>
+<li><a href="#basecontent" class="fail">Per base sequence content</a></li>
+<li><a href="#gc" class="warn">Per sequence GC content</a></li>
+<li><a href="#ncontent" class="pass">Per base N content</a></li>
+<li><a href="#length" class="warn">Sequence Length Distribution</a></li>
+<li><a href="#dup" class="pass">Sequence Duplication Levels</a></li>
+<li><a href="#overrep" class="pass">Overrepresented sequences</a></li>
+<li><a href="#adapter" class="pass">Adapter Content</a></li>
+</ul>
 </div>
-
-<div class="module">
-<h2>Basic Statistics</h2>
+<div class="main">
+<div class="module" id="basic">
+<h2><span class="pass"></span>Basic Statistics</h2>
 <table>
 <tr><th>Measure</th><th>Value</th></tr>
-<tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+<tr><td>Filename</td><td>SRR36708862_1.fastq.gz</td></tr>
 <tr><td>File type</td><td>Conventional base calls</td></tr>
 <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
-<tr><td>Total Sequences</td><td>2,847,293</td></tr>
+<tr><td>Total Sequences</td><td>990478</td></tr>
+<tr><td>Total Bases</td><td>268.4 Mbp</td></tr>
 <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
-<tr><td>Sequence length</td><td>150</td></tr>
-<tr><td>%GC</td><td>52</td></tr>
+<tr><td>Sequence length</td><td>35-301</td></tr>
+<tr><td>%GC</td><td>56</td></tr>
 </table>
 </div>
-
-<div class="module">
-<h2>Per base sequence quality</h2>
-<p>Quality scores across all bases. Mean quality score: <strong>36.2</strong> (Excellent)</p>
-<p style="color:#666;">All positions show quality scores above Q30 threshold, with slight decrease at 3' end (normal for Illumina).</p>
+<div class="module" id="quality">
+<h2><span class="pass"></span>Per base sequence quality</h2>
+<div class="chart-box">
+<p>Quality scores across all bases (Sanger / Illumina 1.9 encoding)</p>
+<p>Mean quality scores range from 32-38 across all positions. Quality remains high (>Q30) throughout the read length with slight decrease at 3' end, which is typical for Illumina sequencing.</p>
 </div>
-
-<div class="module">
-<h2>Per sequence quality scores</h2>
-<p>Mean Sequence Quality: <strong>36.2</strong></p>
-<p style="color:#666;">Peak at Q36, indicating high-quality sequencing run.</p>
 </div>
-
-<div class="module">
-<h2>Per sequence GC content</h2>
-<p>GC content peak: <strong>52%</strong></p>
-<p style="color:#666;">Matches expected GC content for Klebsiella pneumoniae (50-58%).</p>
+<div class="module" id="tile">
+<h2><span class="pass"></span>Per tile sequence quality</h2>
+<div class="chart-box">
+<p>Quality per tile</p>
+<p>All tiles show consistent quality with no significant deviations. Blue coloring indicates uniform quality across the flow cell.</p>
 </div>
-
-<div class="module">
-<h2>Sequence Duplication Levels</h2>
-<table>
-<tr><th>Duplication Level</th><th>% of Library</th></tr>
-<tr><td>1 (unique)</td><td>85.2%</td></tr>
-<tr><td>2</td><td>8.3%</td></tr>
-<tr><td>3</td><td>3.1%</td></tr>
-<tr><td>>10</td><td>3.4%</td></tr>
-</table>
 </div>
-
-<div class="module">
-<h2>Adapter Content</h2>
-<p style="color:#f59e0b;">⚠ Warning: Adapter content detected at 3' end</p>
-<table>
-<tr><th>Adapter</th><th>% at 150bp</th></tr>
-<tr><td>Illumina Universal Adapter</td><td>3.2%</td></tr>
-<tr><td>Illumina Small RNA Adapter</td><td>0.1%</td></tr>
-<tr><td>Nextera Transposase</td><td>0.0%</td></tr>
-</table>
-<p style="color:#666; font-size:0.9em;">Recommendation: Run Trimmomatic to remove adapter sequences before assembly.</p>
+<div class="module" id="seqqual">
+<h2><span class="pass"></span>Per sequence quality scores</h2>
+<div class="chart-box">
+<p>Quality score distribution over all sequences</p>
+<p>Peak at Q36-37, indicating high-quality sequencing. Average quality per read shows a sharp peak at high quality scores.</p>
 </div>
-
-<div class="footer">
-<p>Produced by <strong>FastQC</strong> version 0.12.1 | Babraham Bioinformatics</p>
 </div>
+<div class="module" id="basecontent">
+<h2><span class="fail"></span>Per base sequence content</h2>
+<div class="chart-box">
+<p>Sequence content across all bases</p>
+<p>Shows %A, %T, %G, %C at each position. Initial positions show bias typical of random hexamer priming. Lines stabilize around 25% each after position 15.</p>
+</div>
+</div>
+<div class="module" id="gc">
+<h2><span class="warn"></span>Per sequence GC content</h2>
+<div class="chart-box">
+<p>GC distribution over all sequences</p>
+<p>Peak at 56% GC, matching expected GC content for Klebsiella pneumoniae (50-58%). Distribution follows theoretical normal curve.</p>
+</div>
+</div>
+<div class="module" id="ncontent">
+<h2><span class="pass"></span>Per base N content</h2>
+<div class="chart-box">
+<p>N content across all bases</p>
+<p>N content is essentially 0% across all positions, indicating high-quality base calling.</p>
+</div>
+</div>
+<div class="module" id="length">
+<h2><span class="warn"></span>Sequence Length Distribution</h2>
+<div class="chart-box">
+<p>Distribution of sequence lengths over all sequences</p>
+<p>Read lengths range from 35-301 bp with peak at 301 bp. Variable lengths indicate quality trimming has been applied.</p>
+</div>
+</div>
+<div class="module" id="dup">
+<h2><span class="pass"></span>Sequence Duplication Levels</h2>
+<div class="chart-box">
+<p>Percent of sequences remaining if deduplicated</p>
+<p>85.2% of sequences are unique. Low duplication levels indicate good library complexity.</p>
+</div>
+</div>
+<div class="module" id="overrep">
+<h2><span class="pass"></span>Overrepresented sequences</h2>
+<div class="chart-box">
+<p>No overrepresented sequences found.</p>
+</div>
+</div>
+<div class="module" id="adapter">
+<h2><span class="pass"></span>Adapter Content</h2>
+<div class="chart-box">
+<p>% of sequences with adapter at each position</p>
+<p>Adapter content is below 0.1% at all positions. No trimming required.</p>
+</div>
+</div>
+</div>
+</div>
+<footer>
+Produced by <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> (version 0.12.1)
+</footer>
 </body>
 </html>`,
 		'sample_01_R2_fastqc.html': `<!DOCTYPE html>
 <html>
 <head>
-<title>FastQC Report - sample_01_R2</title>
+<title>SRR36708862_2.fastq.gz FastQC Report</title>
 <style type="text/css">
-body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
-.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-.header h1 { margin: 0; font-size: 1.8em; }
-.header p { margin: 5px 0 0 0; opacity: 0.9; }
-.module { background: white; margin: 15px 0; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-h2 { color: #006699; font-size: 1.3em; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #006699; }
-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-th { background: #006699; color: white; padding: 12px; text-align: left; }
-td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-tr:hover { background: #f5f9fc; }
-.pass { color: #22c55e; font-weight: bold; }
-.warn { color: #f59e0b; font-weight: bold; }
-.fail { color: #ef4444; font-weight: bold; }
-.status-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; color: white; font-size: 12px; margin-right: 10px; }
-.status-pass { background: #22c55e; }
-.status-warn { background: #f59e0b; }
-.footer { margin-top: 30px; padding: 15px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Lucida Grande', Tahoma, Arial, sans-serif; font-size: 11px; }
+.header { background: #fff; border-bottom: 1px solid #ccc; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 24px; color: #b00; font-weight: normal; }
+.header h1::before { content: "🔬"; margin-right: 5px; }
+.header-right { text-align: right; font-size: 12px; color: #333; }
+.container { display: flex; }
+.sidebar { width: 180px; background: #f5f5f5; border-right: 1px solid #ccc; min-height: calc(100vh - 50px); padding: 10px; }
+.sidebar h2 { font-size: 14px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+.sidebar ul { list-style: none; }
+.sidebar li { padding: 3px 0; }
+.sidebar a { color: #006; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.sidebar a:hover { text-decoration: underline; }
+.pass::before { content: "✓"; color: #0a0; font-weight: bold; }
+.warn::before { content: "!"; color: #c90; font-weight: bold; background: #fc0; border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+.fail::before { content: "✗"; color: #fff; font-weight: bold; background: #c00; border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+.main { flex: 1; padding: 15px; }
+.module { margin-bottom: 30px; }
+.module h2 { font-size: 16px; color: #b00; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+table { border-collapse: collapse; margin: 10px 0; }
+th { background: #006; color: #fff; padding: 5px 15px; text-align: left; }
+td { padding: 5px 15px; border: 1px solid #ccc; }
+tr:nth-child(even) { background: #f9f9f9; }
+.chart-box { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; margin: 10px 0; }
+.chart-box p { color: #666; font-style: italic; }
+footer { border-top: 1px solid #ccc; padding: 10px; text-align: left; color: #666; font-size: 11px; }
+footer a { color: #006; }
 </style>
 </head>
 <body>
 <div class="header">
 <h1>FastQC Report</h1>
-<p>sample_01_R2.fastq.gz | Generated: 2024-01-15 10:31:02</p>
+<div class="header-right">Mon 13 Jan 2025<br><strong>SRR36708862_2.fastq.gz</strong></div>
 </div>
-
-<div class="module">
+<div class="container">
+<div class="sidebar">
 <h2>Summary</h2>
-<table>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Basic Statistics</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per tile sequence quality</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence quality scores</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence GC content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base N content</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Length Distribution</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Duplication Levels</td></tr>
-<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Overrepresented sequences</td></tr>
-<tr><td><span class="status-icon status-warn">!</span><span class="warn">WARN</span></td><td>Adapter Content</td></tr>
-</table>
+<ul>
+<li><a href="#basic" class="pass">Basic Statistics</a></li>
+<li><a href="#quality" class="pass">Per base sequence quality</a></li>
+<li><a href="#tile" class="pass">Per tile sequence quality</a></li>
+<li><a href="#seqqual" class="pass">Per sequence quality scores</a></li>
+<li><a href="#basecontent" class="fail">Per base sequence content</a></li>
+<li><a href="#gc" class="warn">Per sequence GC content</a></li>
+<li><a href="#ncontent" class="pass">Per base N content</a></li>
+<li><a href="#length" class="warn">Sequence Length Distribution</a></li>
+<li><a href="#dup" class="pass">Sequence Duplication Levels</a></li>
+<li><a href="#overrep" class="pass">Overrepresented sequences</a></li>
+<li><a href="#adapter" class="pass">Adapter Content</a></li>
+</ul>
 </div>
-
-<div class="module">
-<h2>Basic Statistics</h2>
+<div class="main">
+<div class="module" id="basic">
+<h2><span class="pass"></span>Basic Statistics</h2>
 <table>
 <tr><th>Measure</th><th>Value</th></tr>
-<tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr>
+<tr><td>Filename</td><td>SRR36708862_2.fastq.gz</td></tr>
 <tr><td>File type</td><td>Conventional base calls</td></tr>
 <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
-<tr><td>Total Sequences</td><td>2,847,293</td></tr>
+<tr><td>Total Sequences</td><td>990478</td></tr>
+<tr><td>Total Bases</td><td>265.8 Mbp</td></tr>
 <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
-<tr><td>Sequence length</td><td>150</td></tr>
-<tr><td>%GC</td><td>52</td></tr>
+<tr><td>Sequence length</td><td>35-301</td></tr>
+<tr><td>%GC</td><td>56</td></tr>
 </table>
 </div>
-
-<div class="module">
-<h2>Per base sequence quality</h2>
-<p>Quality scores across all bases. Mean quality score: <strong>35.8</strong> (Excellent)</p>
-<p style="color:#666;">R2 reads show slightly lower quality than R1 at 3' end (normal for paired-end Illumina).</p>
+<div class="module" id="quality">
+<h2><span class="pass"></span>Per base sequence quality</h2>
+<div class="chart-box">
+<p>Quality scores across all bases (Sanger / Illumina 1.9 encoding)</p>
+<p>R2 reads show slightly lower quality than R1 at 3' end, which is normal for paired-end Illumina. Mean scores remain above Q28 throughout.</p>
 </div>
-
-<div class="module">
-<h2>Per sequence quality scores</h2>
-<p>Mean Sequence Quality: <strong>35.8</strong></p>
-<p style="color:#666;">Peak at Q35-36, indicating high-quality sequencing run.</p>
 </div>
-
-<div class="module">
-<h2>Per sequence GC content</h2>
-<p>GC content peak: <strong>52%</strong></p>
-<p style="color:#666;">Matches expected GC content for Klebsiella pneumoniae (50-58%).</p>
+<div class="module" id="tile">
+<h2><span class="pass"></span>Per tile sequence quality</h2>
+<div class="chart-box">
+<p>Quality per tile - All tiles show consistent quality across the flow cell.</p>
 </div>
-
-<div class="module">
-<h2>Sequence Duplication Levels</h2>
-<table>
-<tr><th>Duplication Level</th><th>% of Library</th></tr>
-<tr><td>1 (unique)</td><td>84.8%</td></tr>
-<tr><td>2</td><td>8.5%</td></tr>
-<tr><td>3</td><td>3.2%</td></tr>
-<tr><td>>10</td><td>3.5%</td></tr>
-</table>
 </div>
-
-<div class="module">
-<h2>Adapter Content</h2>
-<p style="color:#f59e0b;">⚠ Warning: Adapter content detected at 3' end</p>
-<table>
-<tr><th>Adapter</th><th>% at 150bp</th></tr>
-<tr><td>Illumina Universal Adapter</td><td>2.8%</td></tr>
-<tr><td>Illumina Small RNA Adapter</td><td>0.1%</td></tr>
-<tr><td>Nextera Transposase</td><td>0.0%</td></tr>
-</table>
-<p style="color:#666; font-size:0.9em;">Recommendation: Run Trimmomatic to remove adapter sequences before assembly.</p>
+<div class="module" id="seqqual">
+<h2><span class="pass"></span>Per sequence quality scores</h2>
+<div class="chart-box">
+<p>Quality score distribution shows peak at Q35-36, indicating high-quality sequencing run.</p>
 </div>
-
-<div class="footer">
-<p>Produced by <strong>FastQC</strong> version 0.12.1 | Babraham Bioinformatics</p>
 </div>
+<div class="module" id="basecontent">
+<h2><span class="fail"></span>Per base sequence content</h2>
+<div class="chart-box">
+<p>Initial positions show bias typical of random hexamer priming. This is expected and does not affect downstream analysis.</p>
+</div>
+</div>
+<div class="module" id="gc">
+<h2><span class="warn"></span>Per sequence GC content</h2>
+<div class="chart-box">
+<p>Peak at 56% GC, consistent with K. pneumoniae genome. Distribution matches theoretical curve.</p>
+</div>
+</div>
+<div class="module" id="ncontent">
+<h2><span class="pass"></span>Per base N content</h2>
+<div class="chart-box">
+<p>N content is essentially 0% across all positions.</p>
+</div>
+</div>
+<div class="module" id="length">
+<h2><span class="warn"></span>Sequence Length Distribution</h2>
+<div class="chart-box">
+<p>Read lengths range from 35-301 bp with peak at 301 bp.</p>
+</div>
+</div>
+<div class="module" id="dup">
+<h2><span class="pass"></span>Sequence Duplication Levels</h2>
+<div class="chart-box">
+<p>84.8% of sequences are unique. Good library complexity.</p>
+</div>
+</div>
+<div class="module" id="overrep">
+<h2><span class="pass"></span>Overrepresented sequences</h2>
+<div class="chart-box">
+<p>No overrepresented sequences found.</p>
+</div>
+</div>
+<div class="module" id="adapter">
+<h2><span class="pass"></span>Adapter Content</h2>
+<div class="chart-box">
+<p>Adapter content below 0.1% at all positions. No trimming required.</p>
+</div>
+</div>
+</div>
+</div>
+<footer>
+Produced by <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> (version 0.12.1)
+</footer>
 </body>
 </html>`,
 		'sample_01_R1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
