@@ -110,6 +110,12 @@
 
 	// Files created by each tool
 	const toolCreatedFiles: Record<string, Record<string, string[]>> = {
+		'seqkit': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['o1_seqkit.stats'],
+			// Hospital outbreak scenario
+			'/data/outbreak_investigation': ['seqkit_stats.txt']
+		},
 		'fastqc': {
 			// Trial/Demo scenario
 			'/data/kpneumoniae_demo': ['fastqc_output/'],
@@ -4550,7 +4556,14 @@ Status: Complete
 Quality metrics passed all thresholds.
 Assembly completed successfully.
 Annotation identified 4,523 coding sequences.
-...`
+...`,
+		// SeqKit stats output
+		'o1_seqkit.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
+SRR36708862_1.fastq.gz     FASTQ   DNA   2,013,579  302,036,850      150      150      150
+SRR36708862_2.fastq.gz     FASTQ   DNA   2,013,579  302,036,850      150      150      150`,
+		'.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
+sample_01_R1.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      150      150
+sample_01_R2.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      150      150`
 	};
 
 	function handleFileView(cmd: string, args: string[]) {

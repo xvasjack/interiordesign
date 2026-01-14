@@ -1161,13 +1161,14 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			{
 				type: 'task',
 				title: 'Step 1: Check Sequencing Statistics',
-				text: `Let's start by examining basic statistics about our sequencing data.`,
-				command: 'seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz',
-				explanation: 'SeqKit provides quick statistics including read count, total bases, and average read length.',
+				text: `Let's start by examining basic statistics about our sequencing data and save the results to a file.`,
+				command: 'seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats',
+				explanation: 'SeqKit provides quick statistics including read count, total bases, and average read length. Output is saved to a file for reference.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
 					{ name: 'stats', desc: 'Generate sequence statistics' },
-					{ name: 'SRR36708862_*.fastq.gz', desc: 'Input paired-end FASTQ files' }
+					{ name: 'SRR36708862_*.fastq.gz', desc: 'Input paired-end FASTQ files' },
+					{ name: '> o1_seqkit.stats', desc: 'Redirect output to file' }
 				]
 			},
 			{
