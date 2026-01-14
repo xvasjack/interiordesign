@@ -303,16 +303,35 @@
 			layout.yaxis.rangemode = 'tozero';
 		} else {
 			// Line chart for FastQC quality scores
-			traces.push({
-				x: chartData.positions || chartData.x,
-				y: chartData.scores || chartData.y,
-				type: 'scatter',
-				mode: 'lines',
-				fill: 'tozeroy',
-				fillcolor: 'rgba(16, 185, 129, 0.2)',
-				line: { color: '#10b981', width: 2 },
-				name: chartData.name || 'Quality Score'
-			});
+			const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+
+			if (chartData.datasets && Array.isArray(chartData.datasets)) {
+				// Multiple datasets (e.g., R1 and R2)
+				chartData.datasets.forEach((dataset: any, idx: number) => {
+					traces.push({
+						x: dataset.positions || chartData.x,
+						y: dataset.scores || chartData.y,
+						type: 'scatter',
+						mode: 'lines',
+						fill: idx === 0 ? 'tozeroy' : 'none',
+						fillcolor: idx === 0 ? 'rgba(16, 185, 129, 0.15)' : undefined,
+						line: { color: colors[idx % colors.length], width: 2 },
+						name: dataset.label || `Dataset ${idx + 1}`
+					});
+				});
+			} else {
+				// Single dataset
+				traces.push({
+					x: chartData.positions || chartData.x,
+					y: chartData.scores || chartData.y,
+					type: 'scatter',
+					mode: 'lines',
+					fill: 'tozeroy',
+					fillcolor: 'rgba(16, 185, 129, 0.2)',
+					line: { color: '#10b981', width: 2 },
+					name: chartData.name || 'Quality Score'
+				});
+			}
 
 			// Add quality threshold lines for FastQC
 			if (chartData.yLabel?.includes('Phred') || chartData.yLabel?.includes('Quality')) {
@@ -322,7 +341,7 @@
 					y: [30, 30],
 					type: 'scatter',
 					mode: 'lines',
-					line: { color: '#10b981', width: 1, dash: 'dash' },
+					line: { color: '#9ca3af', width: 1, dash: 'dash' },
 					name: 'Q30 (Excellent)',
 					showlegend: true
 				});
@@ -332,7 +351,7 @@
 					y: [20, 20],
 					type: 'scatter',
 					mode: 'lines',
-					line: { color: '#f59e0b', width: 1, dash: 'dash' },
+					line: { color: '#d1d5db', width: 1, dash: 'dash' },
 					name: 'Q20 (Acceptable)',
 					showlegend: true
 				});

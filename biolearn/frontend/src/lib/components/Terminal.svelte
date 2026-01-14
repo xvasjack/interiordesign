@@ -641,40 +641,50 @@ ${file2.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.
 				files: []
 			},
 			'fastqc': {
-				output: `Started analysis of ${inputFile}
-Approx 5% complete for ${inputFile}
-Approx 15% complete for ${inputFile}
-Approx 30% complete for ${inputFile}
-Approx 50% complete for ${inputFile}
-Approx 70% complete for ${inputFile}
-Approx 85% complete for ${inputFile}
-Approx 95% complete for ${inputFile}
-Analysis complete for ${inputFile}
+				output: `Started analysis of ${file1}
+Approx 50% complete for ${file1}
+Analysis complete for ${file1}
+Started analysis of ${file2}
+Approx 50% complete for ${file2}
+Analysis complete for ${file2}
 `,
 				summary: {
-					'File': inputFile,
-					'Total Sequences': totalReads.toLocaleString(),
+					'Forward Reads (R1)': file1,
+					'R1 Total Sequences': totalReads.toLocaleString(),
+					'R1 Quality': 'PASS',
+					'Reverse Reads (R2)': file2,
+					'R2 Total Sequences': totalReads.toLocaleString(),
+					'R2 Quality': 'PASS',
 					'Sequence Length': isLongRead ? `${minLen}-${maxLen} bp` : '150 bp',
 					'GC Content': `${gcContent}%`,
-					'Per Base Quality': 'PASS',
-					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`,
-					'Overall Quality': 'PASS'
+					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`
 				},
 				chartData: {
-					title: `Per Base Sequence Quality - ${inputFile}`,
-					positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
-					scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
-						const base = isLongRead ? (isHiFi ? 33 : 18) : (isR2 ? 31 : 32);
-						const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
-						return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.1 : 0);
-					}),
+					title: `Per Base Sequence Quality`,
+					datasets: [
+						{
+							label: file1,
+							positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
+							scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
+								const base = isLongRead ? (isHiFi ? 33 : 18) : 32;
+								const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
+								return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.1 : 0);
+							})
+						},
+						{
+							label: file2,
+							positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
+							scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
+								const base = isLongRead ? (isHiFi ? 33 : 18) : 31;
+								const seed = (i * 7 + parseInt(sampleNum) * 17) % 100;
+								return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.12 : 0);
+							})
+						}
+					],
 					xLabel: 'Position in read (bp)',
 					yLabel: 'Quality Score (Phred)'
 				},
-				files: [
-					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.html`, type: 'html', size: '245 KB' },
-					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
-				]
+				files: []
 			},
 			'multiqc': {
 				output: `\x1b[34m/// \x1b[0m\x1b[1mMultiQC\x1b[0m 🔍 | v1.14
