@@ -1173,7 +1173,19 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 2: Quality Control Report',
+				title: 'Step 2: View Statistics Results',
+				text: `Now let's view the sequencing statistics we just generated.`,
+				command: 'cat o1_seqkit.stats',
+				explanation: 'The cat command displays file contents. We can see ~2 million paired-end reads totaling ~600 Mb, sufficient for bacterial genome assembly.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: 'cat', desc: 'Concatenate and display file contents' },
+					{ name: 'o1_seqkit.stats', desc: 'The statistics output file' }
+				]
+			},
+			{
+				type: 'task',
+				title: 'Step 3: Quality Control Report',
 				text: `Generate detailed quality reports to identify any issues with the sequencing data.`,
 				command: 'fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o o2_fastqc/',
 				explanation: 'FastQC analyzes per-base quality scores, GC content, adapter contamination, and other quality metrics.',
@@ -1190,7 +1202,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 3: Adapter Trimming',
+				title: 'Step 4: Adapter Trimming',
 				text: `Remove Illumina adapters and trim low-quality bases from read ends.`,
 				command: 'trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz trimmed/SRR36708862_R1_paired.fq.gz trimmed/SRR36708862_R1_unpaired.fq.gz trimmed/SRR36708862_R2_paired.fq.gz trimmed/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
 				explanation: 'Trimmomatic removes adapter sequences and trims bases with quality below threshold.',
@@ -1211,7 +1223,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 4: De Novo Assembly',
+				title: 'Step 5: De Novo Assembly',
 				text: `Assemble the trimmed reads into contigs using Unicycler.`,
 				command: 'unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o assembly/',
 				explanation: 'Unicycler uses SPAdes with multiple k-mer sizes and optimizes the assembly graph.',
@@ -1223,7 +1235,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 5: Visualize Assembly Graph',
+				title: 'Step 6: Visualize Assembly Graph',
 				text: `Create a visual representation of the assembly graph to understand genome structure.`,
 				command: 'bandage image assembly/assembly.gfa assembly_graph.png',
 				explanation: 'Bandage visualizes the assembly graph showing how contigs connect.',
@@ -1241,7 +1253,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 6: Assembly Metrics',
+				title: 'Step 7: Assembly Metrics',
 				text: `Calculate assembly statistics including N50, total length, and contig count.`,
 				command: 'quast assembly/assembly.fasta -o quast_output/',
 				explanation: 'QUAST calculates key assembly metrics to assess quality.',
@@ -1252,7 +1264,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 7: Genome Completeness',
+				title: 'Step 8: Genome Completeness',
 				text: `Assess genome completeness and contamination using CheckM2.`,
 				command: 'checkm2 predict --input assembly/ --output-directory checkm2_output/ -x fasta',
 				explanation: 'CheckM2 uses machine learning to estimate completeness and contamination.',
@@ -1270,7 +1282,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 8: AMR Gene Detection',
+				title: 'Step 9: AMR Gene Detection',
 				text: `Screen the assembly for antimicrobial resistance genes using multiple databases.`,
 				command: 'abricate --db ncbi assembly/assembly.fasta > abricate_output/amr_ncbi.tab',
 				explanation: 'ABRicate rapidly screens for resistance genes against curated databases.',
@@ -1282,7 +1294,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 9: MLST Typing',
+				title: 'Step 10: MLST Typing',
 				text: `Determine the sequence type (ST) for epidemiological classification.`,
 				command: 'mlst assembly/assembly.fasta > mlst_output/mlst_result.tab',
 				explanation: 'MLST identifies the allelic profile of 7 housekeeping genes to assign a sequence type.',
@@ -1299,7 +1311,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 10: Gene Annotation',
+				title: 'Step 11: Gene Annotation',
 				text: `Annotate the genome to identify coding sequences, tRNAs, and rRNAs.`,
 				command: 'prokka --outdir prokka_output/ assembly/assembly.fasta',
 				explanation: 'Prokka performs rapid prokaryotic genome annotation.',
