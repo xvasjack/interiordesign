@@ -33,9 +33,10 @@
 	// Base filesystem - sequencing data files exist at start (from sequencer)
 	const baseFilesystem: Record<string, string[]> = {
 		'/data/outbreak_investigation': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz',
+			'reference.gbk', 'sample_info.tsv'
 		],
 		'/data/wastewater_surveillance': [
 			'sample_01_hifi.fastq.gz',
@@ -108,8 +109,12 @@
 		'fastqc': {
 			'/data/outbreak_investigation': ['qc_reports/'],
 			'/data/outbreak_investigation/qc_reports': [
-				'sample_01_R1_fastqc.html', 'sample_01_R1_fastqc.zip',
-				'sample_01_R2_fastqc.html', 'sample_01_R2_fastqc.zip'
+				'patient_01_R1_fastqc.html', 'patient_01_R1_fastqc.zip',
+				'patient_01_R2_fastqc.html', 'patient_01_R2_fastqc.zip',
+				'patient_02_R1_fastqc.html', 'patient_02_R1_fastqc.zip',
+				'patient_02_R2_fastqc.html', 'patient_02_R2_fastqc.zip',
+				'patient_03_R1_fastqc.html', 'patient_03_R1_fastqc.zip',
+				'patient_03_R2_fastqc.html', 'patient_03_R2_fastqc.zip'
 			],
 			// Amplicon directories
 			'/data/gut_microbiome': ['qc_reports/'],
@@ -133,7 +138,10 @@
 			]
 		},
 		'multiqc': {
-			'/data/outbreak_investigation': ['multiqc_report.html', 'multiqc_data/'],
+			'/data/outbreak_investigation': ['multiqc_report.html', 'multiqc_data/', 'multiqc_output/'],
+			'/data/outbreak_investigation/multiqc_output': [
+				'multiqc_report.html', 'multiqc_data/'
+			],
 			'/data/gut_microbiome': ['multiqc_report.html', 'multiqc_data/'],
 			'/data/soil_microbiome': ['multiqc_report.html', 'multiqc_data/'],
 			'/data/water_samples': ['multiqc_report.html', 'multiqc_data/']
@@ -141,38 +149,71 @@
 		'trimmomatic': {
 			'/data/outbreak_investigation': ['trimmed/'],
 			'/data/outbreak_investigation/trimmed': [
-				'sample_01_R1_paired.fq.gz', 'sample_01_R2_paired.fq.gz',
-				'sample_01_R1_unpaired.fq.gz', 'sample_01_R2_unpaired.fq.gz'
+				'patient_01_R1_paired.fq.gz', 'patient_01_R2_paired.fq.gz',
+				'patient_01_R1_unpaired.fq.gz', 'patient_01_R2_unpaired.fq.gz',
+				'patient_02_R1_paired.fq.gz', 'patient_02_R2_paired.fq.gz',
+				'patient_02_R1_unpaired.fq.gz', 'patient_02_R2_unpaired.fq.gz',
+				'patient_03_R1_paired.fq.gz', 'patient_03_R2_paired.fq.gz',
+				'patient_03_R1_unpaired.fq.gz', 'patient_03_R2_unpaired.fq.gz'
 			]
 		},
 		'unicycler': {
 			'/data/outbreak_investigation': ['assembly/'],
 			'/data/outbreak_investigation/assembly': [
+				'patient_01/', 'patient_02/', 'patient_03/'
+			],
+			'/data/outbreak_investigation/assembly/patient_01': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			],
+			'/data/outbreak_investigation/assembly/patient_02': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			],
+			'/data/outbreak_investigation/assembly/patient_03': [
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
 			]
 		},
 		'bandage': {
 			'/data/outbreak_investigation/assembly': [
+				'patient_01_graph.png', 'patient_02_graph.png', 'patient_03_graph.png'
+			],
+			'/data/outbreak_investigation/assembly/patient_01': [
+				'assembly_graph.png'
+			],
+			'/data/outbreak_investigation/assembly/patient_02': [
+				'assembly_graph.png'
+			],
+			'/data/outbreak_investigation/assembly/patient_03': [
 				'assembly_graph.png'
 			]
 		},
 		'prokka': {
 			'/data/outbreak_investigation': ['prokka_results/'],
 			'/data/outbreak_investigation/prokka_results': [
-				'sample_01.gff', 'sample_01.gbk', 'sample_01.fna',
-				'sample_01.faa', 'sample_01.ffn', 'sample_01.txt'
+				'patient_01/', 'patient_02/', 'patient_03/'
+			],
+			'/data/outbreak_investigation/prokka_results/patient_01': [
+				'patient_01.gff', 'patient_01.gbk', 'patient_01.fna',
+				'patient_01.faa', 'patient_01.ffn', 'patient_01.txt'
+			],
+			'/data/outbreak_investigation/prokka_results/patient_02': [
+				'patient_02.gff', 'patient_02.gbk', 'patient_02.fna',
+				'patient_02.faa', 'patient_02.ffn', 'patient_02.txt'
+			],
+			'/data/outbreak_investigation/prokka_results/patient_03': [
+				'patient_03.gff', 'patient_03.gbk', 'patient_03.fna',
+				'patient_03.faa', 'patient_03.ffn', 'patient_03.txt'
 			]
 		},
 		'abricate': {
 			'/data/outbreak_investigation': ['abricate_results/'],
 			'/data/outbreak_investigation/abricate_results': [
-				'amr_report.tsv', 'amr_summary.txt'
+				'all_patients_amr.tsv', 'amr_summary.txt'
 			]
 		},
 		'quast': {
 			'/data/outbreak_investigation': ['quast_results/'],
 			'/data/outbreak_investigation/quast_results': [
-				'quast_report.html', 'quast_report.tsv'
+				'quast_report.html', 'quast_report.tsv', 'transposed_report.tsv'
 			]
 		},
 		'checkm': {
@@ -190,20 +231,23 @@
 		'bakta': {
 			'/data/outbreak_investigation': ['bakta_results/'],
 			'/data/outbreak_investigation/bakta_results': [
-				'sample_01.gff3', 'sample_01.gbff', 'sample_01.fna',
-				'sample_01.faa', 'sample_01.tsv', 'sample_01.json'
+				'patient_01.gff3', 'patient_01.gbff', 'patient_01.fna',
+				'patient_01.faa', 'patient_01.tsv', 'patient_01.json'
 			]
 		},
 		'mlst': {
 			'/data/outbreak_investigation': ['mlst_results/'],
 			'/data/outbreak_investigation/mlst_results': [
-				'mlst_report.tsv'
+				'all_patients_mlst.tsv', 'mlst_report.tsv'
 			]
 		},
 		// Phase 3: Plasmid Analysis
 		'mob_recon': {
 			'/data/outbreak_investigation': ['mob_recon_results/'],
 			'/data/outbreak_investigation/mob_recon_results': [
+				'patient_01/', 'plasmid_report.tsv'
+			],
+			'/data/outbreak_investigation/mob_recon_results/patient_01': [
 				'plasmid_report.tsv', 'chromosome.fasta', 'plasmid_AA001.fasta',
 				'mobtyper_results.txt', 'contig_report.txt'
 			]
@@ -219,8 +263,16 @@
 		'snippy': {
 			'/data/outbreak_investigation': ['snippy_results/'],
 			'/data/outbreak_investigation/snippy_results': [
-				'snps.vcf', 'snps.tab', 'snps.aligned.fa',
-				'snps.consensus.fa', 'snps.log'
+				'patient_01/', 'patient_02/', 'patient_03/', 'core.aln', 'core.vcf'
+			],
+			'/data/outbreak_investigation/snippy_results/patient_01': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa', 'snps.consensus.fa', 'snps.log'
+			],
+			'/data/outbreak_investigation/snippy_results/patient_02': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa', 'snps.consensus.fa', 'snps.log'
+			],
+			'/data/outbreak_investigation/snippy_results/patient_03': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa', 'snps.consensus.fa', 'snps.log'
 			]
 		},
 		'roary': {
@@ -230,8 +282,15 @@
 				'pan_genome_reference.fa', 'summary_statistics.txt'
 			]
 		},
+		'snippy-core': {
+			'/data/outbreak_investigation': [
+				'core.aln', 'core.vcf', 'core.tab', 'core.ref.fa', 'core.txt'
+			]
+		},
 		'iqtree': {
-			'/data/outbreak_investigation': ['iqtree_results/'],
+			'/data/outbreak_investigation': [
+				'core.aln.treefile', 'core.aln.iqtree', 'core.aln.log', 'core.aln.contree'
+			],
 			'/data/outbreak_investigation/iqtree_results': [
 				'core_alignment.treefile', 'core_alignment.iqtree',
 				'core_alignment.log', 'core_alignment.contree'
@@ -261,6 +320,10 @@
 		'resfinder': {
 			'/data/outbreak_investigation': ['resfinder_results/'],
 			'/data/outbreak_investigation/resfinder_results': [
+				'patient_01/', 'ResFinder_results_tab.txt', 'ResFinder_results.txt',
+				'pheno_table.txt', 'PointFinder_results.txt'
+			],
+			'/data/outbreak_investigation/resfinder_results/patient_01': [
 				'ResFinder_results_tab.txt', 'ResFinder_results.txt',
 				'pheno_table.txt', 'PointFinder_results.txt'
 			]
@@ -2734,9 +2797,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 	// Valid files for each tool - must match exactly
 	const validToolFiles: Record<string, string[]> = {
 		'fastqc': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
+			// Hospital outbreak - patient files
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz',
 			// Amplicon files
 			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz', 'IBD_02_R1.fastq.gz', 'IBD_02_R2.fastq.gz',
 			'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz', 'Control_02_R1.fastq.gz', 'Control_02_R2.fastq.gz',
@@ -2746,9 +2810,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'seqkit': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
+			// Hospital outbreak - patient files
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz',
 			// Long-read files
 			'sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz',
 			'sample_01_nanopore.fastq.gz',
@@ -2761,27 +2826,74 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'trimmomatic': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz'
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz'
 		],
 		'unicycler': [
-			'trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'
+			'trimmed/patient_01_R1_paired.fq.gz', 'trimmed/patient_01_R2_paired.fq.gz',
+			'trimmed/patient_02_R1_paired.fq.gz', 'trimmed/patient_02_R2_paired.fq.gz',
+			'trimmed/patient_03_R1_paired.fq.gz', 'trimmed/patient_03_R2_paired.fq.gz'
 		],
-		'bandage': ['assembly/assembly.gfa'],
-		'prokka': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'abricate': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'quast': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'bandage': [
+			'assembly/assembly.gfa',
+			'assembly/patient_01/assembly.gfa', 'assembly/patient_02/assembly.gfa', 'assembly/patient_03/assembly.gfa'
+		],
+		'prokka': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'abricate': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'quast': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		'checkm': ['assembly/', 'polished/'],
 		'confindr': ['assembly/assembly.fasta'],
-		'bakta': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'mlst': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'bakta': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'mlst': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Phase 3: Plasmid Analysis
-		'mob_recon': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'platon': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'mob_recon': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'platon': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Phase 4: Phylogenetics
-		'snippy': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'roary': ['prokka_results/'],
-		'iqtree': ['roary_results/core_gene_alignment.aln'],
-		'gubbins': ['roary_results/core_gene_alignment.aln'],
+		'snippy': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'snippy-core': [
+			'snippy_results/patient_01', 'snippy_results/patient_02', 'snippy_results/patient_03'
+		],
+		'roary': ['prokka_results/', 'prokka_results/patient_01/', 'prokka_results/patient_02/', 'prokka_results/patient_03/'],
+		'iqtree': ['roary_results/core_gene_alignment.aln', 'core.aln'],
+		'gubbins': ['roary_results/core_gene_alignment.aln', 'core.aln'],
+		// Additional resistance/mobile element tools
+		'resfinder': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'integron_finder': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'isescan': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Long-read tools
 		'NanoPlot': ['sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz', 'sample_01_nanopore.fastq.gz'],
 		'filtlong': ['sample_01_hifi.fastq.gz', 'sample_01_nanopore.fastq.gz', 'trimmed/sample_01_trimmed.fastq.gz'],
@@ -2832,6 +2944,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		'roary': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'iqtree': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'gubbins': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'snippy-core': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'resfinder': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'integron_finder': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'isescan': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Long-read tools
 		'NanoPlot': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'filtlong': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },

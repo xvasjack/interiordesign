@@ -34,37 +34,51 @@ function createIlluminaPhase1Sections(): StorylineSection[] {
 		{
 			type: 'phase',
 			title: 'Phase 1: Quality Control & Assembly',
-			text: 'Assess raw sequencing data quality and assemble the genome.',
+			text: 'Assess raw sequencing data quality and assemble the genome for all 3 patient isolates.',
 			phase: 1
 		},
 		{
 			type: 'task',
 			title: 'Step 1: Explore the Data',
-			text: `Check the sequencing data statistics.`,
-			command: 'seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz',
-			explanation: 'SeqKit provides quick statistics about sequencing files.',
+			text: `Check the sequencing data statistics for all patient samples.`,
+			command: 'seqkit stats *.fastq.gz',
+			explanation: 'SeqKit provides quick statistics about sequencing files. Using wildcard (*) processes all FASTQ files at once.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: 'stats', desc: 'Generate sequence statistics' }
+				{ name: 'stats', desc: 'Generate sequence statistics' },
+				{ name: '*.fastq.gz', desc: 'Wildcard matching all FASTQ files' }
 			]
 		},
 		{
 			type: 'task',
 			title: 'Step 2: Quality Control',
-			text: `Generate quality reports for raw reads.`,
-			command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o qc_reports/',
-			explanation: 'FastQC identifies quality issues before assembly.',
+			text: `Generate quality reports for all raw reads.`,
+			command: 'fastqc *.fastq.gz -o qc_reports/',
+			explanation: 'FastQC identifies quality issues before assembly. Running on all samples simultaneously.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
+				{ name: '*.fastq.gz', desc: 'All FASTQ files' },
 				{ name: '-o qc_reports/', desc: 'Output directory' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 3: Read Trimming',
-			text: `Remove adapters and low-quality bases.`,
-			command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
-			explanation: 'Trimmomatic removes adapter contamination and low quality bases.',
+			title: 'Step 3: Aggregate QC Reports',
+			text: `Combine all FastQC reports into a single summary.`,
+			command: 'multiqc qc_reports/ -o multiqc_output/',
+			explanation: 'MultiQC aggregates results from multiple samples for easy comparison.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: 'qc_reports/', desc: 'Input directory with FastQC reports' },
+				{ name: '-o multiqc_output/', desc: 'Output directory' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 4: Read Trimming (Patient 01)',
+			text: `Remove adapters and low-quality bases from Patient 01 reads.`,
+			command: 'trimmomatic PE -phred33 patient_01_R1.fastq.gz patient_01_R2.fastq.gz trimmed/patient_01_R1_paired.fq.gz trimmed/patient_01_R1_unpaired.fq.gz trimmed/patient_01_R2_paired.fq.gz trimmed/patient_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
+			explanation: 'Trimmomatic removes adapter contamination and low quality bases. Processing Patient 01.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: 'PE', desc: 'Paired-end mode' },
@@ -76,22 +90,66 @@ function createIlluminaPhase1Sections(): StorylineSection[] {
 		},
 		{
 			type: 'task',
-			title: 'Step 4: Genome Assembly',
-			text: `Assemble cleaned reads into contigs.`,
-			command: 'unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly/',
-			explanation: 'Unicycler produces high-quality bacterial assemblies.',
+			title: 'Step 5: Read Trimming (Patient 02)',
+			text: `Trim Patient 02 reads.`,
+			command: 'trimmomatic PE -phred33 patient_02_R1.fastq.gz patient_02_R2.fastq.gz trimmed/patient_02_R1_paired.fq.gz trimmed/patient_02_R1_unpaired.fq.gz trimmed/patient_02_R2_paired.fq.gz trimmed/patient_02_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
+			explanation: 'Processing Patient 02 with the same trimming parameters.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '-1/-2', desc: 'Forward/reverse reads' },
-				{ name: '-o assembly/', desc: 'Output directory' }
+				{ name: 'PE', desc: 'Paired-end mode' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 5: Visualize Assembly',
-			text: `Create a visual representation of the assembly graph.`,
-			command: 'bandage image assembly/assembly.gfa assembly/assembly_graph.png',
-			explanation: 'Bandage visualizes assembly graphs to identify structure.',
+			title: 'Step 6: Read Trimming (Patient 03)',
+			text: `Trim Patient 03 reads.`,
+			command: 'trimmomatic PE -phred33 patient_03_R1.fastq.gz patient_03_R2.fastq.gz trimmed/patient_03_R1_paired.fq.gz trimmed/patient_03_R1_unpaired.fq.gz trimmed/patient_03_R2_paired.fq.gz trimmed/patient_03_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
+			explanation: 'Processing Patient 03 with the same trimming parameters.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: 'PE', desc: 'Paired-end mode' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 7: Genome Assembly (Patient 01)',
+			text: `Assemble cleaned reads into contigs for Patient 01.`,
+			command: 'unicycler -1 trimmed/patient_01_R1_paired.fq.gz -2 trimmed/patient_01_R2_paired.fq.gz -o assembly/patient_01/',
+			explanation: 'Unicycler produces high-quality bacterial assemblies. Each patient gets a separate assembly.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '-1/-2', desc: 'Forward/reverse reads' },
+				{ name: '-o assembly/patient_01/', desc: 'Output directory for Patient 01' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 8: Genome Assembly (Patient 02)',
+			text: `Assemble Patient 02.`,
+			command: 'unicycler -1 trimmed/patient_02_R1_paired.fq.gz -2 trimmed/patient_02_R2_paired.fq.gz -o assembly/patient_02/',
+			explanation: 'Assembling Patient 02 isolate.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '-o assembly/patient_02/', desc: 'Output directory for Patient 02' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 9: Genome Assembly (Patient 03)',
+			text: `Assemble Patient 03.`,
+			command: 'unicycler -1 trimmed/patient_03_R1_paired.fq.gz -2 trimmed/patient_03_R2_paired.fq.gz -o assembly/patient_03/',
+			explanation: 'Assembling Patient 03 isolate.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '-o assembly/patient_03/', desc: 'Output directory for Patient 03' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 10: Visualize Assemblies',
+			text: `Create visual representations of all assembly graphs.`,
+			command: 'bandage image assembly/patient_01/assembly.gfa assembly/patient_01_graph.png',
+			explanation: 'Bandage visualizes assembly graphs to identify structure. Repeat for each patient.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: 'image', desc: 'Generate image output' },
@@ -106,15 +164,15 @@ function createIlluminaPhase2Sections(): StorylineSection[] {
 		{
 			type: 'phase',
 			title: 'Phase 2: Quality Assessment & Screening',
-			text: 'Evaluate assembly quality and screen for key markers.',
+			text: 'Evaluate assembly quality and screen for key markers across all patient isolates.',
 			phase: 2
 		},
 		{
 			type: 'task',
-			title: 'Step 6: Assembly Quality',
-			text: `Assess assembly quality metrics.`,
-			command: 'quast assembly/assembly.fasta -o quast_results/',
-			explanation: 'QUAST calculates N50, total length, and other metrics.',
+			title: 'Step 11: Assembly Quality',
+			text: `Assess assembly quality metrics for all patients.`,
+			command: 'quast assembly/patient_01/assembly.fasta assembly/patient_02/assembly.fasta assembly/patient_03/assembly.fasta -o quast_results/',
+			explanation: 'QUAST calculates N50, total length, and other metrics. Comparing all 3 patient assemblies.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '-o quast_results/', desc: 'Output directory' }
@@ -122,10 +180,10 @@ function createIlluminaPhase2Sections(): StorylineSection[] {
 		},
 		{
 			type: 'task',
-			title: 'Step 7: Genome Completeness',
+			title: 'Step 12: Genome Completeness',
 			text: `Check genome completeness using marker genes.`,
 			command: 'checkm lineage_wf assembly/ checkm_results/ -x fasta',
-			explanation: 'CheckM estimates completeness and contamination.',
+			explanation: 'CheckM estimates completeness and contamination for all assemblies.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: 'lineage_wf', desc: 'Full CheckM workflow' },
@@ -134,38 +192,31 @@ function createIlluminaPhase2Sections(): StorylineSection[] {
 		},
 		{
 			type: 'task',
-			title: 'Step 8: BUSCO Assessment',
-			text: `Validate completeness with universal single-copy orthologs.`,
-			command: 'busco -i assembly/assembly.fasta -o busco_results/ -m genome -l bacteria_odb10',
-			explanation: 'BUSCO checks for conserved genes expected in all bacteria.',
-			requiredDir: '/data/outbreak_investigation',
-			parameters: [
-				{ name: '-m genome', desc: 'Genome mode' },
-				{ name: '-l bacteria_odb10', desc: 'Bacteria database' }
-			]
-		},
-		{
-			type: 'task',
-			title: 'Step 9: AMR Screening',
-			text: `Screen for antimicrobial resistance genes.`,
-			command: 'abricate --db ncbi assembly/assembly.fasta -o abricate_results/',
-			explanation: 'ABRicate identifies resistance genes from databases.',
+			title: 'Step 13: AMR Screening (All Patients)',
+			text: `Screen all patient assemblies for antimicrobial resistance genes.`,
+			command: 'abricate --db ncbi assembly/patient_01/assembly.fasta assembly/patient_02/assembly.fasta assembly/patient_03/assembly.fasta > abricate_results/all_patients_amr.tsv',
+			explanation: 'ABRicate identifies resistance genes. Screening all patients at once for comparison.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '--db ncbi', desc: 'Use NCBI database' },
-				{ name: '-o abricate_results/', desc: 'Output directory' }
+				{ name: '>', desc: 'Redirect output to combined file' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 10: MLST Typing',
-			text: `Determine the sequence type.`,
-			command: 'mlst assembly/assembly.fasta -o mlst_results/',
-			explanation: 'MLST assigns sequence types for epidemiological tracking.',
+			title: 'Step 14: MLST Typing (All Patients)',
+			text: `Determine the sequence type for each isolate. This is critical for outbreak investigation.`,
+			command: 'mlst assembly/patient_01/assembly.fasta assembly/patient_02/assembly.fasta assembly/patient_03/assembly.fasta > mlst_results/all_patients_mlst.tsv',
+			explanation: 'MLST assigns sequence types for epidemiological tracking. Same ST suggests clonal outbreak.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '-o mlst_results/', desc: 'Output directory' }
+				{ name: '>', desc: 'Combined output for all patients' }
 			]
+		},
+		{
+			type: 'alert',
+			title: '🔍 MLST Results - Key Finding',
+			text: `**MLST Typing Results:**\n\n| Patient | Species | Sequence Type |\n|---------|---------|---------------|\n| Patient 01 | K. pneumoniae | ST258 |\n| Patient 02 | K. pneumoniae | ST258 |\n| Patient 03 | K. pneumoniae | ST11 |\n\n**Interpretation:**\n• **Patients 01 & 02 (ST258):** Share the same sequence type - strong evidence of clonal transmission (outbreak cluster)\n• **Patient 03 (ST11):** Different sequence type - likely a sporadic case, NOT part of the outbreak\n\n**ST258 Background:** This is a globally-disseminated high-risk clone associated with hospital outbreaks and carbapenem resistance. ST11 is also clinically significant but represents a separate lineage.\n\nContinue analysis to confirm transmission and identify resistance mechanisms...`
 		}
 	];
 }
@@ -175,65 +226,71 @@ function createIlluminaPhase3Sections(): StorylineSection[] {
 		{
 			type: 'phase',
 			title: 'Phase 3: Annotation & Plasmid Analysis',
-			text: 'Annotate genes and identify mobile genetic elements.',
+			text: 'Annotate genes and identify mobile genetic elements for the outbreak cluster (ST258 isolates).',
 			phase: 3
 		},
 		{
+			type: 'context',
+			text: `**Focus on Outbreak Cluster**\n\nBased on MLST results, Patients 01 and 02 are part of a clonal outbreak (ST258). We'll perform detailed annotation on these isolates to understand the outbreak strain. Patient 03 (ST11) represents a separate, sporadic case.`
+		},
+		{
 			type: 'task',
-			title: 'Step 11: Genome Annotation',
-			text: `Annotate genes in the assembly.`,
-			command: 'prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta',
+			title: 'Step 15: Genome Annotation (Patient 01)',
+			text: `Annotate genes in the Patient 01 assembly.`,
+			command: 'prokka --outdir prokka_results/patient_01/ --prefix patient_01 assembly/patient_01/assembly.fasta',
 			explanation: 'Prokka identifies CDS, tRNA, and rRNA features.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '--outdir prokka_results/', desc: 'Output directory' },
-				{ name: '--prefix sample_01', desc: 'Output file prefix' }
+				{ name: '--outdir', desc: 'Output directory' },
+				{ name: '--prefix patient_01', desc: 'Output file prefix' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 12: Detailed Annotation',
-			text: `Get comprehensive annotations with Bakta.`,
-			command: 'bakta assembly/assembly.fasta --output bakta_results/',
-			explanation: 'Bakta provides rich functional annotations.',
+			title: 'Step 16: Genome Annotation (Patient 02)',
+			text: `Annotate Patient 02 (second ST258 isolate).`,
+			command: 'prokka --outdir prokka_results/patient_02/ --prefix patient_02 assembly/patient_02/assembly.fasta',
+			explanation: 'Annotating the second outbreak isolate for comparison.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '--output bakta_results/', desc: 'Output directory' }
+				{ name: '--outdir', desc: 'Output directory' },
+				{ name: '--prefix patient_02', desc: 'Output file prefix' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 13: Plasmid Detection',
-			text: `Identify and characterize plasmids.`,
-			command: 'mob_recon -i assembly/assembly.fasta -o mob_recon_results/',
-			explanation: 'MOB-suite reconstructs plasmids and identifies replicon types.',
+			title: 'Step 17: Genome Annotation (Patient 03)',
+			text: `Annotate Patient 03 (ST11 sporadic case) for comparison.`,
+			command: 'prokka --outdir prokka_results/patient_03/ --prefix patient_03 assembly/patient_03/assembly.fasta',
+			explanation: 'Annotating the sporadic ST11 isolate to compare AMR profiles.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '--outdir', desc: 'Output directory' },
+				{ name: '--prefix patient_03', desc: 'Output file prefix' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 18: Plasmid Detection (ST258 Outbreak)',
+			text: `Identify plasmids in the outbreak strain.`,
+			command: 'mob_recon -i assembly/patient_01/assembly.fasta -o mob_recon_results/patient_01/',
+			explanation: 'MOB-suite reconstructs plasmids carrying AMR genes.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '-i', desc: 'Input assembly' },
-				{ name: '-o mob_recon_results/', desc: 'Output directory' }
+				{ name: '-o', desc: 'Output directory' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 14: Plasmid Typing',
-			text: `Identify plasmid replicon types.`,
-			command: 'plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_results/',
-			explanation: 'PlasmidFinder detects plasmid replicons for typing.',
+			title: 'Step 19: Plasmid Typing',
+			text: `Identify plasmid replicon types across all patients.`,
+			command: 'plasmidfinder -i assembly/patient_01/assembly.fasta -o plasmidfinder_results/',
+			explanation: 'PlasmidFinder detects plasmid replicons for epidemiological typing.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '-i', desc: 'Input assembly' },
 				{ name: '-o plasmidfinder_results/', desc: 'Output directory' }
-			]
-		},
-		{
-			type: 'task',
-			title: 'Step 15: Confirm Plasmids',
-			text: `Verify plasmid predictions with Platon.`,
-			command: 'platon assembly/assembly.fasta -o platon_results/',
-			explanation: 'Platon uses ML to distinguish plasmids from chromosomes.',
-			requiredDir: '/data/outbreak_investigation',
-			parameters: [
-				{ name: '-o platon_results/', desc: 'Output directory' }
 			]
 		}
 	];
@@ -243,61 +300,91 @@ function createIlluminaPhase4Sections(): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
-			title: 'Phase 4: Phylogenetics',
-			text: 'Build evolutionary trees and analyze population structure.',
+			title: 'Phase 4: Phylogenetics & Transmission Analysis',
+			text: 'Build evolutionary trees to confirm outbreak transmission between patients.',
 			phase: 4
 		},
 		{
+			type: 'context',
+			text: `**Phylogenetic Analysis Goal**\n\nWe need to determine:\n1. Are Patients 01 & 02 truly part of a clonal outbreak? (expect <10 SNP differences)\n2. Is Patient 03 definitely unrelated? (expect >100 SNP differences from outbreak cluster)\n3. What is the likely transmission direction?`
+		},
+		{
 			type: 'task',
-			title: 'Step 16: Variant Calling',
-			text: `Call SNPs against the reference genome.`,
-			command: 'snippy --ref reference.gbk --ctgs assembly/assembly.fasta --outdir snippy_results/',
+			title: 'Step 20: Variant Calling (Patient 01)',
+			text: `Call SNPs for Patient 01 against the reference genome.`,
+			command: 'snippy --ref reference.gbk --ctgs assembly/patient_01/assembly.fasta --outdir snippy_results/patient_01/',
 			explanation: 'Snippy identifies SNPs, insertions, and deletions.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '--ref reference.gbk', desc: 'Reference genome' },
-				{ name: '--ctgs assembly/assembly.fasta', desc: 'Query contigs' },
-				{ name: '--outdir snippy_results/', desc: 'Output directory' }
+				{ name: '--ctgs', desc: 'Query contigs' },
+				{ name: '--outdir', desc: 'Output directory' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 17: Pan-genome Analysis',
-			text: `Analyze the pan-genome across isolates.`,
-			command: 'roary -f roary_results/ -e -n -v prokka_results/*.gff',
-			explanation: 'Roary identifies core and accessory genes.',
+			title: 'Step 21: Variant Calling (Patient 02)',
+			text: `Call SNPs for Patient 02.`,
+			command: 'snippy --ref reference.gbk --ctgs assembly/patient_02/assembly.fasta --outdir snippy_results/patient_02/',
+			explanation: 'Calling variants for the second ST258 outbreak isolate.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '--outdir', desc: 'Output directory for Patient 02' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 22: Variant Calling (Patient 03)',
+			text: `Call SNPs for Patient 03 (ST11 control).`,
+			command: 'snippy --ref reference.gbk --ctgs assembly/patient_03/assembly.fasta --outdir snippy_results/patient_03/',
+			explanation: 'Calling variants for the sporadic ST11 isolate as a comparison.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '--outdir', desc: 'Output directory for Patient 03' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 23: Core Genome Alignment',
+			text: `Create a core genome alignment from all samples.`,
+			command: 'snippy-core --ref reference.gbk snippy_results/patient_01 snippy_results/patient_02 snippy_results/patient_03',
+			explanation: 'Snippy-core generates a multiple sequence alignment for phylogenetic analysis.',
+			requiredDir: '/data/outbreak_investigation',
+			parameters: [
+				{ name: '--ref', desc: 'Reference genome' },
+				{ name: 'snippy_results/*', desc: 'All individual snippy outputs' }
+			]
+		},
+		{
+			type: 'task',
+			title: 'Step 24: Pan-genome Analysis',
+			text: `Analyze the pan-genome across all isolates.`,
+			command: 'roary -f roary_results/ -e -n -v prokka_results/patient_01/*.gff prokka_results/patient_02/*.gff prokka_results/patient_03/*.gff',
+			explanation: 'Roary identifies core genes shared by all isolates and accessory genes.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
 				{ name: '-f roary_results/', desc: 'Output directory' },
 				{ name: '-e', desc: 'Create core gene alignment' },
-				{ name: '-n', desc: 'Fast alignment with MAFFT' },
-				{ name: '-v', desc: 'Verbose output' }
+				{ name: '-n', desc: 'Fast alignment with MAFFT' }
 			]
 		},
 		{
 			type: 'task',
-			title: 'Step 18: Phylogenetic Tree',
+			title: 'Step 25: Phylogenetic Tree',
 			text: `Build a maximum-likelihood phylogenetic tree.`,
-			command: 'iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 -nt AUTO',
+			command: 'iqtree -s core.aln -m GTR+G -bb 1000 -nt AUTO',
 			explanation: 'IQ-TREE builds phylogenetic trees with bootstrap support.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
-				{ name: '-s roary_results/core_gene_alignment.aln', desc: 'Input alignment' },
+				{ name: '-s core.aln', desc: 'Core genome alignment' },
 				{ name: '-m GTR+G', desc: 'Substitution model' },
-				{ name: '-bb 1000', desc: 'Bootstrap replicates' },
-				{ name: '-nt AUTO', desc: 'Auto-detect threads' }
+				{ name: '-bb 1000', desc: 'Bootstrap replicates' }
 			]
 		},
 		{
-			type: 'task',
-			title: 'Step 19: Recombination Analysis',
-			text: `Remove recombination for cleaner phylogeny.`,
-			command: 'run_gubbins.py -p gubbins_results/clean roary_results/core_gene_alignment.aln',
-			explanation: 'Gubbins identifies recombination regions.',
-			requiredDir: '/data/outbreak_investigation',
-			parameters: [
-				{ name: '-p gubbins_results/clean', desc: 'Output prefix' }
-			]
+			type: 'alert',
+			title: '🌳 Phylogenetic Results - Outbreak Confirmed',
+			text: `**SNP Distance Matrix:**\n\n|           | Patient 01 | Patient 02 | Patient 03 |\n|-----------|------------|------------|------------|\n| Patient 01 | 0          | 3          | 847        |\n| Patient 02 | 3          | 0          | 851        |\n| Patient 03 | 847        | 851        | 0          |\n\n**Interpretation:**\n• **Patients 01 & 02:** Only 3 SNP differences - confirms direct transmission or very recent common source\n• **Patient 03:** >800 SNPs difference - completely unrelated, sporadic infection\n\n**Timeline Estimate:**\nAt ~1-2 SNPs/genome/year for K. pneumoniae, 3 SNPs suggests transmission occurred within the past 1-3 weeks - consistent with the ICU timeline.\n\n**Conclusion:** This is a confirmed clonal outbreak involving 2 of 3 patients.`
 		}
 	];
 }
@@ -307,9 +394,9 @@ function createHospitalAdditionalTools(): StorylineSection[] {
 	return [
 		{
 			type: 'task',
-			title: 'Step 20: Detailed Resistance Analysis',
-			text: `Get detailed resistance gene information.`,
-			command: 'resfinder -i assembly/assembly.fasta -o resfinder_results/ -db_res',
+			title: 'Step 26: Detailed Resistance Analysis',
+			text: `Get detailed resistance gene information for the outbreak strain.`,
+			command: 'resfinder -i assembly/patient_01/assembly.fasta -o resfinder_results/patient_01/ -db_res',
 			explanation: 'ResFinder provides detailed resistance gene annotations.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
@@ -318,9 +405,9 @@ function createHospitalAdditionalTools(): StorylineSection[] {
 		},
 		{
 			type: 'task',
-			title: 'Step 21: Integron Detection',
-			text: `Find integrons carrying resistance cassettes.`,
-			command: 'integron_finder assembly/assembly.fasta --outdir integron_results/',
+			title: 'Step 27: Integron Detection',
+			text: `Find integrons carrying resistance cassettes in the ST258 outbreak strain.`,
+			command: 'integron_finder assembly/patient_01/assembly.fasta --outdir integron_results/',
 			explanation: 'IntegronFinder detects integrons that often carry AMR genes.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
@@ -329,9 +416,9 @@ function createHospitalAdditionalTools(): StorylineSection[] {
 		},
 		{
 			type: 'task',
-			title: 'Step 22: IS Element Detection',
-			text: `Identify insertion sequences for transmission tracking.`,
-			command: 'isescan --seqfile assembly/assembly.fasta --output isescan_results/',
+			title: 'Step 28: IS Element Detection',
+			text: `Identify insertion sequences for understanding AMR gene mobility.`,
+			command: 'isescan --seqfile assembly/patient_01/assembly.fasta --output isescan_results/',
 			explanation: 'ISEScan finds IS elements that facilitate gene mobility.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
@@ -1033,17 +1120,17 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'illumina',
 		technologyLabel: 'Short Read (Illumina)',
 		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'integron_finder', 'isescan'],
+		toolsUsed: ['seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'abricate', 'mlst', 'prokka', 'mob_recon', 'plasmidfinder', 'snippy', 'roary', 'iqtree', 'resfinder', 'integron_finder', 'isescan'],
 		sections: [
 			{
 				type: 'intro',
-				text: `3 patients in the ICU did not respond to last-line antibiotics. All patients developed severe infections within the past 72 hours.`,
+				text: `**URGENT - Infection Control Alert**\n\n3 patients in the ICU have been diagnosed with carbapenem-resistant *Klebsiella pneumoniae* infections. All developed severe bloodstream infections within the past 72 hours and are not responding to last-line antibiotics.`,
 				hint: null,
 				requiredDir: null
 			},
 			{
 				type: 'context',
-				text: `Samples from all 3 patients have been sequenced using an Illumina NovaSeq. Initial cultures identified Klebsiella pneumoniae. Your task is to determine if this is a clonal outbreak, identify the resistance mechanisms, and trace the source.`,
+				text: `**Patient Information:**\n\n| Patient | Location | Onset | Sample |\n|---------|----------|-------|--------|\n| Patient 01 | ICU Bed 3 | Day 0 | Blood culture |\n| Patient 02 | ICU Bed 7 | Day 2 | Blood culture |\n| Patient 03 | ICU Bed 12 | Day 3 | Blood culture |\n\nSamples from all 3 patients have been sequenced using Illumina NovaSeq (150bp paired-end, ~100x coverage).\n\n**Your Investigation Goals:**\n1. Determine if this is a clonal outbreak (same strain) or coincidental infections\n2. Identify the antimicrobial resistance mechanisms\n3. Guide infection control response`,
 				hint: null,
 				requiredDir: null
 			},
@@ -1054,8 +1141,8 @@ export const storylines: Record<string, Storyline> = {
 			...createHospitalAdditionalTools(),
 			{
 				type: 'complete',
-				title: 'Analysis Complete',
-				text: `Congratulations! You have completed the Hospital Outbreak Investigation.\n\n**Assembly Result:** Complete genome - 1 circular chromosome (5.3 Mb) + 2 plasmids (pKPC-250kb, pNDM-85kb)\n\n**Key findings:**\n• Identified clonal outbreak (ST258 K. pneumoniae)\n• Detected carbapenemase genes (blaKPC-2, blaNDM-1)\n• Located resistance genes on conjugative plasmids\n• Phylogenetic analysis confirmed recent transmission\n\n**Understanding the phylogenetic result:**\nThe phylogenetic tree showed all 3 patient isolates clustered together with only 3-5 SNP differences. In bacteria, approximately 1-2 SNPs accumulate per genome per year. Finding <5 SNPs between isolates indicates they shared a common ancestor within weeks—confirming direct patient-to-patient transmission or a common environmental source within the ICU.`
+				title: 'Investigation Complete',
+				text: `**Hospital Outbreak Investigation - Final Report**\n\n---\n\n**OUTBREAK STATUS: CONFIRMED (Partial)**\n\n**Strain Analysis:**\n| Patient | Sequence Type | Outbreak Status |\n|---------|---------------|------------------|\n| Patient 01 | ST258 | ✓ Outbreak cluster |\n| Patient 02 | ST258 | ✓ Outbreak cluster |\n| Patient 03 | ST11 | ✗ Sporadic case |\n\n**Key Findings:**\n\n*Outbreak Cluster (Patients 01 & 02 - ST258):*\n• Only 3 SNP differences between isolates - confirms direct transmission\n• Complete genome: 5.3 Mb chromosome + 2 plasmids (pKPC-250kb, pNDM-85kb)\n• Carbapenemase genes: blaKPC-2 (IncFII plasmid), blaNDM-1 (IncX3 plasmid)\n• Transmission likely occurred via shared equipment or healthcare worker\n\n*Sporadic Case (Patient 03 - ST11):*\n• >800 SNP differences from outbreak cluster - unrelated strain\n• Different plasmid profile - carries blaCTX-M-15 (ESBL) but no carbapenemases\n• Likely community-acquired infection, NOT part of ICU outbreak\n\n**Infection Control Recommendations:**\n1. Focus containment efforts on Beds 3-7 area (outbreak cluster)\n2. Review shared equipment and procedures between Patients 01 & 02\n3. Patient 03 can be managed separately - not an outbreak risk\n4. Screen other ICU patients for ST258 carriage\n\n**Clinical Implications:**\n• Patients 01 & 02: Consider colistin + tigecycline combination\n• Patient 03: Standard ESBL treatment (carbapenems may still be effective)`
 			}
 		]
 	},
