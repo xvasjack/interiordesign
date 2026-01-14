@@ -1125,13 +1125,26 @@ export const storylines: Record<string, Storyline> = {
 		sections: [
 			{
 				type: 'intro',
-				text: `**Welcome to BioLearn WGS Analysis**\n\nIn this introductory module, you'll learn the fundamentals of whole-genome sequencing (WGS) analysis using a *Klebsiella pneumoniae* isolate. This hands-on tutorial will guide you through the complete workflow from raw reads to annotated genome.`,
+				text: `<strong>Welcome to BioLearn WGS Analysis</strong>
+
+In this introductory module, you'll learn the fundamentals of whole-genome sequencing (WGS) analysis using a <em>Klebsiella pneumoniae</em> isolate. This hands-on tutorial will guide you through the complete workflow from raw reads to annotated genome.
+
+<strong>About <em>Klebsiella pneumoniae</em></strong>
+
+<em>Klebsiella pneumoniae</em> is a common opportunistic, Gram-negative, encapsulated bacterium that is a major cause of hospital-acquired infections including pneumonia, urinary tract infections, and bloodstream infections. It is a critical public health concern due to the emergence of multidrug-resistant (MDR) and hypervirulent strains that are difficult to treat and associated with high mortality rates.
+
+This dataset (SRR36708862) comes from a study investigating antibiotic resistance and virulence profiles of clinical <em>K. pneumoniae</em> strains, helping researchers understand mechanisms of resistance (e.g., blaCTX-M, carbapenemases) and virulence factors (capsule production, fimbriae, siderophores) to inform treatment strategies.`,
 				hint: null,
 				requiredDir: null
 			},
 			{
 				type: 'context',
-				text: `**Sample Information:**\n\n| Field | Value |\n|-------|-------|\n| Accession | SRR36708862 |\n| Organism | *Klebsiella pneumoniae* |\n| Platform | Illumina NovaSeq 6000 |\n| Read Length | 2 × 150 bp (paired-end) |\n| Expected Genome | ~5.5 Mb |\n\n**Learning Objectives:**\n1. Assess raw sequencing data quality\n2. Trim adapters and low-quality bases\n3. Assemble reads into contigs\n4. Evaluate assembly quality\n5. Screen for antimicrobial resistance genes\n6. Annotate the genome`,
+				text: `<strong>Sample Information:</strong>
+
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Accession</td><td>SRR36708862</td></tr><tr><td>Organism</td><td><em>Klebsiella pneumoniae</em></td></tr><tr><td>Platform</td><td>Illumina NovaSeq 6000</td></tr><tr><td>Read Length</td><td>2 × 150 bp (paired-end)</td></tr><tr><td>Expected Genome</td><td>~5.5 Mb</td></tr></tbody></table>
+
+<strong>Learning Objectives:</strong>
+<ol><li>Assess raw sequencing data quality</li><li>Trim adapters and low-quality bases</li><li>Assemble reads into contigs</li><li>Evaluate assembly quality</li><li>Screen for antimicrobial resistance genes</li><li>Annotate the genome</li></ol>`,
 				hint: null,
 				requiredDir: null
 			},

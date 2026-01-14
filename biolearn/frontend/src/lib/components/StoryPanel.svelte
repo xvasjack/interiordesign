@@ -201,11 +201,11 @@
 				<div class="mb-6 animate-fade-in" style="margin-bottom: 1.5rem; opacity: {i < currentStep && section.type !== 'phase' ? '0.5' : '1'};">
 					{#if section.type === 'intro'}
 						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r" style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
-							<p class="text-gray-700 leading-relaxed font-medium whitespace-pre-line" style="color: #374151; line-height: 1.625; font-weight: 500; white-space: pre-line;">{section.text}</p>
+							<div class="text-gray-700 leading-relaxed story-content" style="color: #374151; line-height: 1.625;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br/>')}</div>
 						</div>
 					{:else if section.type === 'context'}
 						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
-							<p class="text-gray-700 whitespace-pre-line" style="color: #374151; white-space: pre-line;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
+							<div class="text-gray-700 story-content" style="color: #374151;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br/>')}</div>
 						</div>
 					{:else if section.type === 'phase'}
 						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md" style="background: linear-gradient(to right, #6366f1, #9333ea); color: white; padding: 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
@@ -420,5 +420,46 @@
 			opacity: 1;
 			transform: translateY(0);
 		}
+	}
+
+	/* Story content table styling */
+	:global(.story-content table) {
+		border-collapse: collapse;
+		margin: 0.75rem 0;
+		font-size: 0.875rem;
+		width: auto;
+		min-width: 300px;
+	}
+
+	:global(.story-content th),
+	:global(.story-content td) {
+		border: 1px solid #d1d5db;
+		padding: 0.5rem 1rem;
+		text-align: left;
+	}
+
+	:global(.story-content th) {
+		background: #f3f4f6;
+		font-weight: 600;
+	}
+
+	:global(.story-content tr:nth-child(even)) {
+		background: #f9fafb;
+	}
+
+	:global(.story-content ol) {
+		list-style-type: decimal;
+		padding-left: 1.5rem;
+		margin: 0.5rem 0;
+	}
+
+	:global(.story-content ul) {
+		list-style-type: disc;
+		padding-left: 1.5rem;
+		margin: 0.5rem 0;
+	}
+
+	:global(.story-content li) {
+		margin: 0.25rem 0;
 	}
 </style>
