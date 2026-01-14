@@ -18,6 +18,12 @@
 			icon: '🧬',
 			storylines: [
 				{
+					id: 'trial',
+					title: 'Exploring K. pneumoniae',
+					description: 'Introduction to WGS analysis with a single bacterial sample',
+					technologyLabel: 'Short Read (Illumina)'
+				},
+				{
 					id: 'hospital',
 					title: 'Hospital Outbreak Investigation',
 					description: 'Investigate a Klebsiella pneumoniae AMR outbreak in ICU patients',
