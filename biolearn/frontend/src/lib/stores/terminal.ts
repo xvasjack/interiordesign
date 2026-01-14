@@ -190,6 +190,7 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'bandage': { min: 3, max: 8 },  // Graph visualization
 	'quast': { min: 15, max: 30 },
 	'checkm': { min: 60, max: 120 },
+	'checkm2': { min: 180, max: 300 },
 	'confindr': { min: 30, max: 60 },
 	'prokka': { min: 60, max: 120 },
 	'bakta': { min: 60, max: 120 },  // Similar to prokka
@@ -246,7 +247,7 @@ export const blockedCommands = new Set([
 // Bioinformatics tools
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
-	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'busco', 'confindr',
+	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'checkm2', 'busco', 'confindr',
 	'prokka', 'bakta', 'abricate', 'resfinder', 'virulencefinder', 'mlst',
 	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
 	'snippy', 'snippy-core', 'roary', 'iqtree', 'gubbins',

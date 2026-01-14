@@ -32,6 +32,10 @@
 
 	// Base filesystem - sequencing data files exist at start (from sequencer)
 	const baseFilesystem: Record<string, string[]> = {
+		// Trial/Demo scenario - single K. pneumoniae sample (SRR36708862)
+		'/data/kpneumoniae_demo': [
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz'
+		],
 		'/data/outbreak_investigation': [
 			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
 			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
@@ -107,6 +111,12 @@
 	// Files created by each tool
 	const toolCreatedFiles: Record<string, Record<string, string[]>> = {
 		'fastqc': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['fastqc_output/'],
+			'/data/kpneumoniae_demo/fastqc_output': [
+				'SRR36708862_1_fastqc.html', 'SRR36708862_1_fastqc.zip',
+				'SRR36708862_2_fastqc.html', 'SRR36708862_2_fastqc.zip'
+			],
 			'/data/outbreak_investigation': ['qc_reports/'],
 			'/data/outbreak_investigation/qc_reports': [
 				'patient_01_R1_fastqc.html', 'patient_01_R1_fastqc.zip',
@@ -147,6 +157,12 @@
 			'/data/water_samples': ['multiqc_report.html', 'multiqc_data/']
 		},
 		'trimmomatic': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['trimmed/'],
+			'/data/kpneumoniae_demo/trimmed': [
+				'SRR36708862_R1_paired.fq.gz', 'SRR36708862_R2_paired.fq.gz',
+				'SRR36708862_R1_unpaired.fq.gz', 'SRR36708862_R2_unpaired.fq.gz'
+			],
 			'/data/outbreak_investigation': ['trimmed/'],
 			'/data/outbreak_investigation/trimmed': [
 				'patient_01_R1_paired.fq.gz', 'patient_01_R2_paired.fq.gz',
@@ -158,6 +174,11 @@
 			]
 		},
 		'unicycler': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['assembly/'],
+			'/data/kpneumoniae_demo/assembly': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			],
 			'/data/outbreak_investigation': ['assembly/'],
 			'/data/outbreak_investigation/assembly': [
 				'patient_01/', 'patient_02/', 'patient_03/'
@@ -173,6 +194,9 @@
 			]
 		},
 		'bandage': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['assembly_graph.png'],
+			'/data/kpneumoniae_demo/assembly': ['assembly_graph.png'],
 			'/data/outbreak_investigation/assembly': [
 				'patient_01_graph.png', 'patient_02_graph.png', 'patient_03_graph.png'
 			],
@@ -187,6 +211,12 @@
 			]
 		},
 		'prokka': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['prokka_output/'],
+			'/data/kpneumoniae_demo/prokka_output': [
+				'PROKKA.gff', 'PROKKA.gbk', 'PROKKA.fna', 'PROKKA.faa',
+				'PROKKA.ffn', 'PROKKA.tsv', 'PROKKA.txt', 'PROKKA.log'
+			],
 			'/data/outbreak_investigation': ['prokka_results/'],
 			'/data/outbreak_investigation/prokka_results': [
 				'patient_01/', 'patient_02/', 'patient_03/'
@@ -205,15 +235,33 @@
 			]
 		},
 		'abricate': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['abricate_output/'],
+			'/data/kpneumoniae_demo/abricate_output': [
+				'amr_ncbi.tab', 'amr_resfinder.tab', 'amr_card.tab', 'amr_summary.tab'
+			],
 			'/data/outbreak_investigation': ['abricate_results/'],
 			'/data/outbreak_investigation/abricate_results': [
 				'all_patients_amr.tsv', 'amr_summary.txt'
 			]
 		},
 		'quast': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['quast_output/'],
+			'/data/kpneumoniae_demo/quast_output': [
+				'report.html', 'report.tsv', 'report.txt', 'transposed_report.tsv',
+				'icarus.html', 'report.pdf'
+			],
 			'/data/outbreak_investigation': ['quast_results/'],
 			'/data/outbreak_investigation/quast_results': [
 				'quast_report.html', 'quast_report.tsv', 'transposed_report.tsv'
+			]
+		},
+		'checkm2': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['checkm2_output/'],
+			'/data/kpneumoniae_demo/checkm2_output': [
+				'quality_report.tsv', 'protein_files/', 'diamond_output/'
 			]
 		},
 		'checkm': {
@@ -236,6 +284,11 @@
 			]
 		},
 		'mlst': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['mlst_output/'],
+			'/data/kpneumoniae_demo/mlst_output': [
+				'mlst_result.tab'
+			],
 			'/data/outbreak_investigation': ['mlst_results/'],
 			'/data/outbreak_investigation/mlst_results': [
 				'all_patients_mlst.tsv', 'mlst_report.tsv'
@@ -2797,6 +2850,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 	// Valid files for each tool - must match exactly
 	const validToolFiles: Record<string, string[]> = {
 		'fastqc': [
+			// Trial/Demo scenario
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz',
 			// Hospital outbreak - patient files
 			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
 			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
@@ -2810,6 +2865,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'seqkit': [
+			// Trial/Demo scenario
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz',
 			// Hospital outbreak - patient files
 			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
 			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
@@ -2826,11 +2883,17 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'trimmomatic': [
+			// Trial/Demo scenario
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz',
+			// Hospital outbreak
 			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
 			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
 			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz'
 		],
 		'unicycler': [
+			// Trial/Demo scenario
+			'trimmed/SRR36708862_R1_paired.fq.gz', 'trimmed/SRR36708862_R2_paired.fq.gz',
+			// Hospital outbreak
 			'trimmed/patient_01_R1_paired.fq.gz', 'trimmed/patient_01_R2_paired.fq.gz',
 			'trimmed/patient_02_R1_paired.fq.gz', 'trimmed/patient_02_R2_paired.fq.gz',
 			'trimmed/patient_03_R1_paired.fq.gz', 'trimmed/patient_03_R2_paired.fq.gz'
@@ -2852,6 +2915,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
 		'checkm': ['assembly/', 'polished/'],
+		'checkm2': ['assembly/', 'polished/'],
 		'confindr': ['assembly/assembly.fasta'],
 		'bakta': [
 			'assembly/assembly.fasta', 'polished/consensus.fasta',
@@ -2923,19 +2987,20 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 	// Tool requirements: allowed directories
 	const toolRequirements: Record<string, { dirs: string[] }> = {
-		'fastqc': { dirs: ['/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
-		'seqkit': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'fastqc': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'seqkit': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
 		'multiqc': { dirs: ['/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
-		'trimmomatic': { dirs: ['/data/outbreak_investigation'] },
-		'unicycler': { dirs: ['/data/outbreak_investigation'] },
-		'bandage': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'prokka': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'abricate': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'quast': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'trimmomatic': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation'] },
+		'unicycler': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation'] },
+		'bandage': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'prokka': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'abricate': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'quast': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'checkm': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'checkm2': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'confindr': { dirs: ['/data/outbreak_investigation'] },
 		'bakta': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'mlst': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'mlst': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Phase 3
 		'mob_recon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'platon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },

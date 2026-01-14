@@ -1112,6 +1112,191 @@ function createNanoporePhase3Sections(dataDir: string = '/data/outbreak_investig
 // ============================================
 
 export const storylines: Record<string, Storyline> = {
+	// Trial/Demo scenario - single sample workflow
+	trial: {
+		id: 'trial',
+		title: 'Exploring K. pneumoniae',
+		subtitle: 'Introduction to WGS Analysis',
+		organism: 'Klebsiella pneumoniae',
+		technology: 'illumina',
+		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/kpneumoniae_demo',
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm2', 'abricate', 'mlst', 'prokka'],
+		sections: [
+			{
+				type: 'intro',
+				text: `**Welcome to BioLearn WGS Analysis**\n\nIn this introductory module, you'll learn the fundamentals of whole-genome sequencing (WGS) analysis using a *Klebsiella pneumoniae* isolate. This hands-on tutorial will guide you through the complete workflow from raw reads to annotated genome.`,
+				hint: null,
+				requiredDir: null
+			},
+			{
+				type: 'context',
+				text: `**Sample Information:**\n\n| Field | Value |\n|-------|-------|\n| Accession | SRR36708862 |\n| Organism | *Klebsiella pneumoniae* |\n| Platform | Illumina NovaSeq 6000 |\n| Read Length | 2 × 150 bp (paired-end) |\n| Expected Genome | ~5.5 Mb |\n\n**Learning Objectives:**\n1. Assess raw sequencing data quality\n2. Trim adapters and low-quality bases\n3. Assemble reads into contigs\n4. Evaluate assembly quality\n5. Screen for antimicrobial resistance genes\n6. Annotate the genome`,
+				hint: null,
+				requiredDir: null
+			},
+			{
+				type: 'phase',
+				title: 'Phase 1: Quality Control',
+				text: 'First, we assess the quality of our raw sequencing data before processing.',
+				phase: 1
+			},
+			{
+				type: 'task',
+				title: 'Step 1: Check Sequencing Statistics',
+				text: `Let's start by examining basic statistics about our sequencing data.`,
+				command: 'seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz',
+				explanation: 'SeqKit provides quick statistics including read count, total bases, and average read length.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: 'stats', desc: 'Generate sequence statistics' },
+					{ name: 'SRR36708862_*.fastq.gz', desc: 'Input paired-end FASTQ files' }
+				]
+			},
+			{
+				type: 'task',
+				title: 'Step 2: Quality Control Report',
+				text: `Generate detailed quality reports to identify any issues with the sequencing data.`,
+				command: 'fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o fastqc_output/',
+				explanation: 'FastQC analyzes per-base quality scores, GC content, adapter contamination, and other quality metrics.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '-o fastqc_output/', desc: 'Output directory for reports' }
+				]
+			},
+			{
+				type: 'phase',
+				title: 'Phase 2: Read Preprocessing',
+				text: 'Clean the raw reads by removing adapters and low-quality bases.',
+				phase: 2
+			},
+			{
+				type: 'task',
+				title: 'Step 3: Adapter Trimming',
+				text: `Remove Illumina adapters and trim low-quality bases from read ends.`,
+				command: 'trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz trimmed/SRR36708862_R1_paired.fq.gz trimmed/SRR36708862_R1_unpaired.fq.gz trimmed/SRR36708862_R2_paired.fq.gz trimmed/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
+				explanation: 'Trimmomatic removes adapter sequences and trims bases with quality below threshold.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: 'PE', desc: 'Paired-end mode' },
+					{ name: '-threads 2', desc: 'Use 2 CPU threads' },
+					{ name: 'ILLUMINACLIP', desc: 'Remove TruSeq adapters' },
+					{ name: 'SLIDINGWINDOW:4:15', desc: 'Trim when 4-base average quality < 15' },
+					{ name: 'MINLEN:36', desc: 'Discard reads shorter than 36 bp' }
+				]
+			},
+			{
+				type: 'phase',
+				title: 'Phase 3: Genome Assembly',
+				text: 'Assemble the cleaned reads into contiguous sequences (contigs).',
+				phase: 3
+			},
+			{
+				type: 'task',
+				title: 'Step 4: De Novo Assembly',
+				text: `Assemble the trimmed reads into contigs using Unicycler.`,
+				command: 'unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o assembly/',
+				explanation: 'Unicycler uses SPAdes with multiple k-mer sizes and optimizes the assembly graph.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '-1/-2', desc: 'Forward and reverse paired reads' },
+					{ name: '-o assembly/', desc: 'Output directory' }
+				]
+			},
+			{
+				type: 'task',
+				title: 'Step 5: Visualize Assembly Graph',
+				text: `Create a visual representation of the assembly graph to understand genome structure.`,
+				command: 'bandage image assembly/assembly.gfa assembly_graph.png',
+				explanation: 'Bandage visualizes the assembly graph showing how contigs connect.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: 'image', desc: 'Generate PNG image' },
+					{ name: 'assembly.gfa', desc: 'Input graph file' }
+				]
+			},
+			{
+				type: 'phase',
+				title: 'Phase 4: Assembly Quality Assessment',
+				text: 'Evaluate the quality and completeness of the assembled genome.',
+				phase: 4
+			},
+			{
+				type: 'task',
+				title: 'Step 6: Assembly Metrics',
+				text: `Calculate assembly statistics including N50, total length, and contig count.`,
+				command: 'quast assembly/assembly.fasta -o quast_output/',
+				explanation: 'QUAST calculates key assembly metrics to assess quality.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '-o quast_output/', desc: 'Output directory' }
+				]
+			},
+			{
+				type: 'task',
+				title: 'Step 7: Genome Completeness',
+				text: `Assess genome completeness and contamination using CheckM2.`,
+				command: 'checkm2 predict --input assembly/ --output-directory checkm2_output/ -x fasta',
+				explanation: 'CheckM2 uses machine learning to estimate completeness and contamination.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '--input assembly/', desc: 'Directory with assembly' },
+					{ name: '-x fasta', desc: 'File extension' }
+				]
+			},
+			{
+				type: 'phase',
+				title: 'Phase 5: AMR Screening & Typing',
+				text: 'Screen for antimicrobial resistance genes and determine sequence type.',
+				phase: 5
+			},
+			{
+				type: 'task',
+				title: 'Step 8: AMR Gene Detection',
+				text: `Screen the assembly for antimicrobial resistance genes using multiple databases.`,
+				command: 'abricate --db ncbi assembly/assembly.fasta > abricate_output/amr_ncbi.tab',
+				explanation: 'ABRicate rapidly screens for resistance genes against curated databases.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '--db ncbi', desc: 'Use NCBI AMRFinder database' },
+					{ name: '>', desc: 'Redirect output to file' }
+				]
+			},
+			{
+				type: 'task',
+				title: 'Step 9: MLST Typing',
+				text: `Determine the sequence type (ST) for epidemiological classification.`,
+				command: 'mlst assembly/assembly.fasta > mlst_output/mlst_result.tab',
+				explanation: 'MLST identifies the allelic profile of 7 housekeeping genes to assign a sequence type.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '>', desc: 'Redirect output to file' }
+				]
+			},
+			{
+				type: 'phase',
+				title: 'Phase 6: Genome Annotation',
+				text: 'Identify and annotate genes in the assembled genome.',
+				phase: 6
+			},
+			{
+				type: 'task',
+				title: 'Step 10: Gene Annotation',
+				text: `Annotate the genome to identify coding sequences, tRNAs, and rRNAs.`,
+				command: 'prokka --outdir prokka_output/ assembly/assembly.fasta',
+				explanation: 'Prokka performs rapid prokaryotic genome annotation.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '--outdir prokka_output/', desc: 'Output directory' }
+				]
+			},
+			{
+				type: 'complete',
+				title: 'Tutorial Complete!',
+				text: `**Congratulations!** You've completed the WGS analysis tutorial.\n\n---\n\n**Your Results Summary:**\n\n| Metric | Value |\n|--------|-------|\n| Input Reads | 990,478 pairs |\n| After Trimming | 982,838 pairs (99.23%) |\n| Assembly Size | 5,553,065 bp |\n| Contigs | 189 |\n| N50 | 371,705 bp |\n| GC Content | 57.18% |\n| Completeness | 99.8% |\n| Contamination | 0.2% |\n\n**Sequence Type:** ST307 (Klebsiella pneumoniae)\n\n**AMR Genes Detected:**\n• blaSHV-28 (β-lactamase)\n• oqxA/oqxB (fluoroquinolone efflux)\n• fosA (fosfomycin resistance)\n\n**Annotation Summary:**\n• 5,234 coding sequences (CDS)\n• 86 tRNAs\n• 25 rRNAs\n\n---\n\n**What's Next?**\nTry the **Hospital Outbreak Investigation** scenario to apply these skills to a real-world epidemiological investigation with multiple samples!`
+			}
+		]
+	},
 	hospital: {
 		id: 'hospital',
 		title: 'Hospital Outbreak Investigation',
