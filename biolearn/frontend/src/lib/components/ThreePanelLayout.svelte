@@ -3,7 +3,7 @@
 	import Terminal from './Terminal.svelte';
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
-	import { executedCommands } from '$lib/stores/terminal';
+	import { executedCommands, storylineDataDir, currentDirectory } from '$lib/stores/terminal';
 	import type { Storyline } from '$lib/storylines/wgs-bacteria';
 
 	let {
@@ -29,8 +29,9 @@
 	// File contents for viewing
 	const fileContents: Record<string, string> = {
 		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
-		'sample_01_R1_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R1</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
-		'sample_01_R2_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R2</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
+		// FastQC reports - loaded from static folder (real FastQC output format)
+		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
+		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
 		'assembly.fasta': `>contig_1 length=4892156 depth=45.2x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_2 length=95234 depth=78.5x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234`,
 		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,
@@ -163,6 +164,11 @@
 	};
 
 	onMount(() => {
+		// Set the storyline's data directory in stores so Terminal knows where to start
+		const dataDir = storyline?.dataDir || '/data/outbreak_investigation';
+		storylineDataDir.set(dataDir);
+		currentDirectory.set(dataDir);
+
 		const unsubscribe = executedCommands.subscribe(cmds => {
 			const files: {name: string, type: string, tool: string}[] = [];
 			cmds.forEach(tool => {
@@ -178,9 +184,27 @@
 		return unsubscribe;
 	});
 
-	function viewFile(file: {name: string, type: string}) {
+	async function viewFile(file: {name: string, type: string}) {
 		const content = fileContents[file.name];
-		if (file.type === 'html' && content) {
+
+		// Handle FastQC HTML files - fetch from static folder
+		if (file.type === 'html' && content === 'FASTQC_STATIC') {
+			try {
+				const response = await fetch(`/fastqc/${file.name}`);
+				if (response.ok) {
+					const htmlContent = await response.text();
+					const newWindow = window.open('', '_blank');
+					if (newWindow) {
+						newWindow.document.write(htmlContent);
+						newWindow.document.close();
+					}
+				} else {
+					alert(`Could not load ${file.name}`);
+				}
+			} catch (error) {
+				alert(`Error loading ${file.name}`);
+			}
+		} else if (file.type === 'html' && content) {
 			const newWindow = window.open('', '_blank');
 			if (newWindow) {
 				newWindow.document.write(content);

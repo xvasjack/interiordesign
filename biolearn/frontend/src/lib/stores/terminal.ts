@@ -49,6 +49,10 @@ export const executedCommands = writable<string[]>([]);
 // Track current directory for directory awareness
 export const currentDirectory = writable<string>('/data/outbreak_investigation');
 
+// Storyline's data directory (the "home" directory for the current storyline)
+// This determines what ~ maps to in the terminal
+export const storylineDataDir = writable<string>('/data/outbreak_investigation');
+
 // Track current step in story (for hiding next steps)
 export const currentStoryStep = writable<number>(0);
 export const executedSteps = writable<Set<number>>(new Set());

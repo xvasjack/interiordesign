@@ -69,9 +69,9 @@
 		// SeqKit stats
 		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
 
-		// FastQC reports
-		'sample_01_R1_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R1</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p><p><span class="pass">✓</span> Per base sequence content</p><p><span class="warn">⚠</span> Per sequence GC content</p><p><span class="pass">✓</span> Per base N content</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
-		'sample_01_R2_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R2</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p><p><span class="pass">✓</span> Per base sequence content</p><p><span class="warn">⚠</span> Per sequence GC content</p><p><span class="pass">✓</span> Per base N content</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
+		// FastQC reports - loaded from static folder (real FastQC output format)
+		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
+		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
 		'sample_01_R1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
 		'sample_01_R2_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
 
@@ -115,9 +115,27 @@
 		'ffn': 'text/plain'
 	};
 
-	function viewFile(file: any) {
+	async function viewFile(file: any) {
 		const content = fileContents[file.name];
-		if (file.type === 'html' && content) {
+
+		// Handle FastQC HTML files - fetch from static folder
+		if (file.type === 'html' && content === 'FASTQC_STATIC') {
+			try {
+				const response = await fetch(`/fastqc/${file.name}`);
+				if (response.ok) {
+					const htmlContent = await response.text();
+					const newWindow = window.open('', '_blank');
+					if (newWindow) {
+						newWindow.document.write(htmlContent);
+						newWindow.document.close();
+					}
+				} else {
+					alert(`Could not load ${file.name}`);
+				}
+			} catch (error) {
+				alert(`Error loading ${file.name}`);
+			}
+		} else if (file.type === 'html' && content) {
 			// Open HTML in new window
 			const newWindow = window.open('', '_blank');
 			if (newWindow) {

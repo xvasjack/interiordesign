@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal } from '$lib/stores/terminal';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 
 	// Props
@@ -14,7 +14,8 @@
 	let stopUnsubscribe: () => void;
 	let cursorPosition = 0;  // Track cursor position for left/right arrow
 	let isExecuting = false;
-	let currentDir = initialDir;
+	// Initialize currentDir from the store (set by ThreePanelLayout based on storyline)
+	let currentDir = get(currentDirectory);
 
 	// Command history for arrow up/down
 	let commandHistoryList: string[] = [];
@@ -2495,23 +2496,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 	};
 
 	function writePrompt() {
-		// Shorten directory paths for display
-		let shortDir = currentDir
-			.replace('/data/outbreak_investigation', '~/outbreak')
-			.replace('/data/wastewater_surveillance', '~/wastewater')
-			.replace('/data/clinical_samples', '~/clinical')
-			.replace('/data/gut_microbiome', '~/gut')
-			.replace('/data/soil_microbiome', '~/soil')
-			.replace('/data/water_samples', '~/water')
-			.replace('/data/wgs_report', '~/wgs_report')
-			.replace('/data/amplicon_report', '~/amplicon_report')
-			.replace('/data/rnaseq_report', '~/rnaseq_report')
-			.replace('/data/', '~/');
-		// If it's exactly the initial directory, show as ~
-		if (currentDir === initialDir) {
-			shortDir = '~' + currentDir.replace(initialDir, '').replace(/^\//, '');
-			if (shortDir === '~') shortDir = '~';
-		}
+		const dataDir = get(storylineDataDir);
+		const shortDir = currentDir.replace(dataDir, '~');
 		terminal.write(`\r\n\x1b[32mbiolearn\x1b[0m:\x1b[34m${shortDir}\x1b[0m$ `);
 	}
 
@@ -2975,12 +2961,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		// Handle bioinformatics tools - require proper arguments and correct directory/files
 		if (bioTools.has(command)) {
 			const req = toolRequirements[command];
+			const dataDir = get(storylineDataDir);
 
 			// Check directory requirement
 			if (req && !req.dirs.includes(currentDir)) {
-				const shortDirs = req.dirs.map(d => d.replace('/data/', '~/')).join(' or ');
+				const shortDirs = req.dirs.map(d => d.replace(dataDir, '~')).join(' or ');
 				terminal.writeln(`\x1b[31mError: ${command} must be run from ${shortDirs}\x1b[0m`);
-				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace('/data/', '~/')}\x1b[0m`);
+				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace(dataDir, '~')}\x1b[0m`);
 				terminal.writeln(`\x1b[90mUse 'cd' to navigate to the correct directory first.\x1b[0m`);
 				writePrompt();
 				return;
@@ -4195,9 +4182,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 	function handleCd(args: string[]) {
 		const filesystem = getFilesystem();
+		const dataDir = get(storylineDataDir);
 
 		if (args.length === 0 || args[0] === '~') {
-			currentDir = initialDir;
+			currentDir = dataDir;
 			currentDirectory.set(currentDir);
 			return;
 		}
@@ -4223,7 +4211,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			currentDir = parts.length > 0 ? '/' + parts.join('/') : '/data';
 			// Don't go above /data - reset to initial directory
 			if (!currentDir.startsWith('/data')) {
-				currentDir = initialDir;
+				currentDir = dataDir;
 			}
 			currentDirectory.set(currentDir);
 			return;
@@ -4592,6 +4580,9 @@ Annotation identified 4,523 coding sequences.
 		const { FitAddon } = await import('@xterm/addon-fit');
 		const { WebLinksAddon } = await import('@xterm/addon-web-links');
 		await import('@xterm/xterm/css/xterm.css');
+
+		// Read the current directory from store (set by ThreePanelLayout based on storyline)
+		currentDir = get(currentDirectory);
 
 		terminal = new Terminal(terminalOptions);
 		fitAddon = new FitAddon();
