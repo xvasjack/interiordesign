@@ -29,8 +29,140 @@
 	// File contents for viewing
 	const fileContents: Record<string, string> = {
 		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
-		'sample_01_R1_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R1</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
-		'sample_01_R2_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R2</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
+		'sample_01_R1_fastqc.html': `<!DOCTYPE html>
+<html>
+<head>
+<title>FastQC Report - sample_01_R1</title>
+<style type="text/css">
+body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
+.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+.header h1 { margin: 0; font-size: 1.8em; }
+.header p { margin: 5px 0 0 0; opacity: 0.9; }
+.module { background: white; margin: 15px 0; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+h2 { color: #006699; font-size: 1.3em; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #006699; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+th { background: #006699; color: white; padding: 12px; text-align: left; }
+td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+tr:hover { background: #f5f9fc; }
+.pass { color: #22c55e; font-weight: bold; }
+.warn { color: #f59e0b; font-weight: bold; }
+.status-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; color: white; font-size: 12px; margin-right: 10px; }
+.status-pass { background: #22c55e; }
+.status-warn { background: #f59e0b; }
+.footer { margin-top: 30px; padding: 15px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>FastQC Report</h1>
+<p>sample_01_R1.fastq.gz | Generated: 2024-01-15 10:30:45</p>
+</div>
+<div class="module">
+<h2>Summary</h2>
+<table>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Basic Statistics</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence quality</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per tile sequence quality</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence quality scores</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence GC content</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Duplication Levels</td></tr>
+<tr><td><span class="status-icon status-warn">!</span><span class="warn">WARN</span></td><td>Adapter Content</td></tr>
+</table>
+</div>
+<div class="module">
+<h2>Basic Statistics</h2>
+<table>
+<tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+<tr><td>File type</td><td>Conventional base calls</td></tr>
+<tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
+<tr><td>Total Sequences</td><td>2,847,293</td></tr>
+<tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
+<tr><td>Sequence length</td><td>150</td></tr>
+<tr><td>%GC</td><td>52</td></tr>
+</table>
+</div>
+<div class="module">
+<h2>Per base sequence quality</h2>
+<p>Mean quality score: <strong>36.2</strong> (Excellent)</p>
+</div>
+<div class="module">
+<h2>Adapter Content</h2>
+<p style="color:#f59e0b;">⚠ Warning: 3.2% adapter content detected</p>
+<p style="color:#666;">Recommendation: Run Trimmomatic to remove adapters.</p>
+</div>
+<div class="footer">
+<p>Produced by <strong>FastQC</strong> version 0.12.1</p>
+</div>
+</body>
+</html>`,
+		'sample_01_R2_fastqc.html': `<!DOCTYPE html>
+<html>
+<head>
+<title>FastQC Report - sample_01_R2</title>
+<style type="text/css">
+body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
+.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+.header h1 { margin: 0; font-size: 1.8em; }
+.header p { margin: 5px 0 0 0; opacity: 0.9; }
+.module { background: white; margin: 15px 0; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+h2 { color: #006699; font-size: 1.3em; margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid #006699; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+th { background: #006699; color: white; padding: 12px; text-align: left; }
+td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+tr:hover { background: #f5f9fc; }
+.pass { color: #22c55e; font-weight: bold; }
+.warn { color: #f59e0b; font-weight: bold; }
+.status-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; color: white; font-size: 12px; margin-right: 10px; }
+.status-pass { background: #22c55e; }
+.status-warn { background: #f59e0b; }
+.footer { margin-top: 30px; padding: 15px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>FastQC Report</h1>
+<p>sample_01_R2.fastq.gz | Generated: 2024-01-15 10:31:02</p>
+</div>
+<div class="module">
+<h2>Summary</h2>
+<table>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Basic Statistics</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per base sequence quality</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per tile sequence quality</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence quality scores</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Per sequence GC content</td></tr>
+<tr><td><span class="status-icon status-pass">✓</span><span class="pass">PASS</span></td><td>Sequence Duplication Levels</td></tr>
+<tr><td><span class="status-icon status-warn">!</span><span class="warn">WARN</span></td><td>Adapter Content</td></tr>
+</table>
+</div>
+<div class="module">
+<h2>Basic Statistics</h2>
+<table>
+<tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr>
+<tr><td>File type</td><td>Conventional base calls</td></tr>
+<tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
+<tr><td>Total Sequences</td><td>2,847,293</td></tr>
+<tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
+<tr><td>Sequence length</td><td>150</td></tr>
+<tr><td>%GC</td><td>52</td></tr>
+</table>
+</div>
+<div class="module">
+<h2>Per base sequence quality</h2>
+<p>Mean quality score: <strong>35.8</strong> (Excellent)</p>
+</div>
+<div class="module">
+<h2>Adapter Content</h2>
+<p style="color:#f59e0b;">⚠ Warning: 2.8% adapter content detected</p>
+<p style="color:#666;">Recommendation: Run Trimmomatic to remove adapters.</p>
+</div>
+<div class="footer">
+<p>Produced by <strong>FastQC</strong> version 0.12.1</p>
+</div>
+</body>
+</html>`,
 		'assembly.fasta': `>contig_1 length=4892156 depth=45.2x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_2 length=95234 depth=78.5x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234`,
 		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,
