@@ -33,10 +33,15 @@
 
 	// Base filesystem - sequencing data files exist at start (from sequencer)
 	const baseFilesystem: Record<string, string[]> = {
+		// Trial/Demo scenario - single K. pneumoniae sample (SRR36708862)
+		'/data/kpneumoniae_demo': [
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz'
+		],
 		'/data/outbreak_investigation': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz'
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz',
+			'reference.gbk', 'sample_info.tsv'
 		],
 		'/data/wastewater_surveillance': [
 			'sample_01_hifi.fastq.gz',
@@ -106,11 +111,27 @@
 
 	// Files created by each tool
 	const toolCreatedFiles: Record<string, Record<string, string[]>> = {
+		'seqkit': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['o1_seqkit.stats'],
+			// Hospital outbreak scenario
+			'/data/outbreak_investigation': ['seqkit_stats.txt']
+		},
 		'fastqc': {
-			'/data/outbreak_investigation': ['qc_reports/'],
-			'/data/outbreak_investigation/qc_reports': [
-				'sample_01_R1_fastqc.html', 'sample_01_R1_fastqc.zip',
-				'sample_01_R2_fastqc.html', 'sample_01_R2_fastqc.zip'
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['o2_fastqc/'],
+			'/data/kpneumoniae_demo/o2_fastqc': [
+				'SRR36708862_1_fastqc.html', 'SRR36708862_1_fastqc.zip',
+				'SRR36708862_2_fastqc.html', 'SRR36708862_2_fastqc.zip'
+			],
+			'/data/outbreak_investigation': ['o2_fastqc/'],
+			'/data/outbreak_investigation/o2_fastqc': [
+				'patient_01_R1_fastqc.html', 'patient_01_R1_fastqc.zip',
+				'patient_01_R2_fastqc.html', 'patient_01_R2_fastqc.zip',
+				'patient_02_R1_fastqc.html', 'patient_02_R1_fastqc.zip',
+				'patient_02_R2_fastqc.html', 'patient_02_R2_fastqc.zip',
+				'patient_03_R1_fastqc.html', 'patient_03_R1_fastqc.zip',
+				'patient_03_R2_fastqc.html', 'patient_03_R2_fastqc.zip'
 			],
 			// Amplicon directories
 			'/data/gut_microbiome': ['qc_reports/'],
@@ -134,46 +155,120 @@
 			]
 		},
 		'multiqc': {
-			'/data/outbreak_investigation': ['multiqc_report.html', 'multiqc_data/'],
+			'/data/outbreak_investigation': ['multiqc_report.html', 'multiqc_data/', 'multiqc_output/'],
+			'/data/outbreak_investigation/multiqc_output': [
+				'multiqc_report.html', 'multiqc_data/'
+			],
 			'/data/gut_microbiome': ['multiqc_report.html', 'multiqc_data/'],
 			'/data/soil_microbiome': ['multiqc_report.html', 'multiqc_data/'],
 			'/data/water_samples': ['multiqc_report.html', 'multiqc_data/']
 		},
 		'trimmomatic': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['trimmed/'],
+			'/data/kpneumoniae_demo/trimmed': [
+				'SRR36708862_R1_paired.fq.gz', 'SRR36708862_R2_paired.fq.gz',
+				'SRR36708862_R1_unpaired.fq.gz', 'SRR36708862_R2_unpaired.fq.gz'
+			],
 			'/data/outbreak_investigation': ['trimmed/'],
 			'/data/outbreak_investigation/trimmed': [
-				'sample_01_R1_paired.fq.gz', 'sample_01_R2_paired.fq.gz',
-				'sample_01_R1_unpaired.fq.gz', 'sample_01_R2_unpaired.fq.gz'
+				'patient_01_R1_paired.fq.gz', 'patient_01_R2_paired.fq.gz',
+				'patient_01_R1_unpaired.fq.gz', 'patient_01_R2_unpaired.fq.gz',
+				'patient_02_R1_paired.fq.gz', 'patient_02_R2_paired.fq.gz',
+				'patient_02_R1_unpaired.fq.gz', 'patient_02_R2_unpaired.fq.gz',
+				'patient_03_R1_paired.fq.gz', 'patient_03_R2_paired.fq.gz',
+				'patient_03_R1_unpaired.fq.gz', 'patient_03_R2_unpaired.fq.gz'
 			]
 		},
 		'unicycler': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['assembly/'],
+			'/data/kpneumoniae_demo/assembly': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			],
 			'/data/outbreak_investigation': ['assembly/'],
 			'/data/outbreak_investigation/assembly': [
+				'patient_01/', 'patient_02/', 'patient_03/'
+			],
+			'/data/outbreak_investigation/assembly/patient_01': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			],
+			'/data/outbreak_investigation/assembly/patient_02': [
+				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
+			],
+			'/data/outbreak_investigation/assembly/patient_03': [
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
 			]
 		},
 		'bandage': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['assembly_graph.png'],
+			'/data/kpneumoniae_demo/assembly': ['assembly_graph.png'],
 			'/data/outbreak_investigation/assembly': [
+				'patient_01_graph.png', 'patient_02_graph.png', 'patient_03_graph.png'
+			],
+			'/data/outbreak_investigation/assembly/patient_01': [
+				'assembly_graph.png'
+			],
+			'/data/outbreak_investigation/assembly/patient_02': [
+				'assembly_graph.png'
+			],
+			'/data/outbreak_investigation/assembly/patient_03': [
 				'assembly_graph.png'
 			]
 		},
 		'prokka': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['prokka_output/'],
+			'/data/kpneumoniae_demo/prokka_output': [
+				'PROKKA.gff', 'PROKKA.gbk', 'PROKKA.fna', 'PROKKA.faa',
+				'PROKKA.ffn', 'PROKKA.tsv', 'PROKKA.txt', 'PROKKA.log'
+			],
 			'/data/outbreak_investigation': ['prokka_results/'],
 			'/data/outbreak_investigation/prokka_results': [
-				'sample_01.gff', 'sample_01.gbk', 'sample_01.fna',
-				'sample_01.faa', 'sample_01.ffn', 'sample_01.txt'
+				'patient_01/', 'patient_02/', 'patient_03/'
+			],
+			'/data/outbreak_investigation/prokka_results/patient_01': [
+				'patient_01.gff', 'patient_01.gbk', 'patient_01.fna',
+				'patient_01.faa', 'patient_01.ffn', 'patient_01.txt'
+			],
+			'/data/outbreak_investigation/prokka_results/patient_02': [
+				'patient_02.gff', 'patient_02.gbk', 'patient_02.fna',
+				'patient_02.faa', 'patient_02.ffn', 'patient_02.txt'
+			],
+			'/data/outbreak_investigation/prokka_results/patient_03': [
+				'patient_03.gff', 'patient_03.gbk', 'patient_03.fna',
+				'patient_03.faa', 'patient_03.ffn', 'patient_03.txt'
 			]
 		},
 		'abricate': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['abricate_output/'],
+			'/data/kpneumoniae_demo/abricate_output': [
+				'amr_ncbi.tab', 'amr_resfinder.tab', 'amr_card.tab', 'amr_summary.tab'
+			],
 			'/data/outbreak_investigation': ['abricate_results/'],
 			'/data/outbreak_investigation/abricate_results': [
-				'amr_report.tsv', 'amr_summary.txt'
+				'all_patients_amr.tsv', 'amr_summary.txt'
 			]
 		},
 		'quast': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['quast_output/'],
+			'/data/kpneumoniae_demo/quast_output': [
+				'report.html', 'report.tsv', 'report.txt', 'transposed_report.tsv',
+				'icarus.html', 'report.pdf'
+			],
 			'/data/outbreak_investigation': ['quast_results/'],
 			'/data/outbreak_investigation/quast_results': [
-				'quast_report.html', 'quast_report.tsv'
+				'quast_report.html', 'quast_report.tsv', 'transposed_report.tsv'
+			]
+		},
+		'checkm2': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['checkm2_output/'],
+			'/data/kpneumoniae_demo/checkm2_output': [
+				'quality_report.tsv', 'protein_files/', 'diamond_output/'
 			]
 		},
 		'checkm': {
@@ -191,20 +286,28 @@
 		'bakta': {
 			'/data/outbreak_investigation': ['bakta_results/'],
 			'/data/outbreak_investigation/bakta_results': [
-				'sample_01.gff3', 'sample_01.gbff', 'sample_01.fna',
-				'sample_01.faa', 'sample_01.tsv', 'sample_01.json'
+				'patient_01.gff3', 'patient_01.gbff', 'patient_01.fna',
+				'patient_01.faa', 'patient_01.tsv', 'patient_01.json'
 			]
 		},
 		'mlst': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['mlst_output/'],
+			'/data/kpneumoniae_demo/mlst_output': [
+				'mlst_result.tab'
+			],
 			'/data/outbreak_investigation': ['mlst_results/'],
 			'/data/outbreak_investigation/mlst_results': [
-				'mlst_report.tsv'
+				'all_patients_mlst.tsv', 'mlst_report.tsv'
 			]
 		},
 		// Phase 3: Plasmid Analysis
 		'mob_recon': {
 			'/data/outbreak_investigation': ['mob_recon_results/'],
 			'/data/outbreak_investigation/mob_recon_results': [
+				'patient_01/', 'plasmid_report.tsv'
+			],
+			'/data/outbreak_investigation/mob_recon_results/patient_01': [
 				'plasmid_report.tsv', 'chromosome.fasta', 'plasmid_AA001.fasta',
 				'mobtyper_results.txt', 'contig_report.txt'
 			]
@@ -220,8 +323,16 @@
 		'snippy': {
 			'/data/outbreak_investigation': ['snippy_results/'],
 			'/data/outbreak_investigation/snippy_results': [
-				'snps.vcf', 'snps.tab', 'snps.aligned.fa',
-				'snps.consensus.fa', 'snps.log'
+				'patient_01/', 'patient_02/', 'patient_03/', 'core.aln', 'core.vcf'
+			],
+			'/data/outbreak_investigation/snippy_results/patient_01': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa', 'snps.consensus.fa', 'snps.log'
+			],
+			'/data/outbreak_investigation/snippy_results/patient_02': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa', 'snps.consensus.fa', 'snps.log'
+			],
+			'/data/outbreak_investigation/snippy_results/patient_03': [
+				'snps.vcf', 'snps.tab', 'snps.aligned.fa', 'snps.consensus.fa', 'snps.log'
 			]
 		},
 		'roary': {
@@ -231,8 +342,15 @@
 				'pan_genome_reference.fa', 'summary_statistics.txt'
 			]
 		},
+		'snippy-core': {
+			'/data/outbreak_investigation': [
+				'core.aln', 'core.vcf', 'core.tab', 'core.ref.fa', 'core.txt'
+			]
+		},
 		'iqtree': {
-			'/data/outbreak_investigation': ['iqtree_results/'],
+			'/data/outbreak_investigation': [
+				'core.aln.treefile', 'core.aln.iqtree', 'core.aln.log', 'core.aln.contree'
+			],
 			'/data/outbreak_investigation/iqtree_results': [
 				'core_alignment.treefile', 'core_alignment.iqtree',
 				'core_alignment.log', 'core_alignment.contree'
@@ -262,6 +380,10 @@
 		'resfinder': {
 			'/data/outbreak_investigation': ['resfinder_results/'],
 			'/data/outbreak_investigation/resfinder_results': [
+				'patient_01/', 'ResFinder_results_tab.txt', 'ResFinder_results.txt',
+				'pheno_table.txt', 'PointFinder_results.txt'
+			],
+			'/data/outbreak_investigation/resfinder_results/patient_01': [
 				'ResFinder_results_tab.txt', 'ResFinder_results.txt',
 				'pheno_table.txt', 'PointFinder_results.txt'
 			]
@@ -487,72 +609,90 @@
 		const maxLen = isHiFi ? 45678 : (isNanopore ? 32456 : 150);
 		const totalBases = totalReads * readLength;
 
+		// Generate file names for paired-end reads
+		const file1 = inputFile.replace('_R2', '_R1').replace('_2.fastq', '_1.fastq');
+		const file2 = inputFile.replace('_R1', '_R2').replace('_1.fastq', '_2.fastq');
+		const totalBasesAll = totalBases * 2;
+
 		const outputs: Record<string, any> = {
 			'seqkit': {
-				output: `\x1b[32m[INFO]\x1b[0m Processing ${inputFile}...
-file                      format  type   num_seqs      sum_len  min_len  avg_len  max_len
-${inputFile.padEnd(25)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
+				output: `\x1b[32m[INFO]\x1b[0m Processing files...
+file                           format  type   num_seqs      sum_len  min_len  avg_len  max_len
+${file1.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
+${file2.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.toLocaleString()}      ${minLen}      ${readLength}      ${maxLen}
 
 \x1b[32m[INFO]\x1b[0m Summary Statistics:
-  Total reads:     ${totalReads.toLocaleString()}
-  Total bases:     ${totalBases.toLocaleString()}
+  Total reads:     ${(totalReads * 2).toLocaleString()} (${totalReads.toLocaleString()} pairs)
+  Total bases:     ${totalBasesAll.toLocaleString()}
   GC content:      ${gcContent}%
   Q20 bases:       ${isLongRead ? '99.8' : '97.2'}%
   Q30 bases:       ${isLongRead ? '98.2' : '93.8'}%
 `,
 				summary: {
-					'File': inputFile,
-					'Total Reads': totalReads.toLocaleString(),
-					'Total Bases': `${(totalBases / 1000000).toFixed(1)} Mb`,
+					'Forward Reads (R1)': file1,
+					'Reverse Reads (R2)': file2,
+					'Reads per File': totalReads.toLocaleString(),
+					'Total Read Pairs': totalReads.toLocaleString(),
+					'Total Bases': `${(totalBasesAll / 1000000).toFixed(1)} Mb`,
 					'Avg Read Length': `${readLength.toLocaleString()} bp`,
 					'GC Content': `${gcContent}%`,
 					'Q20 Bases': isLongRead ? '99.8%' : '97.2%',
 					'Q30 Bases': isLongRead ? '98.2%' : '93.8%'
 				},
-				files: [{ name: 'seqkit_stats.txt', type: 'txt', size: '1.2 KB' }]
+				files: []
 			},
 			'fastqc': {
-				output: `Started analysis of ${inputFile}
-Approx 5% complete for ${inputFile}
-Approx 15% complete for ${inputFile}
-Approx 30% complete for ${inputFile}
-Approx 50% complete for ${inputFile}
-Approx 70% complete for ${inputFile}
-Approx 85% complete for ${inputFile}
-Approx 95% complete for ${inputFile}
-Analysis complete for ${inputFile}
+				output: `Started analysis of ${file1}
+Approx 50% complete for ${file1}
+Analysis complete for ${file1}
+Started analysis of ${file2}
+Approx 50% complete for ${file2}
+Analysis complete for ${file2}
 `,
 				summary: {
-					'File': inputFile,
-					'Total Sequences': totalReads.toLocaleString(),
+					'Forward Reads (R1)': file1,
+					'R1 Total Sequences': totalReads.toLocaleString(),
+					'R1 Quality': 'PASS',
+					'Reverse Reads (R2)': file2,
+					'R2 Total Sequences': totalReads.toLocaleString(),
+					'R2 Quality': 'PASS',
 					'Sequence Length': isLongRead ? `${minLen}-${maxLen} bp` : '150 bp',
 					'GC Content': `${gcContent}%`,
-					'Per Base Quality': 'PASS',
-					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`,
-					'Overall Quality': 'PASS'
+					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`
 				},
 				chartData: {
-					title: `Per Base Sequence Quality - ${inputFile}`,
-					positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
-					scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
-						const base = isLongRead ? (isHiFi ? 33 : 18) : (isR2 ? 31 : 32);
-						const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
-						return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.1 : 0);
-					}),
+					title: `Per Base Sequence Quality`,
+					datasets: [
+						{
+							label: file1,
+							positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
+							scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
+								const base = isLongRead ? (isHiFi ? 33 : 18) : 32;
+								const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
+								return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.1 : 0);
+							})
+						},
+						{
+							label: file2,
+							positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
+							scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
+								const base = isLongRead ? (isHiFi ? 33 : 18) : 31;
+								const seed = (i * 7 + parseInt(sampleNum) * 17) % 100;
+								return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.12 : 0);
+							})
+						}
+					],
 					xLabel: 'Position in read (bp)',
 					yLabel: 'Quality Score (Phred)'
 				},
-				files: [
-					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.html`, type: 'html', size: '245 KB' },
-					{ name: `${sampleName}_${isLongRead ? (isHiFi ? 'hifi' : 'nanopore') : (isR2 ? 'R2' : 'R1')}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
-				]
+				files: []
 			},
 			'multiqc': {
 				output: `\x1b[34m/// \x1b[0m\x1b[1mMultiQC\x1b[0m 🔍 | v1.14
 \x1b[34m/// \x1b[0m
 
 \x1b[32m[INFO]\x1b[0m     multiqc : This is MultiQC v1.14
-\x1b[32m[INFO]\x1b[0m     search_modules : Searching qc_reports/ for analysis results
+\x1b[32m[INFO]\x1b[0m     search_modules : Searching o2_fastqc/ for analysis results
 \x1b[32m[INFO]\x1b[0m     fastqc : Found 8 reports
 \x1b[32m[INFO]\x1b[0m     write_results : Compiling report
 \x1b[32m[INFO]\x1b[0m     write_results : Report written to multiqc_report.html
@@ -2720,9 +2860,12 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 	// Valid files for each tool - must match exactly
 	const validToolFiles: Record<string, string[]> = {
 		'fastqc': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
+			// Trial/Demo scenario
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz',
+			// Hospital outbreak - patient files
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz',
 			// Amplicon files
 			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz', 'IBD_02_R1.fastq.gz', 'IBD_02_R2.fastq.gz',
 			'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz', 'Control_02_R1.fastq.gz', 'Control_02_R2.fastq.gz',
@@ -2732,9 +2875,12 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'seqkit': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz',
-			'sample_02_R1.fastq.gz', 'sample_02_R2.fastq.gz',
-			'sample_03_R1.fastq.gz', 'sample_03_R2.fastq.gz',
+			// Trial/Demo scenario
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz',
+			// Hospital outbreak - patient files
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz',
 			// Long-read files
 			'sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz',
 			'sample_01_nanopore.fastq.gz',
@@ -2747,27 +2893,81 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'Runoff_R1.fastq.gz', 'Runoff_R2.fastq.gz', 'Reference_R1.fastq.gz', 'Reference_R2.fastq.gz'
 		],
 		'trimmomatic': [
-			'sample_01_R1.fastq.gz', 'sample_01_R2.fastq.gz'
+			// Trial/Demo scenario
+			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz',
+			// Hospital outbreak
+			'patient_01_R1.fastq.gz', 'patient_01_R2.fastq.gz',
+			'patient_02_R1.fastq.gz', 'patient_02_R2.fastq.gz',
+			'patient_03_R1.fastq.gz', 'patient_03_R2.fastq.gz'
 		],
 		'unicycler': [
-			'trimmed/sample_01_R1_paired.fq.gz', 'trimmed/sample_01_R2_paired.fq.gz'
+			// Trial/Demo scenario
+			'trimmed/SRR36708862_R1_paired.fq.gz', 'trimmed/SRR36708862_R2_paired.fq.gz',
+			// Hospital outbreak
+			'trimmed/patient_01_R1_paired.fq.gz', 'trimmed/patient_01_R2_paired.fq.gz',
+			'trimmed/patient_02_R1_paired.fq.gz', 'trimmed/patient_02_R2_paired.fq.gz',
+			'trimmed/patient_03_R1_paired.fq.gz', 'trimmed/patient_03_R2_paired.fq.gz'
 		],
-		'bandage': ['assembly/assembly.gfa'],
-		'prokka': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'abricate': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'quast': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'bandage': [
+			'assembly/assembly.gfa',
+			'assembly/patient_01/assembly.gfa', 'assembly/patient_02/assembly.gfa', 'assembly/patient_03/assembly.gfa'
+		],
+		'prokka': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'abricate': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'quast': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		'checkm': ['assembly/', 'polished/'],
+		'checkm2': ['assembly/', 'polished/'],
 		'confindr': ['assembly/assembly.fasta'],
-		'bakta': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'mlst': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'bakta': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'mlst': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Phase 3: Plasmid Analysis
-		'mob_recon': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'platon': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
+		'mob_recon': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'platon': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Phase 4: Phylogenetics
-		'snippy': ['assembly/assembly.fasta', 'polished/consensus.fasta'],
-		'roary': ['prokka_results/'],
-		'iqtree': ['roary_results/core_gene_alignment.aln'],
-		'gubbins': ['roary_results/core_gene_alignment.aln'],
+		'snippy': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'snippy-core': [
+			'snippy_results/patient_01', 'snippy_results/patient_02', 'snippy_results/patient_03'
+		],
+		'roary': ['prokka_results/', 'prokka_results/patient_01/', 'prokka_results/patient_02/', 'prokka_results/patient_03/'],
+		'iqtree': ['roary_results/core_gene_alignment.aln', 'core.aln'],
+		'gubbins': ['roary_results/core_gene_alignment.aln', 'core.aln'],
+		// Additional resistance/mobile element tools
+		'resfinder': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'integron_finder': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
+		'isescan': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Long-read tools
 		'NanoPlot': ['sample_01_hifi.fastq.gz', 'sample_02_hifi.fastq.gz', 'sample_01_nanopore.fastq.gz'],
 		'filtlong': ['sample_01_hifi.fastq.gz', 'sample_01_nanopore.fastq.gz', 'trimmed/sample_01_trimmed.fastq.gz'],
@@ -2797,19 +2997,20 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 	// Tool requirements: allowed directories
 	const toolRequirements: Record<string, { dirs: string[] }> = {
-		'fastqc': { dirs: ['/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
-		'seqkit': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'fastqc': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
+		'seqkit': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
 		'multiqc': { dirs: ['/data/outbreak_investigation', '/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
-		'trimmomatic': { dirs: ['/data/outbreak_investigation'] },
-		'unicycler': { dirs: ['/data/outbreak_investigation'] },
-		'bandage': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'prokka': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'abricate': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'quast': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'trimmomatic': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation'] },
+		'unicycler': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation'] },
+		'bandage': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'prokka': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'abricate': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'quast': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'checkm': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'checkm2': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'confindr': { dirs: ['/data/outbreak_investigation'] },
 		'bakta': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
-		'mlst': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'mlst': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Phase 3
 		'mob_recon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'platon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
@@ -2818,6 +3019,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		'roary': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'iqtree': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'gubbins': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'snippy-core': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'resfinder': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'integron_finder': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'isescan': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Long-read tools
 		'NanoPlot': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'filtlong': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
@@ -2954,6 +3159,15 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'cat' || command === 'head' || command === 'tail') {
 			handleFileView(command, args);
+			// Track cat command for step completion (e.g., viewing output files)
+			if (command === 'cat') {
+				executedCommands.update(cmds => {
+					if (!cmds.includes('cat')) {
+						return [...cmds, 'cat'];
+					}
+					return cmds;
+				});
+			}
 			writePrompt();
 			return;
 		}
@@ -2983,6 +3197,30 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					terminal.writeln(`\x1b[90mExample: seqkit stats *.fastq.gz (supports wildcards)\x1b[0m`);
 					writePrompt();
 					return;
+				}
+
+				// STRICT MODE: Trial scenario requires output redirection
+				if (currentDir === '/data/kpneumoniae_demo') {
+					const hasRedirect = args.includes('>');
+					const outputFile = hasRedirect ? args[args.indexOf('>') + 1] : null;
+					const hasCorrectOutput = outputFile === 'o1_seqkit.stats';
+
+					// Output redirection is required - this teaches real-world practice
+					if (!hasRedirect || !hasCorrectOutput) {
+						terminal.writeln(`\x1b[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`);
+						terminal.writeln(`\x1b[33m⚠  Tutorial Mode: Output file required\x1b[0m`);
+						terminal.writeln(`\x1b[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m`);
+						terminal.writeln(``);
+						terminal.writeln(`\x1b[90mIn real bioinformatics workflows, saving output to files is\x1b[0m`);
+						terminal.writeln(`\x1b[90messential for documentation and downstream analysis.\x1b[0m`);
+						terminal.writeln(``);
+						terminal.writeln(`\x1b[36mPlease redirect output to a file:\x1b[0m`);
+						terminal.writeln(`\x1b[32m  seqkit stats *.fastq.gz > o1_seqkit.stats\x1b[0m`);
+						terminal.writeln(`\x1b[90m  or\x1b[0m`);
+						terminal.writeln(`\x1b[32m  seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats\x1b[0m`);
+						writePrompt();
+						return;
+					}
 				}
 
 				// Get raw input patterns (may include wildcards)
@@ -3044,7 +3282,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
 					if (availableFiles.length > 0) {
 						terminal.writeln(`\x1b[90mAvailable files: ${availableFiles.slice(0, 4).join(', ')}${availableFiles.length > 4 ? '...' : ''}\x1b[0m`);
-						terminal.writeln(`\x1b[90mTip: Use 'fastqc *.fastq.gz -o qc_reports/' to process all files\x1b[0m`);
+						terminal.writeln(`\x1b[90mTip: Use 'fastqc *.fastq.gz -o o2_fastqc/' to process all files\x1b[0m`);
 					}
 					writePrompt();
 					return;
@@ -3068,16 +3306,16 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				if (oIndex === -1 || !args[oIndex + 1]) {
 					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o qc_reports/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o o2_fastqc/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				// Check for exact folder name
 				const outputDir = args[oIndex + 1].replace(/\/$/, ''); // Remove trailing slash
-				if (outputDir !== 'qc_reports') {
+				if (outputDir !== 'o2_fastqc') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIndex + 1]}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: qc_reports\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o qc_reports/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: o2_fastqc\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o o2_fastqc/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4293,20 +4531,127 @@ Command: unicycler -1 sample_01_R1_paired.fq.gz -2 sample_01_R2_paired.fq.gz -o 
 2024-01-15 10:24:15 - Running SPAdes assembly
 2024-01-15 10:35:23 - SPAdes assembly complete
 ...`,
-		// FastQC HTML (simplified)
+		// FastQC HTML (realistic format)
 		'_fastqc.html': `<!DOCTYPE html>
 <html>
-<head><title>FastQC Report</title></head>
+<head>
+<title>FastQC Report</title>
+<style type="text/css">
+body { font-family: Arial, Helvetica, sans-serif; padding: 10px; }
+h1 { font-size: 2em; color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+h2 { font-size: 1.4em; color: #006699; margin-top: 20px; border-bottom: 1px solid #006699; }
+table { border-collapse: collapse; margin: 10px 0; }
+table.summary { width: 100%; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #ddd; }
+th { background-color: #006699; color: white; }
+tr:nth-child(even) { background-color: #f9f9f9; }
+.pass { color: #00aa00; font-weight: bold; }
+.warn { color: #ff9900; font-weight: bold; }
+.fail { color: #ff0000; font-weight: bold; }
+.module { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+.header { background: linear-gradient(135deg, #006699 0%, #003366 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+.header h1 { color: white; border-bottom: none; margin: 0; }
+img.chart { max-width: 800px; border: 1px solid #ddd; margin: 10px 0; }
+</style>
+</head>
 <body>
-<h1>FastQC Report - sample_01_R1</h1>
+<div class="header">
+<h1>FastQC Report</h1>
+<p>Generated: 2024-01-15 10:30:45</p>
+</div>
+
+<div class="module">
+<h2>Summary</h2>
+<table class="summary">
+<tr><td class="pass">PASS</td><td>Basic Statistics</td></tr>
+<tr><td class="pass">PASS</td><td>Per base sequence quality</td></tr>
+<tr><td class="pass">PASS</td><td>Per tile sequence quality</td></tr>
+<tr><td class="pass">PASS</td><td>Per sequence quality scores</td></tr>
+<tr><td class="pass">PASS</td><td>Per base sequence content</td></tr>
+<tr><td class="pass">PASS</td><td>Per sequence GC content</td></tr>
+<tr><td class="pass">PASS</td><td>Per base N content</td></tr>
+<tr><td class="pass">PASS</td><td>Sequence Length Distribution</td></tr>
+<tr><td class="pass">PASS</td><td>Sequence Duplication Levels</td></tr>
+<tr><td class="pass">PASS</td><td>Overrepresented sequences</td></tr>
+<tr><td class="warn">WARN</td><td>Adapter Content</td></tr>
+</table>
+</div>
+
+<div class="module">
 <h2>Basic Statistics</h2>
 <table>
-  <tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
-  <tr><td>Total Sequences</td><td>2,456,789</td></tr>
-  <tr><td>Sequence length</td><td>150</td></tr>
-  <tr><td>%GC</td><td>52</td></tr>
+<tr><th>Measure</th><th>Value</th></tr>
+<tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+<tr><td>File type</td><td>Conventional base calls</td></tr>
+<tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
+<tr><td>Total Sequences</td><td>2,013,579</td></tr>
+<tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
+<tr><td>Sequence length</td><td>150</td></tr>
+<tr><td>%GC</td><td>52</td></tr>
 </table>
-...`,
+</div>
+
+<div class="module">
+<h2>Per base sequence quality</h2>
+<p>Quality scores across all bases (Sanger / Illumina 1.9 encoding).</p>
+<p><em>Chart showing quality scores typically >30 across read positions, with slight decline at 3' end.</em></p>
+</div>
+
+<div class="module">
+<h2>Per sequence quality scores</h2>
+<p>Quality score distribution over all sequences.</p>
+<p>Mean Sequence Quality: 36.2</p>
+</div>
+
+<div class="module">
+<h2>Per base sequence content</h2>
+<p>Proportion of each base position for which each nucleotide has been called.</p>
+</div>
+
+<div class="module">
+<h2>Per sequence GC content</h2>
+<p>GC content distribution over all sequences. Peak at 52% GC (typical for K. pneumoniae).</p>
+</div>
+
+<div class="module">
+<h2>Sequence Length Distribution</h2>
+<p>Distribution of sequence lengths. All sequences are 150bp.</p>
+</div>
+
+<div class="module">
+<h2>Sequence Duplication Levels</h2>
+<p>Relative level of duplication for each sequence.</p>
+<table>
+<tr><th>Duplication Level</th><th>% of Library</th></tr>
+<tr><td>1</td><td>85.2%</td></tr>
+<tr><td>2</td><td>8.3%</td></tr>
+<tr><td>3</td><td>3.1%</td></tr>
+<tr><td>>10</td><td>3.4%</td></tr>
+</table>
+</div>
+
+<div class="module">
+<h2>Overrepresented sequences</h2>
+<p>No overrepresented sequences found.</p>
+</div>
+
+<div class="module">
+<h2>Adapter Content</h2>
+<p>Cumulative percentage of reads with adapter sequences.</p>
+<table>
+<tr><th>Adapter</th><th>% at 150bp</th></tr>
+<tr><td>Illumina Universal Adapter</td><td>3.2%</td></tr>
+<tr><td>Illumina Small RNA 3' Adapter</td><td>0.1%</td></tr>
+<tr><td>Illumina Small RNA 5' Adapter</td><td>0.0%</td></tr>
+<tr><td>Nextera Transposase Sequence</td><td>0.0%</td></tr>
+</table>
+</div>
+
+<footer style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd; color: #666; font-size: 0.9em;">
+<p>Produced by FastQC (version 0.12.1)</p>
+</footer>
+</body>
+</html>`,
 		// TSV report
 		'.tsv': `#Sample	Total_Reads	Mapped_Reads	Coverage	GC_Content
 sample_01	2456789	2394012	97.44	52.3
@@ -4357,7 +4702,14 @@ Status: Complete
 Quality metrics passed all thresholds.
 Assembly completed successfully.
 Annotation identified 4,523 coding sequences.
-...`
+...`,
+		// SeqKit stats output
+		'o1_seqkit.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
+SRR36708862_1.fastq.gz     FASTQ   DNA   2,013,579  302,036,850      150      150      150
+SRR36708862_2.fastq.gz     FASTQ   DNA   2,013,579  302,036,850      150      150      150`,
+		'.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
+sample_01_R1.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      150      150
+sample_01_R2.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      150      150`
 	};
 
 	function handleFileView(cmd: string, args: string[]) {
@@ -4469,6 +4821,10 @@ Annotation identified 4,523 coding sequences.
 		const times = toolExecutionTimes[tool] || { min: 5, max: 15 };
 		const execTime = Math.floor(Math.random() * (times.max - times.min + 1)) + times.min;
 
+		// Check if output is being redirected to a file
+		const hasRedirect = args.includes('>');
+		const redirectFile = hasRedirect ? args[args.indexOf('>') + 1] : null;
+
 		// Update terminal state for output panel
 		terminalState.set({
 			isRunning: true,
@@ -4481,6 +4837,9 @@ Annotation identified 4,523 coding sequences.
 		terminal.writeln(`\x1b[36m[${tool}]\x1b[0m Starting analysis...`);
 		terminal.writeln(`\x1b[90mEstimated time: ~${execTime}s (Press Ctrl+C to cancel)\x1b[0m`);
 		terminal.writeln(`\x1b[90;3m(Note: This is a simulated duration. Real analysis may take minutes to hours.)\x1b[0m`);
+		if (hasRedirect && redirectFile) {
+			terminal.writeln(`\x1b[90mOutput will be saved to: ${redirectFile}\x1b[0m`);
+		}
 		terminal.writeln('');
 
 		// Get dynamic tool output
@@ -4496,7 +4855,10 @@ Annotation identified 4,523 coding sequences.
 				break;
 			}
 
-			terminal.writeln(outputLines[i]);
+			// Only show output in terminal if NOT redirecting to file
+			if (!hasRedirect) {
+				terminal.writeln(outputLines[i]);
+			}
 			const progress = Math.floor(((i + 1) / outputLines.length) * 100);
 			terminalState.update(s => ({ ...s, progress }));
 		}
@@ -4507,6 +4869,12 @@ Annotation identified 4,523 coding sequences.
 			terminal.writeln(`\x1b[33m⚠ ${tool} cancelled by user\x1b[0m`);
 			terminal.writeln(`\x1b[90mNo output files were created.\x1b[0m`);
 		} else if (toolData) {
+			// Show completion message for redirected output
+			if (hasRedirect && redirectFile) {
+				terminal.writeln(`\x1b[32m✓ Analysis complete\x1b[0m`);
+				terminal.writeln(`\x1b[90mOutput saved to: ${redirectFile}\x1b[0m`);
+				terminal.writeln(`\x1b[90mUse 'cat ${redirectFile}' to view the results.\x1b[0m`);
+			}
 			// Track executed command for dynamic filesystem
 			executedCommands.update(cmds => {
 				if (!cmds.includes(tool)) {

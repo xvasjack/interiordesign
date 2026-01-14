@@ -62,6 +62,28 @@ export const commandHistory = writable<string[]>([]);
 
 // File notes/descriptions for Notes tab
 export const fileNotes: Record<string, FileNote[]> = {
+	'seqkit': [
+		{
+			name: 'num_seqs',
+			description: 'Number of sequences/reads',
+		},
+		{
+			name: 'sum_len',
+			description: 'Total length of all sequences (bp)',
+		},
+		{
+			name: 'min_len',
+			description: 'Shortest read length (bp)',
+		},
+		{
+			name: 'avg_len',
+			description: 'Average read length (bp)',
+		},
+		{
+			name: 'max_len',
+			description: 'Longest read length (bp)',
+		}
+	],
 	'fastqc': [
 		{
 			name: 'FASTQ Format',
@@ -194,6 +216,7 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'bandage': { min: 3, max: 8 },  // Graph visualization
 	'quast': { min: 15, max: 30 },
 	'checkm': { min: 60, max: 120 },
+	'checkm2': { min: 180, max: 300 },
 	'confindr': { min: 30, max: 60 },
 	'prokka': { min: 60, max: 120 },
 	'bakta': { min: 60, max: 120 },  // Similar to prokka
@@ -201,7 +224,13 @@ export const toolExecutionTimes: Record<string, { min: number; max: number }> = 
 	'mlst': { min: 3, max: 8 },
 	'mob_recon': { min: 30, max: 60 },
 	'platon': { min: 20, max: 45 },
+	'plasmidfinder': { min: 5, max: 15 },
+	'resfinder': { min: 10, max: 25 },
+	'virulencefinder': { min: 10, max: 20 },
+	'integron_finder': { min: 30, max: 60 },
+	'isescan': { min: 30, max: 60 },
 	'snippy': { min: 60, max: 120 },
+	'snippy-core': { min: 10, max: 20 },
 	'roary': { min: 120, max: 240 },
 	'iqtree': { min: 60, max: 180 },
 	'gubbins': { min: 120, max: 300 },
@@ -244,12 +273,14 @@ export const blockedCommands = new Set([
 // Bioinformatics tools
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
-	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'busco', 'confindr',
+	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'checkm2', 'busco', 'confindr',
 	'prokka', 'bakta', 'abricate', 'resfinder', 'virulencefinder', 'mlst',
 	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
-	'snippy', 'roary', 'iqtree', 'gubbins',
-	// Long-read tools
+	'snippy', 'snippy-core', 'roary', 'iqtree', 'gubbins',
+	// Long-read tools (ONT)
 	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2',
+	// Long-read tools (PacBio HiFi)
+	'pbmarkdup', 'ccs', 'hifiasm',
 	// Amplicon/16S tools
 	'cutadapt', 'qiime', 'biom', 'sourcetracker2',
 	// R/RMarkdown tools
