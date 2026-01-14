@@ -1127,9 +1127,13 @@ export const storylines: Record<string, Storyline> = {
 				type: 'intro',
 				text: `<strong>Welcome to BioLearn WGS Analysis</strong>
 
-In this introductory module, you'll learn the fundamentals of whole-genome sequencing (WGS) analysis using a <em>Klebsiella pneumoniae</em> isolate. This hands-on tutorial will guide you through the complete workflow from raw reads to annotated genome.
-
-<strong>About <em>Klebsiella pneumoniae</em></strong>
+In this introductory module, you'll learn the fundamentals of whole-genome sequencing (WGS) analysis using a <em>Klebsiella pneumoniae</em> isolate. This hands-on tutorial will guide you through the complete workflow from raw reads to annotated genome.`,
+				hint: null,
+				requiredDir: null
+			},
+			{
+				type: 'context',
+				text: `<strong>About <em>Klebsiella pneumoniae</em></strong>
 
 <em>Klebsiella pneumoniae</em> is a common opportunistic, Gram-negative, encapsulated bacterium that is a major cause of hospital-acquired infections including pneumonia, urinary tract infections, and bloodstream infections. It is a critical public health concern due to the emergence of multidrug-resistant (MDR) and hypervirulent strains that are difficult to treat and associated with high mortality rates.
 
