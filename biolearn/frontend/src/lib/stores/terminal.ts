@@ -61,23 +61,23 @@ export const fileNotes: Record<string, FileNote[]> = {
 	'seqkit': [
 		{
 			name: 'num_seqs',
-			description: 'Number of sequences (reads) in the file. For paired-end data, R1 and R2 should have equal counts. Mismatches indicate data corruption or processing errors.',
+			description: 'Number of sequences/reads',
 		},
 		{
 			name: 'sum_len',
-			description: 'Total length of all sequences in base pairs. Useful for estimating genome coverage: Coverage = sum_len / genome_size.',
+			description: 'Total length of all sequences (bp)',
 		},
 		{
 			name: 'min_len',
-			description: 'Length of the shortest read in base pairs. Very short reads (<50bp) may indicate quality issues or aggressive trimming.',
+			description: 'Shortest read length (bp)',
 		},
 		{
 			name: 'avg_len',
-			description: 'Average read length in base pairs. For Illumina, typically 100-300bp. Consistent avg_len between R1/R2 indicates uniform sequencing quality.',
+			description: 'Average read length (bp)',
 		},
 		{
 			name: 'max_len',
-			description: 'Length of the longest read in base pairs. For Illumina paired-end, this usually equals the sequencing cycle length (e.g., 150bp, 250bp).',
+			description: 'Longest read length (bp)',
 		}
 	],
 	'fastqc': [
