@@ -4699,6 +4699,10 @@ sample_01_R2.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      15
 		const times = toolExecutionTimes[tool] || { min: 5, max: 15 };
 		const execTime = Math.floor(Math.random() * (times.max - times.min + 1)) + times.min;
 
+		// Check if output is being redirected to a file
+		const hasRedirect = args.includes('>');
+		const redirectFile = hasRedirect ? args[args.indexOf('>') + 1] : null;
+
 		// Update terminal state for output panel
 		terminalState.set({
 			isRunning: true,
@@ -4711,6 +4715,9 @@ sample_01_R2.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      15
 		terminal.writeln(`\x1b[36m[${tool}]\x1b[0m Starting analysis...`);
 		terminal.writeln(`\x1b[90mEstimated time: ~${execTime}s (Press Ctrl+C to cancel)\x1b[0m`);
 		terminal.writeln(`\x1b[90;3m(Note: This is a simulated duration. Real analysis may take minutes to hours.)\x1b[0m`);
+		if (hasRedirect && redirectFile) {
+			terminal.writeln(`\x1b[90mOutput will be saved to: ${redirectFile}\x1b[0m`);
+		}
 		terminal.writeln('');
 
 		// Get dynamic tool output
@@ -4726,7 +4733,10 @@ sample_01_R2.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      15
 				break;
 			}
 
-			terminal.writeln(outputLines[i]);
+			// Only show output in terminal if NOT redirecting to file
+			if (!hasRedirect) {
+				terminal.writeln(outputLines[i]);
+			}
 			const progress = Math.floor(((i + 1) / outputLines.length) * 100);
 			terminalState.update(s => ({ ...s, progress }));
 		}
@@ -4737,6 +4747,12 @@ sample_01_R2.fastq.gz      FASTQ   DNA   2,456,789  368,518,350      150      15
 			terminal.writeln(`\x1b[33m⚠ ${tool} cancelled by user\x1b[0m`);
 			terminal.writeln(`\x1b[90mNo output files were created.\x1b[0m`);
 		} else if (toolData) {
+			// Show completion message for redirected output
+			if (hasRedirect && redirectFile) {
+				terminal.writeln(`\x1b[32m✓ Analysis complete\x1b[0m`);
+				terminal.writeln(`\x1b[90mOutput saved to: ${redirectFile}\x1b[0m`);
+				terminal.writeln(`\x1b[90mUse 'cat ${redirectFile}' to view the results.\x1b[0m`);
+			}
 			// Track executed command for dynamic filesystem
 			executedCommands.update(cmds => {
 				if (!cmds.includes(tool)) {
