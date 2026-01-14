@@ -59,9 +59,536 @@
 		// SeqKit stats
 		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
 
-		// FastQC reports
-		'sample_01_R1_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R1</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p><p><span class="pass">✓</span> Per base sequence content</p><p><span class="warn">⚠</span> Per sequence GC content</p><p><span class="pass">✓</span> Per base N content</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
-		'sample_01_R2_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R2</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p><p><span class="pass">✓</span> Per base sequence content</p><p><span class="warn">⚠</span> Per sequence GC content</p><p><span class="pass">✓</span> Per base N content</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
+		// FastQC reports - Realistic HTML matching actual FastQC output
+		'sample_01_R1_fastqc.html': `<!DOCTYPE html>
+<html>
+<head>
+<title>FastQC Report: sample_01_R1.fastq.gz</title>
+<style type="text/css">
+@media screen {
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0; padding: 0; background-color: #ffffff; }
+  .header { background-color: #4271ae; color: white; padding: 10px 20px; display: flex; align-items: center; }
+  .header h1 { margin: 0; font-size: 20px; font-weight: normal; }
+  .header img { height: 40px; margin-right: 15px; }
+  .main-container { display: flex; min-height: calc(100vh - 60px); }
+  .sidebar { width: 280px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 0; flex-shrink: 0; }
+  .sidebar h2 { background: #4271ae; color: white; margin: 0; padding: 10px 15px; font-size: 14px; }
+  .sidebar ul { list-style: none; margin: 0; padding: 0; }
+  .sidebar li { border-bottom: 1px solid #ddd; }
+  .sidebar li a { display: flex; align-items: center; padding: 8px 15px; text-decoration: none; color: #333; }
+  .sidebar li a:hover { background: #e8e8e8; }
+  .sidebar li a .icon { width: 20px; height: 20px; margin-right: 10px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
+  .icon.pass { background: #36a64f; }
+  .icon.warn { background: #ff9900; }
+  .icon.fail { background: #dc3545; }
+  .content { flex: 1; padding: 20px 30px; overflow-y: auto; }
+  .module { margin-bottom: 40px; border: 1px solid #ddd; background: white; }
+  .module h2 { background: #f0f0f0; margin: 0; padding: 12px 15px; font-size: 16px; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
+  .module h2 .status { margin-right: 10px; }
+  .module-content { padding: 20px; }
+  table.summary-table { border-collapse: collapse; width: 100%; max-width: 600px; }
+  table.summary-table th, table.summary-table td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; }
+  table.summary-table th { background: #d0d0d0; }
+  table.summary-table tr:nth-child(even) { background: #f9f9f9; }
+  .quality-plot { width: 100%; max-width: 800px; background: #fff; border: 1px solid #ccc; padding: 10px; }
+  .quality-plot .plot-area { position: relative; height: 300px; background: linear-gradient(to bottom, #d4edda 0%, #d4edda 28%, #fff3cd 28%, #fff3cd 52%, #f8d7da 52%, #f8d7da 100%); border: 1px solid #999; border-left: 2px solid #333; border-bottom: 2px solid #333; }
+  .quality-plot .y-axis { position: absolute; left: -45px; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; color: #333; }
+  .quality-plot .x-axis { position: absolute; bottom: -25px; left: 0; width: 100%; display: flex; justify-content: space-between; font-size: 11px; color: #333; }
+  .quality-plot .plot-title { text-align: center; font-weight: bold; margin-bottom: 5px; }
+  .quality-plot .legend { display: flex; gap: 20px; margin-top: 10px; justify-content: center; font-size: 12px; }
+  .quality-plot .legend span { display: flex; align-items: center; gap: 5px; }
+  .quality-plot .legend .box { width: 15px; height: 15px; border: 1px solid #999; }
+  .boxplot-container { position: relative; height: 100%; padding: 20px 10px; display: flex; align-items: flex-end; justify-content: space-around; }
+  .boxplot { width: 12px; display: flex; flex-direction: column; align-items: center; }
+  .boxplot .whisker { width: 1px; background: #333; }
+  .boxplot .box { width: 10px; background: #ffd700; border: 1px solid #333; }
+  .boxplot .median { width: 10px; height: 2px; background: #dc3545; }
+  .gc-plot { width: 100%; max-width: 700px; height: 250px; position: relative; background: white; border: 1px solid #ccc; margin-top: 10px; }
+  .gc-curve { stroke: #dc3545; stroke-width: 2; fill: none; }
+  .gc-theoretical { stroke: #4271ae; stroke-width: 1.5; stroke-dasharray: 5,3; fill: none; }
+  .sequence-length-table { margin-top: 15px; }
+  .duplication-plot { width: 100%; max-width: 700px; }
+  .adapter-plot { width: 100%; max-width: 700px; }
+  .footer { background: #f5f5f5; padding: 15px 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center; }
+  .pass-text { color: #36a64f; }
+  .warn-text { color: #ff9900; }
+  .fail-text { color: #dc3545; }
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="background: white; padding: 5px 10px; border-radius: 3px; margin-right: 15px;">
+    <span style="color: #4271ae; font-weight: bold; font-size: 18px;">FastQC</span>
+  </div>
+  <h1>Quality Control Report - sample_01_R1.fastq.gz</h1>
+</div>
+<div class="main-container">
+  <div class="sidebar">
+    <h2>Summary</h2>
+    <ul>
+      <li><a href="#basic-stats"><span class="icon pass">✓</span>Basic Statistics</a></li>
+      <li><a href="#per-base-quality"><span class="icon pass">✓</span>Per base sequence quality</a></li>
+      <li><a href="#per-tile-quality"><span class="icon pass">✓</span>Per tile sequence quality</a></li>
+      <li><a href="#per-seq-quality"><span class="icon pass">✓</span>Per sequence quality scores</a></li>
+      <li><a href="#per-base-content"><span class="icon pass">✓</span>Per base sequence content</a></li>
+      <li><a href="#per-seq-gc"><span class="icon warn">!</span>Per sequence GC content</a></li>
+      <li><a href="#per-base-n"><span class="icon pass">✓</span>Per base N content</a></li>
+      <li><a href="#seq-length"><span class="icon pass">✓</span>Sequence Length Distribution</a></li>
+      <li><a href="#seq-dup"><span class="icon pass">✓</span>Sequence Duplication Levels</a></li>
+      <li><a href="#overrep"><span class="icon pass">✓</span>Overrepresented sequences</a></li>
+      <li><a href="#adapter"><span class="icon pass">✓</span>Adapter Content</a></li>
+    </ul>
+  </div>
+  <div class="content">
+    <div class="module" id="basic-stats">
+      <h2><span class="status icon pass">✓</span>Basic Statistics</h2>
+      <div class="module-content">
+        <table class="summary-table">
+          <tr><th>Measure</th><th>Value</th></tr>
+          <tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
+          <tr><td>File type</td><td>Conventional base calls</td></tr>
+          <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
+          <tr><td>Total Sequences</td><td>2,847,293</td></tr>
+          <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
+          <tr><td>Sequence length</td><td>150</td></tr>
+          <tr><td>%GC</td><td>52</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="module" id="per-base-quality">
+      <h2><span class="status icon pass">✓</span>Per base sequence quality</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">The boxplot shows the distribution of quality scores at each position. The background colors indicate quality zones: green (very good, Q≥28), yellow (reasonable, Q20-28), and red (poor, Q&lt;20).</p>
+        <div class="quality-plot">
+          <div class="plot-title">Quality scores across all bases (Sanger / Illumina 1.9 encoding)</div>
+          <div style="position:relative; margin-left:50px; margin-top:20px;">
+            <div class="plot-area">
+              <div class="y-axis">
+                <span>40</span><span>38</span><span>36</span><span>34</span><span>32</span><span>30</span><span>28</span><span>26</span><span>24</span><span>22</span><span>20</span><span>18</span><span>16</span><span>14</span><span>12</span><span>10</span><span>8</span><span>6</span><span>4</span><span>2</span><span>0</span>
+              </div>
+              <svg width="100%" height="100%" viewBox="0 0 750 300" preserveAspectRatio="none">
+                <!-- Boxplots for each position - showing high quality typical of modern Illumina -->
+                <g transform="translate(15,0)">
+                  <!-- Position 1-10: slightly lower start -->
+                  <rect x="0" y="20" width="8" height="40" fill="#ffd700" stroke="#333"/>
+                  <line x1="0" y1="35" x2="8" y2="35" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="24" y="15" width="8" height="45" fill="#ffd700" stroke="#333"/>
+                  <line x1="24" y1="32" x2="32" y2="32" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="48" y="10" width="8" height="50" fill="#ffd700" stroke="#333"/>
+                  <line x1="48" y1="28" x2="56" y2="28" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="72" y="8" width="8" height="45" fill="#ffd700" stroke="#333"/>
+                  <line x1="72" y1="25" x2="80" y2="25" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="96" y="8" width="8" height="42" fill="#ffd700" stroke="#333"/>
+                  <line x1="96" y1="24" x2="104" y2="24" stroke="#dc3545" stroke-width="2"/>
+                  <!-- Positions 11-50: stable high quality -->
+                  <rect x="120" y="6" width="8" height="40" fill="#ffd700" stroke="#333"/>
+                  <line x1="120" y1="22" x2="128" y2="22" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="168" y="5" width="8" height="38" fill="#ffd700" stroke="#333"/>
+                  <line x1="168" y1="20" x2="176" y2="20" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="216" y="5" width="8" height="38" fill="#ffd700" stroke="#333"/>
+                  <line x1="216" y1="20" x2="224" y2="20" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="264" y="6" width="8" height="40" fill="#ffd700" stroke="#333"/>
+                  <line x1="264" y1="22" x2="272" y2="22" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="312" y="6" width="8" height="40" fill="#ffd700" stroke="#333"/>
+                  <line x1="312" y1="22" x2="320" y2="22" stroke="#dc3545" stroke-width="2"/>
+                  <!-- Positions 51-100 -->
+                  <rect x="360" y="8" width="8" height="42" fill="#ffd700" stroke="#333"/>
+                  <line x1="360" y1="24" x2="368" y2="24" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="408" y="10" width="8" height="44" fill="#ffd700" stroke="#333"/>
+                  <line x1="408" y1="28" x2="416" y2="28" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="456" y="12" width="8" height="46" fill="#ffd700" stroke="#333"/>
+                  <line x1="456" y1="30" x2="464" y2="30" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="504" y="14" width="8" height="48" fill="#ffd700" stroke="#333"/>
+                  <line x1="504" y1="32" x2="512" y2="32" stroke="#dc3545" stroke-width="2"/>
+                  <!-- Positions 101-150: gradual quality drop typical of Illumina -->
+                  <rect x="552" y="18" width="8" height="52" fill="#ffd700" stroke="#333"/>
+                  <line x1="552" y1="38" x2="560" y2="38" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="600" y="22" width="8" height="56" fill="#ffd700" stroke="#333"/>
+                  <line x1="600" y1="44" x2="608" y2="44" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="648" y="28" width="8" height="60" fill="#ffd700" stroke="#333"/>
+                  <line x1="648" y1="50" x2="656" y2="50" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="696" y="32" width="8" height="65" fill="#ffd700" stroke="#333"/>
+                  <line x1="696" y1="56" x2="704" y2="56" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="720" y="38" width="8" height="70" fill="#ffd700" stroke="#333"/>
+                  <line x1="720" y1="62" x2="728" y2="62" stroke="#dc3545" stroke-width="2"/>
+                </g>
+              </svg>
+            </div>
+            <div class="x-axis"><span>1</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90</span><span>100</span><span>110</span><span>120</span><span>130</span><span>140</span><span>150</span></div>
+            <div style="text-align:center;margin-top:30px;font-size:12px;color:#666;">Position in read (bp)</div>
+          </div>
+          <div class="legend">
+            <span><div class="box" style="background:#d4edda"></div> Very good quality (Q≥28)</span>
+            <span><div class="box" style="background:#fff3cd"></div> Reasonable quality (Q20-28)</span>
+            <span><div class="box" style="background:#f8d7da"></div> Poor quality (Q&lt;20)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="per-seq-quality">
+      <h2><span class="status icon pass">✓</span>Per sequence quality scores</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">This shows the distribution of mean quality scores per sequence. A peak at high quality indicates good data.</p>
+        <svg width="600" height="300" style="border:1px solid #ccc;background:white;">
+          <defs><linearGradient id="qualGrad" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" style="stop-color:#f8d7da"/><stop offset="52%" style="stop-color:#fff3cd"/><stop offset="100%" style="stop-color:#d4edda"/></linearGradient></defs>
+          <rect x="50" y="20" width="500" height="240" fill="url(#qualGrad)"/>
+          <polyline points="60,250 80,248 100,245 120,240 140,235 160,225 180,200 200,160 220,110 240,70 260,45 280,35 300,30 320,28 340,32 360,45 380,80 400,150 420,210 440,238 460,248 480,252 500,254 520,255 540,256" fill="none" stroke="#dc3545" stroke-width="2"/>
+          <line x1="50" y1="260" x2="550" y2="260" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="260" stroke="#333" stroke-width="2"/>
+          <text x="300" y="285" text-anchor="middle" font-size="12">Mean Sequence Quality (Phred Score)</text>
+          <text x="20" y="140" transform="rotate(-90,20,140)" text-anchor="middle" font-size="12">Count</text>
+          <text x="60" y="275" font-size="10">0</text><text x="160" y="275" font-size="10">10</text><text x="260" y="275" font-size="10">20</text><text x="360" y="275" font-size="10">30</text><text x="460" y="275" font-size="10">40</text>
+        </svg>
+        <p style="margin-top:10px;color:#36a64f;"><strong>Result:</strong> Most sequences have mean quality scores above Q30, indicating excellent data quality.</p>
+      </div>
+    </div>
+    <div class="module" id="per-seq-gc">
+      <h2><span class="status icon warn">!</span>Per sequence GC content</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">The red line shows the GC distribution of your sequences. The blue dashed line shows the theoretical normal distribution. Minor deviations are common in bacterial samples.</p>
+        <svg width="600" height="280" style="border:1px solid #ccc;background:white;">
+          <rect x="50" y="20" width="500" height="220" fill="#fafafa"/>
+          <!-- Theoretical normal distribution (blue dashed) centered at 52% -->
+          <polyline points="60,230 100,225 140,200 180,150 220,90 260,50 300,35 340,50 380,90 420,150 460,200 500,225 540,230" fill="none" stroke="#4271ae" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <!-- Actual GC distribution (red) - slight deviation typical of bacterial samples -->
+          <polyline points="60,232 100,228 140,210 180,165 220,105 260,60 280,42 300,38 320,36 340,40 360,55 380,85 420,145 460,198 500,224 540,232" fill="none" stroke="#dc3545" stroke-width="2"/>
+          <line x1="50" y1="240" x2="550" y2="240" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="240" stroke="#333" stroke-width="2"/>
+          <text x="300" y="265" text-anchor="middle" font-size="12">Mean GC content (%)</text>
+          <text x="20" y="130" transform="rotate(-90,20,130)" text-anchor="middle" font-size="12">Count</text>
+          <text x="60" y="255" font-size="10">0</text><text x="160" y="255" font-size="10">20</text><text x="260" y="255" font-size="10">40</text><text x="360" y="255" font-size="10">60</text><text x="460" y="255" font-size="10">80</text><text x="540" y="255" font-size="10">100</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:20px;font-size:12px;">
+          <span style="color:#dc3545;">━ GC count per read</span>
+          <span style="color:#4271ae;">┅ Theoretical Distribution</span>
+        </div>
+        <p style="margin-top:10px;color:#ff9900;"><strong>Warning:</strong> The distribution shows a slight shoulder, which may indicate contamination or mixed species. This is common in environmental/clinical samples and may not affect downstream analysis.</p>
+      </div>
+    </div>
+    <div class="module" id="seq-length">
+      <h2><span class="status icon pass">✓</span>Sequence Length Distribution</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">All sequences are 150bp as expected for Illumina paired-end sequencing.</p>
+        <table class="summary-table" style="max-width:400px;">
+          <tr><th>Length</th><th>Count</th></tr>
+          <tr><td>150</td><td>2,847,293</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="module" id="seq-dup">
+      <h2><span class="status icon pass">✓</span>Sequence Duplication Levels</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">Low duplication levels indicate good library complexity.</p>
+        <svg width="600" height="250" style="border:1px solid #ccc;background:white;">
+          <rect x="50" y="20" width="500" height="190" fill="#fafafa"/>
+          <!-- Duplication histogram bars -->
+          <rect x="70" y="30" width="35" height="170" fill="#4271ae"/>
+          <rect x="115" y="90" width="35" height="110" fill="#4271ae"/>
+          <rect x="160" y="140" width="35" height="60" fill="#4271ae"/>
+          <rect x="205" y="165" width="35" height="35" fill="#4271ae"/>
+          <rect x="250" y="178" width="35" height="22" fill="#4271ae"/>
+          <rect x="295" y="186" width="35" height="14" fill="#4271ae"/>
+          <rect x="340" y="192" width="35" height="8" fill="#4271ae"/>
+          <rect x="385" y="195" width="35" height="5" fill="#4271ae"/>
+          <rect x="430" y="197" width="35" height="3" fill="#4271ae"/>
+          <rect x="475" y="198" width="35" height="2" fill="#4271ae"/>
+          <line x1="50" y1="210" x2="550" y2="210" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="210" stroke="#333" stroke-width="2"/>
+          <text x="300" y="240" text-anchor="middle" font-size="12">Sequence Duplication Level</text>
+          <text x="87" y="225" font-size="9">1</text><text x="132" y="225" font-size="9">2</text><text x="177" y="225" font-size="9">3</text><text x="222" y="225" font-size="9">4</text><text x="267" y="225" font-size="9">5</text><text x="312" y="225" font-size="9">6</text><text x="357" y="225" font-size="9">7</text><text x="402" y="225" font-size="9">8</text><text x="447" y="225" font-size="9">9</text><text x="492" y="225" font-size="9">&gt;10</text>
+        </svg>
+        <table class="summary-table" style="max-width:400px;margin-top:15px;">
+          <tr><td>% Deduplicated</td><td>86.3%</td></tr>
+          <tr><td>% Total Deduplicated</td><td>72.1%</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="module" id="adapter">
+      <h2><span class="status icon pass">✓</span>Adapter Content</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">Very low adapter contamination detected. No trimming required.</p>
+        <svg width="600" height="250" style="border:1px solid #ccc;background:white;">
+          <rect x="50" y="20" width="500" height="190" fill="#fafafa"/>
+          <!-- Adapter content lines - minimal contamination -->
+          <polyline points="60,200 150,200 250,199 350,198 450,196 540,192" fill="none" stroke="#4271ae" stroke-width="2"/>
+          <polyline points="60,200 150,200 250,200 350,199 450,197 540,194" fill="none" stroke="#dc3545" stroke-width="2"/>
+          <polyline points="60,200 150,200 250,200 350,200 450,199 540,197" fill="none" stroke="#36a64f" stroke-width="2"/>
+          <polyline points="60,200 150,200 250,200 350,200 450,200 540,199" fill="none" stroke="#ff9900" stroke-width="2"/>
+          <line x1="50" y1="210" x2="550" y2="210" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="210" stroke="#333" stroke-width="2"/>
+          <text x="300" y="240" text-anchor="middle" font-size="12">Position in read (bp)</text>
+          <text x="60" y="225" font-size="10">1</text><text x="200" y="225" font-size="10">50</text><text x="350" y="225" font-size="10">100</text><text x="520" y="225" font-size="10">150</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:15px;font-size:11px;flex-wrap:wrap;">
+          <span style="color:#4271ae;">━ Illumina Universal Adapter</span>
+          <span style="color:#dc3545;">━ Illumina Small RNA 3' Adapter</span>
+          <span style="color:#36a64f;">━ Illumina Small RNA 5' Adapter</span>
+          <span style="color:#ff9900;">━ Nextera Transposase Sequence</span>
+        </div>
+        <p style="margin-top:10px;color:#36a64f;"><strong>Result:</strong> Adapter content is below 2% at all positions. Data quality is excellent.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  <p>Produced by <strong>FastQC</strong> v0.12.1 | Analysis Date: 2024-01-15 10:23:45 | Babraham Bioinformatics</p>
+</div>
+</body>
+</html>`,
+		'sample_01_R2_fastqc.html': `<!DOCTYPE html>
+<html>
+<head>
+<title>FastQC Report: sample_01_R2.fastq.gz</title>
+<style type="text/css">
+@media screen {
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0; padding: 0; background-color: #ffffff; }
+  .header { background-color: #4271ae; color: white; padding: 10px 20px; display: flex; align-items: center; }
+  .header h1 { margin: 0; font-size: 20px; font-weight: normal; }
+  .main-container { display: flex; min-height: calc(100vh - 60px); }
+  .sidebar { width: 280px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 0; flex-shrink: 0; }
+  .sidebar h2 { background: #4271ae; color: white; margin: 0; padding: 10px 15px; font-size: 14px; }
+  .sidebar ul { list-style: none; margin: 0; padding: 0; }
+  .sidebar li { border-bottom: 1px solid #ddd; }
+  .sidebar li a { display: flex; align-items: center; padding: 8px 15px; text-decoration: none; color: #333; }
+  .sidebar li a:hover { background: #e8e8e8; }
+  .sidebar li a .icon { width: 20px; height: 20px; margin-right: 10px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
+  .icon.pass { background: #36a64f; }
+  .icon.warn { background: #ff9900; }
+  .icon.fail { background: #dc3545; }
+  .content { flex: 1; padding: 20px 30px; overflow-y: auto; }
+  .module { margin-bottom: 40px; border: 1px solid #ddd; background: white; }
+  .module h2 { background: #f0f0f0; margin: 0; padding: 12px 15px; font-size: 16px; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
+  .module h2 .status { margin-right: 10px; }
+  .module-content { padding: 20px; }
+  table.summary-table { border-collapse: collapse; width: 100%; max-width: 600px; }
+  table.summary-table th, table.summary-table td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; }
+  table.summary-table th { background: #d0d0d0; }
+  table.summary-table tr:nth-child(even) { background: #f9f9f9; }
+  .quality-plot { width: 100%; max-width: 800px; background: #fff; border: 1px solid #ccc; padding: 10px; }
+  .quality-plot .plot-area { position: relative; height: 300px; background: linear-gradient(to bottom, #d4edda 0%, #d4edda 28%, #fff3cd 28%, #fff3cd 52%, #f8d7da 52%, #f8d7da 100%); border: 1px solid #999; border-left: 2px solid #333; border-bottom: 2px solid #333; }
+  .quality-plot .y-axis { position: absolute; left: -45px; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; color: #333; }
+  .quality-plot .x-axis { position: absolute; bottom: -25px; left: 0; width: 100%; display: flex; justify-content: space-between; font-size: 11px; color: #333; }
+  .quality-plot .plot-title { text-align: center; font-weight: bold; margin-bottom: 5px; }
+  .quality-plot .legend { display: flex; gap: 20px; margin-top: 10px; justify-content: center; font-size: 12px; }
+  .quality-plot .legend span { display: flex; align-items: center; gap: 5px; }
+  .quality-plot .legend .box { width: 15px; height: 15px; border: 1px solid #999; }
+  .footer { background: #f5f5f5; padding: 15px 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center; }
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="background: white; padding: 5px 10px; border-radius: 3px; margin-right: 15px;">
+    <span style="color: #4271ae; font-weight: bold; font-size: 18px;">FastQC</span>
+  </div>
+  <h1>Quality Control Report - sample_01_R2.fastq.gz</h1>
+</div>
+<div class="main-container">
+  <div class="sidebar">
+    <h2>Summary</h2>
+    <ul>
+      <li><a href="#basic-stats"><span class="icon pass">✓</span>Basic Statistics</a></li>
+      <li><a href="#per-base-quality"><span class="icon pass">✓</span>Per base sequence quality</a></li>
+      <li><a href="#per-tile-quality"><span class="icon pass">✓</span>Per tile sequence quality</a></li>
+      <li><a href="#per-seq-quality"><span class="icon pass">✓</span>Per sequence quality scores</a></li>
+      <li><a href="#per-base-content"><span class="icon pass">✓</span>Per base sequence content</a></li>
+      <li><a href="#per-seq-gc"><span class="icon warn">!</span>Per sequence GC content</a></li>
+      <li><a href="#per-base-n"><span class="icon pass">✓</span>Per base N content</a></li>
+      <li><a href="#seq-length"><span class="icon pass">✓</span>Sequence Length Distribution</a></li>
+      <li><a href="#seq-dup"><span class="icon pass">✓</span>Sequence Duplication Levels</a></li>
+      <li><a href="#overrep"><span class="icon pass">✓</span>Overrepresented sequences</a></li>
+      <li><a href="#adapter"><span class="icon pass">✓</span>Adapter Content</a></li>
+    </ul>
+  </div>
+  <div class="content">
+    <div class="module" id="basic-stats">
+      <h2><span class="status icon pass">✓</span>Basic Statistics</h2>
+      <div class="module-content">
+        <table class="summary-table">
+          <tr><th>Measure</th><th>Value</th></tr>
+          <tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr>
+          <tr><td>File type</td><td>Conventional base calls</td></tr>
+          <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
+          <tr><td>Total Sequences</td><td>2,847,293</td></tr>
+          <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
+          <tr><td>Sequence length</td><td>150</td></tr>
+          <tr><td>%GC</td><td>52</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="module" id="per-base-quality">
+      <h2><span class="status icon pass">✓</span>Per base sequence quality</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">The boxplot shows the distribution of quality scores at each position. R2 reads typically show slightly lower quality at the end compared to R1.</p>
+        <div class="quality-plot">
+          <div class="plot-title">Quality scores across all bases (Sanger / Illumina 1.9 encoding)</div>
+          <div style="position:relative; margin-left:50px; margin-top:20px;">
+            <div class="plot-area">
+              <div class="y-axis">
+                <span>40</span><span>38</span><span>36</span><span>34</span><span>32</span><span>30</span><span>28</span><span>26</span><span>24</span><span>22</span><span>20</span><span>18</span><span>16</span><span>14</span><span>12</span><span>10</span><span>8</span><span>6</span><span>4</span><span>2</span><span>0</span>
+              </div>
+              <svg width="100%" height="100%" viewBox="0 0 750 300" preserveAspectRatio="none">
+                <!-- R2 boxplots - slightly lower quality at ends typical of R2 -->
+                <g transform="translate(15,0)">
+                  <!-- Position 1-10: R2 starts slightly lower -->
+                  <rect x="0" y="28" width="8" height="45" fill="#ffd700" stroke="#333"/>
+                  <line x1="0" y1="42" x2="8" y2="42" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="24" y="22" width="8" height="48" fill="#ffd700" stroke="#333"/>
+                  <line x1="24" y1="38" x2="32" y2="38" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="48" y="16" width="8" height="52" fill="#ffd700" stroke="#333"/>
+                  <line x1="48" y1="34" x2="56" y2="34" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="72" y="12" width="8" height="48" fill="#ffd700" stroke="#333"/>
+                  <line x1="72" y1="30" x2="80" y2="30" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="96" y="10" width="8" height="45" fill="#ffd700" stroke="#333"/>
+                  <line x1="96" y1="28" x2="104" y2="28" stroke="#dc3545" stroke-width="2"/>
+                  <!-- Positions 11-50 -->
+                  <rect x="120" y="8" width="8" height="42" fill="#ffd700" stroke="#333"/>
+                  <line x1="120" y1="25" x2="128" y2="25" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="168" y="7" width="8" height="40" fill="#ffd700" stroke="#333"/>
+                  <line x1="168" y1="23" x2="176" y2="23" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="216" y="8" width="8" height="42" fill="#ffd700" stroke="#333"/>
+                  <line x1="216" y1="24" x2="224" y2="24" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="264" y="10" width="8" height="44" fill="#ffd700" stroke="#333"/>
+                  <line x1="264" y1="26" x2="272" y2="26" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="312" y="12" width="8" height="46" fill="#ffd700" stroke="#333"/>
+                  <line x1="312" y1="28" x2="320" y2="28" stroke="#dc3545" stroke-width="2"/>
+                  <!-- Positions 51-100 -->
+                  <rect x="360" y="16" width="8" height="50" fill="#ffd700" stroke="#333"/>
+                  <line x1="360" y1="34" x2="368" y2="34" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="408" y="20" width="8" height="54" fill="#ffd700" stroke="#333"/>
+                  <line x1="408" y1="40" x2="416" y2="40" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="456" y="26" width="8" height="58" fill="#ffd700" stroke="#333"/>
+                  <line x1="456" y1="46" x2="464" y2="46" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="504" y="32" width="8" height="62" fill="#ffd700" stroke="#333"/>
+                  <line x1="504" y1="52" x2="512" y2="52" stroke="#dc3545" stroke-width="2"/>
+                  <!-- Positions 101-150: more pronounced drop for R2 -->
+                  <rect x="552" y="40" width="8" height="68" fill="#ffd700" stroke="#333"/>
+                  <line x1="552" y1="62" x2="560" y2="62" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="600" y="50" width="8" height="74" fill="#ffd700" stroke="#333"/>
+                  <line x1="600" y1="74" x2="608" y2="74" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="648" y="60" width="8" height="80" fill="#ffd700" stroke="#333"/>
+                  <line x1="648" y1="86" x2="656" y2="86" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="696" y="68" width="8" height="86" fill="#ffd700" stroke="#333"/>
+                  <line x1="696" y1="96" x2="704" y2="96" stroke="#dc3545" stroke-width="2"/>
+                  <rect x="720" y="76" width="8" height="92" fill="#ffd700" stroke="#333"/>
+                  <line x1="720" y1="106" x2="728" y2="106" stroke="#dc3545" stroke-width="2"/>
+                </g>
+              </svg>
+            </div>
+            <div class="x-axis"><span>1</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90</span><span>100</span><span>110</span><span>120</span><span>130</span><span>140</span><span>150</span></div>
+            <div style="text-align:center;margin-top:30px;font-size:12px;color:#666;">Position in read (bp)</div>
+          </div>
+          <div class="legend">
+            <span><div class="box" style="background:#d4edda"></div> Very good quality (Q≥28)</span>
+            <span><div class="box" style="background:#fff3cd"></div> Reasonable quality (Q20-28)</span>
+            <span><div class="box" style="background:#f8d7da"></div> Poor quality (Q&lt;20)</span>
+          </div>
+        </div>
+        <p style="margin-top:15px;color:#36a64f;"><strong>Result:</strong> Quality remains above Q20 across all positions. The slight drop at the 3' end is typical for R2 reads and can be addressed with quality trimming if needed.</p>
+      </div>
+    </div>
+    <div class="module" id="per-seq-quality">
+      <h2><span class="status icon pass">✓</span>Per sequence quality scores</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">Distribution of mean quality scores per sequence.</p>
+        <svg width="600" height="300" style="border:1px solid #ccc;background:white;">
+          <defs><linearGradient id="qualGrad2" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" style="stop-color:#f8d7da"/><stop offset="52%" style="stop-color:#fff3cd"/><stop offset="100%" style="stop-color:#d4edda"/></linearGradient></defs>
+          <rect x="50" y="20" width="500" height="240" fill="url(#qualGrad2)"/>
+          <!-- R2 quality distribution - peak slightly shifted left compared to R1 -->
+          <polyline points="60,252 80,250 100,248 120,245 140,238 160,220 180,185 200,140 220,95 240,60 260,42 280,38 300,40 320,52 340,78 360,120 380,170 400,210 420,235 440,248 460,253 480,255 500,256 520,257 540,257" fill="none" stroke="#dc3545" stroke-width="2"/>
+          <line x1="50" y1="260" x2="550" y2="260" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="260" stroke="#333" stroke-width="2"/>
+          <text x="300" y="285" text-anchor="middle" font-size="12">Mean Sequence Quality (Phred Score)</text>
+          <text x="60" y="275" font-size="10">0</text><text x="160" y="275" font-size="10">10</text><text x="260" y="275" font-size="10">20</text><text x="360" y="275" font-size="10">30</text><text x="460" y="275" font-size="10">40</text>
+        </svg>
+        <p style="margin-top:10px;color:#36a64f;"><strong>Result:</strong> Mean quality scores peak around Q32-34, indicating high-quality sequencing data.</p>
+      </div>
+    </div>
+    <div class="module" id="per-seq-gc">
+      <h2><span class="status icon warn">!</span>Per sequence GC content</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">GC content distribution compared to theoretical normal distribution.</p>
+        <svg width="600" height="280" style="border:1px solid #ccc;background:white;">
+          <rect x="50" y="20" width="500" height="220" fill="#fafafa"/>
+          <polyline points="60,230 100,225 140,200 180,150 220,90 260,50 300,35 340,50 380,90 420,150 460,200 500,225 540,230" fill="none" stroke="#4271ae" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <polyline points="60,232 100,228 140,210 180,165 220,108 260,62 280,44 300,40 320,38 340,42 360,58 380,88 420,148 460,200 500,225 540,232" fill="none" stroke="#dc3545" stroke-width="2"/>
+          <line x1="50" y1="240" x2="550" y2="240" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="240" stroke="#333" stroke-width="2"/>
+          <text x="300" y="265" text-anchor="middle" font-size="12">Mean GC content (%)</text>
+          <text x="60" y="255" font-size="10">0</text><text x="160" y="255" font-size="10">20</text><text x="260" y="255" font-size="10">40</text><text x="360" y="255" font-size="10">60</text><text x="460" y="255" font-size="10">80</text><text x="540" y="255" font-size="10">100</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:20px;font-size:12px;">
+          <span style="color:#dc3545;">━ GC count per read</span>
+          <span style="color:#4271ae;">┅ Theoretical Distribution</span>
+        </div>
+        <p style="margin-top:10px;color:#ff9900;"><strong>Warning:</strong> Minor deviation from normal distribution detected. Consistent with R1 pattern - likely reflects genuine biological variation in the sample.</p>
+      </div>
+    </div>
+    <div class="module" id="seq-length">
+      <h2><span class="status icon pass">✓</span>Sequence Length Distribution</h2>
+      <div class="module-content">
+        <table class="summary-table" style="max-width:400px;">
+          <tr><th>Length</th><th>Count</th></tr>
+          <tr><td>150</td><td>2,847,293</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="module" id="seq-dup">
+      <h2><span class="status icon pass">✓</span>Sequence Duplication Levels</h2>
+      <div class="module-content">
+        <svg width="600" height="250" style="border:1px solid #ccc;background:white;">
+          <rect x="50" y="20" width="500" height="190" fill="#fafafa"/>
+          <rect x="70" y="35" width="35" height="165" fill="#4271ae"/>
+          <rect x="115" y="95" width="35" height="105" fill="#4271ae"/>
+          <rect x="160" y="145" width="35" height="55" fill="#4271ae"/>
+          <rect x="205" y="168" width="35" height="32" fill="#4271ae"/>
+          <rect x="250" y="180" width="35" height="20" fill="#4271ae"/>
+          <rect x="295" y="188" width="35" height="12" fill="#4271ae"/>
+          <rect x="340" y="193" width="35" height="7" fill="#4271ae"/>
+          <rect x="385" y="196" width="35" height="4" fill="#4271ae"/>
+          <rect x="430" y="198" width="35" height="2" fill="#4271ae"/>
+          <rect x="475" y="199" width="35" height="1" fill="#4271ae"/>
+          <line x1="50" y1="210" x2="550" y2="210" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="210" stroke="#333" stroke-width="2"/>
+          <text x="300" y="240" text-anchor="middle" font-size="12">Sequence Duplication Level</text>
+        </svg>
+        <table class="summary-table" style="max-width:400px;margin-top:15px;">
+          <tr><td>% Deduplicated</td><td>85.8%</td></tr>
+          <tr><td>% Total Deduplicated</td><td>71.4%</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="module" id="adapter">
+      <h2><span class="status icon pass">✓</span>Adapter Content</h2>
+      <div class="module-content">
+        <p style="color:#666;font-size:13px;margin-bottom:15px;">Adapter contamination levels across read positions.</p>
+        <svg width="600" height="250" style="border:1px solid #ccc;background:white;">
+          <rect x="50" y="20" width="500" height="190" fill="#fafafa"/>
+          <polyline points="60,200 150,200 250,199 350,198 450,195 540,190" fill="none" stroke="#4271ae" stroke-width="2"/>
+          <polyline points="60,200 150,200 250,200 350,198 450,194 540,188" fill="none" stroke="#dc3545" stroke-width="2"/>
+          <polyline points="60,200 150,200 250,200 350,199 450,196 540,192" fill="none" stroke="#36a64f" stroke-width="2"/>
+          <polyline points="60,200 150,200 250,200 350,200 450,198 540,195" fill="none" stroke="#ff9900" stroke-width="2"/>
+          <line x1="50" y1="210" x2="550" y2="210" stroke="#333" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="210" stroke="#333" stroke-width="2"/>
+          <text x="300" y="240" text-anchor="middle" font-size="12">Position in read (bp)</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:15px;font-size:11px;flex-wrap:wrap;">
+          <span style="color:#4271ae;">━ Illumina Universal Adapter</span>
+          <span style="color:#dc3545;">━ Illumina Small RNA 3' Adapter</span>
+          <span style="color:#36a64f;">━ Illumina Small RNA 5' Adapter</span>
+          <span style="color:#ff9900;">━ Nextera Transposase Sequence</span>
+        </div>
+        <p style="margin-top:10px;color:#36a64f;"><strong>Result:</strong> Minimal adapter content detected. Data is suitable for downstream analysis.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  <p>Produced by <strong>FastQC</strong> v0.12.1 | Analysis Date: 2024-01-15 10:23:52 | Babraham Bioinformatics</p>
+</div>
+</body>
+</html>`,
 		'sample_01_R1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
 		'sample_01_R2_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
 
