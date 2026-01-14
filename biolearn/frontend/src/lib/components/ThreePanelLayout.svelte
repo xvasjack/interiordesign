@@ -26,289 +26,9 @@
 	// File contents for viewing
 	const fileContents: Record<string, string> = {
 		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
-		'sample_01_R1_fastqc.html': `<!DOCTYPE html>
-<html>
-<head>
-<title>FastQC Report: sample_01_R1.fastq.gz</title>
-<style type="text/css">
-@media screen {
-  body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0; padding: 0; background-color: #ffffff; }
-  .header { background-color: #4271ae; color: white; padding: 10px 20px; display: flex; align-items: center; }
-  .header h1 { margin: 0; font-size: 20px; font-weight: normal; }
-  .main-container { display: flex; min-height: calc(100vh - 60px); }
-  .sidebar { width: 280px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 0; flex-shrink: 0; }
-  .sidebar h2 { background: #4271ae; color: white; margin: 0; padding: 10px 15px; font-size: 14px; }
-  .sidebar ul { list-style: none; margin: 0; padding: 0; }
-  .sidebar li { border-bottom: 1px solid #ddd; }
-  .sidebar li a { display: flex; align-items: center; padding: 8px 15px; text-decoration: none; color: #333; }
-  .sidebar li a:hover { background: #e8e8e8; }
-  .sidebar li a .icon { width: 20px; height: 20px; margin-right: 10px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
-  .icon.pass { background: #36a64f; }
-  .icon.warn { background: #ff9900; }
-  .icon.fail { background: #dc3545; }
-  .content { flex: 1; padding: 20px 30px; overflow-y: auto; }
-  .module { margin-bottom: 40px; border: 1px solid #ddd; background: white; }
-  .module h2 { background: #f0f0f0; margin: 0; padding: 12px 15px; font-size: 16px; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
-  .module h2 .status { margin-right: 10px; }
-  .module-content { padding: 20px; }
-  table.summary-table { border-collapse: collapse; width: 100%; max-width: 600px; }
-  table.summary-table th, table.summary-table td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; }
-  table.summary-table th { background: #d0d0d0; }
-  table.summary-table tr:nth-child(even) { background: #f9f9f9; }
-  .quality-plot { width: 100%; max-width: 800px; background: #fff; border: 1px solid #ccc; padding: 10px; }
-  .quality-plot .plot-area { position: relative; height: 300px; background: linear-gradient(to bottom, #d4edda 0%, #d4edda 28%, #fff3cd 28%, #fff3cd 52%, #f8d7da 52%, #f8d7da 100%); border: 1px solid #999; border-left: 2px solid #333; border-bottom: 2px solid #333; }
-  .quality-plot .y-axis { position: absolute; left: -45px; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; color: #333; }
-  .quality-plot .x-axis { position: absolute; bottom: -25px; left: 0; width: 100%; display: flex; justify-content: space-between; font-size: 11px; color: #333; }
-  .quality-plot .plot-title { text-align: center; font-weight: bold; margin-bottom: 5px; }
-  .quality-plot .legend { display: flex; gap: 20px; margin-top: 10px; justify-content: center; font-size: 12px; }
-  .quality-plot .legend span { display: flex; align-items: center; gap: 5px; }
-  .quality-plot .legend .box { width: 15px; height: 15px; border: 1px solid #999; }
-  .footer { background: #f5f5f5; padding: 15px 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center; }
-}
-</style>
-</head>
-<body>
-<div class="header">
-  <div style="background: white; padding: 5px 10px; border-radius: 3px; margin-right: 15px;">
-    <span style="color: #4271ae; font-weight: bold; font-size: 18px;">FastQC</span>
-  </div>
-  <h1>Quality Control Report - sample_01_R1.fastq.gz</h1>
-</div>
-<div class="main-container">
-  <div class="sidebar">
-    <h2>Summary</h2>
-    <ul>
-      <li><a href="#basic-stats"><span class="icon pass">✓</span>Basic Statistics</a></li>
-      <li><a href="#per-base-quality"><span class="icon pass">✓</span>Per base sequence quality</a></li>
-      <li><a href="#per-tile-quality"><span class="icon pass">✓</span>Per tile sequence quality</a></li>
-      <li><a href="#per-seq-quality"><span class="icon pass">✓</span>Per sequence quality scores</a></li>
-      <li><a href="#per-base-content"><span class="icon pass">✓</span>Per base sequence content</a></li>
-      <li><a href="#per-seq-gc"><span class="icon warn">!</span>Per sequence GC content</a></li>
-      <li><a href="#per-base-n"><span class="icon pass">✓</span>Per base N content</a></li>
-      <li><a href="#seq-length"><span class="icon pass">✓</span>Sequence Length Distribution</a></li>
-      <li><a href="#seq-dup"><span class="icon pass">✓</span>Sequence Duplication Levels</a></li>
-      <li><a href="#overrep"><span class="icon pass">✓</span>Overrepresented sequences</a></li>
-      <li><a href="#adapter"><span class="icon pass">✓</span>Adapter Content</a></li>
-    </ul>
-  </div>
-  <div class="content">
-    <div class="module" id="basic-stats">
-      <h2><span class="status icon pass">✓</span>Basic Statistics</h2>
-      <div class="module-content">
-        <table class="summary-table">
-          <tr><th>Measure</th><th>Value</th></tr>
-          <tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr>
-          <tr><td>File type</td><td>Conventional base calls</td></tr>
-          <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
-          <tr><td>Total Sequences</td><td>2,847,293</td></tr>
-          <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
-          <tr><td>Sequence length</td><td>150</td></tr>
-          <tr><td>%GC</td><td>52</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="module" id="per-base-quality">
-      <h2><span class="status icon pass">✓</span>Per base sequence quality</h2>
-      <div class="module-content">
-        <p style="color:#666;font-size:13px;margin-bottom:15px;">The boxplot shows the distribution of quality scores at each position. Background colors indicate quality zones: green (Q≥28), yellow (Q20-28), red (Q&lt;20).</p>
-        <div class="quality-plot">
-          <div class="plot-title">Quality scores across all bases (Sanger / Illumina 1.9 encoding)</div>
-          <div style="position:relative; margin-left:50px; margin-top:20px;">
-            <div class="plot-area">
-              <svg width="100%" height="100%" viewBox="0 0 750 300" preserveAspectRatio="none">
-                <g transform="translate(15,0)">
-                  <rect x="0" y="20" width="8" height="40" fill="#ffd700" stroke="#333"/>
-                  <rect x="48" y="10" width="8" height="50" fill="#ffd700" stroke="#333"/>
-                  <rect x="120" y="6" width="8" height="40" fill="#ffd700" stroke="#333"/>
-                  <rect x="216" y="5" width="8" height="38" fill="#ffd700" stroke="#333"/>
-                  <rect x="312" y="6" width="8" height="40" fill="#ffd700" stroke="#333"/>
-                  <rect x="408" y="10" width="8" height="44" fill="#ffd700" stroke="#333"/>
-                  <rect x="504" y="14" width="8" height="48" fill="#ffd700" stroke="#333"/>
-                  <rect x="600" y="22" width="8" height="56" fill="#ffd700" stroke="#333"/>
-                  <rect x="696" y="32" width="8" height="65" fill="#ffd700" stroke="#333"/>
-                </g>
-              </svg>
-            </div>
-            <div class="x-axis"><span>1</span><span>25</span><span>50</span><span>75</span><span>100</span><span>125</span><span>150</span></div>
-          </div>
-          <div class="legend">
-            <span><div class="box" style="background:#d4edda"></div> Very good (Q≥28)</span>
-            <span><div class="box" style="background:#fff3cd"></div> Reasonable (Q20-28)</span>
-            <span><div class="box" style="background:#f8d7da"></div> Poor (Q&lt;20)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="module" id="per-seq-gc">
-      <h2><span class="status icon warn">!</span>Per sequence GC content</h2>
-      <div class="module-content">
-        <p style="color:#ff9900;"><strong>Warning:</strong> Minor deviation from theoretical distribution - common in bacterial samples.</p>
-      </div>
-    </div>
-    <div class="module" id="seq-dup">
-      <h2><span class="status icon pass">✓</span>Sequence Duplication Levels</h2>
-      <div class="module-content">
-        <table class="summary-table" style="max-width:400px;">
-          <tr><td>% Deduplicated</td><td>86.3%</td></tr>
-          <tr><td>% Total Deduplicated</td><td>72.1%</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="module" id="adapter">
-      <h2><span class="status icon pass">✓</span>Adapter Content</h2>
-      <div class="module-content">
-        <p style="color:#36a64f;"><strong>Result:</strong> Adapter content below 2% - excellent quality data.</p>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="footer">
-  <p>Produced by <strong>FastQC</strong> v0.12.1 | Analysis Date: 2024-01-15 10:23:45 | Babraham Bioinformatics</p>
-</div>
-</body>
-</html>`,
-		'sample_01_R2_fastqc.html': `<!DOCTYPE html>
-<html>
-<head>
-<title>FastQC Report: sample_01_R2.fastq.gz</title>
-<style type="text/css">
-@media screen {
-  body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin: 0; padding: 0; background-color: #ffffff; }
-  .header { background-color: #4271ae; color: white; padding: 10px 20px; display: flex; align-items: center; }
-  .header h1 { margin: 0; font-size: 20px; font-weight: normal; }
-  .main-container { display: flex; min-height: calc(100vh - 60px); }
-  .sidebar { width: 280px; background: #f5f5f5; border-right: 1px solid #ddd; padding: 0; flex-shrink: 0; }
-  .sidebar h2 { background: #4271ae; color: white; margin: 0; padding: 10px 15px; font-size: 14px; }
-  .sidebar ul { list-style: none; margin: 0; padding: 0; }
-  .sidebar li { border-bottom: 1px solid #ddd; }
-  .sidebar li a { display: flex; align-items: center; padding: 8px 15px; text-decoration: none; color: #333; }
-  .sidebar li a:hover { background: #e8e8e8; }
-  .sidebar li a .icon { width: 20px; height: 20px; margin-right: 10px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
-  .icon.pass { background: #36a64f; }
-  .icon.warn { background: #ff9900; }
-  .icon.fail { background: #dc3545; }
-  .content { flex: 1; padding: 20px 30px; overflow-y: auto; }
-  .module { margin-bottom: 40px; border: 1px solid #ddd; background: white; }
-  .module h2 { background: #f0f0f0; margin: 0; padding: 12px 15px; font-size: 16px; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
-  .module h2 .status { margin-right: 10px; }
-  .module-content { padding: 20px; }
-  table.summary-table { border-collapse: collapse; width: 100%; max-width: 600px; }
-  table.summary-table th, table.summary-table td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; }
-  table.summary-table th { background: #d0d0d0; }
-  table.summary-table tr:nth-child(even) { background: #f9f9f9; }
-  .quality-plot { width: 100%; max-width: 800px; background: #fff; border: 1px solid #ccc; padding: 10px; }
-  .quality-plot .plot-area { position: relative; height: 300px; background: linear-gradient(to bottom, #d4edda 0%, #d4edda 28%, #fff3cd 28%, #fff3cd 52%, #f8d7da 52%, #f8d7da 100%); border: 1px solid #999; border-left: 2px solid #333; border-bottom: 2px solid #333; }
-  .quality-plot .y-axis { position: absolute; left: -45px; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; color: #333; }
-  .quality-plot .x-axis { position: absolute; bottom: -25px; left: 0; width: 100%; display: flex; justify-content: space-between; font-size: 11px; color: #333; }
-  .quality-plot .plot-title { text-align: center; font-weight: bold; margin-bottom: 5px; }
-  .quality-plot .legend { display: flex; gap: 20px; margin-top: 10px; justify-content: center; font-size: 12px; }
-  .quality-plot .legend span { display: flex; align-items: center; gap: 5px; }
-  .quality-plot .legend .box { width: 15px; height: 15px; border: 1px solid #999; }
-  .footer { background: #f5f5f5; padding: 15px 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center; }
-}
-</style>
-</head>
-<body>
-<div class="header">
-  <div style="background: white; padding: 5px 10px; border-radius: 3px; margin-right: 15px;">
-    <span style="color: #4271ae; font-weight: bold; font-size: 18px;">FastQC</span>
-  </div>
-  <h1>Quality Control Report - sample_01_R2.fastq.gz</h1>
-</div>
-<div class="main-container">
-  <div class="sidebar">
-    <h2>Summary</h2>
-    <ul>
-      <li><a href="#basic-stats"><span class="icon pass">✓</span>Basic Statistics</a></li>
-      <li><a href="#per-base-quality"><span class="icon pass">✓</span>Per base sequence quality</a></li>
-      <li><a href="#per-tile-quality"><span class="icon pass">✓</span>Per tile sequence quality</a></li>
-      <li><a href="#per-seq-quality"><span class="icon pass">✓</span>Per sequence quality scores</a></li>
-      <li><a href="#per-base-content"><span class="icon pass">✓</span>Per base sequence content</a></li>
-      <li><a href="#per-seq-gc"><span class="icon warn">!</span>Per sequence GC content</a></li>
-      <li><a href="#per-base-n"><span class="icon pass">✓</span>Per base N content</a></li>
-      <li><a href="#seq-length"><span class="icon pass">✓</span>Sequence Length Distribution</a></li>
-      <li><a href="#seq-dup"><span class="icon pass">✓</span>Sequence Duplication Levels</a></li>
-      <li><a href="#overrep"><span class="icon pass">✓</span>Overrepresented sequences</a></li>
-      <li><a href="#adapter"><span class="icon pass">✓</span>Adapter Content</a></li>
-    </ul>
-  </div>
-  <div class="content">
-    <div class="module" id="basic-stats">
-      <h2><span class="status icon pass">✓</span>Basic Statistics</h2>
-      <div class="module-content">
-        <table class="summary-table">
-          <tr><th>Measure</th><th>Value</th></tr>
-          <tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr>
-          <tr><td>File type</td><td>Conventional base calls</td></tr>
-          <tr><td>Encoding</td><td>Sanger / Illumina 1.9</td></tr>
-          <tr><td>Total Sequences</td><td>2,847,293</td></tr>
-          <tr><td>Sequences flagged as poor quality</td><td>0</td></tr>
-          <tr><td>Sequence length</td><td>150</td></tr>
-          <tr><td>%GC</td><td>52</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="module" id="per-base-quality">
-      <h2><span class="status icon pass">✓</span>Per base sequence quality</h2>
-      <div class="module-content">
-        <p style="color:#666;font-size:13px;margin-bottom:15px;">R2 reads typically show slightly lower quality at the 3' end compared to R1, which is normal for Illumina paired-end sequencing.</p>
-        <div class="quality-plot">
-          <div class="plot-title">Quality scores across all bases (Sanger / Illumina 1.9 encoding)</div>
-          <div style="position:relative; margin-left:50px; margin-top:20px;">
-            <div class="plot-area">
-              <svg width="100%" height="100%" viewBox="0 0 750 300" preserveAspectRatio="none">
-                <g transform="translate(15,0)">
-                  <rect x="0" y="28" width="8" height="45" fill="#ffd700" stroke="#333"/>
-                  <rect x="48" y="16" width="8" height="52" fill="#ffd700" stroke="#333"/>
-                  <rect x="120" y="8" width="8" height="42" fill="#ffd700" stroke="#333"/>
-                  <rect x="216" y="8" width="8" height="42" fill="#ffd700" stroke="#333"/>
-                  <rect x="312" y="12" width="8" height="46" fill="#ffd700" stroke="#333"/>
-                  <rect x="408" y="20" width="8" height="54" fill="#ffd700" stroke="#333"/>
-                  <rect x="504" y="32" width="8" height="62" fill="#ffd700" stroke="#333"/>
-                  <rect x="600" y="50" width="8" height="74" fill="#ffd700" stroke="#333"/>
-                  <rect x="696" y="68" width="8" height="86" fill="#ffd700" stroke="#333"/>
-                </g>
-              </svg>
-            </div>
-            <div class="x-axis"><span>1</span><span>25</span><span>50</span><span>75</span><span>100</span><span>125</span><span>150</span></div>
-          </div>
-          <div class="legend">
-            <span><div class="box" style="background:#d4edda"></div> Very good (Q≥28)</span>
-            <span><div class="box" style="background:#fff3cd"></div> Reasonable (Q20-28)</span>
-            <span><div class="box" style="background:#f8d7da"></div> Poor (Q&lt;20)</span>
-          </div>
-        </div>
-        <p style="margin-top:15px;color:#36a64f;"><strong>Result:</strong> Quality remains above Q20 across all positions. The drop at the 3' end is typical for R2 reads.</p>
-      </div>
-    </div>
-    <div class="module" id="per-seq-gc">
-      <h2><span class="status icon warn">!</span>Per sequence GC content</h2>
-      <div class="module-content">
-        <p style="color:#ff9900;"><strong>Warning:</strong> Minor deviation from theoretical distribution - consistent with R1 pattern.</p>
-      </div>
-    </div>
-    <div class="module" id="seq-dup">
-      <h2><span class="status icon pass">✓</span>Sequence Duplication Levels</h2>
-      <div class="module-content">
-        <table class="summary-table" style="max-width:400px;">
-          <tr><td>% Deduplicated</td><td>85.8%</td></tr>
-          <tr><td>% Total Deduplicated</td><td>71.4%</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="module" id="adapter">
-      <h2><span class="status icon pass">✓</span>Adapter Content</h2>
-      <div class="module-content">
-        <p style="color:#36a64f;"><strong>Result:</strong> Minimal adapter content detected. Data is suitable for downstream analysis.</p>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="footer">
-  <p>Produced by <strong>FastQC</strong> v0.12.1 | Analysis Date: 2024-01-15 10:23:52 | Babraham Bioinformatics</p>
-</div>
-</body>
-</html>`,
+		// FastQC reports - loaded from static folder (real FastQC output format)
+		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
+		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
 		'assembly.fasta': `>contig_1 length=4892156 depth=45.2x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_2 length=95234 depth=78.5x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234`,
 		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,
@@ -456,9 +176,27 @@
 		return unsubscribe;
 	});
 
-	function viewFile(file: {name: string, type: string}) {
+	async function viewFile(file: {name: string, type: string}) {
 		const content = fileContents[file.name];
-		if (file.type === 'html' && content) {
+
+		// Handle FastQC HTML files - fetch from static folder
+		if (file.type === 'html' && content === 'FASTQC_STATIC') {
+			try {
+				const response = await fetch(`/fastqc/${file.name}`);
+				if (response.ok) {
+					const htmlContent = await response.text();
+					const newWindow = window.open('', '_blank');
+					if (newWindow) {
+						newWindow.document.write(htmlContent);
+						newWindow.document.close();
+					}
+				} else {
+					alert(`Could not load ${file.name}`);
+				}
+			} catch (error) {
+				alert(`Error loading ${file.name}`);
+			}
+		} else if (file.type === 'html' && content) {
 			const newWindow = window.open('', '_blank');
 			if (newWindow) {
 				newWindow.document.write(content);
