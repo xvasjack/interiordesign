@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
+	import { executedCommands, executedSteps, currentDirectory, storylineDataDir } from '$lib/stores/terminal';
+	import { get } from 'svelte/store';
 	import type { Storyline, StorylineSection } from '$lib/storylines/wgs-bacteria';
 
 	let { storyline = null }: { storyline?: Storyline | null } = $props();
@@ -18,6 +19,7 @@
 		subtitle: 'WGS Analysis Pipeline',
 		organism: 'Klebsiella pneumoniae',
 		technology: 'illumina',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{
@@ -98,9 +100,10 @@
 		return normalizePath(userCurrentDir) === normalizePath(requiredDir);
 	}
 
-	// Get short directory name for display
+	// Get short directory name for display (uses the store set by ThreePanelLayout)
 	function getShortDir(dir: string): string {
-		return dir.replace('/data/outbreak_investigation', '~');
+		const dataDir = get(storylineDataDir);
+		return dir.replace(dataDir, '~');
 	}
 
 	// Check if user can proceed to next step
@@ -301,9 +304,9 @@
 												<p class="text-amber-700 text-sm" style="color: #b45309; font-size: 0.875rem;">
 													You are in <code class="bg-amber-100 px-1 rounded" style="background: #fef3c7; padding: 0 0.25rem; border-radius: 0.25rem;">{getShortDir(userCurrentDir)}</code>
 												</p>
-												<p class="text-amber-700 text-sm mt-1" style="color: #b45309; font-size: 0.875rem; margin-top: 0.25rem;">Return to the project directory first:</p>
+												<p class="text-amber-700 text-sm mt-1" style="color: #b45309; font-size: 0.875rem; margin-top: 0.25rem;">Navigate to the required directory:</p>
 												<div class="bg-gray-900 rounded p-2 mt-1 font-mono text-sm" style="background: #111827; border-radius: 0.25rem; padding: 0.5rem; margin-top: 0.25rem; font-family: monospace; font-size: 0.875rem;">
-													<code class="text-yellow-400" style="color: #facc15;">cd ~</code>
+													<code class="text-yellow-400" style="color: #facc15;">cd {getShortDir(section.requiredDir)}</code>
 												</div>
 											</div>
 										</div>
@@ -311,7 +314,7 @@
 								{:else if section.requiredDir && isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
 									<div class="flex items-center gap-2 text-green-600 text-sm mb-2" style="display: flex; align-items: center; gap: 0.5rem; color: #16a34a; font-size: 0.875rem; margin-bottom: 0.5rem;">
 										<span>OK</span>
-										<span>You are in the correct directory (~)</span>
+										<span>You are in the correct directory ({getShortDir(section.requiredDir)})</span>
 									</div>
 								{/if}
 

@@ -3,7 +3,7 @@
 	import Terminal from './Terminal.svelte';
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
-	import { executedCommands } from '$lib/stores/terminal';
+	import { executedCommands, storylineDataDir, currentDirectory } from '$lib/stores/terminal';
 	import type { Storyline } from '$lib/storylines/wgs-bacteria';
 
 	let {
@@ -161,6 +161,11 @@
 	};
 
 	onMount(() => {
+		// Set the storyline's data directory in stores so Terminal knows where to start
+		const dataDir = storyline?.dataDir || '/data/outbreak_investigation';
+		storylineDataDir.set(dataDir);
+		currentDirectory.set(dataDir);
+
 		const unsubscribe = executedCommands.subscribe(cmds => {
 			const files: {name: string, type: string, tool: string}[] = [];
 			cmds.forEach(tool => {

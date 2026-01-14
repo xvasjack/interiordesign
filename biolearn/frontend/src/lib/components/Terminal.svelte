@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal } from '$lib/stores/terminal';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 
 	let terminalContainer: HTMLDivElement;
@@ -11,7 +11,8 @@
 	let stopUnsubscribe: () => void;
 	let cursorPosition = 0;  // Track cursor position for left/right arrow
 	let isExecuting = false;
-	let currentDir = '/data/outbreak_investigation';
+	// Initialize currentDir from the store (set by ThreePanelLayout based on storyline)
+	let currentDir = get(currentDirectory);
 
 	// Command history for arrow up/down
 	let commandHistoryList: string[] = [];
@@ -1729,7 +1730,8 @@ Loading assembly graph: assembly.gfa
 	};
 
 	function writePrompt() {
-		const shortDir = currentDir.replace('/data/outbreak_investigation', '~');
+		const dataDir = get(storylineDataDir);
+		const shortDir = currentDir.replace(dataDir, '~');
 		terminal.write(`\r\n\x1b[32mbiolearn\x1b[0m:\x1b[34m${shortDir}\x1b[0m$ `);
 	}
 
@@ -2074,12 +2076,13 @@ Loading assembly graph: assembly.gfa
 		// Handle bioinformatics tools - require proper arguments and correct directory/files
 		if (bioTools.has(command)) {
 			const req = toolRequirements[command];
+			const dataDir = get(storylineDataDir);
 
 			// Check directory requirement
 			if (req && currentDir !== req.dir) {
-				const shortDir = req.dir.replace('/data/outbreak_investigation', '~');
+				const shortDir = req.dir.replace(dataDir, '~');
 				terminal.writeln(`\x1b[31mError: ${command} must be run from ${shortDir}\x1b[0m`);
-				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace('/data/outbreak_investigation', '~')}\x1b[0m`);
+				terminal.writeln(`\x1b[90mCurrent directory: ${currentDir.replace(dataDir, '~')}\x1b[0m`);
 				terminal.writeln(`\x1b[90mUse 'cd ${shortDir}' to navigate there first.\x1b[0m`);
 				writePrompt();
 				return;
@@ -3110,9 +3113,10 @@ Loading assembly graph: assembly.gfa
 
 	function handleCd(args: string[]) {
 		const filesystem = getFilesystem();
+		const dataDir = get(storylineDataDir);
 
 		if (args.length === 0 || args[0] === '~') {
-			currentDir = '/data/outbreak_investigation';
+			currentDir = dataDir;
 			currentDirectory.set(currentDir);
 			return;
 		}
@@ -3138,7 +3142,7 @@ Loading assembly graph: assembly.gfa
 			currentDir = parts.length > 0 ? '/' + parts.join('/') : '/data';
 			// Don't go above /data
 			if (!currentDir.startsWith('/data')) {
-				currentDir = '/data/outbreak_investigation';
+				currentDir = dataDir;
 			}
 			currentDirectory.set(currentDir);
 			return;
@@ -3471,8 +3475,8 @@ Annotation identified 4,523 coding sequences.
 		const { WebLinksAddon } = await import('@xterm/addon-web-links');
 		await import('@xterm/xterm/css/xterm.css');
 
-		// Sync the store with the initial directory to ensure StoryPanel is in sync
-		currentDirectory.set(currentDir);
+		// Read the current directory from store (set by ThreePanelLayout based on storyline)
+		currentDir = get(currentDirectory);
 
 		terminal = new Terminal(terminalOptions);
 		fitAddon = new FitAddon();
