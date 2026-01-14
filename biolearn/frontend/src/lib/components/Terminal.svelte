@@ -3155,6 +3155,15 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'cat' || command === 'head' || command === 'tail') {
 			handleFileView(command, args);
+			// Track cat command for step completion (e.g., viewing output files)
+			if (command === 'cat') {
+				executedCommands.update(cmds => {
+					if (!cmds.includes('cat')) {
+						return [...cmds, 'cat'];
+					}
+					return cmds;
+				});
+			}
 			writePrompt();
 			return;
 		}
