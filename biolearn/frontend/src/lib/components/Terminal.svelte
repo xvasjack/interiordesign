@@ -272,12 +272,15 @@
 			// Trial/Demo scenario
 			'/data/kpneumoniae_demo': ['quast_output/'],
 			'/data/kpneumoniae_demo/quast_output': [
-				'report.html', 'report.tsv', 'report.txt', 'transposed_report.tsv',
-				'icarus.html', 'report.pdf'
+				'basic_stats/', 'icarus_viewers/', 'report.html', 'report.tex', 'report.txt',
+				'transposed_report.tex', 'transposed_report.tsv', 'transposed_report.txt',
+				'icarus.html', 'quast.log', 'report.pdf', 'report.tsv'
 			],
 			'/data/outbreak_investigation': ['quast_results/'],
 			'/data/outbreak_investigation/quast_results': [
-				'quast_report.html', 'quast_report.tsv', 'transposed_report.tsv'
+				'basic_stats/', 'icarus_viewers/', 'report.html', 'report.tex', 'report.txt',
+				'transposed_report.tex', 'transposed_report.tsv', 'transposed_report.txt',
+				'icarus.html', 'quast.log', 'report.pdf', 'report.tsv'
 			]
 		},
 		'checkm2': {
@@ -707,24 +710,21 @@ Analysis complete for ${file2}
 				]
 			},
 			'trimmomatic': {
-				output: `TrimmomaticPE: Started with arguments:
- -phred33 ${file1} ${file2} ...
+				output: `Picked up _JAVA_OPTIONS: -Xmx8g
+TrimmomaticPE: Started with arguments:
+ -threads 2 -phred33 ${file1} ${file2} o_trimmomatic/${sampleName}_R1_paired.fq.gz o_trimmomatic/${sampleName}_R1_unpaired.fq.gz o_trimmomatic/${sampleName}_R2_paired.fq.gz o_trimmomatic/${sampleName}_R2_unpaired.fq.gz ILLUMINACLIP:/home/pop/miniconda3/envs/env_seqkit/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36
+ILLUMINACLIP: Using adapter file from user-specified absolute path: /home/pop/miniconda3/envs/env_seqkit/share/trimmomatic/adapters/TruSeq3-PE.fa
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
-ILLUMINACLIP: Using 1 prefix pairs, 2 forward/reverse sequences
-Quality encoding detected as phred33
-Input Read Pairs: ${totalReads.toLocaleString()}
-  Both Surviving: ${trimBothSurviving.toLocaleString()} (97.44%)
-  Forward Only Surviving: ${trimForwardOnly.toLocaleString()} (1.41%)
-  Reverse Only Surviving: ${trimReverseOnly.toLocaleString()} (0.81%)
-  Dropped: ${trimDropped.toLocaleString()} (0.34%)
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Input Read Pairs: ${totalReads.toLocaleString()} Both Surviving: ${trimBothSurviving.toLocaleString()} (99.23%) Forward Only Surviving: ${trimForwardOnly.toLocaleString()} (0.47%) Reverse Only Surviving: ${trimReverseOnly.toLocaleString()} (0.03%) Dropped: ${trimDropped.toLocaleString()} (0.27%)
 TrimmomaticPE: Completed successfully
 `,
 				summary: {
 					'Input Reads': `${totalReads.toLocaleString()} pairs`,
-					'Both Surviving': `${trimBothSurviving.toLocaleString()} (97.44%)`,
-					'Forward Only': `${trimForwardOnly.toLocaleString()} (1.41%)`,
-					'Reverse Only': `${trimReverseOnly.toLocaleString()} (0.81%)`,
-					'Dropped': `${trimDropped.toLocaleString()} (0.34%)`
+					'Both Surviving': `${trimBothSurviving.toLocaleString()} (99.23%)`,
+					'Forward Only': `${trimForwardOnly.toLocaleString()} (0.47%)`,
+					'Reverse Only': `${trimReverseOnly.toLocaleString()} (0.03%)`,
+					'Dropped': `${trimDropped.toLocaleString()} (0.27%)`
 				},
 				chartData: {
 					title: 'Trimmomatic Read Retention',
@@ -912,54 +912,99 @@ Loading assembly graph: assembly.gfa
 				]
 			},
 			'quast': {
-				output: `\x1b[36mQUAST v5.2.0\x1b[0m
-[2024-01-15 11:00:00] INFO: Starting QUAST analysis
+				output: `WARNING: Python locale settings can't be changed
+/home/pop/miniconda3/envs/env_quast/bin/quast assembly/assembly.fasta -o quast_output
 
-\x1b[36mAnalyzing assembly: assembly/assembly.fasta\x1b[0m
-  Contigs: 2
-  Total length: 4,987,390 bp
+Version: 5.0.2
 
-\x1b[36mCalculating assembly metrics...\x1b[0m
-  N50: 4,892,156 bp
-  L50: 1
-  GC content: 55.2%
-  Largest contig: 4,892,156 bp
+System information:
+  OS: Linux-6.1.0-42-cloud-amd64-x86_64-with-debian-12.13 (linux_64)
+  Python version: 3.6.13
+  CPUs number: 4
 
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;32m  ASSEMBLY QUALITY REPORT\x1b[0m
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+Started: 2026-01-12 05:48:06
 
-  Assembly:           assembly
-  # contigs:          2
-  Largest contig:     4,892,156 bp
-  Total length:       4,987,390 bp
-  GC (%):             55.2
-  N50:                4,892,156 bp
-  L50:                1
+Logging to /data/kpneumoniae_demo/quast_output/quast.log
+NOTICE: Maximum number of threads is set to 1 (use --threads option to set it manually)
 
-\x1b[32m✓ Assembly quality: EXCELLENT\x1b[0m
-\x1b[33mNote: N50 close to expected genome size indicates high contiguity\x1b[0m
+CWD: /data/kpneumoniae_demo
+Main parameters:
+  MODE: default, threads: 1, minimum contig length: 500, minimum alignment length: 65, \\
+  ambiguity: one, threshold for extensive misassembly size: 1000
+
+Contigs:
+  Pre-processing...
+  assembly/assembly.fasta ==> assembly
+
+2026-01-12 05:48:08
+Running Basic statistics processor...
+  Contig files:
+    assembly
+  Calculating N50 and L50...
+    assembly, N50 = 371705, L50 = 6, Total length = 5553065, GC % = 57.18, # N's per 100 kbp =  0.00
+  Drawing Nx plot...
+    saved to /data/kpneumoniae_demo/quast_output/basic_stats/Nx_plot.pdf
+  Drawing cumulative plot...
+    saved to /data/kpneumoniae_demo/quast_output/basic_stats/cumulative_plot.pdf
+  Drawing GC content plot...
+    saved to /data/kpneumoniae_demo/quast_output/basic_stats/GC_content_plot.pdf
+  Drawing assembly GC content plot...
+    saved to /data/kpneumoniae_demo/quast_output/basic_stats/assembly_GC_content_plot.pdf
+Done.
+
+NOTICE: Genes are not predicted by default. Use --gene-finding or --glimmer option to enable it.
+
+2026-01-12 05:48:09
+Creating large visual summaries...
+This may take a while: press Ctrl-C to skip this step..
+  1 of 2: Creating Icarus viewers...
+  2 of 2: Creating PDF with all tables and plots...
+Done
+
+2026-01-12 05:48:10
+RESULTS:
+  Text versions of total report are saved to /data/kpneumoniae_demo/quast_output/report.txt, report.tsv, and report.tex
+  Text versions of transposed total report are saved to /data/kpneumoniae_demo/quast_output/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
+  HTML version (interactive tables and plots) is saved to /data/kpneumoniae_demo/quast_output/report.html
+  PDF version (tables and plots) is saved to /data/kpneumoniae_demo/quast_output/report.pdf
+  Icarus (contig browser) is saved to /data/kpneumoniae_demo/quast_output/icarus.html
+  Log is saved to /data/kpneumoniae_demo/quast_output/quast.log
+
+Finished: 2026-01-12 05:48:10
+Elapsed time: 0:00:03.963635
+NOTICEs: 2; WARNINGs: 1; non-fatal ERRORs: 0
+
+Thank you for using QUAST!
 `,
 				summary: {
-					'Contigs': '2',
-					'Total Length': '4,987,390 bp',
-					'Largest Contig': '4,892,156 bp',
-					'N50': '4,892,156 bp',
-					'L50': '1',
-					'GC Content': '55.2%',
+					'Contigs': '6',
+					'Total Length': '5,553,065 bp',
+					'N50': '371,705 bp',
+					'L50': '6',
+					'GC Content': '57.18%',
 					'Quality': 'EXCELLENT'
 				},
 				chartData: {
 					title: 'Assembly Quality Metrics',
-					x: ['Total Length', 'Largest Contig', 'N50'],
-					y: [4987390, 4892156, 4892156],
+					x: ['Total Length', 'N50'],
+					y: [5553065, 371705],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Length (bp)'
 				},
 				files: [
-					{ name: 'quast_report.html', type: 'html', size: '156 KB' },
-					{ name: 'quast_report.tsv', type: 'tsv', size: '2.3 KB' }
+					{ name: 'report.html', type: 'html', size: '156 KB' },
+					{ name: 'report.tsv', type: 'tsv', size: '2.3 KB' },
+					{ name: 'report.txt', type: 'txt', size: '1.8 KB' },
+					{ name: 'report.tex', type: 'tex', size: '2.1 KB' },
+					{ name: 'report.pdf', type: 'pdf', size: '245 KB' },
+					{ name: 'transposed_report.tsv', type: 'tsv', size: '1.9 KB' },
+					{ name: 'transposed_report.txt', type: 'txt', size: '1.5 KB' },
+					{ name: 'transposed_report.tex', type: 'tex', size: '1.7 KB' },
+					{ name: 'icarus.html', type: 'html', size: '89 KB' },
+					{ name: 'quast.log', type: 'log', size: '12 KB' },
+					{ name: 'basic_stats/', type: 'dir', size: '420 KB' },
+					{ name: 'icarus_viewers/', type: 'dir', size: '156 KB' }
 				]
 			},
 			'prokka': {
