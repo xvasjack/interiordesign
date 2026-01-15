@@ -597,9 +597,7 @@
 		// HiFi: ~30k reads × 15kb = ~450 Mb (90x coverage)
 		// Nanopore: ~80k reads × 8kb = ~640 Mb (128x coverage)
 		// Illumina: ~990k reads × 271bp avg = ~268 Mb (54x coverage)
-		const baseReads = isHiFi ? 32456 : (isNanopore ? 78234 : 990478);
-		const sampleVariation = parseInt(sampleNum) * 1234;
-		const totalReads = baseReads + (sampleVariation % 5000);
+		const totalReads = isHiFi ? 32456 : (isNanopore ? 78234 : 990478);
 		const gcContent = isR2 ? 54.8 : 55.2;
 		const adapterPercent = isR2 ? 2.8 : 3.2;
 
