@@ -295,17 +295,6 @@ Analysis complete for ${inputFile}
 					'Adapter Content': `WARNING (${adapterPercent}%)`,
 					'Overall Quality': 'PASS'
 				},
-				chartData: {
-					title: `Per Base Sequence Quality - ${inputFile}`,
-					positions: Array.from({ length: 150 }, (_, i) => i + 1),
-					scores: Array.from({ length: 150 }, (_, i) => {
-						const base = isR2 ? 31 : 32;
-						const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
-						return base + (seed / 100) * 6 - (i > 130 ? (i - 130) * 0.3 : 0);
-					}),
-					xLabel: 'Position in read (bp)',
-					yLabel: 'Quality Score (Phred)'
-				},
 				files: [
 					{ name: `${sampleName}_${isR2 ? 'R2' : 'R1'}_fastqc.html`, type: 'html', size: '245 KB' },
 					{ name: `${sampleName}_${isR2 ? 'R2' : 'R1'}_fastqc.zip`, type: 'zip', size: '1.2 MB' }
