@@ -1176,7 +1176,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				title: 'Step 2: View Statistics Results',
 				text: `Now let's view the sequencing statistics we just generated.`,
 				command: 'cat o1_seqkit.stats',
-				explanation: 'The data were sequenced as 2×150 bp paired-end on Illumina NextSeq 2000, and the apparent ~300 bp read length arises from overlapping R1 and R2 reads. This overlap occurs during post-run processing and FASTQ reconstruction by SRA tools (e.g., fasterq-dump) when the library insert size is short.',
+				explanation: 'This sample was sequenced as 2×150 bp paired-end on Illumina NextSeq 2000. You may notice a max read length of ~300 bp—this is because overlapping R1 and R2 reads were merged during pre-processing before we downloaded the data. For this tutorial, we are using these pre-processed FASTQ files.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
 					{ name: 'cat', desc: 'Concatenate and display file contents' },
