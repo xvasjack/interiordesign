@@ -867,8 +867,8 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 			'bandage': {
 				output: `\x1b[36mBandage v0.8.1\x1b[0m
 Loading assembly graph: assembly.gfa
-  Nodes loaded: 847
-  Edges loaded: 1,203
+  Nodes loaded: 189
+  Edges loaded: 247
 
 \x1b[36mGenerating visualization...\x1b[0m
   Layout algorithm: Force-directed
@@ -878,33 +878,43 @@ Loading assembly graph: assembly.gfa
   Output: assembly_graph.png (2048x2048 px)
 
 \x1b[33mGraph Statistics:\x1b[0m
-  Connected components: 2
-  Largest component: Chromosome (4.89 Mb)
-  Circular contigs: 2
-  Dead ends: 0
+  Connected components: 4
+  Largest component: Chromosome (5.12 Mb, 183 segments)
+  Circular contigs: 3
+  Dead ends: 12
+
+\x1b[33mComponent Details:\x1b[0m
+  1. Chromosome:  5,124,832 bp (183 segments, 12 dead ends)
+  2. Plasmid pKPN1: 231,456 bp (3 segments, circular)
+  3. Plasmid pKPN2: 112,847 bp (2 segments, circular)
+  4. Plasmid pKPN3:  83,930 bp (1 segment, circular)
+
+\x1b[32m✓ Analysis complete\x1b[0m
 `,
 				summary: {
-					'Nodes': '847',
-					'Edges': '1,203',
-					'Components': '2',
-					'Circular Contigs': '2',
-					'Dead Ends': '0',
+					'Nodes': '189',
+					'Edges': '247',
+					'Components': '4',
+					'Circular Contigs': '3',
+					'Dead Ends': '12',
 					'Layout': 'Force-directed',
-					'Quality': 'Excellent (complete circular genome)'
+					'Quality': 'Good (3 complete plasmids, fragmented chromosome)'
 				},
 				chartData: {
 					title: 'Assembly Graph Visualization',
 					type: 'assemblyGraph',
 					components: [
-						{ name: 'Chromosome', size: 4892156, circular: true, color: '#3b82f6' },
-						{ name: 'Plasmid 1', size: 95234, circular: true, color: '#10b981' }
+						{ name: 'Chromosome', size: 5124832, circular: false, segments: 183, color: '#3b82f6' },
+						{ name: 'Plasmid pKPN1', size: 231456, circular: true, segments: 3, color: '#10b981' },
+						{ name: 'Plasmid pKPN2', size: 112847, circular: true, segments: 2, color: '#f59e0b' },
+						{ name: 'Plasmid pKPN3', size: 83930, circular: true, segments: 1, color: '#ef4444' }
 					],
 					graphStats: {
-						totalNodes: 847,
-						totalEdges: 1203,
-						circular: 2,
-						deadEnds: 0,
-						quality: 'excellent'
+						totalNodes: 189,
+						totalEdges: 247,
+						circular: 3,
+						deadEnds: 12,
+						quality: 'good'
 					}
 				},
 				files: [
