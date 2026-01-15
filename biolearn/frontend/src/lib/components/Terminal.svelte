@@ -902,7 +902,7 @@ Loading assembly graph: assembly.gfa
 				chartData: {
 					title: 'Assembly Graph Visualization',
 					type: 'image',
-					imagePath: '/images/assembly_graph.png'
+					imagePath: '/images/o_bandage.png'
 				},
 				files: [
 					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' }
