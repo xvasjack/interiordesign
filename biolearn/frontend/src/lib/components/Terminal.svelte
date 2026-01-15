@@ -738,68 +738,78 @@ TrimmomaticPE: Completed successfully
 
 Starting Unicycler v0.5.0
 
-\x1b[36mChecking dependencies...\x1b[0m
-  SPAdes: 3.15.5 ✓
-  Racon: 1.5.0 ✓
-  Bowtie2: 2.4.5 ✓
-  Samtools: 1.17 ✓
-
 \x1b[36mLoading reads...\x1b[0m
   Forward reads: ${trimBothSurviving.toLocaleString()}
   Reverse reads: ${trimBothSurviving.toLocaleString()}
 
 \x1b[36mPerforming SPAdes assembly...\x1b[0m
-  k=27: 1,234 contigs
-  k=47: 856 contigs
-  k=63: 423 contigs
-  k=77: 245 contigs
-  k=89: 128 contigs
-  k=99: 67 contigs
+  k=27, k=47, k=63, k=77, k=89, k=99, k=127
 
-\x1b[36mBuilding assembly graph...\x1b[0m
-  Nodes: 847
-  Edges: 1,203
+\x1b[1mApplying bridges\x1b[0m
+--------------------------------------
+    Unicycler now applies to the graph in decreasing order of quality.
 
-\x1b[36mRotating circular sequences...\x1b[0m
-  \x1b[32mChromosome: circularized (4,892,156 bp)\x1b[0m
-  \x1b[32mPlasmid 1: circularized (95,234 bp)\x1b[0m
+Bridge type   Start -> end   Path                                       Quality
+SPAdes          25 -> 14                                                 63.243
+SPAdes          13 -> -24    114                                         63.240
+SPAdes          18 -> 39     -152                                        63.226
+SPAdes          37 -> 45     -109, 180, 139                              41.806
+SPAdes          16 -> 54     172                                         33.902
+loop             2 -> 20     137, 99, 137                                34.907
 
-\x1b[36mPolishing assembly...\x1b[0m
-  Round 1: 23 corrections
-  Round 2: 3 corrections
-  Round 3: 0 corrections
+Saving assembly/004_bridges_applied.gfa
+
+
+\x1b[1mBridged assembly graph\x1b[0m
+--------------------------------------------
+    The assembly is now mostly finished and no more structural changes will be made.
+
+Saving assembly/005_final_clean.gfa
+
+Component   Segments   Links   Length        N50         Longest segment   Status
+    total          4       4   5,566,069   5,358,379         5,358,379
+        1          1       1   5,358,379   5,358,379         5,358,379     complete
+        2          1       1     195,434     195,434           195,434     complete
+        3          1       1       7,847       7,847             7,847     complete
+        4          1       1       4,409       4,409             4,409     complete
+
+
+\x1b[1mRotating completed replicons\x1b[0m
+--------------------------------------------------
+    Searching for starting genes (dnaA or repA) in circular contigs.
+
+Segment   Length      Depth    Starting gene   Position   Strand   Identity   Coverage
+      1   5,358,379   1.00x    dnaA            1          +        99.8%      100.0%
+      2     195,434   2.34x    repA            1          +        98.5%      100.0%
+      3       7,847   4.12x    none found
+      4       4,409   3.89x    none found
 
 \x1b[1;32mAssembly complete!\x1b[0m
-
-Final assembly:
-  Contigs: 2
-  Total length: 4,987,390 bp
-  Largest contig: 4,892,156 bp
-  N50: 4,892,156 bp
-  GC content: 55.2%
 
 \x1b[33mTip: Use 'bandage image assembly.gfa assembly_graph.png' to visualize the assembly graph\x1b[0m
 `,
 				summary: {
-					'Total Contigs': '2',
-					'Total Length': '4,987,390 bp',
-					'Largest Contig': '4,892,156 bp',
-					'N50': '4,892,156 bp',
-					'GC Content': '55.2%',
-					'Circular': '2 (chromosome + plasmid)'
+					'Total Segments': '4',
+					'Total Length': '5,566,069 bp',
+					'Chromosome': '5,358,379 bp (complete)',
+					'Plasmid 1': '195,434 bp (complete)',
+					'Plasmid 2': '7,847 bp (complete)',
+					'Plasmid 3': '4,409 bp (complete)',
+					'N50': '5,358,379 bp',
+					'Status': '4/4 complete'
 				},
 				chartData: {
 					title: 'Contig Length Distribution',
-					x: ['Chromosome', 'Plasmid_1'],
-					y: [4892156, 95234],
+					x: ['Chromosome', 'Plasmid 1', 'Plasmid 2', 'Plasmid 3'],
+					y: [5358379, 195434, 7847, 4409],
 					type: 'bar',
 					xLabel: 'Contig',
 					yLabel: 'Length (bp)'
 				},
 				files: [
-					{ name: 'assembly.fasta', type: 'fasta', size: '4.8 MB' },
-					{ name: 'assembly.gfa', type: 'gfa', size: '12 MB' },
-					{ name: 'unicycler.log', type: 'log', size: '156 KB' }
+					{ name: 'assembly.fasta', type: 'fasta', size: '5.3 MB' },
+					{ name: 'assembly.gfa', type: 'gfa', size: '14 MB' },
+					{ name: 'unicycler.log', type: 'log', size: '256 KB' }
 				]
 			},
 			'bandage': {
