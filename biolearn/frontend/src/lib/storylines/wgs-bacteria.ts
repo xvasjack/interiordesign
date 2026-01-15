@@ -1119,7 +1119,7 @@ export const storylines: Record<string, Storyline> = {
 		subtitle: 'Introduction to WGS Analysis',
 		organism: 'Klebsiella pneumoniae',
 		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
+		technologyLabel: 'Illumina NextSeq 2000 (2×150bp)',
 		dataDir: '/data/kpneumoniae_demo',
 		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm2', 'abricate', 'mlst', 'prokka'],
 		sections: [
@@ -1145,7 +1145,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'context',
 				text: `<strong>Sample Information:</strong>
 
-<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>NCBI Accession</td><td>SRR36708862</td></tr><tr><td>Organism</td><td><em>Klebsiella pneumoniae</em></td></tr><tr><td>Platform</td><td>Illumina NovaSeq 6000</td></tr><tr><td>Read Length</td><td>2 × 150 bp (paired-end)</td></tr><tr><td>Expected Genome</td><td>~5.5 Mb</td></tr></tbody></table>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>NCBI Accession</td><td>SRR36708862</td></tr><tr><td>Organism</td><td><em>Klebsiella pneumoniae</em></td></tr><tr><td>Platform</td><td>Illumina NextSeq 2000</td></tr><tr><td>Read Length</td><td>2 × 150 bp (paired-end)</td></tr><tr><td>Expected Genome</td><td>~5.5 Mb</td></tr></tbody></table>
 
 <strong>Learning Objectives:</strong>
 <ol><li>Assess raw sequencing data quality</li><li>Trim adapters and low-quality bases</li><li>Assemble reads into contigs</li><li>Evaluate assembly quality</li><li>Screen for antimicrobial resistance genes</li><li>Annotate the genome</li></ol>`,
@@ -1176,7 +1176,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				title: 'Step 2: View Statistics Results',
 				text: `Now let's view the sequencing statistics we just generated.`,
 				command: 'cat o1_seqkit.stats',
-				explanation: 'The cat command displays file contents. We can see ~2 million paired-end reads totaling ~600 Mb, sufficient for bacterial genome assembly.',
+				explanation: 'The data were sequenced as 2×150 bp paired-end on Illumina NextSeq 2000, and the apparent ~300 bp read length arises from overlapping R1 and R2 reads. This overlap occurs during post-run processing and FASTQ reconstruction by SRA tools (e.g., fasterq-dump) when the library insert size is short.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
 					{ name: 'cat', desc: 'Concatenate and display file contents' },
