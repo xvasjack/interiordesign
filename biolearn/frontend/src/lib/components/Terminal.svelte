@@ -745,6 +745,16 @@ Starting Unicycler v0.5.0
 \x1b[36mPerforming SPAdes assembly...\x1b[0m
   k=27, k=47, k=63, k=77, k=89, k=99, k=127
 
+\x1b[1mCreating loop unrolling bridges\x1b[0m
+-----------------------------------------------------
+    When a SPAdes contig path connects an anchor contig with the middle contig
+    of a simple loop, Unicycler concludes that the sequences are contiguous.
+
+                                  Loop count   Loop count    Loop    Bridge
+Start   Repeat   Middle     End    by repeat    by middle   count   quality
+    2      137       99      20         0.37         0.79       1      34.9
+
+
 \x1b[1mApplying bridges\x1b[0m
 --------------------------------------
     Unicycler now applies to the graph in decreasing order of quality.
@@ -753,8 +763,21 @@ Bridge type   Start -> end   Path                                       Quality
 SPAdes          25 -> 14                                                 63.243
 SPAdes          13 -> -24    114                                         63.240
 SPAdes          18 -> 39     -152                                        63.226
+SPAdes           3 -> -14    114                                         63.157
 SPAdes          37 -> 45     -109, 180, 139                              41.806
 SPAdes          16 -> 54     172                                         33.902
+SPAdes         -40 -> 42     -95, -205, -92, -258, 144                   27.855
+SPAdes          19 -> 38     -120, 224, 116, -197, -168, -244, -165,     20.865
+                             -132, -151, -259, -158, -183, -142
+SPAdes          -5 -> 10     142, 182, 158, 242, 151, -131, 165,         20.721
+                             -236, 168, 196, -116, 223, 120
+SPAdes          40 -> 44     111, 80, -139, 179, 109                     19.855
+SPAdes          -7 -> 25     153, -240, -121, -62, -155, 108, 154        14.885
+SPAdes         -11 -> 12     -154, 107, 155, 63, 121, -235, -153         14.862
+SPAdes          39 -> 31     -150, 96, 169, -91, -113, -77, -148,        14.257
+                             -104, -146
+SPAdes           9 -> 15     -150, -97, 169, -90, -113, 76, -148,        14.237
+                             -105, -146
 loop             2 -> 20     137, 99, 137                                34.907
 
 Saving assembly/004_bridges_applied.gfa
@@ -763,47 +786,48 @@ Saving assembly/004_bridges_applied.gfa
 \x1b[1mBridged assembly graph\x1b[0m
 --------------------------------------------
     The assembly is now mostly finished and no more structural changes will be made.
+    Ideally the assembly graph should now have one contig per replicon and no
+    erroneous contigs (i.e. a complete assembly).
 
 Saving assembly/005_final_clean.gfa
 
-Component   Segments   Links   Length        N50         Longest segment   Status
-    total          4       4   5,566,069   5,358,379         5,358,379
-        1          1       1   5,358,379   5,358,379         5,358,379     complete
-        2          1       1     195,434     195,434           195,434     complete
-        3          1       1       7,847       7,847             7,847     complete
-        4          1       1       4,409       4,409             4,409     complete
+Component   Segments   Links   Length        N50       Longest segment   Status
+    total        189     264   5,566,069   371,705           837,178
+        1        186     261   5,553,813   371,705           837,178   incomplete
+        2          1       1       5,409     5,409             5,409     complete
+        3          1       1       4,315     4,315             4,315     complete
+        4          1       1       2,532     2,532             2,532     complete
 
 
 \x1b[1mRotating completed replicons\x1b[0m
 --------------------------------------------------
-    Searching for starting genes (dnaA or repA) in circular contigs.
+    Any completed circular contigs can have their start position changed without
+    altering the sequence. Unicycler searches for a starting gene (dnaA or repA).
 
-Segment   Length      Depth    Starting gene   Position   Strand   Identity   Coverage
-      1   5,358,379   1.00x    dnaA            1          +        99.8%      100.0%
-      2     195,434   2.34x    repA            1          +        98.5%      100.0%
-      3       7,847   4.12x    none found
-      4       4,409   3.89x    none found
+Segment   Length   Depth    Starting gene   Position   Strand   Identity   Coverage
+     33    5,409    3.90x   none found
+     35    4,315   17.66x   none found
+     41    2,532   19.88x   none found
 
 \x1b[1;32mAssembly complete!\x1b[0m
 
 \x1b[33mTip: Use 'bandage image assembly.gfa assembly_graph.png' to visualize the assembly graph\x1b[0m
 `,
 				summary: {
-					'Total Segments': '4',
+					'Total Segments': '189',
 					'Total Length': '5,566,069 bp',
-					'Chromosome': '5,358,379 bp (complete)',
-					'Plasmid 1': '195,434 bp (complete)',
-					'Plasmid 2': '7,847 bp (complete)',
-					'Plasmid 3': '4,409 bp (complete)',
-					'N50': '5,358,379 bp',
-					'Status': '4/4 complete'
+					'N50': '371,705 bp',
+					'Longest Segment': '837,178 bp',
+					'Complete Replicons': '3 (plasmids)',
+					'Incomplete': '1 (chromosome)',
+					'Status': 'Assembly incomplete'
 				},
 				chartData: {
-					title: 'Contig Length Distribution',
-					x: ['Chromosome', 'Plasmid 1', 'Plasmid 2', 'Plasmid 3'],
-					y: [5358379, 195434, 7847, 4409],
+					title: 'Component Length Distribution',
+					x: ['Chromosome (incomplete)', 'Plasmid 1', 'Plasmid 2', 'Plasmid 3'],
+					y: [5553813, 5409, 4315, 2532],
 					type: 'bar',
-					xLabel: 'Contig',
+					xLabel: 'Component',
 					yLabel: 'Length (bp)'
 				},
 				files: [
