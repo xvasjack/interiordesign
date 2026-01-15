@@ -632,17 +632,7 @@ ${file2.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.
   Q20 bases:       ${isLongRead ? '99.8' : '97.2'}%
   Q30 bases:       ${isLongRead ? '98.2' : '93.8'}%
 `,
-				summary: {
-					'Forward Reads (R1)': file1,
-					'Reverse Reads (R2)': file2,
-					'Reads per File': totalReads.toLocaleString(),
-					'Total Read Pairs': totalReads.toLocaleString(),
-					'Total Bases': `${(totalBasesAll / 1000000).toFixed(1)} Mb`,
-					'Avg Read Length': `${readLength.toLocaleString()} bp`,
-					'GC Content': `${gcContent}%`,
-					'Q20 Bases': isLongRead ? '99.8%' : '97.2%',
-					'Q30 Bases': isLongRead ? '98.2%' : '93.8%'
-				},
+				summary: undefined,
 				files: []
 			},
 			'fastqc': {
