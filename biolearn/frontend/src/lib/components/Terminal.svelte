@@ -614,6 +614,12 @@
 		const file2 = inputFile.replace('_R1', '_R2').replace('_1.fastq', '_2.fastq');
 		const totalBasesAll = totalBases * 2;
 
+		// Trimmomatic results (consistent with input reads)
+		const trimBothSurviving = Math.round(totalReads * 0.9744);
+		const trimForwardOnly = Math.round(totalReads * 0.0141);
+		const trimReverseOnly = Math.round(totalReads * 0.0081);
+		const trimDropped = totalReads - trimBothSurviving - trimForwardOnly - trimReverseOnly;
+
 		const outputs: Record<string, any> = {
 			'seqkit': {
 				output: `\x1b[32m[INFO]\x1b[0m Processing files...
@@ -697,30 +703,29 @@ Analysis complete for ${file2}
 				]
 			},
 			'trimmomatic': {
-				// Fixed math: 2,456,789 = 2,394,012 + 34,567 + 19,876 + 8,334 = 2,456,789 ✓
 				output: `TrimmomaticPE: Started with arguments:
- -phred33 ${sampleName}_R1.fastq.gz ${sampleName}_R2.fastq.gz ...
+ -phred33 ${file1} ${file2} ...
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 ILLUMINACLIP: Using 1 prefix pairs, 2 forward/reverse sequences
 Quality encoding detected as phred33
-Input Read Pairs: 2,456,789
-  Both Surviving: 2,394,012 (97.44%)
-  Forward Only Surviving: 34,567 (1.41%)
-  Reverse Only Surviving: 19,876 (0.81%)
-  Dropped: 8,334 (0.34%)
+Input Read Pairs: ${totalReads.toLocaleString()}
+  Both Surviving: ${trimBothSurviving.toLocaleString()} (97.44%)
+  Forward Only Surviving: ${trimForwardOnly.toLocaleString()} (1.41%)
+  Reverse Only Surviving: ${trimReverseOnly.toLocaleString()} (0.81%)
+  Dropped: ${trimDropped.toLocaleString()} (0.34%)
 TrimmomaticPE: Completed successfully
 `,
 				summary: {
-					'Input Reads': '2,456,789 pairs',
-					'Both Surviving': '2,394,012 (97.44%)',
-					'Forward Only': '34,567 (1.41%)',
-					'Reverse Only': '19,876 (0.81%)',
-					'Dropped': '8,334 (0.34%)'
+					'Input Reads': `${totalReads.toLocaleString()} pairs`,
+					'Both Surviving': `${trimBothSurviving.toLocaleString()} (97.44%)`,
+					'Forward Only': `${trimForwardOnly.toLocaleString()} (1.41%)`,
+					'Reverse Only': `${trimReverseOnly.toLocaleString()} (0.81%)`,
+					'Dropped': `${trimDropped.toLocaleString()} (0.34%)`
 				},
 				chartData: {
 					title: 'Trimmomatic Read Retention',
 					x: ['Both Surviving', 'Forward Only', 'Reverse Only', 'Dropped'],
-					y: [2394012, 34567, 19876, 8334],
+					y: [trimBothSurviving, trimForwardOnly, trimReverseOnly, trimDropped],
 					type: 'bar',
 					xLabel: 'Read Category',
 					yLabel: 'Number of Reads'
@@ -752,8 +757,8 @@ Starting Unicycler v0.5.0
   Samtools: 1.17 ✓
 
 \x1b[36mLoading reads...\x1b[0m
-  Forward reads: 2,394,012
-  Reverse reads: 2,394,012
+  Forward reads: ${trimBothSurviving.toLocaleString()}
+  Reverse reads: ${trimBothSurviving.toLocaleString()}
 
 \x1b[36mPerforming SPAdes assembly...\x1b[0m
   k=27: 1,234 contigs
