@@ -892,30 +892,17 @@ Loading assembly graph: assembly.gfa
 \x1b[32m✓ Analysis complete\x1b[0m
 `,
 				summary: {
-					'Nodes': '189',
-					'Edges': '243',
-					'Components': '4',
-					'Circular Contigs': '3',
-					'Dead Ends': '6',
-					'Layout': 'Force-directed',
-					'Quality': 'Good (3 complete plasmids, fragmented chromosome)'
+					'Nodes (Contigs)': '189 segments in assembly graph',
+					'Edges (Links)': '243 connections between contigs',
+					'Components': '4 (1 chromosome + 3 plasmids)',
+					'Circular Contigs': '3 complete plasmids (no dead ends)',
+					'Dead Ends': '6 (from fragmented chromosome)',
+					'Interpretation': 'The 189 nodes match the 189 contigs, the 243 edges reflect links between contigs in the assembly graph, and the 6 dead ends are expected from the fragmented chromosome, while the 3 complete plasmids appear as small circular components with no dead ends.'
 				},
 				chartData: {
 					title: 'Assembly Graph Visualization',
-					type: 'assemblyGraph',
-					components: [
-						{ name: 'Chromosome', size: 5124832, circular: false, segments: 183, color: '#3b82f6' },
-						{ name: 'Plasmid pKPN1', size: 231456, circular: true, segments: 3, color: '#10b981' },
-						{ name: 'Plasmid pKPN2', size: 112847, circular: true, segments: 2, color: '#f59e0b' },
-						{ name: 'Plasmid pKPN3', size: 83930, circular: true, segments: 1, color: '#ef4444' }
-					],
-					graphStats: {
-						totalNodes: 189,
-						totalEdges: 243,
-						circular: 3,
-						deadEnds: 6,
-						quality: 'good'
-					}
+					type: 'image',
+					imagePath: '/images/assembly_graph.png'
 				},
 				files: [
 					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' }
