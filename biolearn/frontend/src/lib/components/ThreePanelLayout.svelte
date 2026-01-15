@@ -213,7 +213,26 @@
 		} else if (content) {
 			alert(`File: ${file.name}\n\n${content}`);
 		} else if (file.type === 'png') {
-			alert(`${file.name}\n\nImage preview not available in training mode.`);
+			// Open image in new window
+			const newWindow = window.open('', '_blank', 'width=1200,height=900');
+			if (newWindow) {
+				newWindow.document.write(`
+					<!DOCTYPE html>
+					<html>
+					<head>
+						<title>${file.name}</title>
+						<style>
+							body { margin: 0; padding: 20px; background: #1a1a2e; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+							img { max-width: 100%; max-height: 90vh; object-fit: contain; }
+						</style>
+					</head>
+					<body>
+						<img src="/images/${file.name}" alt="${file.name}" />
+					</body>
+					</html>
+				`);
+				newWindow.document.close();
+			}
 		} else {
 			alert(`${file.name}\n\nThis is a simulated file in the training environment.`);
 		}

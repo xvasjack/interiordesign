@@ -494,8 +494,8 @@
 						<dl class="grid grid-cols-2 gap-4">
 							{#each Object.entries(currentOutput.summary) as [key, value]}
 								<div>
-									<dt class="text-sm text-gray-500">{key}</dt>
-									<dd class="text-lg font-semibold text-gray-800">{value}</dd>
+									<dt class="text-sm font-semibold text-gray-800">{key}</dt>
+									<dd class="text-base text-gray-600">{value}</dd>
 								</div>
 							{/each}
 						</dl>
