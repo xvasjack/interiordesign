@@ -672,7 +672,7 @@ Analysis complete for ${file2}
 				summary: {
 					'FastQC Reports': '8 samples',
 					'Mean Quality Score': '34.2',
-					'Mean GC Content': '52.1%',
+					'Mean GC Content': '55.2%',
 					'Samples Passing': '8/8 (100%)',
 					'Adapter Content': 'Low (<5%)',
 					'Report Generated': 'multiqc_report.html'
@@ -776,7 +776,7 @@ Final assembly:
   Total length: 4,987,390 bp
   Largest contig: 4,892,156 bp
   N50: 4,892,156 bp
-  GC content: 52.3%
+  GC content: 55.2%
 
 \x1b[33mTip: Use 'bandage image assembly.gfa assembly_graph.png' to visualize the assembly graph\x1b[0m
 `,
@@ -785,7 +785,7 @@ Final assembly:
 					'Total Length': '4,987,390 bp',
 					'Largest Contig': '4,892,156 bp',
 					'N50': '4,892,156 bp',
-					'GC Content': '52.3%',
+					'GC Content': '55.2%',
 					'Circular': '2 (chromosome + plasmid)'
 				},
 				chartData: {
@@ -860,7 +860,7 @@ Loading assembly graph: assembly.gfa
 \x1b[36mCalculating assembly metrics...\x1b[0m
   N50: 4,892,156 bp
   L50: 1
-  GC content: 52.3%
+  GC content: 55.2%
   Largest contig: 4,892,156 bp
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
@@ -871,7 +871,7 @@ Loading assembly graph: assembly.gfa
   # contigs:          2
   Largest contig:     4,892,156 bp
   Total length:       4,987,390 bp
-  GC (%):             52.3
+  GC (%):             55.2
   N50:                4,892,156 bp
   L50:                1
 
@@ -884,7 +884,7 @@ Loading assembly graph: assembly.gfa
 					'Largest Contig': '4,892,156 bp',
 					'N50': '4,892,156 bp',
 					'L50': '1',
-					'GC Content': '52.3%',
+					'GC Content': '55.2%',
 					'Quality': 'EXCELLENT'
 				},
 				chartData: {
@@ -1031,7 +1031,7 @@ Loading assembly graph: assembly.gfa
   Genome size: 4,987,390 bp
   # contigs: 2
   N50: 4,892,156 bp
-  GC: 52.3%
+  GC: 55.2%
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  QUALITY ASSESSMENT RESULTS\x1b[0m
