@@ -3462,8 +3462,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 			if (command === 'bandage') {
 				if (!args.includes('image')) {
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa assembly/assembly_graph.png\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa assembly/assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3471,7 +3471,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const gfaFile = args.find(a => a.endsWith('.gfa'));
 				if (!gfaFile) {
 					terminal.writeln(`\x1b[31mError: Missing .gfa file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa assembly/assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3485,15 +3485,15 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const pngFile = args.find(a => a.endsWith('.png'));
 				if (!pngFile) {
 					terminal.writeln(`\x1b[31mError: Missing output .png file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa assembly/assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				// Enforce exact output file name (must be in assembly/ folder)
-				if (pngFile !== 'assembly/assembly_graph.png') {
+				// Enforce exact output file name
+				if (pngFile !== 'assembly_graph.png') {
 					terminal.writeln(`\x1b[31mError: Invalid output file name '${pngFile}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: assembly/assembly_graph.png\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa assembly/assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: assembly_graph.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa assembly_graph.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
