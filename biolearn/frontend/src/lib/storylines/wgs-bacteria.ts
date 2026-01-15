@@ -1237,7 +1237,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 6: Visualize Assembly Graph',
 				text: `Create a visual representation of the assembly graph to understand genome structure.`,
-				command: 'bandage image assembly/assembly.gfa assembly_graph.png',
+				command: 'bandage image assembly/assembly.gfa o_bandage.png',
 				explanation: 'Bandage visualizes the assembly graph showing how contigs connect.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
