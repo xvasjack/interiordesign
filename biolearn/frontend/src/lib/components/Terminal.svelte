@@ -666,7 +666,7 @@ Analysis complete for ${file2}
 					'R2 Total Sequences': totalReads.toLocaleString(),
 					'R1 Quality': 'PASS',
 					'R2 Quality': 'PASS',
-					'Sequence Length': isLongRead ? `${minLen}-${maxLen} bp` : '150 bp',
+					'Avg Read Length': `${readLength} bp`,
 					'GC Content': `${gcContent}%`,
 					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`
 				},
