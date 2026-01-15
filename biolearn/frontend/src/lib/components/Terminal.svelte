@@ -668,7 +668,7 @@ Analysis complete for ${file2}
 					'R2 Quality': 'PASS',
 					'Avg Read Length': `${readLength} bp`,
 					'GC Content': `${gcContent}%`,
-					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`
+					'Adapter Content': 'Negligible'
 				},
 				chartData: undefined,
 				files: []
