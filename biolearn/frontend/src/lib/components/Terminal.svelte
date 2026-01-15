@@ -868,7 +868,7 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 				output: `\x1b[36mBandage v0.8.1\x1b[0m
 Loading assembly graph: assembly.gfa
   Nodes loaded: 189
-  Edges loaded: 247
+  Edges loaded: 243
 
 \x1b[36mGenerating visualization...\x1b[0m
   Layout algorithm: Force-directed
@@ -881,10 +881,10 @@ Loading assembly graph: assembly.gfa
   Connected components: 4
   Largest component: Chromosome (5.12 Mb, 183 segments)
   Circular contigs: 3
-  Dead ends: 12
+  Dead ends: 6
 
 \x1b[33mComponent Details:\x1b[0m
-  1. Chromosome:  5,124,832 bp (183 segments, 12 dead ends)
+  1. Chromosome:  5,124,832 bp (183 segments, 6 dead ends)
   2. Plasmid pKPN1: 231,456 bp (3 segments, circular)
   3. Plasmid pKPN2: 112,847 bp (2 segments, circular)
   4. Plasmid pKPN3:  83,930 bp (1 segment, circular)
@@ -893,10 +893,10 @@ Loading assembly graph: assembly.gfa
 `,
 				summary: {
 					'Nodes': '189',
-					'Edges': '247',
+					'Edges': '243',
 					'Components': '4',
 					'Circular Contigs': '3',
-					'Dead Ends': '12',
+					'Dead Ends': '6',
 					'Layout': 'Force-directed',
 					'Quality': 'Good (3 complete plasmids, fragmented chromosome)'
 				},
@@ -911,9 +911,9 @@ Loading assembly graph: assembly.gfa
 					],
 					graphStats: {
 						totalNodes: 189,
-						totalEdges: 247,
+						totalEdges: 243,
 						circular: 3,
-						deadEnds: 12,
+						deadEnds: 6,
 						quality: 'good'
 					}
 				},
