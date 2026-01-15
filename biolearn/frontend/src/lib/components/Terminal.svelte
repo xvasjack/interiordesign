@@ -593,18 +593,18 @@
 		const isNanopore = inputFile.includes('_nanopore');
 		const isLongRead = isHiFi || isNanopore;
 
-		// Realistic bacterial sequencing stats (~5 Mb genome, 60-100x coverage)
+		// Realistic bacterial sequencing stats (~5 Mb genome, 50-100x coverage)
 		// HiFi: ~30k reads × 15kb = ~450 Mb (90x coverage)
 		// Nanopore: ~80k reads × 8kb = ~640 Mb (128x coverage)
-		// Illumina: ~2.8M reads × 150bp avg = ~427 Mb (85x coverage)
-		const baseReads = isHiFi ? 32456 : (isNanopore ? 78234 : 2847293);
+		// Illumina: ~990k reads × 271bp avg = ~268 Mb (54x coverage)
+		const baseReads = isHiFi ? 32456 : (isNanopore ? 78234 : 990478);
 		const sampleVariation = parseInt(sampleNum) * 1234;
 		const totalReads = baseReads + (sampleVariation % 5000);
 		const gcContent = isR2 ? 54.8 : 55.2;
 		const adapterPercent = isR2 ? 2.8 : 3.2;
 
 		// Read length varies by technology
-		const readLength = isHiFi ? 14523 : (isNanopore ? 8234 : 150);
+		const readLength = isHiFi ? 14523 : (isNanopore ? 8234 : 271);
 		const minLen = isHiFi ? 1234 : (isNanopore ? 456 : 35);
 		const maxLen = isHiFi ? 45678 : (isNanopore ? 32456 : 301);
 		const totalBases = totalReads * readLength;
@@ -4705,11 +4705,11 @@ Annotation identified 4,523 coding sequences.
 ...`,
 		// SeqKit stats output
 		'o1_seqkit.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
-SRR36708862_1.fastq.gz     FASTQ   DNA   2,847,293  427,093,950       35      150      301
-SRR36708862_2.fastq.gz     FASTQ   DNA   2,847,293  427,093,950       35      150      301`,
+SRR36708862_1.fastq.gz     FASTQ   DNA     990,478  268,416,273       35      271      301
+SRR36708862_2.fastq.gz     FASTQ   DNA     990,478  268,449,364       35      271      301`,
 		'.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
-sample_01_R1.fastq.gz      FASTQ   DNA   2,847,293  427,093,950       35      150      301
-sample_01_R2.fastq.gz      FASTQ   DNA   2,847,293  427,093,950       35      150      301`
+sample_01_R1.fastq.gz      FASTQ   DNA     990,478  268,416,273       35      271      301
+sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      271      301`
 	};
 
 	function handleFileView(cmd: string, args: string[]) {
