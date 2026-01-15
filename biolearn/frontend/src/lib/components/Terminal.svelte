@@ -651,15 +651,16 @@ Analysis complete for ${file2}
 `,
 				summary: {
 					'Forward Reads (R1)': file1,
-					'R1 Total Sequences': totalReads.toLocaleString(),
-					'R1 Quality': 'PASS',
 					'Reverse Reads (R2)': file2,
+					'R1 Total Sequences': totalReads.toLocaleString(),
 					'R2 Total Sequences': totalReads.toLocaleString(),
+					'R1 Quality': 'PASS',
 					'R2 Quality': 'PASS',
 					'Sequence Length': isLongRead ? `${minLen}-${maxLen} bp` : '150 bp',
 					'GC Content': `${gcContent}%`,
 					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`
 				},
+				chartData: undefined,
 				files: []
 			},
 			'multiqc': {
