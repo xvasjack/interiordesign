@@ -179,8 +179,20 @@
 	async function renderChart(data: any) {
 		if (!plotContainer || !data?.chartData) return;
 
-		const Plotly = await import('plotly.js-dist-min');
 		const chartData = data.chartData;
+
+		// Handle image type - display image directly instead of using Plotly
+		if (chartData.type === 'image') {
+			plotContainer.innerHTML = `
+				<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 1rem;">
+					<h3 style="font-size: 1rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem;">${chartData.title || 'Image'}</h3>
+					<img src="${chartData.imagePath}" alt="${chartData.title || 'Chart'}" style="max-width: 100%; max-height: calc(100% - 3rem); object-fit: contain; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />
+				</div>
+			`;
+			return;
+		}
+
+		const Plotly = await import('plotly.js-dist-min');
 
 		let traces: any[] = [];
 		let layout: any = {
