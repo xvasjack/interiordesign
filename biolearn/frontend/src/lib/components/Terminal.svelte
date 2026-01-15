@@ -905,7 +905,7 @@ Loading assembly graph: assembly.gfa
 					imagePath: '/images/o_bandage.png'
 				},
 				files: [
-					{ name: 'assembly_graph.png', type: 'png', size: '1.8 MB' }
+					{ name: 'o_bandage.png', type: 'png', size: '1.8 MB' }
 				]
 			},
 			'quast': {
