@@ -151,7 +151,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'GC Content Interpretation',
-			description: '52.3% GC is typical for Klebsiella pneumoniae (range: 50-58%). Matching expected GC suggests correct organism and no major contamination.',
+			description: '55.2% GC is typical for Klebsiella pneumoniae (range: 50-58%). Matching expected GC suggests correct organism and no major contamination.',
 		}
 	],
 	'bandage': [
