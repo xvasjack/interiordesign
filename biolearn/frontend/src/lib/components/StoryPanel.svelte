@@ -109,8 +109,17 @@
 
 	// Check if user can proceed to next step
 	function canProceed(stepIndex: number): boolean {
+		if (stepIndex <= 1) return true;
+
+		// Always check if the previous step (current step) is a task that needs completion
+		const prevStepIndex = stepIndex - 1;
+		const prevSection = activeStoryline.sections[prevStepIndex];
+		if (prevSection?.type === 'task' && !completedSteps.has(prevStepIndex)) {
+			return false;
+		}
+
 		const section = activeStoryline.sections[stepIndex];
-		// Phase headers and non-task sections don't need completion
+		// Phase headers and non-task sections don't need completion themselves
 		if (section?.type === 'phase' || section?.type === 'intro' || section?.type === 'context' || section?.type === 'complete' || section?.type === 'alert' || section?.type === 'image') {
 			return true;
 		}
@@ -118,13 +127,7 @@
 		if (section?.type === 'decision') {
 			return selectedDecision !== null;
 		}
-		if (stepIndex <= 1) return true;
-		// For task steps, check if previous task step is completed
-		const prevTaskIndex = stepIndex - 1;
-		if (prevTaskIndex <= 1) return true;
-		const prevSection = activeStoryline.sections[prevTaskIndex];
-		if (prevSection?.type !== 'task') return true;
-		return completedSteps.has(prevTaskIndex);
+		return true;
 	}
 
 	function nextStep() {
