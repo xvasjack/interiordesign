@@ -184,6 +184,10 @@
 			// Trial/Demo scenario
 			'/data/kpneumoniae_demo': ['assembly/'],
 			'/data/kpneumoniae_demo/assembly': [
+				'001_spades_graph_k027.gfa', '001_spades_graph_k053.gfa', '001_spades_graph_k071.gfa',
+				'001_spades_graph_k087.gfa', '001_spades_graph_k099.gfa', '001_spades_graph_k111.gfa',
+				'001_spades_graph_k119.gfa', '001_spades_graph_k127.gfa', '002_depth_filter.gfa',
+				'003_overlaps_removed.gfa', '004_bridges_applied.gfa', '005_final_clean.gfa',
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
 			],
 			'/data/outbreak_investigation': ['assembly/'],
@@ -191,12 +195,24 @@
 				'patient_01/', 'patient_02/', 'patient_03/'
 			],
 			'/data/outbreak_investigation/assembly/patient_01': [
+				'001_spades_graph_k027.gfa', '001_spades_graph_k053.gfa', '001_spades_graph_k071.gfa',
+				'001_spades_graph_k087.gfa', '001_spades_graph_k099.gfa', '001_spades_graph_k111.gfa',
+				'001_spades_graph_k119.gfa', '001_spades_graph_k127.gfa', '002_depth_filter.gfa',
+				'003_overlaps_removed.gfa', '004_bridges_applied.gfa', '005_final_clean.gfa',
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
 			],
 			'/data/outbreak_investigation/assembly/patient_02': [
+				'001_spades_graph_k027.gfa', '001_spades_graph_k053.gfa', '001_spades_graph_k071.gfa',
+				'001_spades_graph_k087.gfa', '001_spades_graph_k099.gfa', '001_spades_graph_k111.gfa',
+				'001_spades_graph_k119.gfa', '001_spades_graph_k127.gfa', '002_depth_filter.gfa',
+				'003_overlaps_removed.gfa', '004_bridges_applied.gfa', '005_final_clean.gfa',
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
 			],
 			'/data/outbreak_investigation/assembly/patient_03': [
+				'001_spades_graph_k027.gfa', '001_spades_graph_k053.gfa', '001_spades_graph_k071.gfa',
+				'001_spades_graph_k087.gfa', '001_spades_graph_k099.gfa', '001_spades_graph_k111.gfa',
+				'001_spades_graph_k119.gfa', '001_spades_graph_k127.gfa', '002_depth_filter.gfa',
+				'003_overlaps_removed.gfa', '004_bridges_applied.gfa', '005_final_clean.gfa',
 				'assembly.fasta', 'assembly.gfa', 'unicycler.log'
 			]
 		},
@@ -831,9 +847,21 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 					yLabel: 'Length (bp)'
 				},
 				files: [
+					{ name: '001_spades_graph_k027.gfa', type: 'gfa', size: '1.2 MB' },
+					{ name: '001_spades_graph_k053.gfa', type: 'gfa', size: '2.1 MB' },
+					{ name: '001_spades_graph_k071.gfa', type: 'gfa', size: '2.8 MB' },
+					{ name: '001_spades_graph_k087.gfa', type: 'gfa', size: '3.2 MB' },
+					{ name: '001_spades_graph_k099.gfa', type: 'gfa', size: '3.5 MB' },
+					{ name: '001_spades_graph_k111.gfa', type: 'gfa', size: '3.8 MB' },
+					{ name: '001_spades_graph_k119.gfa', type: 'gfa', size: '4.0 MB' },
+					{ name: '001_spades_graph_k127.gfa', type: 'gfa', size: '4.2 MB' },
+					{ name: '002_depth_filter.gfa', type: 'gfa', size: '8.5 MB' },
+					{ name: '003_overlaps_removed.gfa', type: 'gfa', size: '7.8 MB' },
+					{ name: '004_bridges_applied.gfa', type: 'gfa', size: '6.2 MB' },
+					{ name: '005_final_clean.gfa', type: 'gfa', size: '5.8 MB' },
 					{ name: 'assembly.fasta', type: 'fasta', size: '5.3 MB' },
-					{ name: 'assembly.gfa', type: 'gfa', size: '14 MB' },
-					{ name: 'unicycler.log', type: 'log', size: '256 KB' }
+					{ name: 'assembly.gfa', type: 'gfa', size: '5.8 MB' },
+					{ name: 'unicycler.log', type: 'log', size: '48 KB' }
 				]
 			},
 			'bandage': {
