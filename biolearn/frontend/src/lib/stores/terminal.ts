@@ -100,7 +100,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Adapter Content',
-			description: 'Adapter sequences appear when read length exceeds insert size. <5% adapter content is acceptable; higher values require trimming before assembly.',
+			description: 'Adapter sequences appear when read length exceeds insert size. <5% adapter content is acceptable; higher values require trimming before assembly. Note: In this tutorial, adapter content is 0% as reads were pre-processed prior to NCBI submission.',
 		},
 		{
 			name: 'FastQC Report',
