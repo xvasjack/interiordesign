@@ -660,31 +660,6 @@ Analysis complete for ${file2}
 					'GC Content': `${gcContent}%`,
 					'Adapter Content': isLongRead ? 'PASS' : `WARNING (${adapterPercent}%)`
 				},
-				chartData: {
-					title: `Per Base Sequence Quality`,
-					datasets: [
-						{
-							label: file1,
-							positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
-							scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
-								const base = isLongRead ? (isHiFi ? 33 : 18) : 32;
-								const seed = (i * 7 + parseInt(sampleNum) * 13) % 100;
-								return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.1 : 0);
-							})
-						},
-						{
-							label: file2,
-							positions: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => isLongRead ? i * 100 : i + 1),
-							scores: Array.from({ length: isLongRead ? 100 : 150 }, (_, i) => {
-								const base = isLongRead ? (isHiFi ? 33 : 18) : 31;
-								const seed = (i * 7 + parseInt(sampleNum) * 17) % 100;
-								return base + (seed / 100) * (isLongRead ? 3 : 6) - (i > (isLongRead ? 80 : 130) ? (i - (isLongRead ? 80 : 130)) * 0.12 : 0);
-							})
-						}
-					],
-					xLabel: 'Position in read (bp)',
-					yLabel: 'Quality Score (Phred)'
-				},
 				files: []
 			},
 			'multiqc': {
