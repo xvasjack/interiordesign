@@ -1296,12 +1296,12 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 10: AMR Gene Detection',
 				text: `Screen the assembly for antimicrobial resistance genes using multiple databases.`,
-				command: 'abricate --db ncbi assembly/assembly.fasta > abricate_output/amr_ncbi.tab',
+				command: 'abricate --db ncbi o_unicycler/assembly.fasta -o o_abricate/',
 				explanation: 'ABRicate rapidly screens for resistance genes against curated databases.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
 					{ name: '--db ncbi', desc: 'Use NCBI AMRFinder database' },
-					{ name: '>', desc: 'Redirect output to file' }
+					{ name: '-o', desc: 'Output directory' }
 				]
 			},
 			{

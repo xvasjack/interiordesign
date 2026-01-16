@@ -259,9 +259,9 @@
 		},
 		'abricate': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['abricate_output/'],
-			'/data/kpneumoniae_demo/abricate_output': [
-				'amr_ncbi.tab', 'amr_resfinder.tab', 'amr_card.tab', 'amr_summary.tab'
+			'/data/kpneumoniae_demo': ['o_abricate/'],
+			'/data/kpneumoniae_demo/o_abricate': [
+				'abricate_report.tsv', 'abricate_summary.txt'
 			],
 			'/data/outbreak_investigation': ['abricate_results/'],
 			'/data/outbreak_investigation/abricate_results': [
@@ -860,7 +860,7 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 					'Longest Segment': '837,178 bp',
 					'Complete (circular)': '3 components',
 					'Incomplete': '1 component (186 segments)',
-					'Status': 'Assembly mostly complete'
+					'Status': 'incomplete'
 				},
 				chartData: {
 					title: 'Component Length Distribution',
