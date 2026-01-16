@@ -391,6 +391,11 @@
 			]
 		},
 		'plasmidfinder': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['plasmidfinder_output/'],
+			'/data/kpneumoniae_demo/plasmidfinder_output': [
+				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
+			],
 			'/data/outbreak_investigation': ['plasmidfinder_results/'],
 			'/data/outbreak_investigation/plasmidfinder_results': [
 				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
@@ -898,25 +903,28 @@ Loading assembly graph: assembly.gfa
 
 \x1b[33mGraph Statistics:\x1b[0m
   Connected components: 4
-  Largest component: Chromosome (5.12 Mb, 183 segments)
+  Largest component: 5.55 Mb (186 segments)
   Circular contigs: 3
   Dead ends: 6
 
 \x1b[33mComponent Details:\x1b[0m
-  1. Chromosome:  5,124,832 bp (183 segments, 6 dead ends)
-  2. Plasmid pKPN1: 231,456 bp (3 segments, circular)
-  3. Plasmid pKPN2: 112,847 bp (2 segments, circular)
-  4. Plasmid pKPN3:  83,930 bp (1 segment, circular)
+  1. Component 1: 5,553,813 bp (186 segments, 6 dead ends) - incomplete
+  2. Component 2:     5,409 bp (1 segment, circular) - complete
+  3. Component 3:     4,315 bp (1 segment, circular) - complete
+  4. Component 4:     2,532 bp (1 segment, circular) - complete
+
+\x1b[33mNote:\x1b[0m Large incomplete component is likely the chromosome.
+      Small circular components may be plasmids - use PlasmidFinder to confirm.
 
 \x1b[32m✓ Analysis complete\x1b[0m
 `,
 				summary: {
 					'Nodes (Contigs)': '189 segments in assembly graph',
 					'Edges (Links)': '243 connections between contigs',
-					'Components': '4 (1 chromosome + 3 plasmids)',
-					'Circular Contigs': '3 complete plasmids (no dead ends)',
-					'Dead Ends': '6 (from fragmented chromosome)',
-					'Interpretation': 'The 189 nodes match the 189 contigs, the 243 edges reflect links between contigs in the assembly graph, and the 6 dead ends are expected from the fragmented chromosome, while the 3 complete plasmids appear as small circular components with no dead ends.'
+					'Components': '4 total (1 large incomplete + 3 small circular)',
+					'Circular Contigs': '3 (complete assemblies)',
+					'Dead Ends': '6 (from incomplete component)',
+					'Interpretation': 'The 189 nodes match the 189 contigs from the assembly. The 6 dead ends indicate the large component is fragmented (likely chromosome). The 3 small circular components may be plasmids - use PlasmidFinder to identify replicon types.'
 				},
 				chartData: {
 					title: 'Assembly Graph Visualization',
@@ -1882,31 +1890,40 @@ Thank you for using QUAST!
 \x1b[1;32m  PLASMIDFINDER RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  \x1b[33mReplicons detected: 2\x1b[0m
+  \x1b[33mReplicons detected: 3\x1b[0m
 
-  1. IncFIB(K)
-     Identity: 98.56%
+  1. ColRNAI
+     Identity: 99.45%
      Coverage: 100%
-     Contig: contig_2 (95,234 bp)
+     Contig: contig_188 (5,409 bp)
 
-  2. IncFII(K)
-     Identity: 99.12%
+  2. Col(pHAD28)
+     Identity: 98.23%
      Coverage: 100%
-     Contig: contig_2 (95,234 bp)
+     Contig: contig_189 (4,315 bp)
 
-\x1b[31m⚠ IncF plasmids are associated with high AMR gene carriage\x1b[0m
+  3. Col156
+     Identity: 97.89%
+     Coverage: 98%
+     Contig: contig_190 (2,532 bp)
+
+\x1b[33mNote:\x1b[0m Col-type plasmids are small, mobilizable plasmids commonly found
+      in Enterobacteriaceae. They may carry colicin or other bacteriocin genes.
+
+\x1b[32m✓ Plasmid identification complete\x1b[0m
 `,
 				summary: {
-					'Replicons Found': '2',
-					'IncFIB(K)': '98.56% identity',
-					'IncFII(K)': '99.12% identity',
-					'Plasmid Size': '95,234 bp',
-					'Risk Level': 'High (IncF family)'
+					'Replicons Found': '3',
+					'Plasmid 1': 'ColRNAI (5,409 bp)',
+					'Plasmid 2': 'Col(pHAD28) (4,315 bp)',
+					'Plasmid 3': 'Col156 (2,532 bp)',
+					'Type': 'Small Col-type plasmids',
+					'Clinical Significance': 'Low (no AMR genes typically)'
 				},
 				chartData: {
 					title: 'Replicon Identity',
-					x: ['IncFIB(K)', 'IncFII(K)'],
-					y: [98.56, 99.12],
+					x: ['ColRNAI', 'Col(pHAD28)', 'Col156'],
+					y: [99.45, 98.23, 97.89],
 					type: 'bar',
 					xLabel: 'Replicon',
 					yLabel: 'Identity (%)'
@@ -3297,6 +3314,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'assembly/assembly.fasta', 'polished/consensus.fasta',
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
+		'plasmidfinder': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+		],
 		// Phase 4: Phylogenetics
 		'snippy': [
 			'assembly/assembly.fasta', 'polished/consensus.fasta',
@@ -3372,6 +3393,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		// Phase 3
 		'mob_recon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'platon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'plasmidfinder': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Phase 4
 		'snippy': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'roary': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },

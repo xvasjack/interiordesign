@@ -1121,7 +1121,7 @@ export const storylines: Record<string, Storyline> = {
 		technology: 'illumina',
 		technologyLabel: 'Illumina NextSeq 2000 (2×150bp)',
 		dataDir: '/data/kpneumoniae_demo',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm2', 'abricate', 'mlst', 'prokka'],
+		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm2', 'plasmidfinder', 'abricate', 'mlst', 'prokka'],
 		sections: [
 			{
 				type: 'intro',
@@ -1275,6 +1275,18 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				]
 			},
 			{
+				type: 'task',
+				title: 'Step 9: Plasmid Identification',
+				text: `Identify plasmid replicons in the assembly to confirm which circular components are plasmids.`,
+				command: 'plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_output/',
+				explanation: 'PlasmidFinder searches for known plasmid replicon sequences in the assembly to identify plasmid types.',
+				requiredDir: '/data/kpneumoniae_demo',
+				parameters: [
+					{ name: '-i', desc: 'Input assembly file' },
+					{ name: '-o', desc: 'Output directory' }
+				]
+			},
+			{
 				type: 'phase',
 				title: 'Phase 5: AMR Screening & Typing',
 				text: 'Screen for antimicrobial resistance genes and determine sequence type.',
@@ -1282,7 +1294,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 9: AMR Gene Detection',
+				title: 'Step 10: AMR Gene Detection',
 				text: `Screen the assembly for antimicrobial resistance genes using multiple databases.`,
 				command: 'abricate --db ncbi assembly/assembly.fasta > abricate_output/amr_ncbi.tab',
 				explanation: 'ABRicate rapidly screens for resistance genes against curated databases.',
@@ -1294,7 +1306,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 10: MLST Typing',
+				title: 'Step 11: MLST Typing',
 				text: `Determine the sequence type (ST) for epidemiological classification.`,
 				command: 'mlst assembly/assembly.fasta > mlst_output/mlst_result.tab',
 				explanation: 'MLST identifies the allelic profile of 7 housekeeping genes to assign a sequence type.',
@@ -1311,7 +1323,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'task',
-				title: 'Step 11: Gene Annotation',
+				title: 'Step 12: Gene Annotation',
 				text: `Annotate the genome to identify coding sequences, tRNAs, and rRNAs.`,
 				command: 'prokka --outdir prokka_output/ assembly/assembly.fasta',
 				explanation: 'Prokka performs rapid prokaryotic genome annotation.',
