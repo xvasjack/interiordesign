@@ -845,9 +845,9 @@ Component   Segments   Links   Length        N50       Longest segment   Status
     altering the sequence. Unicycler searches for a starting gene (dnaA or repA).
 
 Segment   Length   Depth    Starting gene   Position   Strand   Identity   Coverage
-     33    5,409    3.90x   none found
-     35    4,315   17.66x   none found
-     41    2,532   19.88x   none found
+     33    5,409    3.90x   none found           -        -          -          -
+     35    4,315   17.66x   none found           -        -          -          -
+     41    2,532   19.88x   none found           -        -          -          -
 
 \x1b[1;32mAssembly complete!\x1b[0m
 
