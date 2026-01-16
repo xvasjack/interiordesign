@@ -557,6 +557,25 @@
 				'mixing_proportions.txt', 'full_results.txt'
 			]
 		},
+		// PacBio HiFi tools
+		'pbmarkdup': {
+			'/data/wastewater_surveillance': ['sample_01_dedup.fastq.gz']
+		},
+		'ccs': {
+			'/data/wastewater_surveillance': ['sample_01_hifi.fastq.gz']
+		},
+		'hifiasm': {
+			'/data/wastewater_surveillance': ['assembly/'],
+			'/data/wastewater_surveillance/assembly': [
+				'assembly.bp.p_ctg.gfa', 'assembly.bp.p_ctg.fasta', 'assembly.bp.a_ctg.gfa'
+			]
+		},
+		'modkit': {
+			'/data/clinical_samples': ['methylation_results/'],
+			'/data/clinical_samples/methylation_results': [
+				'methylation_5mC.bed', 'methylation_6mA.bed', 'summary.txt'
+			]
+		},
 		// R/RMarkdown tools
 		'Rscript': {
 			'/data/wgs_report': [
@@ -2648,6 +2667,211 @@ Gibbs sampling for source tracking...
 					{ name: 'full_results.txt', type: 'txt', size: '156 KB' }
 				]
 			},
+			// PacBio HiFi tools
+			'pbmarkdup': {
+				output: `\x1b[36mpbmarkdup v1.0.2\x1b[0m
+[INFO] Processing HiFi reads for duplicate marking...
+
+\x1b[36mInput:\x1b[0m
+  File: sample_01_hifi.fastq.gz
+  Reads: 456,789
+
+\x1b[36mIdentifying PCR duplicates...\x1b[0m
+  Analyzing read alignment coordinates...
+  Clustering by position and sequence...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  DUPLICATE MARKING RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Total reads: 456,789
+  Unique reads: 451,234 (98.8%)
+  Duplicates: 5,555 (1.2%)
+
+\x1b[32m✓ Duplicates marked successfully\x1b[0m
+\x1b[33mNote: Low duplication rate indicates high library complexity\x1b[0m
+`,
+				summary: {
+					'Total Reads': '456,789',
+					'Unique Reads': '451,234 (98.8%)',
+					'Duplicates': '5,555 (1.2%)',
+					'Library Complexity': 'HIGH',
+					'Status': 'PASS'
+				},
+				chartData: {
+					title: 'Read Duplication',
+					x: ['Unique Reads', 'Duplicates'],
+					y: [451234, 5555],
+					type: 'bar',
+					xLabel: 'Category',
+					yLabel: 'Read Count'
+				},
+				files: [
+					{ name: 'sample_01_dedup.fastq.gz', type: 'fastq', size: '2.8 GB' }
+				]
+			},
+			'ccs': {
+				output: `\x1b[36mccs v6.4.0\x1b[0m
+[INFO] Generating CCS (Circular Consensus Sequences)...
+
+\x1b[36mInput:\x1b[0m
+  Subreads BAM: sample_01.subreads.bam
+  Min passes: 3
+  Min accuracy: 0.99
+
+\x1b[36mProcessing ZMWs...\x1b[0m
+  Total ZMWs: 523,456
+  With >= 3 passes: 478,234 (91.4%)
+
+\x1b[36mGenerating consensus...\x1b[0m
+  Aligning subreads...
+  Calling consensus bases...
+  Computing quality scores...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  CCS GENERATION RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  HiFi reads generated: 456,789
+  Mean read length: 12,456 bp
+  Mean read quality: Q42
+  Mean passes: 8.3
+  Yield: 5.7 Gb
+
+\x1b[32m✓ CCS generation complete\x1b[0m
+\x1b[33mNote: Q42 indicates 99.994% accuracy per base\x1b[0m
+`,
+				summary: {
+					'HiFi Reads': '456,789',
+					'Mean Length': '12,456 bp',
+					'Mean Quality': 'Q42 (99.994%)',
+					'Mean Passes': '8.3',
+					'Total Yield': '5.7 Gb',
+					'Status': 'EXCELLENT'
+				},
+				chartData: {
+					title: 'HiFi Read Quality Distribution',
+					x: ['Q30-Q35', 'Q35-Q40', 'Q40-Q45', 'Q45+'],
+					y: [45678, 156789, 198765, 55557],
+					type: 'bar',
+					xLabel: 'Quality Score Range',
+					yLabel: 'Read Count'
+				},
+				files: [
+					{ name: 'sample_01_hifi.fastq.gz', type: 'fastq', size: '5.7 GB' }
+				]
+			},
+			'hifiasm': {
+				output: `\x1b[36mhifiasm v0.19.5-r593\x1b[0m
+[M::main] Options: -o assembly -t 8
+
+\x1b[36mLoading HiFi reads...\x1b[0m
+  Reads loaded: 456,789
+  Total bases: 5.7 Gb
+
+\x1b[36mBuilding string graph...\x1b[0m
+  [M::hamt_assemble::ha_hist_line] peak coverage: 45
+  [M::hamt_assemble] homozygous read coverage max: 60
+  [M::hamt_assemble] heterozygous read coverage max: 30
+
+\x1b[36mAssembling primary contigs...\x1b[0m
+  [M::hamt_assemble] # primary contigs: 4
+  [M::hamt_assemble] Total primary assembly size: 5,523,456
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  HIFIASM ASSEMBLY RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Primary assembly:
+    Contigs: 4
+    Total length: 5,523,456 bp
+    N50: 4,892,156 bp
+    Largest contig: 4,892,156 bp
+
+  GFA files generated:
+    - assembly.bp.p_ctg.gfa (primary contigs)
+    - assembly.bp.a_ctg.gfa (alternate contigs)
+
+\x1b[32m✓ Assembly complete\x1b[0m
+\x1b[33mNote: 4 contigs likely represent 1 chromosome + 3 plasmids\x1b[0m
+`,
+				summary: {
+					'Primary Contigs': '4',
+					'Total Length': '5,523,456 bp',
+					'N50': '4,892,156 bp',
+					'Largest Contig': '4,892,156 bp',
+					'Coverage': '45x',
+					'Quality': 'EXCELLENT'
+				},
+				chartData: {
+					title: 'Contig Size Distribution',
+					x: ['Chromosome', 'Plasmid 1', 'Plasmid 2', 'Plasmid 3'],
+					y: [4892156, 312456, 198765, 120079],
+					type: 'bar',
+					xLabel: 'Contig',
+					yLabel: 'Length (bp)'
+				},
+				files: [
+					{ name: 'assembly.bp.p_ctg.gfa', type: 'gfa', size: '5.8 MB' },
+					{ name: 'assembly.bp.p_ctg.fasta', type: 'fasta', size: '5.3 MB' },
+					{ name: 'assembly.bp.a_ctg.gfa', type: 'gfa', size: '2.1 MB' }
+				]
+			},
+			'modkit': {
+				output: `\x1b[36mmodkit v0.2.4\x1b[0m
+[INFO] Analyzing methylation from Nanopore data...
+
+\x1b[36mInput:\x1b[0m
+  BAM file: sample_01_nanopore.bam
+  Reference: polished/consensus.fasta
+  Mode: pileup
+
+\x1b[36mProcessing base modifications...\x1b[0m
+  Detecting 5mC (5-methylcytosine)...
+  Detecting 6mA (N6-methyladenine)...
+  Computing methylation frequencies...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  METHYLATION ANALYSIS RESULTS\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  5mC methylation:
+    Sites analyzed: 234,567
+    Methylated sites: 12,345 (5.3%)
+    Mean modification probability: 0.89
+
+  6mA methylation:
+    Sites analyzed: 456,789
+    Methylated sites: 189,234 (41.4%)
+    Mean modification probability: 0.94
+
+  Genome-wide methylation: 23.3%
+
+\x1b[32m✓ Methylation analysis complete\x1b[0m
+\x1b[33mNote: High 6mA suggests Dam methylase activity (typical for bacteria)\x1b[0m
+`,
+				summary: {
+					'5mC Sites': '12,345 (5.3%)',
+					'6mA Sites': '189,234 (41.4%)',
+					'Total Sites': '691,356',
+					'Genome Methylation': '23.3%',
+					'Dominant Type': '6mA (Dam)',
+					'Status': 'Complete'
+				},
+				chartData: {
+					title: 'Methylation Distribution',
+					x: ['5mC', '6mA', 'Unmethylated'],
+					y: [12345, 189234, 489777],
+					type: 'bar',
+					xLabel: 'Modification Type',
+					yLabel: 'Site Count'
+				},
+				files: [
+					{ name: 'methylation_5mC.bed', type: 'bed', size: '2.3 MB' },
+					{ name: 'methylation_6mA.bed', type: 'bed', size: '8.7 MB' },
+					{ name: 'summary.txt', type: 'txt', size: '12 KB' }
+				]
+			},
 			// R/RMarkdown tools
 			'Rscript': {
 				output: `\x1b[36mR version 4.3.2 (2023-10-31) -- "Eye Holes"\x1b[0m
@@ -3104,6 +3328,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		'medaka_consensus': ['filtered/sample_01_filtered.fastq.gz', 'assembly/assembly.fasta'],
 		'porechop': ['sample_01_nanopore.fastq.gz'],
 		'kraken2': ['filtered/sample_01_filtered.fastq.gz'],
+		// PacBio HiFi tools
+		'pbmarkdup': ['sample_01_hifi.fastq.gz', 'sample_01.subreads.bam'],
+		'ccs': ['sample_01.subreads.bam'],
+		'hifiasm': ['sample_01_hifi.fastq.gz', 'filtered/sample_01_filtered.fastq.gz'],
+		'modkit': ['sample_01_nanopore.bam', 'polished/consensus.fasta'],
 		// Amplicon/16S tools
 		'cutadapt': [
 			'IBD_01_R1.fastq.gz', 'IBD_01_R2.fastq.gz', 'Control_01_R1.fastq.gz', 'Control_01_R2.fastq.gz',
@@ -3159,6 +3388,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		'medaka_consensus': { dirs: ['/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'porechop': { dirs: ['/data/clinical_samples'] },
 		'kraken2': { dirs: ['/data/clinical_samples'] },
+		// PacBio HiFi tools
+		'pbmarkdup': { dirs: ['/data/wastewater_surveillance'] },
+		'ccs': { dirs: ['/data/wastewater_surveillance'] },
+		'hifiasm': { dirs: ['/data/wastewater_surveillance'] },
+		'modkit': { dirs: ['/data/clinical_samples'] },
 		// Amplicon/16S tools
 		'cutadapt': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
 		'qiime': { dirs: ['/data/gut_microbiome', '/data/soil_microbiome', '/data/water_samples'] },
