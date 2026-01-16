@@ -1815,7 +1815,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 		technology: 'nanopore',
 		technologyLabel: 'Long Read (ONT)',
 		dataDir: '/data/clinical_samples',
-		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit'],
+		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka_consensus', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit'],
 		sections: [
 			{
 				type: 'intro',

@@ -278,7 +278,7 @@ export const bioTools = new Set([
 	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
 	'snippy', 'snippy-core', 'roary', 'iqtree', 'gubbins',
 	// Long-read tools (ONT)
-	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2',
+	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2', 'modkit',
 	// Long-read tools (PacBio HiFi)
 	'pbmarkdup', 'ccs', 'hifiasm',
 	// Amplicon/16S tools
