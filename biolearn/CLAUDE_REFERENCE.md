@@ -1,9 +1,11 @@
 # BioLearn Development Reference
 
-## Output Folder Naming Convention
+## Output Folder/File Naming Convention
 
-- **Pattern**: `o_toolname`
-- **Examples**: `o_unicycler`, `o_abricate`, `o_quast`, `o_prokka`, `o_mlst`
+- **Pattern**: `o_toolname` for folders, `o_toolname.ext` for single files
+- **Examples**:
+  - Folders: `o_unicycler/`, `o_abricate/`, `o_quast/`, `o_prokka/`, `o_mlst/`
+  - Single files: `o_bandage.png` (bandage outputs a single image, not a folder)
 
 ## Consistency Requirements
 
@@ -16,6 +18,13 @@
    - Use realistic tool output formats
    - Use biologically accurate data (correct organism, ST types, AMR genes, etc.)
    - Match expected tool behavior and output structure
+
+3. **When changing a filename/path, update ALL locations:**
+   - `Terminal.svelte` - toolCreatedFiles, toolOutputs, files array
+   - `wgs-bacteria.ts` - storyline commands
+   - `ThreePanelLayout.svelte` - toolOutputFiles mapping
+   - `OutputPanel.svelte` - mockFileContents
+   - `terminal.ts` - bioTools set (if adding new tool)
 
 ## Trial Storyline (kpneumoniae_demo)
 
@@ -34,3 +43,11 @@
 - **Terminal outputs**: `biolearn/frontend/src/lib/components/Terminal.svelte`
 - **Storylines**: `biolearn/frontend/src/lib/storylines/wgs-bacteria.ts`
 - **Terminal store**: `biolearn/frontend/src/lib/stores/terminal.ts`
+- **Three panel layout**: `biolearn/frontend/src/lib/components/ThreePanelLayout.svelte`
+- **Output panel**: `biolearn/frontend/src/lib/components/OutputPanel.svelte`
+
+## Common Pitfalls
+
+1. **Filename mismatch**: Always search for the old filename across all files before changing
+2. **Inconsistent paths**: Input files should use source folder (e.g., `o_unicycler/assembly.fasta`)
+3. **Missing tool in bioTools**: New tools must be added to the bioTools set in terminal.ts
