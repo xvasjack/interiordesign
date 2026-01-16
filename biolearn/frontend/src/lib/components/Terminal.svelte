@@ -858,13 +858,13 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 					'Total Length': '5,566,069 bp',
 					'N50': '371,705 bp',
 					'Longest Segment': '837,178 bp',
-					'Complete Replicons': '3 (plasmids)',
-					'Incomplete': '1 (chromosome)',
-					'Status': 'Assembly incomplete'
+					'Complete (circular)': '3 components',
+					'Incomplete': '1 component (186 segments)',
+					'Status': 'Assembly mostly complete'
 				},
 				chartData: {
 					title: 'Component Length Distribution',
-					x: ['Chromosome (incomplete)', 'Plasmid 1', 'Plasmid 2', 'Plasmid 3'],
+					x: ['Component 1 (incomplete)', 'Component 2', 'Component 3', 'Component 4'],
 					y: [5553813, 5409, 4315, 2532],
 					type: 'bar',
 					xLabel: 'Component',
@@ -1037,13 +1037,13 @@ Thank you for using QUAST!
 
 \x1b[36mInput:\x1b[0m
   Assembly: assembly/assembly.fasta
-  Contigs: 2
-  Total length: 4,987,390 bp
+  Contigs: 189
+  Total length: 5,566,069 bp
 
 \x1b[36mRunning annotation pipeline...\x1b[0m
   tRNA detection (Aragorn): 86 tRNAs found
-  rRNA detection (Barrnap): 22 rRNAs found
-  CDS prediction (Prodigal): 4,523 CDSs predicted
+  rRNA detection (Barrnap): 25 rRNAs found
+  CDS prediction (Prodigal): 5,287 CDSs predicted
 
 \x1b[36mFunctional annotation...\x1b[0m
   Running BLASTP against UniProt...
@@ -1054,41 +1054,41 @@ Thank you for using QUAST!
 \x1b[1;32m  ANNOTATION SUMMARY\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  Organism:         Escherichia coli sample_01
+  Organism:         Klebsiella pneumoniae sample_01
   Features:
-    - CDS: 4,523
+    - CDS: 5,287
     - tRNA: 86
-    - rRNA: 22
+    - rRNA: 25
     - tmRNA: 1
-    - misc_RNA: 12
+    - misc_RNA: 14
 
-  Hypothetical proteins: 487 (10.8%)
-  Proteins with function: 4,036 (89.2%)
+  Hypothetical proteins: 634 (12.0%)
+  Proteins with function: 4,653 (88.0%)
 
 \x1b[33mOutput files written to: prokka_results/\x1b[0m
 `,
 				summary: {
-					'Total Features': '4,644',
-					'CDS': '4,523',
+					'Total Features': '5,413',
+					'CDS': '5,287',
 					'tRNA': '86',
-					'rRNA': '22',
+					'rRNA': '25',
 					'tmRNA': '1',
-					'misc_RNA': '12',
-					'Functional Annotation': '89.2%',
-					'Hypothetical': '10.8%'
+					'misc_RNA': '14',
+					'Functional Annotation': '88.0%',
+					'Hypothetical': '12.0%'
 				},
 				chartData: {
 					title: 'Genome Annotation Summary',
 					x: ['CDS', 'tRNA', 'rRNA', 'Other'],
-					y: [4523, 86, 22, 13],
+					y: [5287, 86, 25, 15],
 					type: 'bar',
 					xLabel: 'Feature Type',
 					yLabel: 'Count'
 				},
 				files: [
-					{ name: 'sample_01.gff', type: 'gff', size: '2.5 MB' },
-					{ name: 'sample_01.gbk', type: 'gbk', size: '7.8 MB' },
-					{ name: 'sample_01.txt', type: 'txt', size: '1.2 KB' }
+					{ name: 'sample_01.gff', type: 'gff', size: '2.9 MB' },
+					{ name: 'sample_01.gbk', type: 'gbk', size: '9.2 MB' },
+					{ name: 'sample_01.txt', type: 'txt', size: '1.4 KB' }
 				]
 			},
 			'abricate': {
@@ -1101,47 +1101,53 @@ Thank you for using QUAST!
 
 \x1b[36mScanning assembly...\x1b[0m
   Input: assembly/assembly.fasta
-  Contigs: 2
+  Contigs: 189
 
 \x1b[36mResults:\x1b[0m
-  Genes found: 2 AMR genes
+  Genes found: 3 AMR genes
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  ANTIMICROBIAL RESISTANCE GENES DETECTED\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  \x1b[31m1. blaCTX-M-15\x1b[0m
-     Location: chromosome, 123456-124789
+  \x1b[31m1. blaKPC-2\x1b[0m
+     Location: chromosome, 2345678-2346567
+     Identity: 100.00%
+     Resistance: Carbapenems (KPC carbapenemase)
+
+  \x1b[31m2. blaSHV-12\x1b[0m
+     Location: chromosome, 1234567-1235432
      Identity: 99.89%
      Resistance: Cephalosporins (ESBL)
 
-  \x1b[31m2. tet(A)\x1b[0m
-     Location: plasmid_1, 12345-13567
+  \x1b[33m3. fosA\x1b[0m
+     Location: chromosome, 3456789-3457234
      Identity: 100.00%
-     Resistance: Tetracycline
+     Resistance: Fosfomycin (intrinsic)
 
-\x1b[33m⚠ WARNING: ESBL-producing organism detected\x1b[0m
-\x1b[33mRecommendation: Confirm with phenotypic testing\x1b[0m
+\x1b[31m⚠ CRITICAL: Carbapenem-resistant organism detected (CRE)\x1b[0m
+\x1b[33mRecommendation: Confirm with phenotypic testing and infection control measures\x1b[0m
 `,
 				summary: {
-					'AMR Genes Found': '2',
+					'AMR Genes Found': '3',
 					'Database': 'NCBI AMRFinderPlus',
-					'Gene 1': 'blaCTX-M-15 (99.89%)',
-					'Gene 2': 'tet(A) (100.00%)',
-					'Resistance': 'Cephalosporins, Tetracycline',
-					'Clinical Alert': 'ESBL detected'
+					'Gene 1': 'blaKPC-2 (100.00%)',
+					'Gene 2': 'blaSHV-12 (99.89%)',
+					'Gene 3': 'fosA (100.00%)',
+					'Resistance': 'Carbapenems, Cephalosporins, Fosfomycin',
+					'Clinical Alert': 'CRE - Carbapenemase detected'
 				},
 				chartData: {
 					title: 'AMR Gene Distribution',
-					x: ['blaCTX-M-15', 'tet(A)'],
-					y: [99.89, 100.00],
+					x: ['blaKPC-2', 'blaSHV-12', 'fosA'],
+					y: [100.00, 99.89, 100.00],
 					type: 'bar',
 					xLabel: 'Gene',
 					yLabel: 'Identity (%)'
 				},
 				files: [
-					{ name: 'amr_report.tsv', type: 'tsv', size: '1.8 KB' },
-					{ name: 'amr_summary.txt', type: 'txt', size: '856 B' }
+					{ name: 'amr_report.tsv', type: 'tsv', size: '2.1 KB' },
+					{ name: 'amr_summary.txt', type: 'txt', size: '956 B' }
 				]
 			},
 			'checkm': {
@@ -1159,10 +1165,10 @@ Thank you for using QUAST!
   Marker lineage: f__Enterobacteriaceae
 
 \x1b[36mCalculating genome statistics...\x1b[0m
-  Genome size: 4,987,390 bp
-  # contigs: 2
-  N50: 4,892,156 bp
-  GC: 55.2%
+  Genome size: 5,566,069 bp
+  # contigs: 189
+  N50: 371,705 bp
+  GC: 57.18%
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  QUALITY ASSESSMENT RESULTS\x1b[0m
@@ -1282,7 +1288,7 @@ Thank you for using QUAST!
 
   Evidence:
     - No multi-allelic genes detected
-    - Single genus detected: Escherichia
+    - Single genus detected: Klebsiella
     - All rMLST genes present with single copies
 
   \x1b[32m✓ No intra-species contamination detected\x1b[0m
@@ -1293,7 +1299,7 @@ Thank you for using QUAST!
 				summary: {
 					'Sample': 'sample_01',
 					'Status': 'CLEAN (No contamination)',
-					'Genus Detected': 'Escherichia',
+					'Genus Detected': 'Klebsiella',
 					'rMLST Genes': '53/53 found',
 					'Multi-allelic Genes': '0',
 					'Intra-species Contam.': 'Not detected',
@@ -1318,63 +1324,63 @@ Thank you for using QUAST!
 
 \x1b[36mInput:\x1b[0m
   Assembly: assembly/assembly.fasta
-  Contigs: 2
-  Total length: 4,987,390 bp
+  Contigs: 189
+  Total length: 5,566,069 bp
 
 \x1b[36mRunning annotation pipeline...\x1b[0m
   tRNA detection (tRNAscan-SE): 86 tRNAs found
   tmRNA detection: 1 tmRNA found
-  rRNA detection (Infernal): 22 rRNAs found
-  ncRNA detection: 89 ncRNAs found
+  rRNA detection (Infernal): 25 rRNAs found
+  ncRNA detection: 95 ncRNAs found
   CRISPR detection: 2 CRISPR arrays found
-  CDS prediction (Prodigal): 4,623 CDSs predicted
+  CDS prediction (Prodigal): 5,312 CDSs predicted
 
 \x1b[36mFunctional annotation...\x1b[0m
-  UniProt matches: 4,102 (88.7%)
-  COG assignments: 3,856 (83.4%)
-  KEGG orthologs: 2,934 (63.5%)
-  Pfam domains: 3,678 (79.6%)
+  UniProt matches: 4,687 (88.2%)
+  COG assignments: 4,412 (83.1%)
+  KEGG orthologs: 3,356 (63.2%)
+  Pfam domains: 4,207 (79.2%)
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  ANNOTATION SUMMARY\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  Features annotated: 4,823
-    - CDS: 4,623
+  Features annotated: 5,521
+    - CDS: 5,312
     - tRNA: 86
-    - rRNA: 22
+    - rRNA: 25
     - tmRNA: 1
-    - ncRNA: 89
+    - ncRNA: 95
     - CRISPR: 2
 
-  Hypothetical proteins: 521 (11.3%)
-  Proteins with function: 4,102 (88.7%)
+  Hypothetical proteins: 625 (11.8%)
+  Proteins with function: 4,687 (88.2%)
 
 \x1b[33mOutput files written to: bakta_results/\x1b[0m
 `,
 				summary: {
-					'Total Features': '4,823',
-					'CDS': '4,623',
+					'Total Features': '5,521',
+					'CDS': '5,312',
 					'tRNA': '86',
-					'rRNA': '22',
-					'ncRNA': '89',
+					'rRNA': '25',
+					'ncRNA': '95',
 					'CRISPR Arrays': '2',
-					'Functional Annotation': '88.7%',
-					'Hypothetical': '11.3%'
+					'Functional Annotation': '88.2%',
+					'Hypothetical': '11.8%'
 				},
 				chartData: {
 					title: 'Genome Annotation Summary',
 					x: ['CDS', 'tRNA', 'rRNA', 'ncRNA', 'Other'],
-					y: [4623, 86, 22, 89, 3],
+					y: [5312, 86, 25, 95, 3],
 					type: 'bar',
 					xLabel: 'Feature Type',
 					yLabel: 'Count'
 				},
 				files: [
-					{ name: 'sample_01.gff3', type: 'gff', size: '2.8 MB' },
-					{ name: 'sample_01.gbff', type: 'gbk', size: '8.4 MB' },
-					{ name: 'sample_01.faa', type: 'faa', size: '1.6 MB' },
-					{ name: 'sample_01.tsv', type: 'tsv', size: '890 KB' }
+					{ name: 'sample_01.gff3', type: 'gff', size: '3.2 MB' },
+					{ name: 'sample_01.gbff', type: 'gbk', size: '9.5 MB' },
+					{ name: 'sample_01.faa', type: 'faa', size: '1.8 MB' },
+					{ name: 'sample_01.tsv', type: 'tsv', size: '980 KB' }
 				]
 			},
 			'mlst': {
@@ -1385,53 +1391,53 @@ Thank you for using QUAST!
   Assembly: assembly/assembly.fasta
 
 \x1b[36mScheme detection...\x1b[0m
-  Best match: Escherichia coli #1 (Achtman)
+  Best match: Klebsiella pneumoniae
 
 \x1b[36mAllele identification...\x1b[0m
-  adk:   10  (exact match)
-  fumC:  11  (exact match)
-  gyrB:  4   (exact match)
-  icd:   8   (exact match)
-  mdh:   8   (exact match)
-  purA:  8   (exact match)
-  recA:  2   (exact match)
+  gapA:  3   (exact match)
+  infB:  3   (exact match)
+  mdh:   1   (exact match)
+  pgi:   1   (exact match)
+  phoE:  1   (exact match)
+  rpoB:  1   (exact match)
+  tonB:  79  (exact match)
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  MLST RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  Scheme: \x1b[36mescherichia_coli_achtman\x1b[0m
+  Scheme: \x1b[36mklebsiella_pneumoniae\x1b[0m
 
-  \x1b[1;33mSequence Type: ST131\x1b[0m
+  \x1b[1;33mSequence Type: ST258\x1b[0m
 
   Allelic Profile:
-    adk(10) fumC(11) gyrB(4) icd(8) mdh(8) purA(8) recA(2)
+    gapA(3) infB(3) mdh(1) pgi(1) phoE(1) rpoB(1) tonB(79)
 
-  \x1b[31m⚠ ST131 is a high-risk pandemic clone associated with:\x1b[0m
-    - Extended-spectrum beta-lactamase (ESBL) production
-    - Fluoroquinolone resistance
-    - Extraintestinal pathogenic E. coli (ExPEC)
-    - Urinary tract infections
-    - Bloodstream infections
+  \x1b[31m⚠ ST258 is a high-risk clone associated with:\x1b[0m
+    - KPC carbapenemase production
+    - Carbapenem-resistant Enterobacteriaceae (CRE)
+    - Healthcare-associated infections
+    - Hospital outbreaks worldwide
+    - High mortality rates in bloodstream infections
 
-\x1b[33mRecommendation: Further antimicrobial susceptibility testing advised\x1b[0m
+\x1b[33mRecommendation: Confirm carbapenemase production with phenotypic/molecular testing\x1b[0m
 `,
 				summary: {
-					'Scheme': 'E. coli (Achtman)',
-					'Sequence Type': 'ST131',
-					'adk': '10',
-					'fumC': '11',
-					'gyrB': '4',
-					'icd': '8',
-					'mdh': '8',
-					'purA': '8',
-					'recA': '2',
+					'Scheme': 'K. pneumoniae',
+					'Sequence Type': 'ST258',
+					'gapA': '3',
+					'infB': '3',
+					'mdh': '1',
+					'pgi': '1',
+					'phoE': '1',
+					'rpoB': '1',
+					'tonB': '79',
 					'Clinical Significance': 'High-risk clone'
 				},
 				chartData: {
 					title: 'MLST Allelic Profile',
-					x: ['adk', 'fumC', 'gyrB', 'icd', 'mdh', 'purA', 'recA'],
-					y: [10, 11, 4, 8, 8, 8, 2],
+					x: ['gapA', 'infB', 'mdh', 'pgi', 'phoE', 'rpoB', 'tonB'],
+					y: [3, 3, 1, 1, 1, 1, 79],
 					type: 'bar',
 					xLabel: 'Locus',
 					yLabel: 'Allele Number'
