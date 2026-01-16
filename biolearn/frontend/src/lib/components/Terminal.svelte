@@ -731,7 +731,7 @@ Analysis complete for ${file2}
 			'trimmomatic': {
 				output: `Picked up _JAVA_OPTIONS: -Xmx8g
 TrimmomaticPE: Started with arguments:
- -threads 2 -phred33 ${file1} ${file2} o_trimmomatic/${sampleName}_R1_paired.fq.gz o_trimmomatic/${sampleName}_R1_unpaired.fq.gz o_trimmomatic/${sampleName}_R2_paired.fq.gz o_trimmomatic/${sampleName}_R2_unpaired.fq.gz ILLUMINACLIP:/home/pop/miniconda3/envs/env_seqkit/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36
+ -threads 2 -phred33 ${file1} ${file2} trimmed/${sampleName}_R1_paired.fq.gz trimmed/${sampleName}_R1_unpaired.fq.gz trimmed/${sampleName}_R2_paired.fq.gz trimmed/${sampleName}_R2_unpaired.fq.gz ILLUMINACLIP:/home/pop/miniconda3/envs/env_seqkit/share/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36
 ILLUMINACLIP: Using adapter file from user-specified absolute path: /home/pop/miniconda3/envs/env_seqkit/share/trimmomatic/adapters/TruSeq3-PE.fa
 Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
 ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
