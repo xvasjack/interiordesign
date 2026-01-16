@@ -631,10 +631,10 @@
 		const file2 = inputFile.replace('_R1', '_R2').replace('_1.fastq', '_2.fastq');
 		const totalBasesAll = totalBases * 2;
 
-		// Trimmomatic results (consistent with input reads)
-		const trimBothSurviving = Math.round(totalReads * 0.9744);
-		const trimForwardOnly = Math.round(totalReads * 0.0141);
-		const trimReverseOnly = Math.round(totalReads * 0.0081);
+		// Trimmomatic results (matching real analysis: 99.23%, 0.47%, 0.03%, 0.27%)
+		const trimBothSurviving = Math.round(totalReads * 0.9923);
+		const trimForwardOnly = Math.round(totalReads * 0.0047);
+		const trimReverseOnly = Math.round(totalReads * 0.0003);
 		const trimDropped = totalReads - trimBothSurviving - trimForwardOnly - trimReverseOnly;
 
 		const outputs: Record<string, any> = {
