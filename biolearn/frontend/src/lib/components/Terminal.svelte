@@ -270,8 +270,8 @@
 		},
 		'quast': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['quast_output/'],
-			'/data/kpneumoniae_demo/quast_output': [
+			'/data/kpneumoniae_demo': ['o_quast/'],
+			'/data/kpneumoniae_demo/o_quast': [
 				'basic_stats/', 'icarus_viewers/', 'report.html', 'report.tex', 'report.txt',
 				'transposed_report.tex', 'transposed_report.tsv', 'transposed_report.txt',
 				'icarus.html', 'quast.log', 'report.pdf', 'report.tsv'
@@ -910,7 +910,7 @@ Loading assembly graph: assembly.gfa
 			},
 			'quast': {
 				output: `WARNING: Python locale settings can't be changed
-/home/pop/miniconda3/envs/env_quast/bin/quast assembly/assembly.fasta -o quast_output
+/home/pop/miniconda3/envs/env_quast/bin/quast assembly/assembly.fasta -o o_quast
 
 Version: 5.0.2
 
@@ -921,7 +921,7 @@ System information:
 
 Started: 2026-01-12 05:48:06
 
-Logging to /data/kpneumoniae_demo/quast_output/quast.log
+Logging to /data/kpneumoniae_demo/o_quast/quast.log
 NOTICE: Maximum number of threads is set to 1 (use --threads option to set it manually)
 
 CWD: /data/kpneumoniae_demo
@@ -940,13 +940,13 @@ Running Basic statistics processor...
   Calculating N50 and L50...
     assembly, N50 = 371705, L50 = 6, Total length = 5553065, GC % = 57.18, # N's per 100 kbp =  0.00
   Drawing Nx plot...
-    saved to /data/kpneumoniae_demo/quast_output/basic_stats/Nx_plot.pdf
+    saved to /data/kpneumoniae_demo/o_quast/basic_stats/Nx_plot.pdf
   Drawing cumulative plot...
-    saved to /data/kpneumoniae_demo/quast_output/basic_stats/cumulative_plot.pdf
+    saved to /data/kpneumoniae_demo/o_quast/basic_stats/cumulative_plot.pdf
   Drawing GC content plot...
-    saved to /data/kpneumoniae_demo/quast_output/basic_stats/GC_content_plot.pdf
+    saved to /data/kpneumoniae_demo/o_quast/basic_stats/GC_content_plot.pdf
   Drawing assembly GC content plot...
-    saved to /data/kpneumoniae_demo/quast_output/basic_stats/assembly_GC_content_plot.pdf
+    saved to /data/kpneumoniae_demo/o_quast/basic_stats/assembly_GC_content_plot.pdf
 Done.
 
 NOTICE: Genes are not predicted by default. Use --gene-finding or --glimmer option to enable it.
@@ -960,12 +960,12 @@ Done
 
 2026-01-12 05:48:10
 RESULTS:
-  Text versions of total report are saved to /data/kpneumoniae_demo/quast_output/report.txt, report.tsv, and report.tex
-  Text versions of transposed total report are saved to /data/kpneumoniae_demo/quast_output/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
-  HTML version (interactive tables and plots) is saved to /data/kpneumoniae_demo/quast_output/report.html
-  PDF version (tables and plots) is saved to /data/kpneumoniae_demo/quast_output/report.pdf
-  Icarus (contig browser) is saved to /data/kpneumoniae_demo/quast_output/icarus.html
-  Log is saved to /data/kpneumoniae_demo/quast_output/quast.log
+  Text versions of total report are saved to /data/kpneumoniae_demo/o_quast/report.txt, report.tsv, and report.tex
+  Text versions of transposed total report are saved to /data/kpneumoniae_demo/o_quast/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
+  HTML version (interactive tables and plots) is saved to /data/kpneumoniae_demo/o_quast/report.html
+  PDF version (tables and plots) is saved to /data/kpneumoniae_demo/o_quast/report.pdf
+  Icarus (contig browser) is saved to /data/kpneumoniae_demo/o_quast/icarus.html
+  Log is saved to /data/kpneumoniae_demo/o_quast/quast.log
 
 Finished: 2026-01-12 05:48:10
 Elapsed time: 0:00:03.963635
@@ -1169,6 +1169,62 @@ Thank you for using QUAST!
 				},
 				files: [
 					{ name: 'checkm_report.tsv', type: 'tsv', size: '2.3 KB' }
+				]
+			},
+			'checkm2': {
+				output: `\x1b[36mCheckM2 v1.0.1\x1b[0m
+[INFO]: Running CheckM2 predict workflow
+
+\x1b[36mLoading ML model...\x1b[0m
+  Model: gradient_boost_model
+  Version: 1.0.1
+
+\x1b[36mProcessing input genomes...\x1b[0m
+  Input directory: assembly/
+  Genomes found: 1
+  Extension filter: .fasta
+
+\x1b[36mPredicting genome quality...\x1b[0m
+  Running DIAMOND against reference database...
+  Extracting features...
+  Applying ML model...
+
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+\x1b[1;32m  CHECKM2 QUALITY PREDICTION\x1b[0m
+\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
+
+  Genome: assembly.fasta
+  \x1b[32mCompleteness:    98.76%\x1b[0m
+  \x1b[32mContamination:   0.45%\x1b[0m
+
+  Genome Size:     5,553,065 bp
+  GC Content:      57.18%
+  Coding Density:  87.2%
+
+  Quality tier: \x1b[1;32mHIGH-QUALITY\x1b[0m
+
+\x1b[33mNote: CheckM2 uses machine learning for faster quality prediction\x1b[0m
+
+[INFO]: Results written to checkm2_output/quality_report.tsv
+`,
+				summary: {
+					'Completeness': '98.76%',
+					'Contamination': '0.45%',
+					'Genome Size': '5,553,065 bp',
+					'GC Content': '57.18%',
+					'Coding Density': '87.2%',
+					'Quality': 'HIGH-QUALITY'
+				},
+				chartData: {
+					title: 'CheckM2 Quality Assessment',
+					x: ['Completeness', 'Contamination'],
+					y: [98.76, 0.45],
+					type: 'bar',
+					xLabel: 'Metric',
+					yLabel: 'Percentage (%)'
+				},
+				files: [
+					{ name: 'quality_report.tsv', type: 'tsv', size: '1.8 KB' }
 				]
 			},
 			'confindr': {
@@ -3542,12 +3598,12 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'quast') {
-				// quast assembly/assembly.fasta -o quast_results/
+				// quast assembly/assembly.fasta -o o_quast/
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: quast assembly/assembly.fasta -o quast_results/\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: quast assembly/assembly.fasta -o quast_results/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: quast assembly/assembly.fasta -o o_quast/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: quast assembly/assembly.fasta -o o_quast/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3560,15 +3616,15 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				// Check -o output directory
 				if (!args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: -o quast_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -o o_quast/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const oIdx = args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'quast_results') {
+				if (outDir !== 'o_quast') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: quast_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: o_quast/\x1b[0m`);
 					writePrompt();
 					return;
 				}

@@ -1255,11 +1255,11 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 7: Assembly Metrics',
 				text: `Calculate assembly statistics including N50, total length, and contig count.`,
-				command: 'quast assembly/assembly.fasta -o quast_output/',
+				command: 'quast assembly/assembly.fasta -o o_quast/',
 				explanation: 'QUAST calculates key assembly metrics to assess quality.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
-					{ name: '-o quast_output/', desc: 'Output directory' }
+					{ name: '-o o_quast/', desc: 'Output directory' }
 				]
 			},
 			{
