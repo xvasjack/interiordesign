@@ -32,11 +32,37 @@
 		// FastQC reports - loaded from static folder (real FastQC output format)
 		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
 		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
-		'assembly.fasta': `>contig_1 length=4892156 depth=45.2x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_2 length=95234 depth=78.5x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT`,
-		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234`,
-		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] 2 contigs assembled\n[2024-01-15 10:25:12] Total length: 4,987,390 bp`,
-		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial;margin:20px;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:12px;} th{background:#4CAF50;color:white;}</style></head><body><h1>QUAST Report</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td>Total contigs</td><td>2</td></tr><tr><td>Total length</td><td>4,987,390 bp</td></tr><tr><td>N50</td><td>4,892,156 bp</td></tr></table></body></html>`,
-		'quast_report.tsv': `Assembly\tcontigs\ttotal_length\tlargest_contig\tN50\tGC_percent\nassembly\t2\t4987390\t4892156\t4892156\t52.3`,
+		'assembly.fasta': `>contig_1 length=837178 depth=45.2x\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n>contig_2 length=721456 depth=44.8x\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_3 length=512089 depth=46.1x\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n... (65 contigs total)`,
+		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:837178\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:721456\nS\t3\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:512089\nL\t1\t+\t2\t+\t0M\nL\t2\t+\t3\t+\t0M\n... (65 segments, 78 links)`,
+		'unicycler.log': `
+Unicycler v0.5.0
+Command: unicycler -1 sample_01_R1_paired.fq.gz -2 sample_01_R2_paired.fq.gz -o o_unicycler/
+
+[2024-01-15 10:23:45] Starting Unicycler
+[2024-01-15 10:23:45] Loading reads
+[2024-01-15 10:24:12] Building assembly graph with SPAdes
+[2024-01-15 10:38:45] SPAdes assembly complete
+[2024-01-15 10:38:46] Cleaning graph
+[2024-01-15 10:39:02] Bridging graph
+[2024-01-15 10:45:23] Polishing assembly
+[2024-01-15 10:52:18] Assembly complete
+
+Assembly Statistics:
+  Total length: 5,553,065 bp
+  Number of contigs: 65
+  Largest contig: 837,178 bp
+  N50: 371,705 bp
+  GC content: 57.18%
+
+Component summary:
+  1 linear component (chromosome - incomplete)
+  3 circular components (plasmids)
+    - ColRNAI: 5,409 bp
+    - Col(pHAD28): 4,315 bp
+    - Col156: 2,532 bp
+`,
+		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;background:#f5f5f5;} .container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);} h1{color:#333;border-bottom:2px solid #4CAF50;padding-bottom:10px;} table{border-collapse:collapse;width:100%;margin-top:20px;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f9f9f9;} tr:hover{background:#f1f1f1;} .metric{font-weight:bold;}</style></head><body><div class="container"><h1>QUAST Report - assembly</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td class="metric"># contigs (>= 0 bp)</td><td>117</td></tr><tr><td class="metric"># contigs (>= 1000 bp)</td><td>57</td></tr><tr><td class="metric"># contigs (>= 5000 bp)</td><td>33</td></tr><tr><td class="metric"># contigs (>= 10000 bp)</td><td>29</td></tr><tr><td class="metric"># contigs (>= 25000 bp)</td><td>24</td></tr><tr><td class="metric"># contigs (>= 50000 bp)</td><td>18</td></tr><tr><td class="metric">Total length (>= 0 bp)</td><td>5,564,255</td></tr><tr><td class="metric">Total length (>= 1000 bp)</td><td>5,547,651</td></tr><tr><td class="metric"># contigs</td><td>65</td></tr><tr><td class="metric">Largest contig</td><td>837,178</td></tr><tr><td class="metric">Total length</td><td>5,553,065</td></tr><tr><td class="metric">GC (%)</td><td>57.18</td></tr><tr><td class="metric">N50</td><td>371,705</td></tr><tr><td class="metric">N75</td><td>224,673</td></tr><tr><td class="metric">L50</td><td>6</td></tr><tr><td class="metric">L75</td><td>10</td></tr><tr><td class="metric"># N's per 100 kbp</td><td>0.00</td></tr></table></div></body></html>`,
+		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
 		'amr_report.tsv': `#FILE\tSEQUENCE\tGENE\t%IDENTITY\tRESISTANCE\nassembly.fasta\tcontig_1\tblaCTX-M-15\t99.89\tCephalosporin\nassembly.fasta\tcontig_2\ttet(A)\t100.00\tTetracycline`,
 		'amr_summary.txt': `AMR Gene Summary\n================\nTotal genes found: 2\n\n1. blaCTX-M-15 - Cephalosporin resistance\n2. tet(A) - Tetracycline resistance`,
 		// CheckM files

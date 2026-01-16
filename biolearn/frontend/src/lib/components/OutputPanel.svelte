@@ -96,14 +96,39 @@
 		'005_final_clean.gfa': `H\tVN:Z:1.0\n# Final cleaned assembly graph\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\tcl:Z:chromosome\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\tcl:Z:plasmid\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\tcl:Z:plasmid\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\tcl:Z:plasmid\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
 		'assembly.fasta': `>1 length=5553813 depth=1.00x circular=false\nACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n...\n>33 length=5409 depth=3.90x circular=true\nTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\n...\n>35 length=4315 depth=17.66x circular=true\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n...\n>41 length=2532 depth=19.88x circular=true\nATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC\n...`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
-		'unicycler.log': `[2026-01-12 04:15:32] Starting Unicycler v0.5.0\n[2026-01-12 04:15:32] Command: unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o assembly\n[2026-01-12 04:15:33] Loading reads\n[2026-01-12 04:15:45] SPAdes assembly with k=27,53,71,87,99,111,119,127\n[2026-01-12 04:18:23] Building bridges\n[2026-01-12 04:20:21] Applying bridges\n[2026-01-12 04:20:21] Final assembly: 189 segments, 5,566,069 bp total\n[2026-01-12 04:20:21] Complete replicons: 3 (plasmids)\n[2026-01-12 04:20:21] Incomplete: 1 (chromosome)\n...`,
+		'unicycler.log': `
+Unicycler v0.5.0
+Command: unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o o_unicycler/
+
+[2026-01-12 04:15:32] Starting Unicycler
+[2026-01-12 04:15:33] Loading reads
+[2026-01-12 04:15:45] SPAdes assembly with k=27,53,71,87,99,111,119,127
+[2026-01-12 04:18:23] Building bridges
+[2026-01-12 04:20:21] Applying bridges
+[2026-01-12 04:20:21] Polishing assembly
+[2026-01-12 04:25:18] Assembly complete
+
+Assembly Statistics:
+  Total length: 5,553,065 bp
+  Number of contigs: 65
+  Largest contig: 837,178 bp
+  N50: 371,705 bp
+  GC content: 57.18%
+
+Component summary:
+  1 linear component (chromosome - incomplete)
+  3 circular components (plasmids)
+    - ColRNAI: 5,409 bp
+    - Col(pHAD28): 4,315 bp
+    - Col156: 2,532 bp
+`,
 
 		// Bandage output (base64 placeholder for PNG)
 		'o_bandage.png': 'PNG_IMAGE_PLACEHOLDER',
 
 		// QUAST outputs
-		'quast_report.tsv': `Assembly\t# contigs\tTotal length\tLargest contig\tGC (%)\tN50\tN75\tL50\tL75\n# misassemblies\t# misassembled contigs\nsample_01\t2\t4987390\t4892156\t52.3\t4892156\t95234\t1\t2\t0\t0`,
-		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} table{border-collapse:collapse;width:100%;margin:20px 0;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f2f2f2;} .good{color:green;font-weight:bold;}</style></head><body><h1>QUAST Quality Assessment Report</h1><h2>Assembly Statistics</h2><table><tr><th>Metric</th><th>Value</th></tr><tr><td>Total contigs</td><td class="good">2</td></tr><tr><td>Total length</td><td>4,987,390 bp</td></tr><tr><td>Largest contig</td><td>4,892,156 bp</td></tr><tr><td>GC content</td><td>52.3%</td></tr><tr><td>N50</td><td class="good">4,892,156 bp</td></tr><tr><td>N75</td><td>95,234 bp</td></tr></table><h2>Conclusion</h2><p>Assembly quality: <span class="good">EXCELLENT</span> - Complete circular chromosome with one plasmid detected.</p></body></html>`,
+		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
+		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;background:#f5f5f5;} .container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);} h1{color:#333;border-bottom:2px solid #4CAF50;padding-bottom:10px;} table{border-collapse:collapse;width:100%;margin-top:20px;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f9f9f9;} tr:hover{background:#f1f1f1;} .metric{font-weight:bold;}</style></head><body><div class="container"><h1>QUAST Report - assembly</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td class="metric"># contigs (>= 0 bp)</td><td>117</td></tr><tr><td class="metric"># contigs (>= 1000 bp)</td><td>57</td></tr><tr><td class="metric"># contigs (>= 5000 bp)</td><td>33</td></tr><tr><td class="metric"># contigs (>= 10000 bp)</td><td>29</td></tr><tr><td class="metric"># contigs (>= 25000 bp)</td><td>24</td></tr><tr><td class="metric"># contigs (>= 50000 bp)</td><td>18</td></tr><tr><td class="metric">Total length (>= 0 bp)</td><td>5,564,255</td></tr><tr><td class="metric">Total length (>= 1000 bp)</td><td>5,547,651</td></tr><tr><td class="metric"># contigs</td><td>65</td></tr><tr><td class="metric">Largest contig</td><td>837,178</td></tr><tr><td class="metric">Total length</td><td>5,553,065</td></tr><tr><td class="metric">GC (%)</td><td>57.18</td></tr><tr><td class="metric">N50</td><td>371,705</td></tr><tr><td class="metric">N75</td><td>224,673</td></tr><tr><td class="metric">L50</td><td>6</td></tr><tr><td class="metric">L75</td><td>10</td></tr><tr><td class="metric"># N's per 100 kbp</td><td>0.00</td></tr></table></div></body></html>`,
 
 		// Abricate outputs
 		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE\nassembly.fasta\tcontig_1\t1245678\t1246523\t+\tblaCTX-M-15\t1-846/846\t===============\t0/0\t100.00\t99.89\tncbi\tNG_049557.1\tclass A extended-spectrum beta-lactamase CTX-M-15\tCephalosporin\nassembly.fasta\tcontig_2\t52345\t53567\t+\ttet(A)\t1-1223/1223\t===============\t0/0\t100.00\t100.00\tncbi\tAF534183.1\ttetracycline efflux MFS transporter Tet(A)\tTetracycline`,

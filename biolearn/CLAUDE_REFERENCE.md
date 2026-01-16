@@ -32,7 +32,9 @@
 **Tools used**: seqkit, fastqc, trimmomatic, unicycler, bandage, quast, checkm2, plasmidfinder, abricate, mlst, prokka
 
 ### Key Data Points
-- **Assembly**: 189 contigs, 5,566,069 bp, N50 371,705 bp, GC 57.18%
+- **Assembly**: 65 contigs (>=500bp), 117 contigs total, 5,553,065 bp, N50 371,705 bp, GC 57.18%
+- **Largest contig**: 837,178 bp
+- **L50**: 6, **L75**: 10, **N75**: 224,673 bp
 - **Components**: 1 incomplete (chromosome), 3 complete circular (Col-type plasmids)
 - **Plasmids**: ColRNAI (5,409 bp), Col(pHAD28) (4,315 bp), Col156 (2,532 bp)
 - **MLST**: ST258 (gapA-3, infB-3, mdh-1, pgi-1, phoE-1, rpoB-1, tonB-79)

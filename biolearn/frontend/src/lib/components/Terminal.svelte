@@ -1001,8 +1001,9 @@ NOTICEs: 2; WARNINGs: 1; non-fatal ERRORs: 0
 Thank you for using QUAST!
 `,
 				summary: {
-					'Contigs': '189',
-					'Total Length': '5,566,069 bp',
+					'Contigs': '65',
+					'Total Length': '5,553,065 bp',
+					'Largest Contig': '837,178 bp',
 					'N50': '371,705 bp',
 					'L50': '6',
 					'GC Content': '57.18%',
@@ -1010,8 +1011,8 @@ Thank you for using QUAST!
 				},
 				chartData: {
 					title: 'Assembly Quality Metrics',
-					x: ['Total Length', 'N50'],
-					y: [5566069, 371705],
+					x: ['Total Length', 'N50', 'Largest Contig'],
+					y: [5553065, 371705, 837178],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Length (bp)'
