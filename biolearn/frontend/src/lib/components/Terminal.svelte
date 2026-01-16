@@ -115,7 +115,7 @@
 			// Trial/Demo scenario
 			'/data/kpneumoniae_demo': ['o1_seqkit.stats'],
 			// Hospital outbreak scenario
-			'/data/outbreak_investigation': ['seqkit_stats.txt']
+			'/data/outbreak_investigation': ['o_seqkit_stats.txt']
 		},
 		'fastqc': {
 			// Trial/Demo scenario
