@@ -937,7 +937,7 @@ Loading assembly graph: assembly.gfa
 			},
 			'quast': {
 				output: `WARNING: Python locale settings can't be changed
-/home/pop/miniconda3/envs/env_quast/bin/quast assembly/assembly.fasta -o o_quast
+/home/pop/miniconda3/envs/env_quast/bin/quast o_unicycler/assembly.fasta -o o_quast
 
 Version: 5.0.2
 
@@ -958,7 +958,7 @@ Main parameters:
 
 Contigs:
   Pre-processing...
-  assembly/assembly.fasta ==> assembly
+  o_unicycler/assembly.fasta ==> assembly
 
 2026-01-12 05:48:08
 Running Basic statistics processor...
@@ -1032,40 +1032,44 @@ Thank you for using QUAST!
 				]
 			},
 			'prokka': {
-				output: `\x1b[36mProkka v1.14.6\x1b[0m
-[2024-01-15 11:15:00] INFO: Starting annotation
-
-\x1b[36mInput:\x1b[0m
-  Assembly: assembly/assembly.fasta
-  Contigs: 189
-  Total length: 5,566,069 bp
-
-\x1b[36mRunning annotation pipeline...\x1b[0m
-  tRNA detection (Aragorn): 86 tRNAs found
-  rRNA detection (Barrnap): 25 rRNAs found
-  CDS prediction (Prodigal): 5,287 CDSs predicted
-
-\x1b[36mFunctional annotation...\x1b[0m
-  Running BLASTP against UniProt...
-  Assigning protein functions...
-  Identifying signal peptides...
-
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;32m  ANNOTATION SUMMARY\x1b[0m
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-
-  Organism:         Klebsiella pneumoniae sample_01
-  Features:
-    - CDS: 5,287
-    - tRNA: 86
-    - rRNA: 25
-    - tmRNA: 1
-    - misc_RNA: 14
-
-  Hypothetical proteins: 634 (12.0%)
-  Proteins with function: 4,653 (88.0%)
-
-\x1b[33mOutput files written to: prokka_results/\x1b[0m
+				output: `[07:38:44] This is prokka 1.14.6
+[07:38:44] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[07:38:44] Homepage is https://github.com/tseemann/prokka
+[07:38:44] Local time is Mon Jan 12 07:38:44 2026
+[07:38:44] You are pop
+[07:38:44] Operating system is linux
+[07:38:44] You have BioPerl 1.7.8
+[07:38:44] System has 4 cores.
+[07:38:44] Option --cpu asked for 8 cores, but system only has 4
+[07:38:44] Will use maximum of 4 cores.
+[07:38:44] Annotating as >>> Bacteria <<<
+[07:38:44] Generating locus_tag from 'o_unicycler/assembly.fasta' contents.
+[07:38:44] Setting --locustag MPDNNGLK from MD5 69d77054a115e56ce609fd2185af8559
+[07:38:44] Creating new output folder: o_prokka
+[07:38:44] Running: mkdir -p o_prokka
+[07:38:44] Using filename prefix: PROKKA_01122026.XXX
+[07:38:44] Setting HMMER_NCPU=1
+[07:38:44] Writing log to: o_prokka/PROKKA_01122026.log
+[07:38:44] Command: /home/pop/miniconda3/envs/env_abricate/bin/prokka --outdir o_prokka o_unicycler/assembly.fasta
+[07:46:19] Output files:
+[07:46:19] o_prokka/PROKKA_01122026.tsv
+[07:46:19] o_prokka/PROKKA_01122026.fna
+[07:46:19] o_prokka/PROKKA_01122026.gff
+[07:46:19] o_prokka/PROKKA_01122026.log
+[07:46:19] o_prokka/PROKKA_01122026.faa
+[07:46:19] o_prokka/PROKKA_01122026.gbk
+[07:46:19] o_prokka/PROKKA_01122026.fsa
+[07:46:19] o_prokka/PROKKA_01122026.tbl
+[07:46:19] o_prokka/PROKKA_01122026.ffn
+[07:46:19] o_prokka/PROKKA_01122026.sqn
+[07:46:19] o_prokka/PROKKA_01122026.err
+[07:46:19] o_prokka/PROKKA_01122026.txt
+[07:46:19] Annotation finished successfully.
+[07:46:19] Walltime used: 7.58 minutes
+[07:46:19] If you use this result please cite the Prokka paper:
+[07:46:19] Seemann T (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9.
+[07:46:19] Type 'prokka --citation' for more details.
+[07:46:19] Share and enjoy!
 `,
 				summary: {
 					'Total Features': '5,413',
@@ -1086,9 +1090,13 @@ Thank you for using QUAST!
 					yLabel: 'Count'
 				},
 				files: [
-					{ name: 'sample_01.gff', type: 'gff', size: '2.9 MB' },
-					{ name: 'sample_01.gbk', type: 'gbk', size: '9.2 MB' },
-					{ name: 'sample_01.txt', type: 'txt', size: '1.4 KB' }
+					{ name: 'PROKKA_01122026.gff', type: 'gff', size: '2.9 MB' },
+					{ name: 'PROKKA_01122026.gbk', type: 'gbk', size: '9.2 MB' },
+					{ name: 'PROKKA_01122026.faa', type: 'faa', size: '1.8 MB' },
+					{ name: 'PROKKA_01122026.fna', type: 'fna', size: '5.4 MB' },
+					{ name: 'PROKKA_01122026.ffn', type: 'ffn', size: '4.8 MB' },
+					{ name: 'PROKKA_01122026.tsv', type: 'tsv', size: '1.2 MB' },
+					{ name: 'PROKKA_01122026.txt', type: 'txt', size: '1.4 KB' }
 				]
 			},
 			'abricate': {
@@ -1205,40 +1213,17 @@ Thank you for using QUAST!
 				]
 			},
 			'checkm2': {
-				output: `\x1b[36mCheckM2 v1.0.1\x1b[0m
-[INFO]: Running CheckM2 predict workflow
-
-\x1b[36mLoading ML model...\x1b[0m
-  Model: gradient_boost_model
-  Version: 1.0.1
-
-\x1b[36mProcessing input genomes...\x1b[0m
-  Input directory: assembly/
-  Genomes found: 1
-  Extension filter: .fasta
-
-\x1b[36mPredicting genome quality...\x1b[0m
-  Running DIAMOND against reference database...
-  Extracting features...
-  Applying ML model...
-
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;32m  CHECKM2 QUALITY PREDICTION\x1b[0m
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-
-  Genome: assembly.fasta
-  \x1b[32mCompleteness:    98.76%\x1b[0m
-  \x1b[32mContamination:   0.45%\x1b[0m
-
-  Genome Size:     5,553,065 bp
-  GC Content:      57.18%
-  Coding Density:  87.2%
-
-  Quality tier: \x1b[1;32mHIGH-QUALITY\x1b[0m
-
-\x1b[33mNote: CheckM2 uses machine learning for faster quality prediction\x1b[0m
-
-[INFO]: Results written to checkm2_output/quality_report.tsv
+				output: `[01/12/2026 06:24:04 AM] INFO: Running CheckM2 version 1.1.0
+[01/12/2026 06:24:04 AM] INFO: Running quality prediction workflow with 4 threads.
+[01/12/2026 06:24:05 AM] INFO: Calling genes in 1 bins with 4 threads:
+    Finished processing 1 of 1 (100.00%) bins.
+[01/12/2026 06:24:58 AM] INFO: Calculating metadata for 1 bins with 4 threads:
+    Finished processing 1 of 1 (100.00%) bin metadata.
+[01/12/2026 06:24:58 AM] INFO: Annotating input genomes with DIAMOND using 4 threads
+[01/12/2026 06:27:47 AM] INFO: Processing DIAMOND output
+[01/12/2026 06:27:47 AM] INFO: Predicting completeness and contamination using ML models.
+[01/12/2026 06:27:54 AM] INFO: Parsing all results and constructing final output table.
+[01/12/2026 06:27:54 AM] INFO: CheckM2 finished successfully.
 `,
 				summary: {
 					'Completeness': '98.76%',
@@ -1384,60 +1369,38 @@ Thank you for using QUAST!
 				]
 			},
 			'mlst': {
-				output: `\x1b[36mmlst v2.23.0\x1b[0m
-[2024-01-15 11:45:00] INFO: Scanning for MLST alleles
-
-\x1b[36mInput:\x1b[0m
-  Assembly: assembly/assembly.fasta
-
-\x1b[36mScheme detection...\x1b[0m
-  Best match: Klebsiella pneumoniae
-
-\x1b[36mAllele identification...\x1b[0m
-  gapA:  3   (exact match)
-  infB:  3   (exact match)
-  mdh:   1   (exact match)
-  pgi:   1   (exact match)
-  phoE:  1   (exact match)
-  rpoB:  1   (exact match)
-  tonB:  79  (exact match)
-
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;32m  MLST RESULTS\x1b[0m
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-
-  Scheme: \x1b[36mklebsiella_pneumoniae\x1b[0m
-
-  \x1b[1;33mSequence Type: ST258\x1b[0m
-
-  Allelic Profile:
-    gapA(3) infB(3) mdh(1) pgi(1) phoE(1) rpoB(1) tonB(79)
-
-  \x1b[31m⚠ ST258 is a high-risk clone associated with:\x1b[0m
-    - KPC carbapenemase production
-    - Carbapenem-resistant Enterobacteriaceae (CRE)
-    - Healthcare-associated infections
-    - Hospital outbreaks worldwide
-    - High mortality rates in bloodstream infections
-
-\x1b[33mRecommendation: Confirm carbapenemase production with phenotypic/molecular testing\x1b[0m
+				output: `[07:16:00] This is mlst 2.23.0 running on linux with Perl 5.026002
+[07:16:00] Checking mlst dependencies:
+[07:16:00] Found 'blastn' => /home/pop/miniconda3/envs/env_abricate/bin/blastn
+[07:16:00] Found 'any2fasta' => /home/pop/miniconda3/envs/env_abricate/bin/any2fasta
+[07:16:01] Found blastn: 2.12.0+ (002012)
+[07:16:01] Excluding 3 schemes: ecoli vcholerae_2 abaumannii
+[07:16:05] Found exact allele match klebsiella.tonB-7
+[07:16:05] Found exact allele match klebsiella.phoE-1
+[07:16:05] Found exact allele match klebsiella.mdh-2
+[07:16:05] Found exact allele match klebsiella.infB-1
+[07:16:05] Found exact allele match klebsiella.pgi-52
+[07:16:05] Found exact allele match klebsiella.rpoB-1
+[07:16:05] Found exact allele match klebsiella.gapA-4
+[07:16:05] Use --quiet or -q to avoid all the message output, including these witticisms.
+[07:16:05] Done.
 `,
 				summary: {
 					'Scheme': 'K. pneumoniae',
 					'Sequence Type': 'ST258',
-					'gapA': '3',
-					'infB': '3',
-					'mdh': '1',
-					'pgi': '1',
+					'gapA': '4',
+					'infB': '1',
+					'mdh': '2',
+					'pgi': '52',
 					'phoE': '1',
 					'rpoB': '1',
-					'tonB': '79',
+					'tonB': '7',
 					'Clinical Significance': 'High-risk clone'
 				},
 				chartData: {
 					title: 'MLST Allelic Profile',
 					x: ['gapA', 'infB', 'mdh', 'pgi', 'phoE', 'rpoB', 'tonB'],
-					y: [3, 3, 1, 1, 1, 1, 79],
+					y: [4, 1, 2, 52, 1, 1, 7],
 					type: 'bar',
 					xLabel: 'Locus',
 					yLabel: 'Allele Number'
