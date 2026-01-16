@@ -965,7 +965,7 @@ Running Basic statistics processor...
   Contig files:
     assembly
   Calculating N50 and L50...
-    assembly, N50 = 371705, L50 = 6, Total length = 5553065, GC % = 57.18, # N's per 100 kbp =  0.00
+    assembly, N50 = 371705, L50 = 6, Total length = 5566069, GC % = 57.18, # N's per 100 kbp =  0.00
   Drawing Nx plot...
     saved to /data/kpneumoniae_demo/o_quast/basic_stats/Nx_plot.pdf
   Drawing cumulative plot...
@@ -1001,8 +1001,8 @@ NOTICEs: 2; WARNINGs: 1; non-fatal ERRORs: 0
 Thank you for using QUAST!
 `,
 				summary: {
-					'Contigs': '6',
-					'Total Length': '5,553,065 bp',
+					'Contigs': '189',
+					'Total Length': '5,566,069 bp',
 					'N50': '371,705 bp',
 					'L50': '6',
 					'GC Content': '57.18%',
@@ -1011,7 +1011,7 @@ Thank you for using QUAST!
 				chartData: {
 					title: 'Assembly Quality Metrics',
 					x: ['Total Length', 'N50'],
-					y: [5553065, 371705],
+					y: [5566069, 371705],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Length (bp)'
@@ -1100,62 +1100,38 @@ Thank you for using QUAST!
 				]
 			},
 			'abricate': {
-				output: `\x1b[36mABRicate v1.0.1\x1b[0m
-[2024-01-15 11:25:00] INFO: Starting AMR gene screening
+				output: `Using database ncbi:	5386 sequences -  2024-Jan-10
+Processing: o_unicycler/assembly.fasta
+Found 5 genes in o_unicycler/assembly.fasta
 
-\x1b[36mUsing database: NCBI AMRFinderPlus\x1b[0m
-  Sequences: 5,386 resistance genes
-  Last updated: 2024-01-10
-
-\x1b[36mScanning assembly...\x1b[0m
-  Input: assembly/assembly.fasta
-  Contigs: 189
-
-\x1b[36mResults:\x1b[0m
-  Genes found: 3 AMR genes
-
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;32m  ANTIMICROBIAL RESISTANCE GENES DETECTED\x1b[0m
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-
-  \x1b[31m1. blaKPC-2\x1b[0m
-     Location: chromosome, 2345678-2346567
-     Identity: 100.00%
-     Resistance: Carbapenems (KPC carbapenemase)
-
-  \x1b[31m2. blaSHV-12\x1b[0m
-     Location: chromosome, 1234567-1235432
-     Identity: 99.89%
-     Resistance: Cephalosporins (ESBL)
-
-  \x1b[33m3. fosA\x1b[0m
-     Location: chromosome, 3456789-3457234
-     Identity: 100.00%
-     Resistance: Fosfomycin (intrinsic)
-
-\x1b[31m⚠ CRITICAL: Carbapenem-resistant organism detected (CRE)\x1b[0m
-\x1b[33mRecommendation: Confirm with phenotypic testing and infection control measures\x1b[0m
+#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
+assembly.fasta	contig_1	2345678	2346559	+	blaKPC-2	1-882/882	0/0	100.00	100.00	ncbi	NG_049253.1	KPC-2 carbapenemase	CARBAPENEM
+assembly.fasta	contig_1	1234567	1235432	+	blaSHV-11	1-866/866	0/0	100.00	99.77	ncbi	NG_049956.1	SHV-11 beta-lactamase	BETA-LACTAM
+assembly.fasta	contig_1	3456789	3457208	-	fosA	1-420/420	0/0	100.00	100.00	ncbi	NG_047840.1	FosA fosfomycin resistance	FOSFOMYCIN
+assembly.fasta	contig_1	4567890	4569056	+	oqxA	1-1167/1167	0/0	100.00	99.91	ncbi	NG_048024.1	OqxA efflux pump	QUINOLONE
+assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi	NG_048025.1	OqxB efflux pump	QUINOLONE
 `,
 				summary: {
-					'AMR Genes Found': '3',
+					'AMR Genes Found': '5',
 					'Database': 'NCBI AMRFinderPlus',
-					'Gene 1': 'blaKPC-2 (100.00%)',
-					'Gene 2': 'blaSHV-12 (99.89%)',
-					'Gene 3': 'fosA (100.00%)',
-					'Resistance': 'Carbapenems, Cephalosporins, Fosfomycin',
-					'Clinical Alert': 'CRE - Carbapenemase detected'
+					'Carbapenem': 'blaKPC-2 (100%)',
+					'Beta-lactam': 'blaSHV-11 (99.77%)',
+					'Fosfomycin': 'fosA (100%)',
+					'Quinolone Efflux': 'oqxAB (99.9%)',
+					'Location': 'All chromosomal',
+					'Clinical Alert': 'CRE - KPC carbapenemase'
 				},
 				chartData: {
-					title: 'AMR Gene Distribution',
-					x: ['blaKPC-2', 'blaSHV-12', 'fosA'],
-					y: [100.00, 99.89, 100.00],
+					title: 'AMR Gene Identity',
+					x: ['blaKPC-2', 'blaSHV-11', 'fosA', 'oqxA', 'oqxB'],
+					y: [100.00, 99.77, 100.00, 99.91, 99.87],
 					type: 'bar',
 					xLabel: 'Gene',
 					yLabel: 'Identity (%)'
 				},
 				files: [
-					{ name: 'amr_report.tsv', type: 'tsv', size: '2.1 KB' },
-					{ name: 'amr_summary.txt', type: 'txt', size: '956 B' }
+					{ name: 'abricate_report.tsv', type: 'tsv', size: '2.8 KB' },
+					{ name: 'abricate_summary.txt', type: 'txt', size: '1.2 KB' }
 				]
 			},
 			'checkm': {
@@ -1228,7 +1204,7 @@ Thank you for using QUAST!
 				summary: {
 					'Completeness': '98.76%',
 					'Contamination': '0.45%',
-					'Genome Size': '5,553,065 bp',
+					'Genome Size': '5,566,069 bp',
 					'GC Content': '57.18%',
 					'Coding Density': '87.2%',
 					'Quality': 'HIGH-QUALITY'
@@ -1375,32 +1351,32 @@ Thank you for using QUAST!
 [07:16:00] Found 'any2fasta' => /home/pop/miniconda3/envs/env_abricate/bin/any2fasta
 [07:16:01] Found blastn: 2.12.0+ (002012)
 [07:16:01] Excluding 3 schemes: ecoli vcholerae_2 abaumannii
-[07:16:05] Found exact allele match klebsiella.tonB-7
+[07:16:05] Found exact allele match klebsiella.gapA-3
+[07:16:05] Found exact allele match klebsiella.infB-3
+[07:16:05] Found exact allele match klebsiella.mdh-1
+[07:16:05] Found exact allele match klebsiella.pgi-1
 [07:16:05] Found exact allele match klebsiella.phoE-1
-[07:16:05] Found exact allele match klebsiella.mdh-2
-[07:16:05] Found exact allele match klebsiella.infB-1
-[07:16:05] Found exact allele match klebsiella.pgi-52
 [07:16:05] Found exact allele match klebsiella.rpoB-1
-[07:16:05] Found exact allele match klebsiella.gapA-4
+[07:16:05] Found exact allele match klebsiella.tonB-79
 [07:16:05] Use --quiet or -q to avoid all the message output, including these witticisms.
 [07:16:05] Done.
 `,
 				summary: {
 					'Scheme': 'K. pneumoniae',
 					'Sequence Type': 'ST258',
-					'gapA': '4',
-					'infB': '1',
-					'mdh': '2',
-					'pgi': '52',
+					'gapA': '3',
+					'infB': '3',
+					'mdh': '1',
+					'pgi': '1',
 					'phoE': '1',
 					'rpoB': '1',
-					'tonB': '7',
-					'Clinical Significance': 'High-risk clone'
+					'tonB': '79',
+					'Clinical Significance': 'High-risk KPC clone'
 				},
 				chartData: {
 					title: 'MLST Allelic Profile',
 					x: ['gapA', 'infB', 'mdh', 'pgi', 'phoE', 'rpoB', 'tonB'],
-					y: [4, 1, 2, 52, 1, 1, 7],
+					y: [3, 3, 1, 1, 1, 1, 79],
 					type: 'bar',
 					xLabel: 'Locus',
 					yLabel: 'Allele Number'
