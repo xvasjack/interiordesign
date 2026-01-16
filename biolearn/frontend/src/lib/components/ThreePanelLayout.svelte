@@ -95,7 +95,7 @@
 			{ name: 'assembly.gfa', type: 'gfa' },
 			{ name: 'unicycler.log', type: 'log' }
 		],
-		'bandage': [{ name: 'assembly_graph.png', type: 'png' }],
+		'bandage': [{ name: 'o_bandage.png', type: 'png' }],
 		'quast': [
 			{ name: 'quast_report.html', type: 'html' },
 			{ name: 'quast_report.tsv', type: 'tsv' }

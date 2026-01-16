@@ -99,7 +99,7 @@
 		'unicycler.log': `[2026-01-12 04:15:32] Starting Unicycler v0.5.0\n[2026-01-12 04:15:32] Command: unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o assembly\n[2026-01-12 04:15:33] Loading reads\n[2026-01-12 04:15:45] SPAdes assembly with k=27,53,71,87,99,111,119,127\n[2026-01-12 04:18:23] Building bridges\n[2026-01-12 04:20:21] Applying bridges\n[2026-01-12 04:20:21] Final assembly: 189 segments, 5,566,069 bp total\n[2026-01-12 04:20:21] Complete replicons: 3 (plasmids)\n[2026-01-12 04:20:21] Incomplete: 1 (chromosome)\n...`,
 
 		// Bandage output (base64 placeholder for PNG)
-		'assembly_graph.png': 'PNG_IMAGE_PLACEHOLDER',
+		'o_bandage.png': 'PNG_IMAGE_PLACEHOLDER',
 
 		// QUAST outputs
 		'quast_report.tsv': `Assembly\t# contigs\tTotal length\tLargest contig\tGC (%)\tN50\tN75\tL50\tL75\n# misassemblies\t# misassembled contigs\nsample_01\t2\t4987390\t4892156\t52.3\t4892156\t95234\t1\t2\t0\t0`,
