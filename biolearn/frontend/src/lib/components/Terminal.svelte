@@ -401,6 +401,17 @@
 				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
 			]
 		},
+		'plasmidfinder.py': {
+			// Trial/Demo scenario
+			'/data/kpneumoniae_demo': ['o_plasmidfinder/'],
+			'/data/kpneumoniae_demo/o_plasmidfinder': [
+				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
+			],
+			'/data/outbreak_investigation': ['plasmidfinder_results/'],
+			'/data/outbreak_investigation/plasmidfinder_results': [
+				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
+			]
+		},
 		'resfinder': {
 			'/data/outbreak_investigation': ['resfinder_results/'],
 			'/data/outbreak_investigation/resfinder_results': [
@@ -2979,7 +2990,9 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 		};
 
-		return outputs[tool] || null;
+		// Handle plasmidfinder.py as alias for plasmidfinder
+		const toolKey = tool === 'plasmidfinder.py' ? 'plasmidfinder' : tool;
+		return outputs[toolKey] || null;
 	}
 
 	const terminalOptions = {
@@ -3325,7 +3338,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		],
 		'plasmidfinder': [
 			'assembly/assembly.fasta', 'polished/consensus.fasta',
-			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta',
+			'o_unicycler/assembly.fasta'
+		],
+		'plasmidfinder.py': [
+			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta',
+			'o_unicycler/assembly.fasta'
 		],
 		// Phase 4: Phylogenetics
 		'snippy': [
@@ -3403,6 +3422,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		'mob_recon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'platon': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'plasmidfinder': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
+		'plasmidfinder.py': { dirs: ['/data/kpneumoniae_demo', '/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		// Phase 4
 		'snippy': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
 		'roary': { dirs: ['/data/outbreak_investigation', '/data/wastewater_surveillance', '/data/clinical_samples'] },
@@ -4391,9 +4411,9 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				}
 			}
 
-			if (command === 'plasmidfinder') {
+			if (command === 'plasmidfinder' || command === 'plasmidfinder.py') {
 				// plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_results/
-				const expectedCmd = 'plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_results/';
+				const expectedCmd = `${command} -i assembly/assembly.fasta -o plasmidfinder_results/`;
 				if (!args.includes('-i')) {
 					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);

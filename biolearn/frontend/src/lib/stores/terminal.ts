@@ -327,7 +327,7 @@ export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
 	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'checkm2', 'busco', 'confindr',
 	'prokka', 'bakta', 'abricate', 'resfinder', 'virulencefinder', 'mlst',
-	'mob_recon', 'platon', 'plasmidfinder', 'integron_finder', 'isescan',
+	'mob_recon', 'platon', 'plasmidfinder', 'plasmidfinder.py', 'integron_finder', 'isescan',
 	'snippy', 'snippy-core', 'roary', 'iqtree', 'gubbins',
 	// Long-read tools (ONT)
 	'NanoPlot', 'filtlong', 'flye', 'medaka_consensus', 'porechop', 'kraken2', 'modkit',
