@@ -82,7 +82,7 @@ Component summary:
 		'sample_01.tsv': `locus_tag\ttype\tstart\tend\tstrand\tgene\tproduct\nSAMPLE01_00001\tCDS\t1\t1350\t+\tdnaA\tChromosomal replication initiator protein DnaA\nSAMPLE01_00002\tCDS\t1524\t2624\t+\tdnaN\tDNA polymerase III subunit beta`,
 		'sample_01.json': `{"version":"1.8.2","genome":{"length":4987390,"contigs":2,"gc":52.3},"features":{"CDS":4623,"tRNA":86,"rRNA":22,"ncRNA":89,"CRISPR":2}}`,
 		// MLST files
-		'mlst_report.tsv': `FILE\tSCHEME\tST\tadk\tfumC\tgyrB\ticd\tmdh\tpurA\trecA\nassembly/assembly.fasta\techerichia_coli_achtman\t131\t10\t11\t4\t8\t8\t8\t2`,
+		'o_mlst.tab': `o_unicycler/assembly.fasta\tklebsiella\t307\tgapA(4)\tinfB(1)\tmdh(2)\tpgi(52)\tphoE(1)\trpoB(1)\ttonB(7)`,
 		// Phase 3: MOB-suite files
 		'plasmid_report.tsv': `sample_id\tnum_contigs\ttotal_length\tplasmid_id\treplicon_type\tmobility\nchromosome\t1\t4892156\t-\t-\t-\nplasmid_1\t1\t95234\tAA001\tIncFIB(K),IncFII(K)\tconjugative`,
 		'mobtyper_results.txt': `MOB-typer Results\n=================\nPlasmid: AA001\nSize: 95,234 bp\nReplicon type: IncFIB(K), IncFII(K)\nMobility: Conjugative\nRelaxase: MOBF\nMate-pair formation: MPF_F`,
@@ -151,7 +151,7 @@ Component summary:
 			{ name: 'amr_summary.txt', type: 'txt' }
 		],
 		'mlst': [
-			{ name: 'mlst_report.tsv', type: 'tsv' }
+			{ name: 'o_mlst.tab', type: 'tsv' }
 		],
 		// Phase 3: Plasmid Analysis
 		'mob_recon': [
