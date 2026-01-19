@@ -156,22 +156,11 @@ Component summary:
 	async function viewFile(file: any) {
 		const content = fileContents[file.name];
 
-		// Handle FastQC HTML files - fetch from static folder
+		// Handle FastQC HTML files - open directly from static folder
 		if (file.type === 'html' && content === 'FASTQC_STATIC') {
-			try {
-				const response = await fetch(`/fastqc/${file.name}`);
-				if (response.ok) {
-					const htmlContent = await response.text();
-					const newWindow = window.open('', '_blank');
-					if (newWindow) {
-						newWindow.document.write(htmlContent);
-						newWindow.document.close();
-					}
-				} else {
-					alert(`Could not load ${file.name}`);
-				}
-			} catch (error) {
-				alert(`Error loading ${file.name}`);
+			const newWindow = window.open(`/fastqc/${file.name}`, '_blank');
+			if (!newWindow) {
+				alert(`Could not open ${file.name}`);
 			}
 		} else if (file.type === 'svg' && content === 'SVG_STATIC') {
 			// Handle SVG files from static/images folder - open in new window
