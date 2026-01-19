@@ -67,7 +67,7 @@
 	// Sample file contents for different file types
 	const fileContents: Record<string, string> = {
 		// SeqKit stats
-		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
+		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t990,478\t268,416,273\t35\t271\t301\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t990,478\t268,449,364\t35\t271\t301`,
 
 		// FastQC reports - loaded from static folder (real FastQC output format)
 		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
