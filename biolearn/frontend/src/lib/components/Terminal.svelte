@@ -1821,55 +1821,96 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 				]
 			},
 			'plasmidfinder': {
-				output: `\x1b[36mPlasmidFinder v2.1.6\x1b[0m
-[2024-01-15 13:20:00] INFO: Starting plasmid replicon typing
-
-\x1b[36mInput:\x1b[0m
-  Assembly: assembly/assembly.fasta
-
-\x1b[36mSearching replicon databases...\x1b[0m
-  Enterobacteriaceae replicons...
-  Gram-positive replicons...
-  Custom database...
-
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-\x1b[1;32m  PLASMIDFINDER RESULTS\x1b[0m
-\x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
-
-  \x1b[33mReplicons detected: 3\x1b[0m
-
-  1. ColRNAI
-     Identity: 99.45%
-     Coverage: 100%
-     Contig: contig_188 (5,409 bp)
-
-  2. Col(pHAD28)
-     Identity: 98.23%
-     Coverage: 100%
-     Contig: contig_189 (4,315 bp)
-
-  3. Col156
-     Identity: 97.89%
-     Coverage: 98%
-     Contig: contig_190 (2,532 bp)
-
-\x1b[33mNote:\x1b[0m Col-type plasmids are small, mobilizable plasmids commonly found
-      in Enterobacteriaceae. They may carry colicin or other bacteriocin genes.
-
-\x1b[32m✓ Plasmid identification complete\x1b[0m
+				output: `/home/pop/miniconda3/envs/env_plasmidfinder/bin/plasmidfinder.py:351: DeprecationWarning: Use shutil.which instead of find_executable
+  if find_executable(method_path) is None:
+{'plasmidfinder': {'results': {'Enterobacteriaceae': {'enterobacteriaceae': {'19 length=49609 depth=1.36x:47871..48018:IncFII(K)_1__CP000648:95.945946': {'HSP_length': 148,
+                                                                                                                                                          'accession': 'CP000648',
+                                                                                                                                                          'contig_name': '19 '
+                                                                                                                                                                         'length=49609 '
+                                                                                                                                                                         'depth=1.36x',
+                                                                                                                                                          'coverage': 100.0,
+                                                                                                                                                          'hit_id': '19 '
+                                                                                                                                                                    'length=49609 '
+                                                                                                                                                                    'depth=1.36x:47871..48018:IncFII(K)_1__CP000648:95.945946',
+                                                                                                                                                          'identity': 95.95,
+                                                                                                                                                          'note': '',
+                                                                                                                                                          'plasmid': 'IncFII(K)',
+                                                                                                                                                          'position_in_ref': '1..148',
+                                                                                                                                                          'positions_in_contig': '47871..48018',
+                                                                                                                                                          'template_length': 148},
+                                                                             '22 length=34124 depth=1.41x:4640..5013:IncX3_1__JN247852:100.000000': {'HSP_length': 374,
+                                                                                                                                                     'accession': 'JN247852',
+                                                                                                                                                     'contig_name': '22 '
+                                                                                                                                                                    'length=34124 '
+                                                                                                                                                                    'depth=1.41x',
+                                                                                                                                                     'coverage': 100.0,
+                                                                                                                                                     'hit_id': '22 '
+                                                                                                                                                               'length=34124 '
+                                                                                                                                                               'depth=1.41x:4640..5013:IncX3_1__JN247852:100.000000',
+                                                                                                                                                     'identity': 100.0,
+                                                                                                                                                     'note': '',
+                                                                                                                                                     'plasmid': 'IncX3',
+                                                                                                                                                     'position_in_ref': '1..374',
+                                                                                                                                                     'positions_in_contig': '4640..5013',
+                                                                                                                                                     'template_length': 374},
+                                                                             '23 length=26349 depth=1.32x:12470..13029:IncFIB(K)_1_Kpn3_JN233704:98.928571': {'HSP_length': 560,
+                                                                                                                                                              'accession': 'JN233704',
+                                                                                                                                                              'contig_name': '23 '
+                                                                                                                                                                             'length=26349 '
+                                                                                                                                                                             'depth=1.32x',
+                                                                                                                                                              'coverage': 100.0,
+                                                                                                                                                              'hit_id': '23 '
+                                                                                                                                                                        'length=26349 '
+                                                                                                                                                                        'depth=1.32x:12470..13029:IncFIB(K)_1_Kpn3_JN233704:98.928571',
+                                                                                                                                                              'identity': 98.93,
+                                                                                                                                                              'note': 'Kpn3',
+                                                                                                                                                              'plasmid': 'IncFIB(K)',
+                                                                                                                                                              'position_in_ref': '1..560',
+                                                                                                                                                              'positions_in_contig': '12470..13029',
+                                                                                                                                                              'template_length': 560},
+                                                                             '35 length=4315 depth=17.66x circular=true:3913..4026:Col440I_1__CP023920.1:97.368421': {'HSP_length': 114,
+                                                                                                                                                                      'accession': 'CP023920.1',
+                                                                                                                                                                      'contig_name': '35 '
+                                                                                                                                                                                     'length=4315 '
+                                                                                                                                                                                     'depth=17.66x '
+                                                                                                                                                                                     'circular=true',
+                                                                                                                                                                      'coverage': 100.0,
+                                                                                                                                                                      'hit_id': '35 '
+                                                                                                                                                                                'length=4315 '
+                                                                                                                                                                                'depth=17.66x '
+                                                                                                                                                                                'circular=true:3913..4026:Col440I_1__CP023920.1:97.368421',
+                                                                                                                                                                      'identity': 97.37,
+                                                                                                                                                                      'note': '',
+                                                                                                                                                                      'plasmid': 'Col440I',
+                                                                                                                                                                      'position_in_ref': '1..114',
+                                                                                                                                                                      'positions_in_contig': '3913..4026',
+                                                                                                                                                                      'template_length': 114}}},
+                               'Gram Positive': {'Inc18': 'No hit found',
+                                                 'NT_Rep': 'No hit found',
+                                                 'Rep1': 'No hit found',
+                                                 'Rep2': 'No hit found',
+                                                 'Rep3': 'No hit found',
+                                                 'RepA_N': 'No hit found',
+                                                 'RepL': 'No hit found',
+                                                 'Rep_trans': 'No hit found'}},
+                   'run_info': {'date': '19.01.2026', 'time': '06:51:42'},
+                   'user_input': {'file_format': 'fasta',
+                                  'filename(s)': ['o_unicycler/assembly.fasta'],
+                                  'method': 'blast'}}}
 `,
 				summary: {
-					'Replicons Found': '3',
-					'Plasmid 1': 'ColRNAI (5,409 bp)',
-					'Plasmid 2': 'Col(pHAD28) (4,315 bp)',
-					'Plasmid 3': 'Col156 (2,532 bp)',
-					'Type': 'Small Col-type plasmids',
-					'Clinical Significance': 'Low (no AMR genes typically)'
+					'Replicons Found': '4',
+					'Plasmid 1': 'IncFII(K) (95.95%)',
+					'Plasmid 2': 'IncX3 (100%)',
+					'Plasmid 3': 'IncFIB(K) (98.93%)',
+					'Plasmid 4': 'Col440I (97.37%)',
+					'Type': 'Inc-type and Col-type plasmids',
+					'Clinical Significance': 'High (IncX3 associated with AMR)'
 				},
 				chartData: {
 					title: 'Replicon Identity',
-					x: ['ColRNAI', 'Col(pHAD28)', 'Col156'],
-					y: [99.45, 98.23, 97.89],
+					x: ['IncFII(K)', 'IncX3', 'IncFIB(K)', 'Col440I'],
+					y: [95.95, 100.0, 98.93, 97.37],
 					type: 'bar',
 					xLabel: 'Replicon',
 					yLabel: 'Identity (%)'
