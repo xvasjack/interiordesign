@@ -172,6 +172,28 @@ export const fileNotes: Record<string, FileNote[]> = {
 			description: 'Number of separate connected components. For bacteria: expect 1 chromosome + 0-5 plasmids. Many components may indicate fragmentation.',
 		}
 	],
+	'quast': [
+		{
+			name: 'N50 Metric',
+			description: 'N50 is the contig length where 50% of the assembly is in contigs of this size or larger. For bacterial genomes: >300kb is EXCELLENT, >100kb is GOOD, <50kb may indicate fragmentation.',
+		},
+		{
+			name: 'L50 Metric',
+			description: 'L50 is the minimum number of contigs needed to cover 50% of the assembly. Lower is better. L50 ≤10 is EXCELLENT for bacteria, indicating good contiguity.',
+		},
+		{
+			name: 'Total Length',
+			description: 'Should match expected genome size for your organism. K. pneumoniae: ~5.5 Mb, E. coli: ~5.0 Mb. Large deviations may indicate contamination or incomplete assembly.',
+		},
+		{
+			name: 'GC Content',
+			description: 'GC% should match your organism. K. pneumoniae: 55-58%, E. coli: 50-51%. Unexpected GC suggests contamination or misidentification.',
+		},
+		{
+			name: 'Quality Assessment',
+			description: 'EXCELLENT: N50 >300kb, L50 ≤10, total length matches expected, correct GC%. GOOD: N50 >100kb, L50 ≤20. FAIR: N50 >50kb. POOR: highly fragmented assembly.',
+		}
+	],
 	'prokka': [
 		{
 			name: 'GFF3 Annotation',
