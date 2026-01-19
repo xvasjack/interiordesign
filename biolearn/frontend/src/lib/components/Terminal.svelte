@@ -392,8 +392,8 @@
 		},
 		'plasmidfinder': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['plasmidfinder_output/'],
-			'/data/kpneumoniae_demo/plasmidfinder_output': [
+			'/data/kpneumoniae_demo': ['o_plasmidfinder/'],
+			'/data/kpneumoniae_demo/o_plasmidfinder': [
 				'results_tab.tsv', 'Hit_in_genome_seq.fsa', 'data.json'
 			],
 			'/data/outbreak_investigation': ['plasmidfinder_results/'],
@@ -5030,6 +5030,12 @@ sample_01	2456789	2394012	97.44	52.3
 sample_02	2489123	2421456	97.28	51.9
 sample_03	2512456	2445678	97.34	52.1
 ...`,
+		// PlasmidFinder results_tab.tsv
+		'results_tab.tsv': `Database	Plasmid	Identity	Query / Template length	Contig	Position in contig	Note	Accession number
+enterobacteriaceae	Col440I	97.37	114 / 114	35 length=4315 depth=17.66x circular=true	3913..4026		CP023920.1
+enterobacteriaceae	IncFIB(K)	98.93	560 / 560	23 length=26349 depth=1.32x	12470..13029	Kpn3	JN233704
+enterobacteriaceae	IncFII(K)	95.95	148 / 148	19 length=49609 depth=1.36x	47871..48018		CP000648
+enterobacteriaceae	IncX3	100.0	374 / 374	22 length=34124 depth=1.41x	4640..5013		JN247852`,
 		// CheckM2 quality report
 		'quality_report.tsv': `Name	Completeness	Contamination	Completeness_Model_Used	Translation_Table_Used	Coding_Density	Contig_N50	Average_Gene_Length	Genome_Size	GC_Content	Total_Coding_Sequences	Total_Contigs	Max_Contig_Length	Additional_Notes
 assembly	100.0	0.16	Neural Network (Specific Model)	11	0.882	371705	312.0826981707317	5564255	0.57	5248	117	837178	None`,
