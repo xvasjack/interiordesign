@@ -1279,7 +1279,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 9: Plasmid Identification',
 				text: `Identify plasmid replicons in the assembly to confirm which circular components are plasmids.`,
-				command: 'plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_output/',
+				command: 'mkdir o_plasmidfinder && plasmidfinder.py -i o_assembly/assembly.fasta -o o_plasmidfinder',
 				explanation: 'PlasmidFinder searches for known plasmid replicon sequences in the assembly to identify plasmid types.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
