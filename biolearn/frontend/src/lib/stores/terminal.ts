@@ -227,6 +227,32 @@ export const fileNotes: Record<string, FileNote[]> = {
 			name: 'Contig N50',
 			description: 'Assembly contiguity metric. Higher N50 values indicate better assembly with longer contiguous sequences. N50 >100kb is generally good for bacterial genomes.',
 		}
+	],
+	'plasmidfinder': [
+		{
+			name: 'Replicon Type',
+			description: 'Plasmid replicons are classified by incompatibility (Inc) groups. Plasmids in the same Inc group cannot coexist stably in the same cell. Common types in Enterobacteriaceae: IncF, IncX, IncI, IncN, Col.',
+		},
+		{
+			name: 'Identity Percentage',
+			description: 'Sequence similarity to the reference replicon. >95% identity indicates a confident match. Lower identity may suggest novel variants or distant relatives of known replicons.',
+		},
+		{
+			name: 'Coverage',
+			description: 'Percentage of the reference replicon sequence covered by the query. 100% coverage means the entire replicon sequence was found in the assembly.',
+		},
+		{
+			name: 'IncF Plasmids',
+			description: 'Large conjugative plasmids (50-200 kb) common in Enterobacteriaceae. Often carry multiple resistance genes. IncFII(K) and IncFIB(K) are Klebsiella-associated variants.',
+		},
+		{
+			name: 'IncX3 Plasmids',
+			description: 'Medium-sized plasmids (~30-50 kb) frequently associated with carbapenemase genes (blaNDM, blaKPC). High clinical significance for antimicrobial resistance surveillance.',
+		},
+		{
+			name: 'Col Plasmids',
+			description: 'Small mobilizable plasmids (~4-10 kb) originally identified as colicin-producing. Col440I and similar types often carry no resistance genes but can mobilize with conjugative plasmids.',
+		}
 	]
 };
 
