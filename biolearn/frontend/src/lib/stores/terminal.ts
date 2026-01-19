@@ -201,6 +201,32 @@ export const fileNotes: Record<string, FileNote[]> = {
 			name: 'Clinical Interpretation',
 			description: 'Presence of resistance genes predicts phenotypic resistance. blaSHV = ampicillin resistance, blaCTX-M = extended-spectrum beta-lactamase (ESBL).',
 		}
+	],
+	'checkm2': [
+		{
+			name: 'Completeness',
+			description: 'Percentage of expected single-copy marker genes present. >95% is high-quality, >90% is medium-quality, >50% is low-quality. 100% indicates all expected genes were found.',
+		},
+		{
+			name: 'Contamination',
+			description: 'Percentage of duplicated single-copy marker genes indicating possible contamination. <5% is high-quality, <10% is medium-quality. Values near 0% indicate a clean assembly.',
+		},
+		{
+			name: 'Completeness Model Used',
+			description: 'CheckM2 uses machine learning models (Neural Network) to predict completeness. "Specific Model" means a lineage-specific model was applied for higher accuracy.',
+		},
+		{
+			name: 'Coding Density',
+			description: 'Fraction of genome coding for proteins. Typical bacterial genomes have 85-95% coding density. Values outside this range may indicate assembly issues or contamination.',
+		},
+		{
+			name: 'Quality Categories',
+			description: 'HIGH-QUALITY: >95% complete, <5% contamination. MEDIUM-QUALITY: >50% complete, <10% contamination. LOW-QUALITY: below these thresholds.',
+		},
+		{
+			name: 'Contig N50',
+			description: 'Assembly contiguity metric. Higher N50 values indicate better assembly with longer contiguous sequences. N50 >100kb is generally good for bacterial genomes.',
+		}
 	]
 };
 

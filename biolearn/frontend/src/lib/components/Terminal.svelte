@@ -1203,17 +1203,17 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 [01/12/2026 06:27:54 AM] INFO: CheckM2 finished successfully.
 `,
 				summary: {
-					'Completeness': '98.76%',
-					'Contamination': '0.45%',
-					'Genome Size': '5,566,069 bp',
-					'GC Content': '57.18%',
-					'Coding Density': '87.2%',
+					'Completeness': '100.0%',
+					'Contamination': '0.16%',
+					'Genome Size': '5,564,255 bp',
+					'GC Content': '57%',
+					'Coding Density': '88.2%',
 					'Quality': 'HIGH-QUALITY'
 				},
 				chartData: {
 					title: 'CheckM2 Quality Assessment',
 					x: ['Completeness', 'Contamination'],
-					y: [98.76, 0.45],
+					y: [100.0, 0.16],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Percentage (%)'
@@ -4989,6 +4989,9 @@ sample_01	2456789	2394012	97.44	52.3
 sample_02	2489123	2421456	97.28	51.9
 sample_03	2512456	2445678	97.34	52.1
 ...`,
+		// CheckM2 quality report
+		'quality_report.tsv': `Name	Completeness	Contamination	Completeness_Model_Used	Translation_Table_Used	Coding_Density	Contig_N50	Average_Gene_Length	Genome_Size	GC_Content	Total_Coding_Sequences	Total_Contigs	Max_Contig_Length	Additional_Notes
+assembly	100.0	0.16	Neural Network (Specific Model)	11	0.882	371705	312.0826981707317	5564255	0.57	5248	117	837178	None`,
 		// GFF annotation
 		'.gff': `##gff-version 3
 ##sequence-region chromosome_1 1 4892156
