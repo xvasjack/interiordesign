@@ -736,11 +736,11 @@ function createLongReadPhase2Sections(dataDir: string = '/data/outbreak_investig
 			type: 'task',
 			title: 'Step 11: MLST Typing',
 			text: `Determine the sequence type.`,
-			command: 'mlst polished/consensus.fasta -o mlst_results/',
+			command: 'mlst polished/consensus.fasta > o_mlst/mlst_result.tab',
 			explanation: 'MLST assigns sequence types for epidemiological tracking.',
 			requiredDir: dataDir,
 			parameters: [
-				{ name: '-o mlst_results/', desc: 'Output directory' }
+				{ name: '>', desc: 'Redirect output to file' }
 			]
 		}
 	];
@@ -1027,11 +1027,11 @@ function createNanoporePhase2Sections(dataDir: string = '/data/outbreak_investig
 			type: 'task',
 			title: 'Step 11: MLST Typing',
 			text: `Determine sequence type for epidemiology.`,
-			command: 'mlst polished/consensus.fasta -o mlst_results/',
+			command: 'mlst polished/consensus.fasta > o_mlst/mlst_result.tab',
 			explanation: 'MLST provides immediate epidemiological context.',
 			requiredDir: dataDir,
 			parameters: [
-				{ name: '-o mlst_results/', desc: 'Output directory' }
+				{ name: '>', desc: 'Redirect output to file' }
 			]
 		},
 		{
@@ -1604,11 +1604,11 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 10: MLST Typing',
 				text: `Determine the sequence type.`,
-				command: 'mlst assembly/assembly.fasta -o mlst_results/',
+				command: 'mlst assembly/assembly.fasta > o_mlst/mlst_result.tab',
 				explanation: 'MLST assigns sequence types for epidemiological tracking.',
 				requiredDir: '/data/outbreak_investigation',
 				parameters: [
-					{ name: '-o mlst_results/', desc: 'Output directory' }
+					{ name: '>', desc: 'Redirect output to file' }
 				]
 			},
 			// Phase 3: Annotation
@@ -1895,11 +1895,11 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 19: MLST Comparison',
 				text: `Compare sequence type with known outbreak strains.`,
-				command: 'mlst polished/consensus.fasta -o mlst_results/',
+				command: 'mlst polished/consensus.fasta > o_mlst/mlst_result.tab',
 				explanation: 'MLST helps identify if this strain matches known outbreak clusters.',
 				requiredDir: '/data/clinical_samples',
 				parameters: [
-					{ name: '-o mlst_results/', desc: 'Output directory' }
+					{ name: '>', desc: 'Redirect output to file' }
 				]
 			},
 			{
@@ -1910,7 +1910,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 20: Generate Clinical Report',
 				text: `Create a summary report for the clinical team.`,
-				command: 'summary_report --input polished/consensus.fasta --amr o_abricate/ --mlst mlst_results/ -o clinical_report/',
+				command: 'summary_report --input polished/consensus.fasta --amr o_abricate/ --mlst o_mlst/ -o clinical_report/',
 				explanation: 'Generates a clinical summary for immediate use by the care team.',
 				requiredDir: '/data/clinical_samples',
 				parameters: [
