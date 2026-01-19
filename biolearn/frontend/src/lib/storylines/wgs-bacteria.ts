@@ -194,7 +194,7 @@ function createIlluminaPhase2Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 13: AMR Screening (All Patients)',
 			text: `Screen all patient assemblies for antimicrobial resistance genes.`,
-			command: 'abricate --db ncbi assembly/patient_01/assembly.fasta assembly/patient_02/assembly.fasta assembly/patient_03/assembly.fasta > abricate_results/all_patients_amr.tsv',
+			command: 'abricate --db ncbi assembly/patient_01/assembly.fasta assembly/patient_02/assembly.fasta assembly/patient_03/assembly.fasta > o_abricate/all_patients_amr.tsv',
 			explanation: 'ABRicate identifies resistance genes. Screening all patients at once for comparison.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
@@ -724,12 +724,12 @@ function createLongReadPhase2Sections(dataDir: string = '/data/outbreak_investig
 			type: 'task',
 			title: 'Step 10: AMR Screening',
 			text: `Screen for antimicrobial resistance genes.`,
-			command: 'abricate --db ncbi polished/consensus.fasta -o abricate_results/',
+			command: 'abricate --db ncbi polished/consensus.fasta -o o_abricate/',
 			explanation: 'ABRicate identifies resistance genes from databases.',
 			requiredDir: dataDir,
 			parameters: [
 				{ name: '--db ncbi', desc: 'Use NCBI database' },
-				{ name: '-o abricate_results/', desc: 'Output directory' }
+				{ name: '-o o_abricate/', desc: 'Output directory' }
 			]
 		},
 		{
@@ -1015,12 +1015,12 @@ function createNanoporePhase2Sections(dataDir: string = '/data/outbreak_investig
 			type: 'task',
 			title: 'Step 10: Real-Time AMR Detection',
 			text: `Screen for resistance genes directly from reads.`,
-			command: 'abricate --db resfinder polished/consensus.fasta -o abricate_results/',
+			command: 'abricate --db resfinder polished/consensus.fasta -o o_abricate/',
 			explanation: 'ABRicate rapidly identifies resistance genes.',
 			requiredDir: dataDir,
 			parameters: [
 				{ name: '--db resfinder', desc: 'Use ResFinder database' },
-				{ name: '-o abricate_results/', desc: 'Output directory' }
+				{ name: '-o o_abricate/', desc: 'Output directory' }
 			]
 		},
 		{
@@ -1592,12 +1592,12 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 9: AMR Screening',
 				text: `Screen for antimicrobial resistance genes.`,
-				command: 'abricate --db ncbi assembly/assembly.fasta -o abricate_results/',
+				command: 'abricate --db ncbi assembly/assembly.fasta -o o_abricate/',
 				explanation: 'ABRicate identifies resistance genes from databases.',
 				requiredDir: '/data/outbreak_investigation',
 				parameters: [
 					{ name: '--db ncbi', desc: 'Use NCBI database' },
-					{ name: '-o abricate_results/', desc: 'Output directory' }
+					{ name: '-o o_abricate/', desc: 'Output directory' }
 				]
 			},
 			{
@@ -1910,7 +1910,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 20: Generate Clinical Report',
 				text: `Create a summary report for the clinical team.`,
-				command: 'summary_report --input polished/consensus.fasta --amr abricate_results/ --mlst mlst_results/ -o clinical_report/',
+				command: 'summary_report --input polished/consensus.fasta --amr o_abricate/ --mlst mlst_results/ -o clinical_report/',
 				explanation: 'Generates a clinical summary for immediate use by the care team.',
 				requiredDir: '/data/clinical_samples',
 				parameters: [

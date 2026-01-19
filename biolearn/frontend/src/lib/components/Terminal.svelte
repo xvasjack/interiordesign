@@ -75,12 +75,12 @@
 		],
 		// R Report directories - pre-populated with analysis results
 		'/data/wgs_report': [
-			'quast_results/', 'abricate_results/', 'mlst_results/', 'iqtree_results/'
+			'quast_results/', 'o_abricate/', 'mlst_results/', 'iqtree_results/'
 		],
 		'/data/wgs_report/quast_results': [
 			'report.tsv', 'report.html'
 		],
-		'/data/wgs_report/abricate_results': [
+		'/data/wgs_report/o_abricate': [
 			'summary.tsv'
 		],
 		'/data/wgs_report/mlst_results': [
@@ -263,8 +263,8 @@
 			'/data/kpneumoniae_demo/o_abricate': [
 				'abricate_report.tsv', 'abricate_summary.txt'
 			],
-			'/data/outbreak_investigation': ['abricate_results/'],
-			'/data/outbreak_investigation/abricate_results': [
+			'/data/outbreak_investigation': ['o_abricate/'],
+			'/data/outbreak_investigation/o_abricate': [
 				'all_patients_amr.tsv', 'amr_summary.txt'
 			]
 		},
@@ -3355,7 +3355,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		'sourcetracker2': ['exported/feature-table.biom', 'source-metadata.tsv'],
 		// R/RMarkdown tools
 		'Rscript': [
-			'quast_results/report.tsv', 'abricate_results/summary.tsv', 'mlst_results/mlst.tsv',
+			'quast_results/report.tsv', 'o_abricate/summary.tsv', 'mlst_results/mlst.tsv',
 			'iqtree_results/core_snps.treefile', 'phyloseq_object.rds', 'metadata.csv',
 			'counts_matrix.csv', 'sample_info.csv', 'deseq2_results.rds'
 		]
@@ -3914,8 +3914,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'abricate') {
-				// abricate --db ncbi assembly/assembly.fasta -o abricate_results/
-				const expectedCmd = 'abricate --db ncbi assembly/assembly.fasta -o abricate_results/';
+				// abricate --db ncbi assembly/assembly.fasta -o o_abricate/
+				const expectedCmd = 'abricate --db ncbi assembly/assembly.fasta -o o_abricate/';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
@@ -3940,15 +3940,15 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				// Check output
 				if (!args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mRequired: -o abricate_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o o_abricate/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const oIdx = args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'abricate_results') {
+				if (outDir !== 'o_abricate') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: abricate_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: o_abricate/\x1b[0m`);
 					writePrompt();
 					return;
 				}

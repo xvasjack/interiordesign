@@ -110,7 +110,7 @@ const wgsBacteriaReportSections: StorylineSection[] = [
 		type: 'task',
 		title: 'Step 5: Load AMR Results',
 		text: `Read ABRicate AMR gene detection results.`,
-		command: `Rscript -e "amr <- read.delim('abricate_results/summary.tsv', header=TRUE); print(table(amr\\$GENE))"`,
+		command: `Rscript -e "amr <- read.delim('o_abricate/summary.tsv', header=TRUE); print(table(amr\\$GENE))"`,
 		explanation: 'ABRicate summary contains gene names, coverage, and identity for each sample.',
 		requiredDir: '/data/wgs_report',
 		parameters: [
@@ -173,7 +173,7 @@ const wgsBacteriaReportSections: StorylineSection[] = [
 		type: 'task',
 		title: 'Step 9: AMR Heatmap',
 		text: `Create a presence/absence heatmap of AMR genes.`,
-		command: `Rscript -e "library(pheatmap); library(tidyr); amr <- read.delim('abricate_results/summary.tsv'); amr_matrix <- amr %>% mutate(present=1) %>% select(FILE, GENE, present) %>% distinct() %>% pivot_wider(names_from=GENE, values_from=present, values_fill=0) %>% column_to_rownames('FILE') %>% as.matrix(); pheatmap(amr_matrix, color=c('white','#ef4444'), legend_breaks=c(0,1), legend_labels=c('Absent','Present'), main='AMR Gene Presence/Absence')"`,
+		command: `Rscript -e "library(pheatmap); library(tidyr); amr <- read.delim('o_abricate/summary.tsv'); amr_matrix <- amr %>% mutate(present=1) %>% select(FILE, GENE, present) %>% distinct() %>% pivot_wider(names_from=GENE, values_from=present, values_fill=0) %>% column_to_rownames('FILE') %>% as.matrix(); pheatmap(amr_matrix, color=c('white','#ef4444'), legend_breaks=c(0,1), legend_labels=c('Absent','Present'), main='AMR Gene Presence/Absence')"`,
 		explanation: 'pheatmap creates clustered heatmaps. We convert gene presence to a binary matrix.',
 		requiredDir: '/data/wgs_report',
 		parameters: [
