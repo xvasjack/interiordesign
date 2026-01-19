@@ -987,6 +987,27 @@ Done
 
 2026-01-12 05:48:10
 RESULTS:
+  All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
+
+Assembly                   assembly
+# contigs (>= 0 bp)        117
+# contigs (>= 1000 bp)     57
+# contigs (>= 5000 bp)     33
+# contigs (>= 10000 bp)    29
+# contigs (>= 25000 bp)    24
+# contigs (>= 50000 bp)    18
+Total length (>= 0 bp)     5564255
+Total length (>= 1000 bp)  5547651
+# contigs                  65
+Largest contig             837178
+Total length               5553065
+GC (%)                     57.18
+N50                        371705
+N75                        224673
+L50                        6
+L75                        10
+# N's per 100 kbp          0.00
+
   Text versions of total report are saved to /data/kpneumoniae_demo/o_quast/report.txt, report.tsv, and report.tex
   Text versions of transposed total report are saved to /data/kpneumoniae_demo/o_quast/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
   HTML version (interactive tables and plots) is saved to /data/kpneumoniae_demo/o_quast/report.html
