@@ -329,6 +329,10 @@ Component summary:
 
 			{#if filesDropdownOpen}
 				<div class="absolute right-0 top-full mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-auto" style="position: absolute; right: 0; top: 100%; margin-top: 0.25rem; width: 18rem; background: white; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; z-index: 50; max-height: 24rem; overflow: auto;">
+					<!-- Educational warning -->
+					<div class="p-2 bg-amber-50 border-b border-amber-200 text-xs text-amber-700" style="padding: 0.5rem; background: #fffbeb; border-bottom: 1px solid #fde68a; font-size: 0.75rem; color: #b45309;">
+						<span style="font-weight: 500;">Note:</span> Only a few files are included for educational purposes.
+					</div>
 					{#if allGeneratedFiles.length === 0}
 						<div class="p-4 text-gray-500 text-sm text-center" style="padding: 1rem; color: #6b7280; font-size: 0.875rem; text-align: center;">
 							No output files yet.<br/>
