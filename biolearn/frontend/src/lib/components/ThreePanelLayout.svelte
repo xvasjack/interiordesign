@@ -29,6 +29,7 @@
 	// File contents for viewing
 	const fileContents: Record<string, string> = {
 		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
+		'o1_seqkit.stats': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nSRR36708862_1.fastq.gz\tFASTQ\tDNA\t990,478\t268,416,273\t35\t271\t301\nSRR36708862_2.fastq.gz\tFASTQ\tDNA\t990,478\t268,449,364\t35\t271\t301`,
 		// FastQC reports - loaded from static folder (real FastQC output format)
 		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
 		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
@@ -121,7 +122,7 @@ Component summary:
 			{ name: 'assembly.gfa', type: 'gfa' },
 			{ name: 'unicycler.log', type: 'log' }
 		],
-		'bandage': [{ name: 'o_bandage.png', type: 'png' }],
+		'bandage': [{ name: 'o_bandage.svg', type: 'svg' }],
 		'quast': [
 			{ name: 'quast_report.html', type: 'html' },
 			{ name: 'quast_report.tsv', type: 'tsv' }

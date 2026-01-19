@@ -131,7 +131,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Quality Trimming',
-			description: 'SLIDINGWINDOW:4:15 scans with 4bp window, cuts when average quality drops below Q15. LEADING/TRAILING removes low quality bases from ends.',
+			description: 'SLIDINGWINDOW:4:15 scans with 4bp window, cuts when average quality drops below Q15 (Q15 = 96.8% base call accuracy, or 1 error per ~32 bases). LEADING/TRAILING removes low quality bases from ends.',
 		}
 	],
 	'unicycler': [
@@ -142,7 +142,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Contigs vs Scaffolds',
-			description: 'Contigs are contiguous sequences. Unicycler can circularize bacterial chromosomes and plasmids, which is ideal for complete genome assembly.',
+			description: 'Contigs are contiguous sequences assembled from overlapping reads. Scaffolds are ordered contigs connected by gaps (Ns) using paired-end or mate-pair information. Unicycler can circularize bacterial chromosomes and plasmids, which is ideal for complete genome assembly.',
 			format: '.fasta'
 		},
 		{

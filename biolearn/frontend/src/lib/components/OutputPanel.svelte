@@ -123,8 +123,8 @@ Component summary:
     - Col156: 2,532 bp
 `,
 
-		// Bandage output (base64 placeholder for PNG)
-		'o_bandage.png': 'PNG_IMAGE_PLACEHOLDER',
+		// Bandage output (served from static/images)
+		'o_bandage.svg': 'SVG_STATIC',
 
 		// QUAST outputs
 		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
@@ -144,6 +144,7 @@ Component summary:
 		'gfa': 'text/plain',
 		'log': 'text/plain',
 		'png': 'image/png',
+		'svg': 'image/svg+xml',
 		'zip': 'application/zip',
 		'gff': 'text/plain',
 		'gbk': 'text/plain',
@@ -171,6 +172,12 @@ Component summary:
 				}
 			} catch (error) {
 				alert(`Error loading ${file.name}`);
+			}
+		} else if (file.type === 'svg' && content === 'SVG_STATIC') {
+			// Handle SVG files from static/images folder - open in new window
+			const newWindow = window.open(`/images/${file.name}`, '_blank');
+			if (!newWindow) {
+				alert(`Could not open ${file.name}`);
 			}
 		} else if (file.type === 'html' && content) {
 			// Open HTML in new window
