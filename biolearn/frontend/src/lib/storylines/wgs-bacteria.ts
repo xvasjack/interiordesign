@@ -562,7 +562,7 @@ function createPacBioHybridSections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step H4: Visualize Hybrid Assembly',
 			text: `Visualize the improved assembly graph.`,
-			command: 'bandage image hybrid_assembly/assembly.gfa hybrid_assembly/o_bandage.svg',
+			command: 'bandage image hybrid_assembly/assembly.gfa hybrid_assembly/o_bandage.png',
 			explanation: 'Check if hybrid assembly resolved circular chromosomes.',
 			requiredDir: '/data/outbreak_investigation',
 			parameters: [
@@ -652,7 +652,7 @@ function createPacBioPhase1Sections(dataDir: string = '/data/outbreak_investigat
 			type: 'task',
 			title: 'Step 5: Visualize Assembly Graph',
 			text: `Examine the assembly graph for circular chromosomes.`,
-			command: 'bandage image assembly/assembly.gfa assembly/o_bandage.svg --lengths',
+			command: 'bandage image assembly/assembly.gfa assembly/o_bandage.png --lengths',
 			explanation: 'Bandage visualizes assembly graphs; circular contigs indicate complete chromosomes.',
 			requiredDir: dataDir,
 			parameters: [
@@ -981,7 +981,7 @@ function createNanoporePhase1Sections(dataDir: string = '/data/outbreak_investig
 			type: 'task',
 			title: 'Step 8: Visualize Assembly',
 			text: `Examine the assembly graph structure.`,
-			command: 'bandage image assembly/assembly.gfa assembly/o_bandage.svg --lengths',
+			command: 'bandage image assembly/assembly.gfa assembly/o_bandage.png --lengths',
 			explanation: 'Bandage visualizes assembly completeness and structure.',
 			requiredDir: dataDir,
 			parameters: [
@@ -1238,7 +1238,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 6: Visualize Assembly Graph',
 				text: `Create a visual representation of the assembly graph to understand genome structure.`,
-				command: 'bandage image assembly/assembly.gfa o_bandage.svg',
+				command: 'bandage image assembly/assembly.gfa o_bandage.png',
 				explanation: 'Bandage visualizes the assembly graph showing how contigs connect.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
@@ -1504,7 +1504,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 5: Visualize Assembly',
 				text: `Create a visual representation of the assembly graph.`,
-				command: 'bandage image assembly/assembly.gfa assembly/o_bandage.svg',
+				command: 'bandage image assembly/assembly.gfa assembly/o_bandage.png',
 				explanation: 'Bandage visualizes assembly graphs to identify structure.',
 				requiredDir: '/data/outbreak_investigation',
 				parameters: [

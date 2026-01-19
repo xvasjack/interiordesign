@@ -5,7 +5,7 @@
 - **Pattern**: `o_toolname` for folders, `o_toolname.ext` for single files
 - **Examples**:
   - Folders: `o_unicycler/`, `o_abricate/`, `o_quast/`, `o_prokka/`, `o_mlst/`
-  - Single files: `o_bandage.svg`, `o_seqkit_stats.txt`
+  - Single files: `o_bandage.png`, `o_seqkit_stats.txt`
 
 ## Consistency Requirements
 

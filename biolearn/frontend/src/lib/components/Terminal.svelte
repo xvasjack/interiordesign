@@ -218,19 +218,19 @@
 		},
 		'bandage': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['o_bandage.svg'],
-			'/data/kpneumoniae_demo/assembly': ['o_bandage.svg'],
+			'/data/kpneumoniae_demo': ['o_bandage.png'],
+			'/data/kpneumoniae_demo/assembly': ['o_bandage.png'],
 			'/data/outbreak_investigation/assembly': [
 				'patient_01_graph.png', 'patient_02_graph.png', 'patient_03_graph.png'
 			],
 			'/data/outbreak_investigation/assembly/patient_01': [
-				'o_bandage.svg'
+				'o_bandage.png'
 			],
 			'/data/outbreak_investigation/assembly/patient_02': [
-				'o_bandage.svg'
+				'o_bandage.png'
 			],
 			'/data/outbreak_investigation/assembly/patient_03': [
-				'o_bandage.svg'
+				'o_bandage.png'
 			]
 		},
 		'prokka': {
@@ -851,7 +851,7 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 
 \x1b[1;32mAssembly complete!\x1b[0m
 
-\x1b[33mTip: Use 'bandage image assembly.gfa o_bandage.svg' to visualize the assembly graph\x1b[0m
+\x1b[33mTip: Use 'bandage image assembly.gfa o_bandage.png' to visualize the assembly graph\x1b[0m
 `,
 				summary: {
 					'Total Segments': '189',
@@ -899,7 +899,7 @@ Loading assembly graph: assembly.gfa
   Node coloring: By depth
 
 \x1b[32m✓ Graph visualization saved\x1b[0m
-  Output: o_bandage.svg (800x600 px)
+  Output: o_bandage.png (800x600 px)
 
 \x1b[33mGraph Statistics:\x1b[0m
   Connected components: 4
@@ -929,10 +929,10 @@ Loading assembly graph: assembly.gfa
 				chartData: {
 					title: 'Assembly Graph Visualization',
 					type: 'image',
-					imagePath: '/images/o_bandage.svg'
+					imagePath: '/images/o_bandage.png'
 				},
 				files: [
-					{ name: 'o_bandage.svg', type: 'svg', size: '4.2 KB' }
+					{ name: 'o_bandage.png', type: 'png', size: '245 KB' }
 				]
 			},
 			'quast': {
@@ -3762,8 +3762,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 			if (command === 'bandage') {
 				if (!args.includes('image')) {
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.svg\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa o_bandage.svg\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3771,7 +3771,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const gfaFile = args.find(a => a.endsWith('.gfa'));
 				if (!gfaFile) {
 					terminal.writeln(`\x1b[31mError: Missing .gfa file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.svg\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -3781,19 +3781,19 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					writePrompt();
 					return;
 				}
-				// Check SVG output
-				const svgFile = args.find(a => a.endsWith('.svg'));
-				if (!svgFile) {
-					terminal.writeln(`\x1b[31mError: Missing output .svg file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.svg\x1b[0m`);
+				// Check PNG output
+				const pngFile = args.find(a => a.endsWith('.png'));
+				if (!pngFile) {
+					terminal.writeln(`\x1b[31mError: Missing output .png file\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				// Enforce exact output file name
-				if (svgFile !== 'o_bandage.svg') {
-					terminal.writeln(`\x1b[31mError: Invalid output file name '${svgFile}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: o_bandage.svg\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa o_bandage.svg\x1b[0m`);
+				if (pngFile !== 'o_bandage.png') {
+					terminal.writeln(`\x1b[31mError: Invalid output file name '${pngFile}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
