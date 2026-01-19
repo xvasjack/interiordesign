@@ -1001,7 +1001,8 @@ NOTICEs: 2; WARNINGs: 1; non-fatal ERRORs: 0
 Thank you for using QUAST!
 `,
 				summary: {
-					'Contigs': '65',
+					'Contigs (≥500 bp)': '65',
+					'Contigs (all)': '117',
 					'Total Length': '5,553,065 bp',
 					'Largest Contig': '837,178 bp',
 					'N50': '371,705 bp',
