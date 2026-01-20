@@ -39,7 +39,7 @@ function createPhase0Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 0c: Copy a File',
 			text: `Copy files using the cp command. Let's copy a reference file to your working directory.`,
-			command: 'ls && cp /data/references/sample_info.txt . && ls',
+			command: 'ls\ncp /data/references/sample_info.txt .\nls',
 			explanation: 'The cp command copies files. The dot (.) represents the current directory as the destination. The ls commands show the directory contents before and after the copy.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
@@ -54,7 +54,7 @@ function createPhase0Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 0d: Copy a Directory',
 			text: `To copy directories with their contents, use the -r (recursive) flag.`,
-			command: 'ls && cp -r /data/references/scripts ./my_scripts && ls',
+			command: 'ls\ncp -r /data/references/scripts ./my_scripts\nls',
 			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files. The ls commands show the directory contents before and after the copy.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
