@@ -33,6 +33,22 @@
 
 	// Base filesystem - sequencing data files exist at start (from sequencer)
 	const baseFilesystem: Record<string, string[]> = {
+		// Linux Tutorial directory
+		'/data/linux_tutorial': [
+			'sample_info.txt', 'sequences/', 'references/'
+		],
+		'/data/linux_tutorial/sequences': [
+			'sample_R1.fastq', 'sample_R2.fastq'
+		],
+		'/data/linux_tutorial/references': [
+			'genome.fasta', 'annotations.gff'
+		],
+		'/data/references': [
+			'sample_info.txt', 'scripts/'
+		],
+		'/data/references/scripts': [
+			'analyze.sh', 'report.py'
+		],
 		// Trial/Demo scenario - single K. pneumoniae sample (SRR36708862)
 		'/data/kpneumoniae_demo': [
 			'SRR36708862_1.fastq.gz', 'SRR36708862_2.fastq.gz'
@@ -3586,8 +3602,59 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			return;
 		}
 
+		// Handle wc (word count) command
+		if (command === 'wc') {
+			handleWc(args, cmd);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('wc')) return [...cmds, 'wc'];
+				return cmds;
+			});
+			writePrompt();
+			return;
+		}
+
+		// Handle mkdir command
+		if (command === 'mkdir') {
+			handleMkdir(args);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('mkdir')) return [...cmds, 'mkdir'];
+				return cmds;
+			});
+			writePrompt();
+			return;
+		}
+
+		// Handle cp command
+		if (command === 'cp') {
+			handleCp(args);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('cp')) return [...cmds, 'cp'];
+				return cmds;
+			});
+			writePrompt();
+			return;
+		}
+
+		// Handle grep command
+		if (command === 'grep') {
+			handleGrep(args, cmd);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('grep')) return [...cmds, 'grep'];
+				return cmds;
+			});
+			writePrompt();
+			return;
+		}
+
 		// Handle bioinformatics tools - require proper arguments and correct directory/files
 		if (bioTools.has(command)) {
+			// Handle --help flag for any bio tool
+			if (args.includes('--help') || args.includes('-h')) {
+				handleBioToolHelp(command, args);
+				writePrompt();
+				return;
+			}
+
 			const req = toolRequirements[command];
 			const dataDir = get(storylineDataDir);
 
@@ -5115,6 +5182,55 @@ sample_01	chromosome	123456	124789	+	blaSHV-11	100.00	99.89	CARD	ARO:3000839	SHV
 sample_01	chromosome	234567	235890	+	oqxA	100.00	98.76	CARD	ARO:3002999	multidrug efflux pump	quinolone
 sample_01	plasmid_1	12345	14567	+	blaCTX-M-15	100.00	100.00	CARD	ARO:3000096	CTX-M-15 extended-spectrum beta-lactamase	cefotaxime;ceftazidime
 ...`,
+		// Linux tutorial sample_info.txt
+		'sample_info.txt': `Sample Information
+==================
+Sample ID: sample_01
+Sample Type: Bacterial isolate
+Sample Collection: 2024-01-15
+Organism: Klebsiella pneumoniae
+Sequencing Platform: Illumina MiSeq`,
+		// Linux tutorial FASTQ (uncompressed for tutorial)
+		'.fastq': `@M00123:45:000000000-ABC12:1:1101:15234:1000 1:N:0:1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15235:1001 1:N:0:1
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15236:1002 1:N:0:1
+TACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15237:1003 1:N:0:1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15238:1004 1:N:0:1
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15239:1005 1:N:0:1
+TACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15240:1006 1:N:0:1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15241:1007 1:N:0:1
+GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15242:1008 1:N:0:1
+TACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@M00123:45:000000000-ABC12:1:1101:15243:1009 1:N:0:1
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`,
 		// Default text file
 		'.txt': `Analysis Summary
 ================
@@ -5136,12 +5252,27 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 	};
 
 	function handleFileView(cmd: string, args: string[]) {
-		if (args.length === 0) {
+		// Parse -n flag for head/tail
+		let numLines = 10; // default
+		let filename: string | undefined;
+
+		for (let i = 0; i < args.length; i++) {
+			if (args[i] === '-n' && i + 1 < args.length) {
+				numLines = parseInt(args[i + 1], 10) || 10;
+				i++; // skip the number
+			} else if (args[i].startsWith('-n')) {
+				// Handle -n8 format (no space)
+				numLines = parseInt(args[i].substring(2), 10) || 10;
+			} else if (!args[i].startsWith('-')) {
+				filename = args[i];
+			}
+		}
+
+		if (!filename) {
 			terminal.writeln(`\x1b[31m${cmd}: missing file operand\x1b[0m`);
 			return;
 		}
 
-		const filename = args[0];
 		const filesystem = getFilesystem();
 
 		// Resolve the path
@@ -5230,13 +5361,398 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 		// Display the content
 		if (content) {
 			const lines = content.split('\n');
-			const maxLines = cmd === 'head' ? 10 : (cmd === 'tail' ? 10 : lines.length);
+			const maxLines = cmd === 'head' ? numLines : (cmd === 'tail' ? numLines : lines.length);
 			const startLine = cmd === 'tail' ? Math.max(0, lines.length - maxLines) : 0;
 
 			for (let i = startLine; i < Math.min(startLine + maxLines, lines.length); i++) {
 				terminal.writeln(lines[i]);
 			}
 		}
+	}
+
+	// Track created directories and files for the session
+	let createdDirs: Set<string> = new Set();
+	let createdFiles: Record<string, string> = {};
+
+	function handleWc(args: string[], fullCmd: string) {
+		const hasLineFlag = args.includes('-l');
+		const filteredArgs = args.filter(a => !a.startsWith('-'));
+
+		if (filteredArgs.length === 0) {
+			terminal.writeln(`\x1b[31mwc: missing file operand\x1b[0m`);
+			return;
+		}
+
+		const filesystem = getFilesystem();
+		let totalLines = 0;
+		let totalWords = 0;
+		let totalBytes = 0;
+		let fileCount = 0;
+
+		// Handle wildcards
+		let filesToProcess: string[] = [];
+		for (const pattern of filteredArgs) {
+			if (pattern.includes('*')) {
+				const expanded = expandGlobPattern(pattern);
+				filesToProcess.push(...expanded);
+			} else {
+				filesToProcess.push(pattern);
+			}
+		}
+
+		for (const filename of filesToProcess) {
+			// Resolve path
+			let fullPath: string;
+			let dirPath: string;
+			let baseName: string;
+
+			if (filename.includes('/')) {
+				const parts = filename.split('/');
+				baseName = parts.pop() || '';
+				const relativeDirPath = parts.join('/');
+				dirPath = relativeDirPath.startsWith('/')
+					? relativeDirPath
+					: `${currentDir}/${relativeDirPath}`.replace(/\/+/g, '/');
+				fullPath = `${dirPath}/${baseName}`;
+			} else {
+				baseName = filename;
+				dirPath = currentDir;
+				fullPath = `${currentDir}/${filename}`;
+			}
+
+			// Check if file exists
+			const filesInDir = filesystem[dirPath] || [];
+			const fileExists = filesInDir.some(f => f === baseName);
+
+			if (!fileExists) {
+				terminal.writeln(`\x1b[31mwc: ${filename}: No such file or directory\x1b[0m`);
+				continue;
+			}
+
+			// Simulate file stats based on file type
+			let lines = 40, words = 120, bytes = 4800;
+			if (baseName.endsWith('.fastq') || baseName.endsWith('.fastq.gz')) {
+				lines = 40; words = 40; bytes = 2840;
+			} else if (baseName.endsWith('.txt')) {
+				lines = 5; words = 25; bytes = 180;
+			} else if (baseName.endsWith('.fasta')) {
+				lines = 100; words = 100; bytes = 5200;
+			}
+
+			if (hasLineFlag) {
+				terminal.writeln(`  ${lines.toString().padStart(7)} ${filename}`);
+			} else {
+				terminal.writeln(`  ${lines.toString().padStart(7)} ${words.toString().padStart(7)} ${bytes.toString().padStart(7)} ${filename}`);
+			}
+
+			totalLines += lines;
+			totalWords += words;
+			totalBytes += bytes;
+			fileCount++;
+		}
+
+		// Show total if multiple files
+		if (fileCount > 1) {
+			if (hasLineFlag) {
+				terminal.writeln(`  ${totalLines.toString().padStart(7)} total`);
+			} else {
+				terminal.writeln(`  ${totalLines.toString().padStart(7)} ${totalWords.toString().padStart(7)} ${totalBytes.toString().padStart(7)} total`);
+			}
+		}
+	}
+
+	function handleMkdir(args: string[]) {
+		const hasParentFlag = args.includes('-p');
+		const filteredArgs = args.filter(a => !a.startsWith('-'));
+
+		if (filteredArgs.length === 0) {
+			terminal.writeln(`\x1b[31mmkdir: missing operand\x1b[0m`);
+			return;
+		}
+
+		for (const dir of filteredArgs) {
+			const fullPath = dir.startsWith('/')
+				? dir
+				: `${currentDir}/${dir}`.replace(/\/+/g, '/');
+
+			if (hasParentFlag) {
+				// Create all parent directories
+				const parts = fullPath.split('/').filter(p => p);
+				let currentPath = '';
+				for (const part of parts) {
+					currentPath += '/' + part;
+					createdDirs.add(currentPath);
+				}
+				terminal.writeln(`\x1b[32m✓ Created directory: ${dir}\x1b[0m`);
+			} else {
+				// Check if parent exists
+				const parentPath = fullPath.substring(0, fullPath.lastIndexOf('/')) || '/';
+				const filesystem = getFilesystem();
+
+				if (!filesystem[parentPath] && !createdDirs.has(parentPath)) {
+					terminal.writeln(`\x1b[31mmkdir: cannot create directory '${dir}': No such file or directory\x1b[0m`);
+					terminal.writeln(`\x1b[90mTip: Use mkdir -p to create parent directories\x1b[0m`);
+					continue;
+				}
+				createdDirs.add(fullPath);
+				terminal.writeln(`\x1b[32m✓ Created directory: ${dir}\x1b[0m`);
+			}
+		}
+	}
+
+	function handleCp(args: string[]) {
+		const hasRecursiveFlag = args.includes('-r') || args.includes('-R');
+		const filteredArgs = args.filter(a => !a.startsWith('-'));
+
+		if (filteredArgs.length < 2) {
+			terminal.writeln(`\x1b[31mcp: missing destination file operand\x1b[0m`);
+			return;
+		}
+
+		const source = filteredArgs[0];
+		const dest = filteredArgs[1];
+		const filesystem = getFilesystem();
+
+		// Resolve source path
+		const sourcePath = source.startsWith('/')
+			? source
+			: `${currentDir}/${source}`.replace(/\/+/g, '/');
+
+		// Check if source is a directory
+		const sourceIsDir = filesystem[sourcePath] !== undefined;
+
+		if (sourceIsDir && !hasRecursiveFlag) {
+			terminal.writeln(`\x1b[31mcp: -r not specified; omitting directory '${source}'\x1b[0m`);
+			return;
+		}
+
+		// Resolve destination path
+		const destPath = dest === '.'
+			? currentDir
+			: (dest.startsWith('/')
+				? dest
+				: `${currentDir}/${dest}`.replace(/\/+/g, '/'));
+
+		// Simulate copy success
+		if (sourceIsDir) {
+			createdDirs.add(destPath);
+			terminal.writeln(`\x1b[32m✓ Copied directory: ${source} -> ${dest}\x1b[0m`);
+		} else {
+			// Check source file exists
+			const sourceDir = sourcePath.substring(0, sourcePath.lastIndexOf('/')) || '/';
+			const sourceFile = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+			const filesInDir = filesystem[sourceDir] || [];
+
+			if (!filesInDir.includes(sourceFile)) {
+				terminal.writeln(`\x1b[31mcp: cannot stat '${source}': No such file or directory\x1b[0m`);
+				return;
+			}
+
+			createdFiles[destPath] = sourcePath;
+			terminal.writeln(`\x1b[32m✓ Copied: ${source} -> ${dest}\x1b[0m`);
+		}
+	}
+
+	function handleGrep(args: string[], fullCmd: string) {
+		const hasCaseInsensitive = args.includes('-i');
+		const hasCount = args.includes('-c');
+		const filteredArgs = args.filter(a => !a.startsWith('-'));
+
+		if (filteredArgs.length < 2) {
+			terminal.writeln(`\x1b[31mUsage: grep [OPTIONS] PATTERN FILE\x1b[0m`);
+			return;
+		}
+
+		const pattern = filteredArgs[0].replace(/^["']|["']$/g, ''); // Remove quotes
+		const filename = filteredArgs[1];
+		const filesystem = getFilesystem();
+
+		// Resolve path
+		let dirPath: string;
+		let baseName: string;
+
+		if (filename.includes('/')) {
+			const parts = filename.split('/');
+			baseName = parts.pop() || '';
+			const relativeDirPath = parts.join('/');
+			dirPath = relativeDirPath.startsWith('/')
+				? relativeDirPath
+				: `${currentDir}/${relativeDirPath}`.replace(/\/+/g, '/');
+		} else {
+			baseName = filename;
+			dirPath = currentDir;
+		}
+
+		// Check if file exists
+		const filesInDir = filesystem[dirPath] || [];
+		const fileExists = filesInDir.some(f => f === baseName);
+
+		if (!fileExists) {
+			terminal.writeln(`\x1b[31mgrep: ${filename}: No such file or directory\x1b[0m`);
+			return;
+		}
+
+		// Check for redirect
+		const hasRedirect = fullCmd.includes('>');
+
+		// Simulate grep results based on pattern and file type
+		let matchCount = 0;
+		let matches: string[] = [];
+
+		if (baseName.endsWith('.fastq') || baseName.endsWith('.fastq.gz')) {
+			if (pattern === '@' || pattern.includes('@')) {
+				matchCount = 10;
+				matches = [
+					'@M00123:45:000000000-ABC12:1:1101:15234:1000 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15235:1001 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15236:1002 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15237:1003 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15238:1004 1:N:0:1'
+				];
+			} else if (pattern.includes('F')) {
+				matchCount = 10;
+				matches = [
+					'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+					'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+					'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
+				];
+			}
+		} else if (baseName.endsWith('.txt')) {
+			if (pattern.toLowerCase() === 'sample' || hasCaseInsensitive) {
+				matchCount = 3;
+				matches = [
+					'Sample ID: sample_01',
+					'Sample type: Bacterial isolate',
+					'Sample collection: 2024-01-15'
+				];
+			}
+		}
+
+		if (hasRedirect) {
+			terminal.writeln(`\x1b[32m✓ Results saved to file\x1b[0m`);
+		} else if (hasCount) {
+			terminal.writeln(matchCount.toString());
+		} else {
+			for (const match of matches) {
+				// Highlight the pattern in the output
+				const regex = new RegExp(`(${pattern})`, hasCaseInsensitive ? 'gi' : 'g');
+				const highlighted = match.replace(regex, '\x1b[1;31m$1\x1b[0m');
+				terminal.writeln(highlighted);
+			}
+			if (matches.length === 0 && matchCount === 0) {
+				// No output for no matches (standard grep behavior)
+			}
+		}
+	}
+
+	function handleBioToolHelp(tool: string, args: string[]) {
+		// Check if this is a subcommand help request (e.g., seqkit stats --help)
+		const subcommand = args.find(a => !a.startsWith('-'));
+
+		const helpTexts: Record<string, Record<string, string>> = {
+			'seqkit': {
+				'main': `\x1b[1mseqkit\x1b[0m - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
+
+\x1b[1mUsage:\x1b[0m
+  seqkit [command]
+
+\x1b[1mAvailable Commands:\x1b[0m
+  stats       simple statistics of FASTA/Q files
+  seq         transform sequences
+  subseq      get subsequences by region/gtf/bed
+  fq2fa       convert FASTQ to FASTA
+  fx2tab      convert FASTA/Q to tabular format
+  grep        search sequences by ID/name/sequence/sequence motifs
+  head        print first N FASTA/Q records
+  sample      sample sequences by number or proportion
+
+\x1b[1mFlags:\x1b[0m
+  -h, --help      help for seqkit
+  -j, --threads   number of CPUs (default 4)
+
+Use "seqkit [command] --help" for more information about a command.`,
+				'stats': `\x1b[1mseqkit stats\x1b[0m - simple statistics of FASTA/Q files
+
+\x1b[1mUsage:\x1b[0m
+  seqkit stats [flags] <file1> [file2] ...
+
+\x1b[1mFlags:\x1b[0m
+  -a, --all          all statistics, including sum_gap, N50, L50
+  -b, --basename     only output basename of files
+  -G, --gap-letters  gap letters (default "- .")
+  -j, --threads      number of CPUs (default 4)
+  -T, --tabular      output in machine-friendly tabular format
+  -h, --help         help for stats
+
+\x1b[1mExamples:\x1b[0m
+  seqkit stats *.fastq.gz
+  seqkit stats -a sample_R1.fastq.gz sample_R2.fastq.gz
+  seqkit stats *.fastq.gz > stats.txt`
+			},
+			'fastqc': {
+				'main': `\x1b[1mFastQC\x1b[0m - A quality control tool for high throughput sequence data
+
+\x1b[1mUsage:\x1b[0m
+  fastqc [options] <seqfile1> <seqfile2> ...
+
+\x1b[1mOptions:\x1b[0m
+  -o, --outdir       Create all output files in the specified directory
+  -t, --threads      Number of files to process simultaneously
+  -f, --format       Force file format (fastq, bam, sam)
+  --noextract        Do not uncompress the output file after creating it
+  -h, --help         Print this help message
+
+\x1b[1mExamples:\x1b[0m
+  fastqc sample_R1.fastq.gz sample_R2.fastq.gz
+  fastqc *.fastq.gz -o qc_reports/ -t 4`
+			},
+			'trimmomatic': {
+				'main': `\x1b[1mTrimmomatic\x1b[0m - A flexible read trimming tool for Illumina NGS data
+
+\x1b[1mUsage:\x1b[0m
+  trimmomatic PE [-threads <threads>] <input1> <input2> <output1P> <output1U> <output2P> <output2U> <steps>
+
+\x1b[1mTrimming Steps:\x1b[0m
+  ILLUMINACLIP:<fastaWithAdapters>:<seed mismatches>:<palindrome threshold>:<simple threshold>
+  SLIDINGWINDOW:<windowSize>:<requiredQuality>
+  LEADING:<quality>
+  TRAILING:<quality>
+  MINLEN:<length>
+
+\x1b[1mExample:\x1b[0m
+  trimmomatic PE -phred33 input_R1.fq.gz input_R2.fq.gz \\
+    output_R1_paired.fq.gz output_R1_unpaired.fq.gz \\
+    output_R2_paired.fq.gz output_R2_unpaired.fq.gz \\
+    ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36`
+			}
+		};
+
+		// Get help text
+		let helpText: string;
+		const toolHelp = helpTexts[tool];
+
+		if (toolHelp) {
+			if (subcommand && toolHelp[subcommand]) {
+				helpText = toolHelp[subcommand];
+			} else {
+				helpText = toolHelp['main'];
+			}
+		} else {
+			// Generic help for tools without specific help text
+			helpText = `\x1b[1m${tool}\x1b[0m - Bioinformatics tool
+
+\x1b[1mUsage:\x1b[0m
+  ${tool} [options] <input files>
+
+Use --help or -h for more information about available options.
+Refer to the tool documentation for detailed usage instructions.`;
+		}
+
+		terminal.writeln(helpText);
+		executedCommands.update(cmds => {
+			if (!cmds.includes(tool)) return [...cmds, tool];
+			return cmds;
+		});
 	}
 
 	async function executeBioTool(tool: string, args: string[], fullCmd: string) {

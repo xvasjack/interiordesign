@@ -357,12 +357,13 @@ export function getExecutionTime(tool: string): number {
 // Allowed read-only commands (less/more are NOT available)
 export const allowedCommands = new Set([
 	'ls', 'cat', 'head', 'tail',
-	'pwd', 'cd', 'clear', 'help'
+	'pwd', 'cd', 'clear', 'help',
+	'wc', 'mkdir', 'cp', 'grep'
 ]);
 
 // Blocked/dangerous commands
 export const blockedCommands = new Set([
-	'rm', 'mv', 'cp', 'mkdir', 'rmdir', 'touch',
+	'rm', 'mv', 'rmdir', 'touch',
 	'chmod', 'chown', 'nano', 'vim', 'vi', 'emacs',
 	'wget', 'curl', 'ssh', 'scp', 'rsync',
 	'apt', 'yum', 'pip', 'npm', 'sudo', 'su'
