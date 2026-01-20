@@ -12,17 +12,17 @@
 
 	const modes: Mode[] = [
 		{
+			id: 'tutorial',
+			title: 'Tutorials',
+			description: 'Start here! Learn bioinformatics fundamentals step-by-step',
+			icon: '📚'
+		},
+		{
 			id: 'wgs-bacteria',
 			title: 'WGS Bacteria',
 			description: 'Whole Genome Sequencing analysis for bacterial pathogens',
 			icon: '🧬',
 			storylines: [
-				{
-					id: 'trial',
-					title: 'Exploring K. pneumoniae',
-					description: 'Introduction to WGS analysis with a single bacterial sample',
-					technologyLabel: 'Short Read (Illumina)'
-				},
 				{
 					id: 'hospital',
 					title: 'Hospital Outbreak Investigation',

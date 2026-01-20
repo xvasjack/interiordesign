@@ -10,9 +10,11 @@ biolearn/template/
 │   ├── basic_linux_commands/
 │   │   └── (sample files for Linux basics tutorial)
 │   └── kpneumoniae_demo/
+│       ├── o_seqkit/
 │       ├── o_fastqc/
 │       ├── o_trimmomatic/
 │       ├── o_unicycler/
+│       ├── o_bandage/
 │       ├── o_quast/
 │       ├── o_checkm2/
 │       ├── o_plasmidfinder/
@@ -40,8 +42,6 @@ biolearn/template/
 │   │   └── o_isescan/
 │   │
 │   ├── foodborne/                   # Storyline 2: Food Poisoning Outbreak
-│   │   ├── o_fastqc/
-│   │   ├── o_trimmomatic/
 │   │   └── ... (same pattern)
 │   │
 │   ├── plant/                       # Storyline 3: Plant Pathogen (Citrus Canker)
@@ -61,16 +61,52 @@ biolearn/template/
     │   ├── o_fastqc/
     │   ├── o_multiqc/
     │   ├── o_cutadapt/
-    │   ├── o_qiime2/
-    │   └── ...
+    │   └── o_qiime2/
     │
     ├── soil/                        # Storyline 2: Compost Microbiome
-    │   ├── o_fastqc/
     │   └── ...
     │
     └── water/                       # Storyline 3: Water Contamination Investigation
-        ├── o_fastqc/
         └── ...
+```
+
+## Frontend Route Structure
+
+```
+biolearn/frontend/src/routes/
+├── +page.svelte                     # Home: category selection
+├── +layout.svelte                   # Global layout
+│
+├── tutorial/                        # Tutorial category
+│   ├── +page.svelte                 # Tutorial selection page
+│   └── kpneumoniae-demo/            # K. pneumoniae intro tutorial
+│       └── +page.svelte
+│
+├── linux-basics/                    # Linux basics tutorial
+│   └── +page.svelte
+│
+├── wgs-bacteria/                    # WGS category
+│   ├── +page.svelte                 # Storyline selection (if needed)
+│   ├── hospital/                    # Hospital outbreak
+│   ├── foodborne/                   # Food poisoning
+│   ├── plant/                       # Plant pathogen
+│   ├── fish/                        # Fish mortality
+│   ├── wastewater/                  # Wastewater surveillance
+│   └── clinical/                    # Clinical diagnostics
+│
+├── amplicon-bacteria/               # Amplicon category
+│   ├── +page.svelte                 # Storyline selection
+│   ├── gut/
+│   ├── soil/
+│   └── water/
+│
+├── rna-seq/                         # RNA-seq category (coming soon)
+│   └── +page.svelte
+│
+└── reports/                         # Report viewing
+    ├── wgs-bacteria/
+    ├── amplicon/
+    └── rnaseq/
 ```
 
 ## Output Folder/File Naming Convention
@@ -95,29 +131,51 @@ biolearn/template/
 
 3. **When changing a filename/path, update ALL locations:**
    - `Terminal.svelte` - toolCreatedFiles, toolOutputs, files array
-   - `wgs-bacteria.ts` - storyline commands
+   - `wgs-bacteria.ts` / `tutorial.ts` - storyline commands
    - `ThreePanelLayout.svelte` - toolOutputFiles mapping
    - `OutputPanel.svelte` - mockFileContents
    - `terminal.ts` - bioTools set (if adding new tool)
 
-## Trial Storyline (kpneumoniae_demo)
+## Storyline Files
 
-**Organism**: Klebsiella pneumoniae ST258
+| Category | File | Description |
+|----------|------|-------------|
+| Tutorial | `tutorial.ts` | K. pneumoniae demo, Linux basics |
+| WGS Bacteria | `wgs-bacteria.ts` | Hospital, foodborne, plant, fish, wastewater, clinical |
+| Amplicon | `amplicon-bacteria.ts` | Gut, soil, water microbiome |
+| Reports | `r-reports.ts` | R-based PDF report generation |
+
+## K. pneumoniae Demo (Tutorial)
+
+**Organism**: Klebsiella pneumoniae ST307
+**Dataset**: SRR36708862
 **Tools used**: seqkit, fastqc, trimmomatic, unicycler, bandage, quast, checkm2, plasmidfinder, abricate, mlst, prokka
 
 ### Key Data Points
-- **Assembly**: 65 contigs (>=500bp), 117 contigs total, 5,553,065 bp, N50 371,705 bp, GC 57.18%
-- **Largest contig**: 837,178 bp
-- **L50**: 6, **L75**: 10, **N75**: 224,673 bp
-- **Components**: 1 incomplete (chromosome), 3 complete circular (Col-type plasmids)
-- **Plasmids**: ColRNAI (5,409 bp), Col(pHAD28) (4,315 bp), Col156 (2,532 bp)
-- **MLST**: ST258 (gapA-3, infB-3, mdh-1, pgi-1, phoE-1, rpoB-1, tonB-79)
-- **AMR genes**: blaKPC-2, blaSHV-11, fosA, oqxA, oqxB (all chromosomal)
+- **Assembly**: 117 contigs, 5,564,255 bp, N50 371,705 bp, GC 57.18%
+- **Completeness**: 100.0%
+- **Contamination**: 0.16%
+- **Sequence Type**: ST307
+- **Plasmids**: IncFII(K), IncX3, IncFIB(K), Col440I
+- **AMR genes**: blaKPC-2, blaSHV-11, fosA, oqxA, oqxB
+
+## Backend API Endpoints
+
+### Template File Serving (`/api/templates/`)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/templates/` | GET | List all template categories |
+| `/api/templates/{category}` | GET | List storylines in a category |
+| `/api/templates/{category}/{storyline}` | GET | Get storyline template info |
+| `/api/templates/{category}/{storyline}/{tool}` | GET | List files in tool output |
+| `/api/templates/{category}/{storyline}/{tool}/{filename}` | GET | Serve template file |
 
 ## File Locations
 
+- **Tutorial storylines**: `biolearn/frontend/src/lib/storylines/tutorial.ts`
+- **WGS storylines**: `biolearn/frontend/src/lib/storylines/wgs-bacteria.ts`
 - **Terminal outputs**: `biolearn/frontend/src/lib/components/Terminal.svelte`
-- **Storylines**: `biolearn/frontend/src/lib/storylines/wgs-bacteria.ts`
 - **Terminal store**: `biolearn/frontend/src/lib/stores/terminal.ts`
 - **Three panel layout**: `biolearn/frontend/src/lib/components/ThreePanelLayout.svelte`
 - **Output panel**: `biolearn/frontend/src/lib/components/OutputPanel.svelte`
@@ -127,40 +185,3 @@ biolearn/template/
 1. **Filename mismatch**: Always search for the old filename across all files before changing
 2. **Inconsistent paths**: Input files should use source folder (e.g., `o_unicycler/assembly.fasta`)
 3. **Missing tool in bioTools**: New tools must be added to the bioTools set in terminal.ts
-
-## TODO: Apply `o_toolname` Convention and Create Template Files
-
-### Phase 1: Tutorial Templates
-1. **`template/tutorial/basic_linux_commands/`** - Sample files for Linux basics
-2. **`template/tutorial/kpneumoniae_demo/`** - Current o_fastqc/ files need to be moved here
-
-### Phase 2: WGS Bacteria Templates
-Each storyline needs template output files created in `template/wgs_bacteria/<storyline>/`:
-
-| Storyline | Template Path | Status |
-|-----------|---------------|--------|
-| `hospital` | `template/wgs_bacteria/hospital/` | Pending |
-| `foodborne` | `template/wgs_bacteria/foodborne/` | Pending |
-| `plant` | `template/wgs_bacteria/plant/` | Pending |
-| `fish` | `template/wgs_bacteria/fish/` | Pending |
-| `wastewater` | `template/wgs_bacteria/wastewater/` | Pending |
-| `clinical` | `template/wgs_bacteria/clinical/` | Pending |
-
-### Phase 3: Amplicon Bacteria Templates
-Each storyline needs template output files created in `template/amplicon_bacteria/<storyline>/`:
-
-| Storyline | Template Path | Status |
-|-----------|---------------|--------|
-| `gut` | `template/amplicon_bacteria/gut/` | Pending |
-| `soil` | `template/amplicon_bacteria/soil/` | Pending |
-| `water` | `template/amplicon_bacteria/water/` | Pending |
-
-### Legacy Folder Names to Update in Code
-The following storylines still use non-standard output folder names in their code:
-
-| Storyline | Current Names | Should Be |
-|-----------|---------------|-----------|
-| WGS storylines | `trimmed/`, `assembly/`, `quast_results/`, etc. | `o_trimmomatic/`, `o_unicycler/`, `o_quast/`, etc. |
-| Amplicon storylines | `qc_reports/`, `trimmed/` | `o_fastqc/`, `o_cutadapt/` |
-
-**Note**: Apply code changes when working on each storyline individually.
