@@ -117,6 +117,24 @@ o_prokka/                - Prokka genome annotation
   └── PROKKA.log         - Annotation log
 
 ================================================================================
+OUTPUT NAMING CONVENTION (o_toolname)
+================================================================================
+
+| Tool          | Output Name           |
+|---------------|-----------------------|
+| seqkit        | o_seqkit_stats.txt    |
+| fastqc        | o_fastqc/             |
+| trimmomatic   | o_trimmomatic/        |
+| unicycler     | o_unicycler/          |
+| bandage       | o_bandage.png         |
+| quast         | o_quast/              |
+| checkm2       | o_checkm2/            |
+| plasmidfinder | o_plasmidfinder/      |
+| abricate      | o_abricate/           |
+| mlst          | o_mlst/               |
+| prokka        | o_prokka/             |
+
+================================================================================
 RESULTS SUMMARY
 ================================================================================
 
