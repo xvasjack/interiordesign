@@ -2,6 +2,8 @@ import type { Storyline } from '../types';
 
 export const kpneumoniaeDemo: Storyline = {
 	id: 'kpneumoniae-demo',
+	category: 'tutorial',
+	templateId: 'kpneumoniae_demo',  // Template folder uses underscore
 	title: 'Exploring K. pneumoniae',
 	subtitle: 'Introduction to WGS Analysis',
 	organism: 'Klebsiella pneumoniae',

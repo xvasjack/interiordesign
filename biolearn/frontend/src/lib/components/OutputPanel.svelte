@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { outputData, terminalState, fileNotes, stopSignal } from '$lib/stores/terminal';
+	import { outputData, terminalState, fileNotes, stopSignal, storylineContext, API_BASE_URL } from '$lib/stores/terminal';
+	import { getToolFileUrl, getRootFileUrl } from '$lib/services/templateService';
+	import { get } from 'svelte/store';
 
 	let { isReportPage = false }: { isReportPage?: boolean } = $props();
 
@@ -224,6 +226,46 @@ This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance
 	};
 
 	async function viewFile(file: any) {
+		// Check if this is a template file (from API)
+		if (file.isTemplate && file.tool) {
+			const context = get(storylineContext);
+			if (context) {
+				const url = `${API_BASE_URL}/templates/${context.category}/${context.storyline}/${file.tool}/${file.name}`;
+
+				// Handle different file types
+				if (file.type === 'html' || file.type === 'png' || file.type === 'svg' || file.type === 'pdf') {
+					// Open binary/rich content in new window
+					const newWindow = window.open(url, '_blank');
+					if (!newWindow) {
+						alert(`Could not open ${file.name}`);
+					}
+				} else if (file.type === 'zip') {
+					// Trigger download for zip files
+					const a = document.createElement('a');
+					a.href = url;
+					a.download = file.name;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+				} else {
+					// Fetch and display text content
+					try {
+						const response = await fetch(url);
+						if (response.ok) {
+							const content = await response.text();
+							alert(`File: ${file.name}\n\n${content.substring(0, 2000)}${content.length > 2000 ? '\n...(truncated)' : ''}`);
+						} else {
+							alert(`Failed to fetch ${file.name}: ${response.statusText}`);
+						}
+					} catch (error) {
+						alert(`Error fetching ${file.name}: ${error}`);
+					}
+				}
+				return;
+			}
+		}
+
+		// Fall back to hardcoded content for non-template files
 		const content = fileContents[file.name];
 
 		// Handle FastQC HTML files - open directly from static folder

@@ -8,6 +8,7 @@ import {
 
 export const wastewater: Storyline = {
 	id: 'wastewater',
+	category: 'wgs_bacteria',
 	title: 'Wastewater AMR Surveillance',
 	subtitle: 'Environmental Resistance Monitoring',
 	organism: 'Escherichia coli (mcr-positive)',

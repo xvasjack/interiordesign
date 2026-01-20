@@ -17,6 +17,8 @@ export interface StorylineSection {
 
 export interface Storyline {
 	id: string;
+	category: 'tutorial' | 'wgs_bacteria' | 'amplicon_bacteria' | 'reports';  // Template folder category
+	templateId?: string;  // Template folder storyline ID (if different from id, e.g., 'kpneumoniae_demo' vs 'kpneumoniae-demo')
 	title: string;
 	subtitle: string;
 	organism: string;

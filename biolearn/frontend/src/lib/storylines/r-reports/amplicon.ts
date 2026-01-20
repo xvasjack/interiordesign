@@ -310,6 +310,7 @@ EOF`,
 
 export const amplicon: Storyline = {
 	id: 'amplicon',
+	category: 'reports',
 	title: '16S/Amplicon Report',
 	subtitle: 'Diversity, Functional & Composition',
 	organism: 'Microbiome',

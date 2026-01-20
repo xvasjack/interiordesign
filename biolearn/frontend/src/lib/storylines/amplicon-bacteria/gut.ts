@@ -42,6 +42,7 @@ function createGutMicrobiomeConclusion(): StorylineSection {
 
 export const gut: Storyline = {
 	id: 'gut',
+	category: 'amplicon_bacteria',
 	title: 'Gut Microbiome Study',
 	subtitle: 'IBD vs Healthy Controls',
 	organism: 'Human gut microbiota',

@@ -9,6 +9,7 @@ import {
 
 export const plant: Storyline = {
 	id: 'plant',
+	category: 'wgs_bacteria',
 	title: 'Plant Pathogen Investigation',
 	subtitle: 'Citrus Canker Outbreak',
 	organism: 'Xanthomonas citri',

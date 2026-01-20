@@ -68,6 +68,7 @@ function createSoilMicrobiomeConclusion(): StorylineSection {
 
 export const soil: Storyline = {
 	id: 'soil',
+	category: 'amplicon_bacteria',
 	title: 'Beneficial Soil Bacteria',
 	subtitle: 'Compost Microbiome Analysis',
 	organism: 'Soil/compost microbiota',

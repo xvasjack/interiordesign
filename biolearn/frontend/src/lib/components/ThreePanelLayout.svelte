@@ -4,6 +4,7 @@
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
 	import { executedCommands, storylineDataDir, currentDirectory } from '$lib/stores/terminal';
+	import { initializeStoryline } from '$lib/services/templateService';
 	import type { Storyline } from '$lib/storylines/types';
 
 	let {
@@ -189,11 +190,17 @@ Component summary:
 		]
 	};
 
-	onMount(() => {
+	onMount(async () => {
 		// Set the storyline's data directory in stores so Terminal knows where to start
 		const dataDir = storyline?.dataDir || '/data/outbreak_investigation';
 		storylineDataDir.set(dataDir);
 		currentDirectory.set(dataDir);
+
+		// Initialize storyline context for template file fetching
+		if (storyline?.category) {
+			const templateId = storyline.templateId || storyline.id;
+			await initializeStoryline(storyline.category, templateId);
+		}
 
 		const unsubscribe = executedCommands.subscribe(cmds => {
 			const files: {name: string, type: string, tool: string}[] = [];

@@ -272,6 +272,7 @@ EOF`,
 
 export const rnaseq: Storyline = {
 	id: 'rnaseq',
+	category: 'reports',
 	title: 'RNA-Seq Report',
 	subtitle: 'Differential Expression',
 	organism: 'Transcriptome',

@@ -55,6 +55,14 @@ async def list_storylines(category: str) -> list[str]:
     return [d.name for d in category_path.iterdir() if d.is_dir()]
 
 
+class StorylineFiles(BaseModel):
+    """All files available in a storyline, organized by tool."""
+    category: str
+    storyline: str
+    tools: dict[str, list[str]]  # tool_name -> list of filenames
+    root_files: list[str]  # Files directly in storyline folder (like o_bandage.png)
+
+
 @router.get("/{category}/{storyline}")
 async def get_storyline_info(category: str, storyline: str) -> TemplateInfo:
     """Get information about a storyline's templates."""
@@ -77,6 +85,89 @@ async def get_storyline_info(category: str, storyline: str) -> TemplateInfo:
         storyline=storyline,
         tools=sorted(tools),
         file_count=file_count
+    )
+
+
+@router.get("/{category}/{storyline}/files")
+async def get_storyline_files(category: str, storyline: str) -> StorylineFiles:
+    """Get all files in a storyline, organized by tool.
+
+    This returns all files that can be used for output display:
+    - Files in o_toolname/ directories
+    - Files directly in the storyline folder (like o_bandage.png)
+    """
+    storyline_path = get_template_path(category, storyline)
+    if not storyline_path.exists():
+        raise HTTPException(status_code=404, detail=f"Storyline '{storyline}' not found in category '{category}'")
+
+    tools: dict[str, list[str]] = {}
+    root_files: list[str] = []
+
+    for item in storyline_path.iterdir():
+        if item.name == ".gitkeep":
+            continue
+
+        if item.is_dir() and item.name.startswith("o_"):
+            # This is a tool output directory
+            tool_name = item.name[2:]  # Remove 'o_' prefix
+            files = [f.name for f in item.iterdir() if f.is_file() and f.name != ".gitkeep"]
+            if files:
+                tools[tool_name] = sorted(files)
+        elif item.is_file() and item.name.startswith("o_"):
+            # This is a root-level output file (like o_bandage.png)
+            root_files.append(item.name)
+
+    return StorylineFiles(
+        category=category,
+        storyline=storyline,
+        tools=tools,
+        root_files=sorted(root_files)
+    )
+
+
+@router.get("/{category}/{storyline}/root/{filename:path}")
+async def get_root_file(category: str, storyline: str, filename: str) -> FileResponse:
+    """Serve a file directly from the storyline folder (not in an o_tool/ subdirectory).
+
+    This handles files like o_bandage.png that are stored directly in the storyline folder.
+    """
+    storyline_path = get_template_path(category, storyline)
+    file_path = storyline_path / filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"File '{filename}' not found")
+
+    if not file_path.is_file():
+        raise HTTPException(status_code=400, detail=f"'{filename}' is not a file")
+
+    # Determine media type based on extension
+    media_types = {
+        ".html": "text/html",
+        ".txt": "text/plain",
+        ".tsv": "text/tab-separated-values",
+        ".csv": "text/csv",
+        ".json": "application/json",
+        ".fasta": "text/plain",
+        ".fa": "text/plain",
+        ".fna": "text/plain",
+        ".faa": "text/plain",
+        ".fastq": "text/plain",
+        ".fq": "text/plain",
+        ".gff": "text/plain",
+        ".gbk": "text/plain",
+        ".png": "image/png",
+        ".svg": "image/svg+xml",
+        ".pdf": "application/pdf",
+        ".zip": "application/zip",
+    }
+
+    ext = file_path.suffix.lower()
+    media_type = media_types.get(ext, "application/octet-stream")
+
+    return FileResponse(
+        path=file_path,
+        media_type=media_type,
+        filename=filename
     )
 
 

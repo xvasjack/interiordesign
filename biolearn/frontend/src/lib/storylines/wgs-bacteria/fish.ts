@@ -2,6 +2,7 @@ import type { Storyline } from '../types';
 
 export const fish: Storyline = {
 	id: 'fish',
+	category: 'wgs_bacteria',
 	title: 'Fish Mortality Event',
 	subtitle: 'Suspected Vibrio Outbreak',
 	organism: 'Vibrio vulnificus',

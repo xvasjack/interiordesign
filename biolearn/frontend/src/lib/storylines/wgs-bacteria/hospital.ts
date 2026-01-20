@@ -9,6 +9,7 @@ import {
 
 export const hospital: Storyline = {
 	id: 'hospital',
+	category: 'wgs_bacteria',
 	title: 'Hospital Outbreak Investigation',
 	subtitle: 'Antimicrobial Resistance in ICU',
 	organism: 'Klebsiella pneumoniae',

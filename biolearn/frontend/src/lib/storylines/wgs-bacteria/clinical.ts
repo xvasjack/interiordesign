@@ -7,6 +7,7 @@ import {
 
 export const clinical: Storyline = {
 	id: 'clinical',
+	category: 'wgs_bacteria',
 	title: 'Clinical Rapid Diagnostics',
 	subtitle: 'Same-Day Pathogen Identification',
 	organism: 'Pseudomonas aeruginosa',

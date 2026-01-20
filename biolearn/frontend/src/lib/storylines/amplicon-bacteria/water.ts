@@ -80,6 +80,7 @@ function createWaterContaminationConclusion(): StorylineSection {
 
 export const water: Storyline = {
 	id: 'water',
+	category: 'amplicon_bacteria',
 	title: 'Water Contamination',
 	subtitle: 'Source Tracking Investigation',
 	organism: 'Water microbiota',

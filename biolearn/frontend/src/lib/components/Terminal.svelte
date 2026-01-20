@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir } from '$lib/stores/terminal';
+	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir, templateFiles, storylineContext, API_BASE_URL } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
+	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize } from '$lib/services/templateService';
 
 	// Props
 	let { initialDir = '/data/outbreak_investigation' }: { initialDir?: string } = $props();
@@ -5824,6 +5825,20 @@ Refer to the tool documentation for detailed usage instructions.`;
 				return cmds;
 			});
 
+			// Fetch template files from API if available
+			let outputFiles = toolData.files || [];
+			const templateToolFiles = get(templateFiles);
+			if (templateToolFiles[tool] && templateToolFiles[tool].length > 0) {
+				// Template files exist for this tool - use them instead of hardcoded files
+				outputFiles = templateToolFiles[tool].map(filename => ({
+					name: filename,
+					type: getFileType(filename),
+					size: 'N/A', // Size will be fetched when viewing
+					isTemplate: true, // Mark as template file for proper URL handling
+					tool: tool // Store tool name for URL generation
+				}));
+			}
+
 			// Update output panel with results
 			const isPdfReport = fullCmd.includes('rmarkdown::render');
 			const pdfTitle = fullCmd.includes('microbiome_report') ? '16S Microbiome Analysis Report' :
@@ -5836,7 +5851,7 @@ Refer to the tool documentation for detailed usage instructions.`;
 				tool: fullCmd,
 				summary: toolData.summary,
 				chartData: toolData.chartData,
-				files: toolData.files,
+				files: outputFiles,
 				// PDF report specific fields
 				isPdfReport: isPdfReport,
 				pdfTitle: isPdfReport ? pdfTitle : null,

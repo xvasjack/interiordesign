@@ -9,6 +9,7 @@ import {
 
 export const foodborne: Storyline = {
 	id: 'foodborne',
+	category: 'wgs_bacteria',
 	title: 'Food Poisoning Outbreak',
 	subtitle: 'Restaurant-Associated Illness',
 	organism: 'Salmonella enterica',

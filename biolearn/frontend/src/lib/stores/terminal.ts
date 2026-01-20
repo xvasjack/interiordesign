@@ -53,6 +53,24 @@ export const currentDirectory = writable<string>('/data/outbreak_investigation')
 // This determines what ~ maps to in the terminal
 export const storylineDataDir = writable<string>('/data/outbreak_investigation');
 
+// Storyline context for template file fetching
+// This tells the app which category/storyline to fetch template files from
+export interface StorylineContext {
+	category: string;  // e.g., 'tutorial', 'wgs_bacteria', 'amplicon_bacteria'
+	storyline: string; // e.g., 'kpneumoniae_demo', 'hospital', 'gut'
+}
+export const storylineContext = writable<StorylineContext | null>(null);
+
+// API base URL for template fetching
+export const API_BASE_URL = 'http://localhost:8000/api';
+
+// Store for dynamically fetched template files
+// Structure: { toolName: [filenames] }
+export const templateFiles = writable<Record<string, string[]>>({});
+
+// Root files from template (files directly in storyline folder, like o_bandage.png)
+export const templateRootFiles = writable<string[]>([]);
+
 // Track current step in story (for hiding next steps)
 export const currentStoryStep = writable<number>(0);
 export const executedSteps = writable<Set<number>>(new Set());

@@ -369,6 +369,8 @@ function createPhase5Sections(): StorylineSection[] {
 
 export const linuxBasics: Storyline = {
 	id: 'linux-basics',
+	category: 'tutorial',
+	templateId: 'basic_linux_commands',
 	title: 'Linux Command Line Basics',
 	subtitle: 'Essential Command Line Skills for Bioinformatics',
 	organism: 'N/A',

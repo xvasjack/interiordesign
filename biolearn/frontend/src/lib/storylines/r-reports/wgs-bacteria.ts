@@ -262,6 +262,7 @@ EOF`,
 
 export const wgsBacteria: Storyline = {
 	id: 'wgs-bacteria',
+	category: 'reports',
 	title: 'WGS Bacteria Report',
 	subtitle: 'Assembly, AMR & Phylogenetics',
 	organism: 'Bacterial genomes',
