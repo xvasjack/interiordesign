@@ -181,8 +181,8 @@
 		},
 		'trimmomatic': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['trimmed/'],
-			'/data/kpneumoniae_demo/trimmed': [
+			'/data/kpneumoniae_demo': ['o_trimmomatic/'],
+			'/data/kpneumoniae_demo/o_trimmomatic': [
 				'SRR36708862_R1_paired.fq.gz', 'SRR36708862_R2_paired.fq.gz',
 				'SRR36708862_R1_unpaired.fq.gz', 'SRR36708862_R2_unpaired.fq.gz'
 			],
@@ -3312,7 +3312,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		],
 		'unicycler': [
 			// Trial/Demo scenario
-			'trimmed/SRR36708862_R1_paired.fq.gz', 'trimmed/SRR36708862_R2_paired.fq.gz',
+			'o_trimmomatic/SRR36708862_R1_paired.fq.gz', 'o_trimmomatic/SRR36708862_R2_paired.fq.gz',
 			// Hospital outbreak
 			'trimmed/patient_01_R1_paired.fq.gz', 'trimmed/patient_01_R2_paired.fq.gz',
 			'trimmed/patient_02_R1_paired.fq.gz', 'trimmed/patient_02_R2_paired.fq.gz',

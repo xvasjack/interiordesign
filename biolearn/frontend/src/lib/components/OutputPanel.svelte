@@ -98,7 +98,7 @@
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
 		'unicycler.log': `
 Unicycler v0.5.0
-Command: unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o o_unicycler/
+Command: unicycler -1 o_trimmomatic/SRR36708862_R1_paired.fq.gz -2 o_trimmomatic/SRR36708862_R2_paired.fq.gz -o o_unicycler/
 
 [2026-01-12 04:15:32] Starting Unicycler
 [2026-01-12 04:15:33] Loading reads

@@ -1204,7 +1204,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 4: Adapter Trimming',
 				text: `Remove Illumina adapters and trim low-quality bases from read ends.`,
-				command: 'trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz trimmed/SRR36708862_R1_paired.fq.gz trimmed/SRR36708862_R1_unpaired.fq.gz trimmed/SRR36708862_R2_paired.fq.gz trimmed/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
+				command: 'trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz o_trimmomatic/SRR36708862_R1_paired.fq.gz o_trimmomatic/SRR36708862_R1_unpaired.fq.gz o_trimmomatic/SRR36708862_R2_paired.fq.gz o_trimmomatic/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
 				explanation: 'Trimmomatic removes adapter sequences and trims bases with quality below threshold.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
@@ -1226,7 +1226,7 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 5: De Novo Assembly',
 				text: `Assemble the trimmed reads into contigs using Unicycler.`,
-				command: 'unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o o_unicycler/',
+				command: 'unicycler -1 o_trimmomatic/SRR36708862_R1_paired.fq.gz -2 o_trimmomatic/SRR36708862_R2_paired.fq.gz -o o_unicycler/',
 				explanation: 'Unicycler uses SPAdes with multiple k-mer sizes and optimizes the assembly graph.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [

@@ -24,12 +24,12 @@ fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o o_fastqc/
 Phase 2: Read Preprocessing
 ---------------------------
 Step 4: Adapter Trimming
-trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz trimmed/SRR36708862_R1_paired.fq.gz trimmed/SRR36708862_R1_unpaired.fq.gz trimmed/SRR36708862_R2_paired.fq.gz trimmed/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36
+trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz o_trimmomatic/SRR36708862_R1_paired.fq.gz o_trimmomatic/SRR36708862_R1_unpaired.fq.gz o_trimmomatic/SRR36708862_R2_paired.fq.gz o_trimmomatic/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36
 
 Phase 3: Genome Assembly
 ------------------------
 Step 5: De Novo Assembly
-unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o o_unicycler/
+unicycler -1 o_trimmomatic/SRR36708862_R1_paired.fq.gz -2 o_trimmomatic/SRR36708862_R2_paired.fq.gz -o o_unicycler/
 
 Step 6: Visualize Assembly Graph
 bandage image o_unicycler/assembly.gfa o_bandage.png
@@ -75,7 +75,7 @@ o_fastqc/               - FastQC quality control reports
   ├── SRR36708862_2_fastqc.html
   └── SRR36708862_2_fastqc.zip
 
-trimmed/                 - Trimmed paired-end reads
+o_trimmomatic/           - Trimmed paired-end reads
   ├── SRR36708862_R1_paired.fq.gz
   ├── SRR36708862_R1_unpaired.fq.gz
   ├── SRR36708862_R2_paired.fq.gz
