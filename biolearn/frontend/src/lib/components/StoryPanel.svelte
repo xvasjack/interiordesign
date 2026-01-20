@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { executedCommands, executedSteps, currentDirectory, storylineDataDir } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
-	import type { Storyline, StorylineSection } from '$lib/storylines/wgs-bacteria';
+	import type { Storyline, StorylineSection } from '$lib/storylines/types';
 
 	let { storyline = null }: { storyline?: Storyline | null } = $props();
 

@@ -4,7 +4,7 @@
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
 	import { executedCommands, storylineDataDir, currentDirectory } from '$lib/stores/terminal';
-	import type { Storyline } from '$lib/storylines/wgs-bacteria';
+	import type { Storyline } from '$lib/storylines/types';
 
 	let {
 		storyContent = '',
