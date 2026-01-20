@@ -178,8 +178,24 @@ export const fileNotes: Record<string, FileNote[]> = {
 			description: 'N50 is the contig length where 50% of the assembly is in contigs of this size or larger. For bacterial genomes: >300kb is EXCELLENT, >100kb is GOOD, <50kb may indicate fragmentation.',
 		},
 		{
+			name: 'N75 Metric',
+			description: 'N75 is the contig length where 75% of the assembly is in contigs of this size or larger. Always ≤N50. Comparing N50 and N75 reveals assembly uniformity—similar values indicate consistent contig sizes.',
+		},
+		{
 			name: 'L50 Metric',
 			description: 'L50 is the minimum number of contigs needed to cover 50% of the assembly. Lower is better. L50 ≤10 is EXCELLENT for bacteria, indicating good contiguity.',
+		},
+		{
+			name: 'L75 Metric',
+			description: 'L75 is the minimum number of contigs needed to cover 75% of the assembly. Always ≥L50. A large gap between L50 and L75 indicates many small contigs in the assembly tail.',
+		},
+		{
+			name: 'Minimum Contig Length',
+			description: 'QUAST default minimum contig length is 500bp. Contigs shorter than this threshold are excluded from analysis. Use --min-contig flag to adjust (e.g., --min-contig 1000 for stricter filtering).',
+		},
+		{
+			name: 'Minimum Alignment Length',
+			description: 'When using a reference genome (-r), QUAST requires alignments ≥65bp by default to count as valid. Shorter alignments are ignored to reduce noise from spurious matches. Adjust with --min-alignment.',
 		},
 		{
 			name: 'Total Length',
