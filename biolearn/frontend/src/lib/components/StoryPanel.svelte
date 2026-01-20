@@ -15,6 +15,7 @@
 	// Default storyline if none provided
 	const defaultStoryline: Storyline = {
 		id: 'default',
+		category: 'tutorial',
 		title: 'Hospital Outbreak Investigation',
 		subtitle: 'WGS Analysis Pipeline',
 		organism: 'Klebsiella pneumoniae',

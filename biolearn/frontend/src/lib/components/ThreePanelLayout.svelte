@@ -190,16 +190,16 @@ Component summary:
 		]
 	};
 
-	onMount(async () => {
+	onMount(() => {
 		// Set the storyline's data directory in stores so Terminal knows where to start
 		const dataDir = storyline?.dataDir || '/data/outbreak_investigation';
 		storylineDataDir.set(dataDir);
 		currentDirectory.set(dataDir);
 
-		// Initialize storyline context for template file fetching
+		// Initialize storyline context for template file fetching (async operation)
 		if (storyline?.category) {
 			const templateId = storyline.templateId || storyline.id;
-			await initializeStoryline(storyline.category, templateId);
+			initializeStoryline(storyline.category, templateId);
 		}
 
 		const unsubscribe = executedCommands.subscribe(cmds => {
