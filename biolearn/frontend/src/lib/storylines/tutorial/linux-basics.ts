@@ -39,25 +39,29 @@ function createPhase0Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 0c: Copy a File',
 			text: `Copy files using the cp command. Let's copy a reference file to your working directory.`,
-			command: 'cp /data/references/sample_info.txt .',
-			explanation: 'The cp command copies files. The dot (.) represents the current directory as the destination.',
+			command: 'ls && cp /data/references/sample_info.txt . && ls',
+			explanation: 'The cp command copies files. The dot (.) represents the current directory as the destination. The ls commands show the directory contents before and after the copy.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
+				{ name: 'ls', desc: 'List directory contents (before copy)' },
 				{ name: 'cp', desc: 'Copy command' },
 				{ name: 'source', desc: 'File to copy from' },
-				{ name: '.', desc: 'Current directory (destination)' }
+				{ name: '.', desc: 'Current directory (destination)' },
+				{ name: 'ls', desc: 'List directory contents (after copy)' }
 			]
 		},
 		{
 			type: 'task',
 			title: 'Step 0d: Copy a Directory',
 			text: `To copy directories with their contents, use the -r (recursive) flag.`,
-			command: 'cp -r /data/references/scripts ./my_scripts',
-			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files.',
+			command: 'ls && cp -r /data/references/scripts ./my_scripts && ls',
+			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files. The ls commands show the directory contents before and after the copy.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
+				{ name: 'ls', desc: 'List directory contents (before copy)' },
 				{ name: '-r', desc: 'Recursive copy for directories' },
-				{ name: './my_scripts', desc: 'New directory name' }
+				{ name: './my_scripts', desc: 'New directory name' },
+				{ name: 'ls', desc: 'List directory contents (after copy)' }
 			]
 		}
 	];
