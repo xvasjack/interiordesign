@@ -647,6 +647,18 @@
 			}
 		}
 
+		// Add directories created by mkdir/cp -r to their parent directory
+		for (const dirPath of createdDirs) {
+			const parentPath = dirPath.substring(0, dirPath.lastIndexOf('/')) || '/';
+			const dirName = dirPath.substring(dirPath.lastIndexOf('/') + 1) + '/';
+			if (!fs[parentPath]) fs[parentPath] = [];
+			if (!fs[parentPath].includes(dirName)) {
+				fs[parentPath].push(dirName);
+			}
+			// Also create empty entry for the new directory itself
+			if (!fs[dirPath]) fs[dirPath] = [];
+		}
+
 		return fs;
 	}
 
