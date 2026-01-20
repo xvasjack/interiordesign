@@ -362,7 +362,7 @@ export const allowedCommands = new Set([
 
 // Blocked/dangerous commands
 export const blockedCommands = new Set([
-	'rm', 'mv', 'cp', 'mkdir', 'rmdir', 'touch',
+	'rm', 'mv', 'mkdir', 'rmdir', 'touch',
 	'chmod', 'chown', 'nano', 'vim', 'vi', 'emacs',
 	'wget', 'curl', 'ssh', 'scp', 'rsync',
 	'apt', 'yum', 'pip', 'npm', 'sudo', 'su'
