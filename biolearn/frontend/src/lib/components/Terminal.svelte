@@ -4,6 +4,10 @@
 	import { get } from 'svelte/store';
 	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize } from '$lib/services/templateService';
 
+	// Import terminal outputs from storylines
+	import { helpTexts as tutorialHelpTexts } from '$lib/storylines/tutorial/terminal-outputs';
+	import { helpTexts as wgsBacteriaHelpTexts } from '$lib/storylines/wgs-bacteria/terminal-outputs';
+
 	// Props
 	let { initialDir = '/data/outbreak_investigation' }: { initialDir?: string } = $props();
 
@@ -5703,47 +5707,10 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 		// Check if this is a subcommand help request (e.g., seqkit stats --help)
 		const subcommand = args.find(a => !a.startsWith('-'));
 
+		// Merge help texts from all storylines (later imports override earlier ones)
 		const helpTexts: Record<string, Record<string, string>> = {
-			'seqkit': {
-				'main': '\x1b[1mseqkit\x1b[0m - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation\n\n\x1b[1mUsage:\x1b[0m\n  seqkit [command]\n\n\x1b[1mAvailable Commands:\x1b[0m\n  stats\n    simple statistics of FASTA/Q files\n  seq\n    transform sequences\n  subseq\n    get subsequences by region/gtf/bed\n  fq2fa\n    convert FASTQ to FASTA\n  fx2tab\n    convert FASTA/Q to tabular format\n  grep\n    search sequences by ID/name/sequence/sequence motifs\n  head\n    print first N FASTA/Q records\n  sample\n    sample sequences by number or proportion\n\n\x1b[1mFlags:\x1b[0m\n  -h, --help\n    help for seqkit\n  -j, --threads\n    number of CPUs (default 4)\n\nUse "seqkit [command] --help" for more information about a command.',
-				'stats': '\x1b[1mseqkit stats\x1b[0m - simple statistics of FASTA/Q files\n\n\x1b[1mUsage:\x1b[0m\n  seqkit stats [flags] <file1> [file2] ...\n\n\x1b[1mFlags:\x1b[0m\n  -a, --all\n    all statistics, including sum_gap, N50, L50\n  -b, --basename\n    only output basename of files\n  -G, --gap-letters\n    gap letters (default "- .")\n  -j, --threads\n    number of CPUs (default 4)\n  -T, --tabular\n    output in machine-friendly tabular format\n  -h, --help\n    help for stats\n\n\x1b[1mExamples:\x1b[0m\n  seqkit stats *.fastq.gz\n  seqkit stats -a sample_R1.fastq.gz sample_R2.fastq.gz\n  seqkit stats *.fastq.gz > stats.txt'
-			},
-			'fastqc': {
-				'main': `\x1b[1mFastQC\x1b[0m - A quality control tool for high throughput sequence data
-
-\x1b[1mUsage:\x1b[0m
-  fastqc [options] <seqfile1> <seqfile2> ...
-
-\x1b[1mOptions:\x1b[0m
-  -o, --outdir       Create all output files in the specified directory
-  -t, --threads      Number of files to process simultaneously
-  -f, --format       Force file format (fastq, bam, sam)
-  --noextract        Do not uncompress the output file after creating it
-  -h, --help         Print this help message
-
-\x1b[1mExamples:\x1b[0m
-  fastqc sample_R1.fastq.gz sample_R2.fastq.gz
-  fastqc *.fastq.gz -o qc_reports/ -t 4`
-			},
-			'trimmomatic': {
-				'main': `\x1b[1mTrimmomatic\x1b[0m - A flexible read trimming tool for Illumina NGS data
-
-\x1b[1mUsage:\x1b[0m
-  trimmomatic PE [-threads <threads>] <input1> <input2> <output1P> <output1U> <output2P> <output2U> <steps>
-
-\x1b[1mTrimming Steps:\x1b[0m
-  ILLUMINACLIP:<fastaWithAdapters>:<seed mismatches>:<palindrome threshold>:<simple threshold>
-  SLIDINGWINDOW:<windowSize>:<requiredQuality>
-  LEADING:<quality>
-  TRAILING:<quality>
-  MINLEN:<length>
-
-\x1b[1mExample:\x1b[0m
-  trimmomatic PE -phred33 input_R1.fq.gz input_R2.fq.gz \\
-    output_R1_paired.fq.gz output_R1_unpaired.fq.gz \\
-    output_R2_paired.fq.gz output_R2_unpaired.fq.gz \\
-    ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36`
-			}
+			...tutorialHelpTexts,
+			...wgsBacteriaHelpTexts
 		};
 
 		// Get help text

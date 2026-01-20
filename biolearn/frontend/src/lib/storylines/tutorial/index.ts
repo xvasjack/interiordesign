@@ -24,3 +24,6 @@ export function getStorylinesList(): StorylineSummary[] {
 
 // Re-export individual storylines for direct imports if needed
 export { linuxBasics, kpneumoniaeDemo };
+
+// Re-export terminal outputs
+export * from './terminal-outputs';

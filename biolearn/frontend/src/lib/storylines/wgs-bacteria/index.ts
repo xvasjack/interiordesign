@@ -32,3 +32,6 @@ export function getStorylinesList(): StorylineSummary[] {
 
 // Re-export individual storylines for direct imports if needed
 export { hospital, plant, fish, foodborne, wastewater, clinical };
+
+// Re-export terminal outputs
+export * from './terminal-outputs';
