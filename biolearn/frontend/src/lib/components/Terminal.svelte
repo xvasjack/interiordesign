@@ -5845,12 +5845,21 @@ Refer to the tool documentation for detailed usage instructions.`;
 							 fullCmd.includes('wgs_report') ? 'WGS Bacteria Analysis Report' :
 							 fullCmd.includes('rnaseq_report') ? 'RNA-Seq Analysis Report' : 'Analysis Report';
 
+			// For bandage, dynamically set the image path from template API
+			let chartData = toolData.chartData;
+			if (tool === 'bandage' && chartData?.type === 'image') {
+				const templateUrl = getRootFileUrl('o_bandage.png');
+				if (templateUrl) {
+					chartData = { ...chartData, imagePath: templateUrl };
+				}
+			}
+
 			outputData.set({
 				type: tool,
 				title: `${tool.charAt(0).toUpperCase() + tool.slice(1)} Results`,
 				tool: fullCmd,
 				summary: toolData.summary,
-				chartData: toolData.chartData,
+				chartData: chartData,
 				files: outputFiles,
 				// PDF report specific fields
 				isPdfReport: isPdfReport,

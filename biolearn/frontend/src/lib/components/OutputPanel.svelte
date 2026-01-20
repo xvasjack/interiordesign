@@ -125,8 +125,8 @@ Component summary:
     - Col156: 2,532 bp
 `,
 
-		// Bandage output (served from static/images)
-		'o_bandage.png': 'PNG_STATIC',
+		// Bandage output (served from template API - storyline-specific)
+		'o_bandage.png': 'PNG_TEMPLATE',
 
 		// QUAST outputs
 		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
@@ -290,6 +290,17 @@ This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance
 			const newWindow = window.open(`/images/${file.name}`, '_blank');
 			if (!newWindow) {
 				alert(`Could not open ${file.name}`);
+			}
+		} else if (file.type === 'png' && content === 'PNG_TEMPLATE') {
+			// Handle PNG files from template API (storyline-specific)
+			const url = getRootFileUrl(file.name);
+			if (url) {
+				const newWindow = window.open(url, '_blank');
+				if (!newWindow) {
+					alert(`Could not open ${file.name}`);
+				}
+			} else {
+				alert(`Could not open ${file.name} - no storyline context`);
 			}
 		} else if (file.type === 'html' && content) {
 			// Open HTML in new window
