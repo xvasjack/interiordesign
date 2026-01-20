@@ -13,13 +13,6 @@ function createPhase0Sections(): StorylineSection[] {
 			phase: 0
 		},
 		{
-			type: 'context',
-			title: 'Welcome to the Terminal',
-			text: `Before analyzing sequencing data, you need to be comfortable navigating the Linux command line. This tutorial will teach you essential commands used in bioinformatics workflows.
-
-The terminal is your gateway to powerful data analysis. Let's start by learning how to get help.`
-		},
-		{
 			type: 'task',
 			title: 'Step 0a: Get Tool Help',
 			text: `Most command-line tools have built-in help. Use the --help flag to see available options for seqkit, a tool you'll use later.`,
