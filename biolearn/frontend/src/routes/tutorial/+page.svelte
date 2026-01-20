@@ -2,7 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { getStorylinesList } from '$lib/storylines/tutorial';
 
-	const tutorials = getStorylinesList();
+	// Filter out linux-basics since it's displayed as a featured "Start Here" item above
+	const tutorials = getStorylinesList().filter(t => t.id !== 'linux-basics');
 
 	let hoveredTutorial: string | null = $state(null);
 
