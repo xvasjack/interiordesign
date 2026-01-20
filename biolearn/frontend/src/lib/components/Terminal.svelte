@@ -707,11 +707,50 @@ ${file2.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.
 				files: []
 			},
 			'fastqc': {
-				output: `Started analysis of ${file1}
+				output: `Picked up _JAVA_OPTIONS: -Xmx1g
+FastQC v0.12.1
+
+Started analysis of ${file1}
+Approx 5% complete for ${file1}
+Approx 10% complete for ${file1}
+Approx 15% complete for ${file1}
+Approx 20% complete for ${file1}
+Approx 25% complete for ${file1}
+Approx 30% complete for ${file1}
+Approx 35% complete for ${file1}
+Approx 40% complete for ${file1}
+Approx 45% complete for ${file1}
 Approx 50% complete for ${file1}
+Approx 55% complete for ${file1}
+Approx 60% complete for ${file1}
+Approx 65% complete for ${file1}
+Approx 70% complete for ${file1}
+Approx 75% complete for ${file1}
+Approx 80% complete for ${file1}
+Approx 85% complete for ${file1}
+Approx 90% complete for ${file1}
+Approx 95% complete for ${file1}
 Analysis complete for ${file1}
 Started analysis of ${file2}
+Approx 5% complete for ${file2}
+Approx 10% complete for ${file2}
+Approx 15% complete for ${file2}
+Approx 20% complete for ${file2}
+Approx 25% complete for ${file2}
+Approx 30% complete for ${file2}
+Approx 35% complete for ${file2}
+Approx 40% complete for ${file2}
+Approx 45% complete for ${file2}
 Approx 50% complete for ${file2}
+Approx 55% complete for ${file2}
+Approx 60% complete for ${file2}
+Approx 65% complete for ${file2}
+Approx 70% complete for ${file2}
+Approx 75% complete for ${file2}
+Approx 80% complete for ${file2}
+Approx 85% complete for ${file2}
+Approx 90% complete for ${file2}
+Approx 95% complete for ${file2}
 Analysis complete for ${file2}
 `,
 				summary: {
