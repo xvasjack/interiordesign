@@ -2,10 +2,11 @@
 
 ## Output Folder/File Naming Convention
 
-- **Pattern**: `o_toolname` for folders, `o_toolname.ext` for single files
-- **Examples**:
-  - Folders: `o_unicycler/`, `o_abricate/`, `o_quast/`, `o_prokka/`, `o_mlst/`
-  - Single files: `o_bandage.png`, `o_seqkit_stats.txt`
+**Output file format: `o_toolname`**
+
+- All output folders and files MUST follow this pattern
+- **Folders**: `o_toolname/` (e.g., `o_unicycler/`, `o_abricate/`, `o_quast/`, `o_prokka/`, `o_mlst/`)
+- **Single files**: `o_toolname.ext` (e.g., `o_bandage.png`, `o_seqkit_stats.txt`, `o_fastqc.html`)
 
 ## Consistency Requirements
 
