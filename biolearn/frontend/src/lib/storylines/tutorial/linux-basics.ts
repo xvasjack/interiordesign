@@ -38,28 +38,26 @@ function createPhase0Sections(): StorylineSection[] {
 		{
 			type: 'task',
 			title: 'Step 0c: Copy a File',
-			text: `Copy files using the cp command. Let's copy a reference file to your working directory and use ls to see it appear.`,
-			command: 'echo "Before:" && ls && cp /data/references/sample_info.txt . && echo "After:" && ls',
-			explanation: 'The cp command copies files. The dot (.) represents the current directory. The labeled ls outputs show the new file appearing.',
+			text: `Copy files using the cp command. Let's copy a reference file to your working directory.`,
+			command: 'cp /data/references/sample_info.txt .',
+			explanation: 'The cp command copies files. The dot (.) represents the current directory as the destination.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
 				{ name: 'cp', desc: 'Copy command' },
 				{ name: 'source', desc: 'File to copy from' },
-				{ name: '.', desc: 'Current directory (destination)' },
-				{ name: 'ls', desc: 'List files before and after to see the change' }
+				{ name: '.', desc: 'Current directory (destination)' }
 			]
 		},
 		{
 			type: 'task',
 			title: 'Step 0d: Copy a Directory',
-			text: `To copy directories with their contents, use the -r (recursive) flag. Use ls to see the new folder appear.`,
-			command: 'echo "Before:" && ls && cp -r /data/references/scripts ./my_scripts && echo "After:" && ls',
-			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files. The labeled ls outputs show the new folder appearing.',
+			text: `To copy directories with their contents, use the -r (recursive) flag.`,
+			command: 'cp -r /data/references/scripts ./my_scripts',
+			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
 				{ name: '-r', desc: 'Recursive copy for directories' },
-				{ name: './my_scripts', desc: 'New directory name' },
-				{ name: 'ls', desc: 'List files before and after to see the change' }
+				{ name: './my_scripts', desc: 'New directory name' }
 			]
 		}
 	];
