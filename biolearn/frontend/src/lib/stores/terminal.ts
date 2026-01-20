@@ -208,6 +208,10 @@ export const fileNotes: Record<string, FileNote[]> = {
 		{
 			name: 'Quality Assessment',
 			description: 'EXCELLENT: N50 >300kb, L50 ≤10, total length matches expected, correct GC%. GOOD: N50 >100kb, L50 ≤20. FAIR: N50 >50kb. POOR: highly fragmented assembly.',
+		},
+		{
+			name: 'Interpretation',
+			description: 'ASSEMBLY QUALITY: Compare total length to expected genome size for your organism (K. pneumoniae ~5.5 Mb, E. coli ~5.0 Mb). N50 >100kb with L50 ≤10 indicates good contiguity suitable for most downstream analyses. COMPLETENESS CHECK: Use CheckM2 or BUSCO alongside QUAST to assess gene content. CONTAMINATION: Unexpected GC%, total length significantly larger than expected, or duplicate contigs may indicate contamination—consider running CheckM2 or ConFindr. ACTIONABLE: If N50 <50kb, consider increasing sequencing depth or using long-read data for hybrid assembly.',
 		}
 	],
 	'prokka': [
@@ -290,6 +294,10 @@ export const fileNotes: Record<string, FileNote[]> = {
 		{
 			name: 'Col Plasmids',
 			description: 'Small mobilizable plasmids (~4-10 kb) originally identified as colicin-producing. Col440I and similar types often carry no resistance genes but can mobilize with conjugative plasmids.',
+		},
+		{
+			name: 'Interpretation',
+			description: 'CLINICAL SIGNIFICANCE: Multiple replicons indicate plasmid diversity and potential for horizontal gene transfer. IncF and IncX3 plasmids are epidemiologically important as they frequently carry antimicrobial resistance genes including carbapenemases (NDM, KPC) and ESBLs. Finding multiple Inc types suggests the isolate may harbor multiple resistance plasmids. QUALITY: Identity ≥95% and coverage ≥95% indicate confident plasmid typing; lower values may suggest novel variants requiring further investigation.',
 		}
 	]
 };

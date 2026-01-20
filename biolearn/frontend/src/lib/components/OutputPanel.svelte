@@ -131,8 +131,78 @@ Component summary:
 		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;background:#f5f5f5;} .container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);} h1{color:#333;border-bottom:2px solid #4CAF50;padding-bottom:10px;} table{border-collapse:collapse;width:100%;margin-top:20px;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f9f9f9;} tr:hover{background:#f1f1f1;} .metric{font-weight:bold;}</style></head><body><div class="container"><h1>QUAST Report - assembly</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td class="metric"># contigs (>= 0 bp)</td><td>117</td></tr><tr><td class="metric"># contigs (>= 1000 bp)</td><td>57</td></tr><tr><td class="metric"># contigs (>= 5000 bp)</td><td>33</td></tr><tr><td class="metric"># contigs (>= 10000 bp)</td><td>29</td></tr><tr><td class="metric"># contigs (>= 25000 bp)</td><td>24</td></tr><tr><td class="metric"># contigs (>= 50000 bp)</td><td>18</td></tr><tr><td class="metric">Total length (>= 0 bp)</td><td>5,564,255</td></tr><tr><td class="metric">Total length (>= 1000 bp)</td><td>5,547,651</td></tr><tr><td class="metric"># contigs</td><td>65</td></tr><tr><td class="metric">Largest contig</td><td>837,178</td></tr><tr><td class="metric">Total length</td><td>5,553,065</td></tr><tr><td class="metric">GC (%)</td><td>57.18</td></tr><tr><td class="metric">N50</td><td>371,705</td></tr><tr><td class="metric">N75</td><td>224,673</td></tr><tr><td class="metric">L50</td><td>6</td></tr><tr><td class="metric">L75</td><td>10</td></tr><tr><td class="metric"># N's per 100 kbp</td><td>0.00</td></tr></table></div></body></html>`,
 
 		// Abricate outputs
-		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE\nassembly.fasta\tcontig_1\t1245678\t1246523\t+\tblaCTX-M-15\t1-846/846\t===============\t0/0\t100.00\t99.89\tncbi\tNG_049557.1\tclass A extended-spectrum beta-lactamase CTX-M-15\tCephalosporin\nassembly.fasta\tcontig_2\t52345\t53567\t+\ttet(A)\t1-1223/1223\t===============\t0/0\t100.00\t100.00\tncbi\tAF534183.1\ttetracycline efflux MFS transporter Tet(A)\tTetracycline`,
-		'amr_summary.txt': `AMR Gene Summary Report\n=======================\nGenerated: 2024-01-15\nSample: sample_01\nDatabase: NCBI AMRFinderPlus\n\nTotal AMR genes found: 2\n\n1. blaCTX-M-15 (Beta-lactamase)\n   Location: contig_1:1245678-1246523\n   Coverage: 100.00%\n   Identity: 99.89%\n   Resistance: Extended-spectrum cephalosporins (3rd/4th generation)\n   Clinical significance: HIGH - Associated with hospital-acquired infections\n\n2. tet(A) (Tetracycline efflux pump)\n   Location: contig_2:52345-53567  \n   Coverage: 100.00%\n   Identity: 100.00%\n   Resistance: Tetracycline, Doxycycline\n   Clinical significance: MODERATE\n\nRecommendation: Avoid cephalosporins and tetracyclines for treatment.`
+		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE
+o_unicycler/assembly.fasta\t30\t423\t1238\t+\tsul2\t1-816/816\t===============\t0/0\t100.00\t100.00\tncbi\tNG_051852.1\tsulfonamide-resistant dihydropteroate synthase Sul2\tSULFONAMIDE
+o_unicycler/assembly.fasta\t30\t1300\t2102\t+\taph(3'')-Ib\t2-804/804\t===============\t0/0\t99.88\t99.88\tncbi\tNG_047413.1\taminoglycoside O-phosphotransferase APH(3'')-Ib\tSTREPTOMYCIN
+o_unicycler/assembly.fasta\t30\t2102\t2938\t+\taph(6)-Id\t1-837/837\t===============\t0/0\t100.00\t100.00\tncbi\tNG_047464.1\taminoglycoside O-phosphotransferase APH(6)-Id\tSTREPTOMYCIN
+o_unicycler/assembly.fasta\t30\t3659\t4519\t-\tblaTEM-1\t1-861/861\t===============\t0/0\t100.00\t100.00\tncbi\tNG_050145.1\tbroad-spectrum class A beta-lactamase TEM-1\tBETA-LACTAM
+o_unicycler/assembly.fasta\t30\t7341\t8216\t+\tblaCTX-M-15\t1-876/876\t===============\t0/0\t100.00\t100.00\tncbi\tNG_048935.1\textended-spectrum class A beta-lactamase CTX-M-15\tCEPHALOSPORIN
+o_unicycler/assembly.fasta\t31\t1713\t2186\t+\tdfrA14\t1-474/474\t===============\t0/0\t100.00\t100.00\tncbi\tNG_056035.1\ttrimethoprim-resistant dihydrofolate reductase DfrA14\tTRIMETHOPRIM
+o_unicycler/assembly.fasta\t32\t2466\t3278\t+\tblaNDM-7\t1-813/813\t===============\t0/0\t100.00\t100.00\tncbi\tNG_049339.1\tsubclass B1 metallo-beta-lactamase NDM-7\tCARBAPENEM
+o_unicycler/assembly.fasta\t32\t3282\t3647\t+\tble-MBL\t1-366/366\t===============\t0/0\t100.00\t100.00\tncbi\tNG_047559.1\tbleomycin binding protein Ble-MBL\tBLEOMYCIN
+o_unicycler/assembly.fasta\t4\t37001\t38176\t+\toqxA5\t1-1176/1176\t===============\t0/0\t100.00\t99.41\tncbi\tNG_050423.1\tmultidrug efflux RND transporter periplasmic adaptor subunit OqxA5\tPHENICOL;QUINOLONE
+o_unicycler/assembly.fasta\t4\t38200\t41352\t+\toqxB19\t1-3153/3153\t===============\t0/0\t100.00\t99.40\tncbi\tNG_050437.1\tmultidrug efflux RND transporter permease subunit OqxB19\tPHENICOL;QUINOLONE
+o_unicycler/assembly.fasta\t40\t105\t965\t+\taac(3)-IIe\t1-861/861\t===============\t0/0\t100.00\t99.77\tncbi\tNG_047244.1\taminoglycoside N-acetyltransferase AAC(3)-IIe\tGENTAMICIN
+o_unicycler/assembly.fasta\t44\t92\t646\t+\taac(6')-Ib-D181Y\t1-555/555\t===============\t0/0\t100.00\t99.82\tncbi\tNG_067946.1\tAAC(6')-Ib family aminoglycoside 6'-N-acetyltransferase\tAMIKACIN;KANAMYCIN;TOBRAMYCIN
+o_unicycler/assembly.fasta\t44\t777\t1607\t+\tblaOXA-1\t1-831/831\t===============\t0/0\t100.00\t100.00\tncbi\tNG_049392.1\toxacillin-hydrolyzing class D beta-lactamase OXA-1\tCEPHALOSPORIN
+o_unicycler/assembly.fasta\t46\t492\t1136\t+\tqnrB1\t1-645/645\t===============\t0/0\t100.00\t100.00\tncbi\tNG_050469.1\tquinolone resistance pentapeptide repeat protein QnrB1\tQUINOLONE
+o_unicycler/assembly.fasta\t5\t354542\t354961\t-\tfosA6\t1-420/420\t===============\t0/0\t100.00\t99.76\tncbi\tNG_051497.1\tfosfomycin resistance glutathione transferase FosA6\tFOSFOMYCIN
+o_unicycler/assembly.fasta\t7\t245723\t246583\t-\tblaSHV-106\t1-861/861\t===============\t0/0\t100.00\t99.88\tncbi\tNG_049996.1\textended-spectrum class A beta-lactamase SHV-106\tCEPHALOSPORIN`,
+		'amr_summary.txt': `AMR Gene Summary Report
+=======================
+Generated: 2024-01-15
+Sample: o_unicycler/assembly.fasta
+Database: NCBI AMRFinderPlus
+
+Total AMR genes found: 16
+
+BETA-LACTAM RESISTANCE:
+1. blaNDM-7 (Carbapenemase)
+   Location: contig_32:2466-3278
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: CARBAPENEM (meropenem, imipenem, ertapenem)
+   Clinical significance: CRITICAL - Carbapenem-resistant Enterobacteriaceae (CRE)
+
+2. blaCTX-M-15 (ESBL)
+   Location: contig_30:7341-8216
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: Extended-spectrum cephalosporins (3rd/4th gen)
+   Clinical significance: HIGH
+
+3. blaTEM-1 (Penicillinase)
+   Location: contig_30:3659-4519
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: Ampicillin, penicillins
+
+4. blaSHV-106 (ESBL)
+   Location: contig_7:245723-246583
+   Coverage: 100.00% | Identity: 99.88%
+   Resistance: Extended-spectrum cephalosporins
+
+5. blaOXA-1 (Oxacillinase)
+   Location: contig_44:777-1607
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: Cephalosporins
+
+AMINOGLYCOSIDE RESISTANCE:
+6. aac(6')-Ib-D181Y | aac(3)-IIe | aph(3'')-Ib | aph(6)-Id
+   Resistance: Amikacin, kanamycin, tobramycin, gentamicin, streptomycin
+
+QUINOLONE RESISTANCE:
+7. qnrB1 | oqxA5 | oqxB19
+   Resistance: Fluoroquinolones (ciprofloxacin, levofloxacin)
+
+OTHER RESISTANCE:
+8. sul2 - Sulfonamide resistance
+9. dfrA14 - Trimethoprim resistance
+10. fosA6 - Fosfomycin resistance
+11. ble-MBL - Bleomycin resistance
+
+CLINICAL INTERPRETATION:
+This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance.
+- AVOID: Carbapenems, cephalosporins, penicillins, aminoglycosides, fluoroquinolones, sulfonamides, trimethoprim
+- CONSIDER: Colistin, tigecycline (susceptibility testing required)
+- Report to infection control for CRE surveillance`
 	};
 
 	// MIME types for different file extensions
