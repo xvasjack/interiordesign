@@ -30,8 +30,8 @@
 	const fileContents: Record<string, string> = {
 		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nSRR36708862_1.fastq.gz\tFASTQ\tDNA\t990,478\t268,416,273\t35\t271\t301\nSRR36708862_2.fastq.gz\tFASTQ\tDNA\t990,478\t268,449,364\t35\t271\t301`,
 		// FastQC reports - loaded from static folder (real FastQC output format)
-		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
-		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
+		'SRR36708862_1_fastqc.html': 'FASTQC_STATIC',
+		'SRR36708862_2_fastqc.html': 'FASTQC_STATIC',
 		'assembly.fasta': `>contig_1 length=837178 depth=45.2x\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n>contig_2 length=721456 depth=44.8x\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_3 length=512089 depth=46.1x\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n... (65 contigs total)`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:837178\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:721456\nS\t3\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:512089\nL\t1\t+\t2\t+\t0M\nL\t2\t+\t3\t+\t0M\n... (65 segments, 78 links)`,
 		'unicycler.log': `
@@ -105,10 +105,10 @@ Component summary:
 	const toolFiles: Record<string, {name: string, type: string}[]> = {
 		'seqkit': [{ name: 'o_seqkit_stats.txt', type: 'txt' }],
 		'fastqc': [
-			{ name: 'sample_01_R1_fastqc.html', type: 'html' },
-			{ name: 'sample_01_R2_fastqc.html', type: 'html' },
-			{ name: 'sample_01_R1_fastqc.zip', type: 'zip' },
-			{ name: 'sample_01_R2_fastqc.zip', type: 'zip' }
+			{ name: 'SRR36708862_1_fastqc.html', type: 'html' },
+			{ name: 'SRR36708862_2_fastqc.html', type: 'html' },
+			{ name: 'SRR36708862_1_fastqc.zip', type: 'zip' },
+			{ name: 'SRR36708862_2_fastqc.zip', type: 'zip' }
 		],
 		'trimmomatic': [
 			{ name: 'sample_01_R1_paired.fq.gz', type: 'fastq' },

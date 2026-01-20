@@ -70,10 +70,10 @@
 		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t990,478\t268,416,273\t35\t271\t301\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t990,478\t268,449,364\t35\t271\t301`,
 
 		// FastQC reports - loaded from static folder (real FastQC output format)
-		'sample_01_R1_fastqc.html': 'FASTQC_STATIC',
-		'sample_01_R2_fastqc.html': 'FASTQC_STATIC',
-		'sample_01_R1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
-		'sample_01_R2_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
+		'SRR36708862_1_fastqc.html': 'FASTQC_STATIC',
+		'SRR36708862_2_fastqc.html': 'FASTQC_STATIC',
+		'SRR36708862_1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
+		'SRR36708862_2_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
 
 		// Trimmomatic outputs
 		'sample_01_R1_paired.fq.gz': `@SEQ_ID_1\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
