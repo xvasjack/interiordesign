@@ -764,56 +764,216 @@ plt.savefig("coverage_plot.pdf")
 
 ---
 
-## File Structure
+## Architecture Overview
+
+### Content Hierarchy
+
+```
+Platform
+└── Category (sequencing type)
+    └── Storyline (narrative/case study)
+        └── Phase (workflow stage)
+            └── Step (individual command)
+```
+
+**Example path**: BioLearn → WGS Bacteria → Hospital Outbreak → Phase 1: QC → Step 1: FastQC
+
+---
+
+## Directory Structure
+
+### Top-Level Organization
 
 ```
 biolearn/
-├── frontend/
-│   └── src/
-│       ├── routes/
-│       │   ├── +page.svelte              # Category selection
-│       │   ├── wgs/
-│       │   │   ├── +page.svelte          # WGS narrative selection
-│       │   │   └── [narrativeId]/
-│       │   │       └── [phaseId]/
-│       │   │           └── +page.svelte  # 3-panel learning UI
-│       │   ├── amplicon/                 # Future
-│       │   └── rnaseq/                   # Future
-│       └── lib/
-│           └── components/
-│               ├── Terminal.svelte
-│               ├── StoryPanel.svelte
-│               └── OutputPanel.svelte
+├── frontend/          # SvelteKit web application
+├── backend/           # FastAPI server
+├── template/          # Pre-generated tool output files
+├── docker/            # Container definitions
+└── reference.md       # Development reference
+```
+
+---
+
+### 1. Template Directory (Output Files)
+
+Pre-generated output files organized by category and storyline:
+
+```
+biolearn/template/
 │
-├── backend/
-│   └── app/
-│       ├── main.py
-│       ├── routers/
-│       │   ├── terminal.py
-│       │   ├── narratives.py
-│       │   └── progress.py
-│       └── services/
-│           ├── docker_executor.py
-│           └── output_watcher.py
+├── tutorial/
+│   ├── basic_linux_commands/
+│   │   └── sample_files/           # Files for ls, cat, grep practice
+│   │
+│   └── kpneumoniae_demo/           # Introductory WGS tutorial
+│       ├── o_seqkit/
+│       ├── o_fastqc/
+│       ├── o_trimmomatic/
+│       ├── o_unicycler/
+│       ├── o_bandage/
+│       ├── o_quast/
+│       ├── o_checkm2/
+│       ├── o_plasmidfinder/
+│       ├── o_abricate/
+│       ├── o_mlst/
+│       └── o_prokka/
 │
-├── docker/
-│   └── bioinfo-wgs/
-│       └── Dockerfile                    # All WGS tools
+├── wgs_bacteria/
+│   ├── hospital/                   # Hospital Outbreak (K. pneumoniae)
+│   │   ├── o_fastqc/
+│   │   ├── o_trimmomatic/
+│   │   ├── o_unicycler/
+│   │   ├── o_quast/
+│   │   ├── o_checkm/
+│   │   ├── o_mlst/
+│   │   ├── o_prokka/
+│   │   ├── o_abricate/
+│   │   ├── o_plasmidfinder/
+│   │   ├── o_mob_recon/
+│   │   ├── o_snippy/
+│   │   ├── o_roary/
+│   │   ├── o_iqtree/
+│   │   ├── o_resfinder/
+│   │   ├── o_integron_finder/
+│   │   └── o_isescan/
+│   │
+│   ├── foodborne/                  # Food Poisoning (Salmonella)
+│   │   └── ...
+│   │
+│   ├── plant/                      # Citrus Canker (Xanthomonas)
+│   │   └── ...
+│   │
+│   ├── fish/                       # Fish Mortality (Vibrio) - Hybrid
+│   │   └── ...
+│   │
+│   ├── wastewater/                 # AMR Surveillance (E. coli) - PacBio
+│   │   └── ...
+│   │
+│   └── clinical/                   # Rapid Diagnostics (Pseudomonas) - ONT
+│       └── ...
 │
-└── content/
-    └── wgs/
-        ├── hospital-outbreak/
-        │   ├── narrative.json
-        │   ├── phase1.json
-        │   ├── phase2.json
-        │   ├── phase3.json
-        │   ├── phase4.json
-        │   ├── scripts/
-        │   └── data/
-        ├── food-poisoning/
-        ├── water-contamination/
-        ├── environmental/
-        └── clinical-isolate/
+└── amplicon_bacteria/
+    ├── gut/                        # IBD Microbiome Study
+    │   ├── o_fastqc/
+    │   ├── o_multiqc/
+    │   ├── o_cutadapt/
+    │   └── o_qiime2/
+    │
+    ├── soil/                       # Compost Microbiome
+    │   └── ...
+    │
+    └── water/                      # Water Contamination
+        └── ...
+```
+
+**Naming Convention**: All output folders use `o_toolname/` format.
+
+---
+
+### 2. Frontend Directory
+
+```
+biolearn/frontend/
+└── src/
+    ├── routes/                     # Page routing
+    │   ├── +page.svelte            # Home: category selection
+    │   ├── +layout.svelte          # Global layout
+    │   │
+    │   ├── linux-basics/           # Tutorial route
+    │   │   └── +page.svelte
+    │   │
+    │   ├── wgs-bacteria/           # WGS category
+    │   │   ├── +page.svelte        # Storyline selection
+    │   │   ├── trial/              # K. pneumoniae demo
+    │   │   ├── hospital/           # Hospital outbreak
+    │   │   ├── foodborne/          # Food poisoning
+    │   │   ├── plant/              # Plant pathogen
+    │   │   ├── fish/               # Fish mortality
+    │   │   ├── wastewater/         # Wastewater surveillance
+    │   │   └── clinical/           # Clinical diagnostics
+    │   │
+    │   ├── amplicon-bacteria/      # Amplicon category
+    │   │   ├── +page.svelte        # Storyline selection
+    │   │   ├── gut/
+    │   │   ├── soil/
+    │   │   └── water/
+    │   │
+    │   └── reports/                # Report viewing
+    │       ├── wgs-bacteria/
+    │       ├── amplicon/
+    │       └── rnaseq/
+    │
+    ├── lib/
+    │   ├── components/             # Reusable UI components
+    │   │   ├── Terminal.svelte
+    │   │   ├── StoryPanel.svelte
+    │   │   ├── OutputPanel.svelte
+    │   │   └── ThreePanelLayout.svelte
+    │   │
+    │   ├── storylines/             # Storyline definitions
+    │   │   ├── basic-linux.ts
+    │   │   ├── wgs-bacteria.ts
+    │   │   ├── amplicon-bacteria.ts
+    │   │   └── exploring_kpneumoniae/
+    │   │       └── exploringkpneumoniae.txt
+    │   │
+    │   ├── stores/                 # Svelte stores
+    │   │   └── terminal.ts
+    │   │
+    │   └── types/                  # TypeScript types
+    │       └── plotly.d.ts
+    │
+    └── static/                     # Static assets
+        ├── fastqc/                 # FastQC HTML reports
+        └── images/                 # Storyline images
+```
+
+---
+
+### 3. Backend Directory
+
+```
+biolearn/backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py                     # FastAPI entry point
+│   │
+│   ├── api/                        # API routes
+│   │   ├── __init__.py
+│   │   ├── analysis.py
+│   │   ├── narratives.py
+│   │   └── users.py
+│   │
+│   ├── storage/                    # File storage
+│   │   └── __init__.py
+│   │
+│   └── websocket/                  # Real-time communication
+│       └── __init__.py
+│
+├── content/
+│   └── results/                    # User-generated results
+│       └── .gitkeep
+│
+├── Dockerfile
+├── requirements.txt
+└── .gitignore
+```
+
+---
+
+### 4. Docker Directory
+
+```
+biolearn/docker/
+├── bioinfo-wgs/
+│   └── Dockerfile                  # WGS tools container
+│
+├── bioinfo-amplicon/
+│   └── Dockerfile                  # Amplicon tools container
+│
+└── bioinfo-rnaseq/
+    └── Dockerfile                  # RNA-seq tools container
 ```
 
 ---
