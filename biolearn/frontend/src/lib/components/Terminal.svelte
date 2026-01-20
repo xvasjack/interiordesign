@@ -5705,59 +5705,8 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 
 		const helpTexts: Record<string, Record<string, string>> = {
 			'seqkit': {
-				'main': `\x1b[1mseqkit\x1b[0m - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
-
-\x1b[1mUsage:\x1b[0m
-  seqkit [command]
-
-\x1b[1mAvailable Commands:\x1b[0m
-  stats
-    simple statistics of FASTA/Q files
-  seq
-    transform sequences
-  subseq
-    get subsequences by region/gtf/bed
-  fq2fa
-    convert FASTQ to FASTA
-  fx2tab
-    convert FASTA/Q to tabular format
-  grep
-    search sequences by ID/name/sequence/sequence motifs
-  head
-    print first N FASTA/Q records
-  sample
-    sample sequences by number or proportion
-
-\x1b[1mFlags:\x1b[0m
-  -h, --help
-    help for seqkit
-  -j, --threads
-    number of CPUs (default 4)
-
-Use "seqkit [command] --help" for more information about a command.`,
-				'stats': `\x1b[1mseqkit stats\x1b[0m - simple statistics of FASTA/Q files
-
-\x1b[1mUsage:\x1b[0m
-  seqkit stats [flags] <file1> [file2] ...
-
-\x1b[1mFlags:\x1b[0m
-  -a, --all
-    all statistics, including sum_gap, N50, L50
-  -b, --basename
-    only output basename of files
-  -G, --gap-letters
-    gap letters (default "- .")
-  -j, --threads
-    number of CPUs (default 4)
-  -T, --tabular
-    output in machine-friendly tabular format
-  -h, --help
-    help for stats
-
-\x1b[1mExamples:\x1b[0m
-  seqkit stats *.fastq.gz
-  seqkit stats -a sample_R1.fastq.gz sample_R2.fastq.gz
-  seqkit stats *.fastq.gz > stats.txt`
+				'main': '\x1b[1mseqkit\x1b[0m - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation\n\n\x1b[1mUsage:\x1b[0m\n  seqkit [command]\n\n\x1b[1mAvailable Commands:\x1b[0m\n  stats\n    simple statistics of FASTA/Q files\n  seq\n    transform sequences\n  subseq\n    get subsequences by region/gtf/bed\n  fq2fa\n    convert FASTQ to FASTA\n  fx2tab\n    convert FASTA/Q to tabular format\n  grep\n    search sequences by ID/name/sequence/sequence motifs\n  head\n    print first N FASTA/Q records\n  sample\n    sample sequences by number or proportion\n\n\x1b[1mFlags:\x1b[0m\n  -h, --help\n    help for seqkit\n  -j, --threads\n    number of CPUs (default 4)\n\nUse "seqkit [command] --help" for more information about a command.',
+				'stats': '\x1b[1mseqkit stats\x1b[0m - simple statistics of FASTA/Q files\n\n\x1b[1mUsage:\x1b[0m\n  seqkit stats [flags] <file1> [file2] ...\n\n\x1b[1mFlags:\x1b[0m\n  -a, --all\n    all statistics, including sum_gap, N50, L50\n  -b, --basename\n    only output basename of files\n  -G, --gap-letters\n    gap letters (default "- .")\n  -j, --threads\n    number of CPUs (default 4)\n  -T, --tabular\n    output in machine-friendly tabular format\n  -h, --help\n    help for stats\n\n\x1b[1mExamples:\x1b[0m\n  seqkit stats *.fastq.gz\n  seqkit stats -a sample_R1.fastq.gz sample_R2.fastq.gz\n  seqkit stats *.fastq.gz > stats.txt'
 			},
 			'fastqc': {
 				'main': `\x1b[1mFastQC\x1b[0m - A quality control tool for high throughput sequence data
