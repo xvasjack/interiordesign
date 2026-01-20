@@ -1,5 +1,78 @@
 # BioLearn Development Reference
 
+## Template Directory Structure
+
+The `biolearn/template/` directory contains pre-generated output files for storylines:
+
+```
+biolearn/template/
+├── tutorial/
+│   ├── basic_linux_commands/
+│   │   └── (sample files for Linux basics tutorial)
+│   └── kpneumoniae_demo/
+│       ├── o_fastqc/
+│       ├── o_trimmomatic/
+│       ├── o_unicycler/
+│       ├── o_quast/
+│       ├── o_checkm2/
+│       ├── o_plasmidfinder/
+│       ├── o_abricate/
+│       ├── o_mlst/
+│       └── o_prokka/
+│
+├── wgs_bacteria/
+│   ├── hospital/                    # Storyline 1: Hospital Outbreak (AMR in ICU)
+│   │   ├── o_fastqc/
+│   │   ├── o_trimmomatic/
+│   │   ├── o_unicycler/
+│   │   ├── o_quast/
+│   │   ├── o_checkm/
+│   │   ├── o_abricate/
+│   │   ├── o_mlst/
+│   │   ├── o_prokka/
+│   │   ├── o_mob_recon/
+│   │   ├── o_plasmidfinder/
+│   │   ├── o_snippy/
+│   │   ├── o_roary/
+│   │   ├── o_iqtree/
+│   │   ├── o_resfinder/
+│   │   ├── o_integron_finder/
+│   │   └── o_isescan/
+│   │
+│   ├── foodborne/                   # Storyline 2: Food Poisoning Outbreak
+│   │   ├── o_fastqc/
+│   │   ├── o_trimmomatic/
+│   │   └── ... (same pattern)
+│   │
+│   ├── plant/                       # Storyline 3: Plant Pathogen (Citrus Canker)
+│   │   └── ...
+│   │
+│   ├── fish/                        # Storyline 4: Fish Mortality Event
+│   │   └── ...
+│   │
+│   ├── wastewater/                  # Storyline 5: Wastewater AMR Surveillance
+│   │   └── ...
+│   │
+│   └── clinical/                    # Storyline 6: Clinical Rapid Diagnostics
+│       └── ...
+│
+└── amplicon_bacteria/
+    ├── gut/                         # Storyline 1: Gut Microbiome (IBD vs Healthy)
+    │   ├── o_fastqc/
+    │   ├── o_multiqc/
+    │   ├── o_cutadapt/
+    │   ├── o_qiime2/
+    │   └── ...
+    │
+    ├── soil/                        # Storyline 2: Compost Microbiome
+    │   ├── o_fastqc/
+    │   └── ...
+    │
+    └── water/                       # Storyline 3: Water Contamination Investigation
+        ├── o_fastqc/
+        └── ...
+```
+
 ## Output Folder/File Naming Convention
 
 **Output file format: `o_toolname`**
@@ -55,15 +128,39 @@
 2. **Inconsistent paths**: Input files should use source folder (e.g., `o_unicycler/assembly.fasta`)
 3. **Missing tool in bioTools**: New tools must be added to the bioTools set in terminal.ts
 
-## TODO: Apply `o_toolname` Convention to Other Storylines
+## TODO: Apply `o_toolname` Convention and Create Template Files
 
-The following storylines still use non-standard output folder names and need to be updated:
+### Phase 1: Tutorial Templates
+1. **`template/tutorial/basic_linux_commands/`** - Sample files for Linux basics
+2. **`template/tutorial/kpneumoniae_demo/`** - Current o_fastqc/ files need to be moved here
+
+### Phase 2: WGS Bacteria Templates
+Each storyline needs template output files created in `template/wgs_bacteria/<storyline>/`:
+
+| Storyline | Template Path | Status |
+|-----------|---------------|--------|
+| `hospital` | `template/wgs_bacteria/hospital/` | Pending |
+| `foodborne` | `template/wgs_bacteria/foodborne/` | Pending |
+| `plant` | `template/wgs_bacteria/plant/` | Pending |
+| `fish` | `template/wgs_bacteria/fish/` | Pending |
+| `wastewater` | `template/wgs_bacteria/wastewater/` | Pending |
+| `clinical` | `template/wgs_bacteria/clinical/` | Pending |
+
+### Phase 3: Amplicon Bacteria Templates
+Each storyline needs template output files created in `template/amplicon_bacteria/<storyline>/`:
+
+| Storyline | Template Path | Status |
+|-----------|---------------|--------|
+| `gut` | `template/amplicon_bacteria/gut/` | Pending |
+| `soil` | `template/amplicon_bacteria/soil/` | Pending |
+| `water` | `template/amplicon_bacteria/water/` | Pending |
+
+### Legacy Folder Names to Update in Code
+The following storylines still use non-standard output folder names in their code:
 
 | Storyline | Current Names | Should Be |
 |-----------|---------------|-----------|
-| `outbreak_investigation` | `trimmed/`, `assembly/`, `quast_results/`, `mlst_results/`, `prokka_results/`, `plasmidfinder_results/`, `checkm_results/`, `confindr_results/`, `bakta_results/`, `mob_recon_results/`, `platon_results/`, `snippy_results/`, `roary_results/`, `gubbins_results/`, `busco_results/`, `resfinder_results/`, `virulencefinder_results/`, `integron_results/`, `isescan_results/`, `nanoplot_results/` | `o_trimmomatic/`, `o_unicycler/`, `o_quast/`, `o_mlst/`, `o_prokka/`, `o_plasmidfinder/`, `o_checkm/`, `o_confindr/`, `o_bakta/`, `o_mob_recon/`, `o_platon/`, `o_snippy/`, `o_roary/`, `o_gubbins/`, `o_busco/`, `o_resfinder/`, `o_virulencefinder/`, `o_integron_finder/`, `o_isescan/`, `o_nanoplot/` |
-| `gut_microbiome` | `qc_reports/` | `o_fastqc/` |
-| `soil_microbiome` | `qc_reports/` | `o_fastqc/` |
-| `water_samples` | `qc_reports/` | `o_fastqc/` |
+| WGS storylines | `trimmed/`, `assembly/`, `quast_results/`, etc. | `o_trimmomatic/`, `o_unicycler/`, `o_quast/`, etc. |
+| Amplicon storylines | `qc_reports/`, `trimmed/` | `o_fastqc/`, `o_cutadapt/` |
 
-**Note**: Apply these changes when working on each storyline individually.
+**Note**: Apply code changes when working on each storyline individually.
