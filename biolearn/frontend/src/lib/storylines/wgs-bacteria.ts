@@ -1154,71 +1154,14 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 			},
 			{
 				type: 'phase',
-				title: 'Phase 0: Getting Started',
-				text: 'Learn essential terminal commands and how to explore bioinformatics tools before starting your analysis.',
-				phase: 0
-			},
-			{
-				type: 'task',
-				title: 'Step 0a: Learning a Tool',
-				text: `Before using any bioinformatics tool, you can learn about it using the <code>--help</code> flag. Let's explore SeqKit, a tool for sequence QC.`,
-				command: 'seqkit --help',
-				explanation: 'The --help flag displays usage information, available subcommands, and options for any tool. This is the first step when learning a new bioinformatics tool.',
-				requiredDir: '/data/kpneumoniae_demo',
-				parameters: [
-					{ name: 'seqkit', desc: 'A toolkit for FASTA/Q file manipulation' },
-					{ name: '--help', desc: 'Display help information and available commands' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 0b: Learning a Subcommand',
-				text: `Most tools have subcommands with their own options. Let's learn specifically about the <code>stats</code> subcommand that we'll use for sequence statistics.`,
-				command: 'seqkit stats --help',
-				explanation: 'Each subcommand has its own help page explaining its specific options. Understanding these options helps you customize your analysis.',
-				requiredDir: '/data/kpneumoniae_demo',
-				parameters: [
-					{ name: 'stats', desc: 'The subcommand to get help for' },
-					{ name: '--help', desc: 'Display help for this specific subcommand' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 0c: Saving Output to a File',
-				text: `In bioinformatics, we often save command output to files using the <code>></code> redirect operator. Let's practice with a simple example.`,
-				command: 'echo "Analysis started" > notes.txt',
-				explanation: 'The > operator redirects output to a file instead of displaying it on screen. This is essential for saving results and creating documentation.',
-				requiredDir: '/data/kpneumoniae_demo',
-				parameters: [
-					{ name: 'echo', desc: 'Print text to the terminal' },
-					{ name: '>', desc: 'Redirect output to a file (overwrites if exists)' },
-					{ name: 'notes.txt', desc: 'The file to create/overwrite' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 0d: Copying Files',
-				text: `The <code>cp</code> command copies files. Use <code>cp -r</code> to copy entire directories recursively.`,
-				command: 'cp SRR36708862_1.fastq.gz backup_R1.fastq.gz',
-				explanation: 'Copying files is essential for creating backups before processing. Use cp -r to copy directories (e.g., cp -r assembly/ assembly_backup/).',
-				requiredDir: '/data/kpneumoniae_demo',
-				parameters: [
-					{ name: 'cp', desc: 'Copy files or directories' },
-					{ name: 'source', desc: 'The file to copy from' },
-					{ name: 'destination', desc: 'The file to copy to' },
-					{ name: '-r', desc: '(Optional) Copy directories recursively' }
-				]
-			},
-			{
-				type: 'phase',
 				title: 'Phase 1: Quality Control',
-				text: 'Now that you know the basics, let\'s assess the quality of our raw sequencing data before processing.',
+				text: 'First, we assess the quality of our raw sequencing data before processing.',
 				phase: 1
 			},
 			{
 				type: 'task',
 				title: 'Step 1: Check Sequencing Statistics',
-				text: `Let's examine basic statistics about our sequencing data and save the results to a file.`,
+				text: `Let's start by examining basic statistics about our sequencing data and save the results to a file.`,
 				command: 'seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats',
 				explanation: 'SeqKit provides quick statistics including read count, total bases, and average read length. Output is saved to a file for reference.',
 				requiredDir: '/data/kpneumoniae_demo',
