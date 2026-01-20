@@ -1,35 +1,12 @@
-export interface StorylineSection {
-	type: 'intro' | 'context' | 'task' | 'phase' | 'complete' | 'alert' | 'decision' | 'image';
-	title?: string;
-	text: string;
-	command?: string;
-	explanation?: string;
-	requiredDir?: string | null;
-	parameters?: { name: string; desc: string }[];
-	hint?: string | null;
-	phase?: number;
-	imageUrl?: string;
-	imageAlt?: string;
-	options?: { id: string; label: string; description: string }[];
-}
+// Shared section creator functions for WGS Bacteria storylines
 
-export interface Storyline {
-	id: string;
-	title: string;
-	subtitle: string;
-	organism: string;
-	technology: 'illumina' | 'pacbio' | 'nanopore' | 'hybrid' | 'r-report';
-	technologyLabel: string; // Display label like "Short Read (Illumina)" or "Long Read (PacBio)"
-	dataDir: string; // Initial directory for terminal (e.g., '/data/outbreak_investigation')
-	sections: StorylineSection[];
-	toolsUsed: string[];
-}
+import type { StorylineSection } from '../types';
 
 // ============================================
 // ILLUMINA WORKFLOW SECTIONS
 // ============================================
 
-function createIlluminaPhase1Sections(): StorylineSection[] {
+export function createIlluminaPhase1Sections(): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -159,7 +136,7 @@ function createIlluminaPhase1Sections(): StorylineSection[] {
 	];
 }
 
-function createIlluminaPhase2Sections(): StorylineSection[] {
+export function createIlluminaPhase2Sections(): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -215,13 +192,13 @@ function createIlluminaPhase2Sections(): StorylineSection[] {
 		},
 		{
 			type: 'alert',
-			title: '🔍 MLST Results - Key Finding',
-			text: `**MLST Typing Results:**\n\n| Patient | Species | Sequence Type |\n|---------|---------|---------------|\n| Patient 01 | K. pneumoniae | ST258 |\n| Patient 02 | K. pneumoniae | ST258 |\n| Patient 03 | K. pneumoniae | ST11 |\n\n**Interpretation:**\n• **Patients 01 & 02 (ST258):** Share the same sequence type - strong evidence of clonal transmission (outbreak cluster)\n• **Patient 03 (ST11):** Different sequence type - likely a sporadic case, NOT part of the outbreak\n\n**ST258 Background:** This is a globally-disseminated high-risk clone associated with hospital outbreaks and carbapenem resistance. ST11 is also clinically significant but represents a separate lineage.\n\nContinue analysis to confirm transmission and identify resistance mechanisms...`
+			title: 'MLST Results - Key Finding',
+			text: `**MLST Typing Results:**\n\n| Patient | Species | Sequence Type |\n|---------|---------|---------------|\n| Patient 01 | K. pneumoniae | ST258 |\n| Patient 02 | K. pneumoniae | ST258 |\n| Patient 03 | K. pneumoniae | ST11 |\n\n**Interpretation:**\n- **Patients 01 & 02 (ST258):** Share the same sequence type - strong evidence of clonal transmission (outbreak cluster)\n- **Patient 03 (ST11):** Different sequence type - likely a sporadic case, NOT part of the outbreak\n\n**ST258 Background:** This is a globally-disseminated high-risk clone associated with hospital outbreaks and carbapenem resistance. ST11 is also clinically significant but represents a separate lineage.\n\nContinue analysis to confirm transmission and identify resistance mechanisms...`
 		}
 	];
 }
 
-function createIlluminaPhase3Sections(): StorylineSection[] {
+export function createIlluminaPhase3Sections(): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -296,7 +273,7 @@ function createIlluminaPhase3Sections(): StorylineSection[] {
 	];
 }
 
-function createIlluminaPhase4Sections(): StorylineSection[] {
+export function createIlluminaPhase4Sections(): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -383,14 +360,14 @@ function createIlluminaPhase4Sections(): StorylineSection[] {
 		},
 		{
 			type: 'alert',
-			title: '🌳 Phylogenetic Results - Outbreak Confirmed',
-			text: `**SNP Distance Matrix:**\n\n|           | Patient 01 | Patient 02 | Patient 03 |\n|-----------|------------|------------|------------|\n| Patient 01 | 0          | 3          | 847        |\n| Patient 02 | 3          | 0          | 851        |\n| Patient 03 | 847        | 851        | 0          |\n\n**Interpretation:**\n• **Patients 01 & 02:** Only 3 SNP differences - confirms direct transmission or very recent common source\n• **Patient 03:** >800 SNPs difference - completely unrelated, sporadic infection\n\n**Timeline Estimate:**\nAt ~1-2 SNPs/genome/year for K. pneumoniae, 3 SNPs suggests transmission occurred within the past 1-3 weeks - consistent with the ICU timeline.\n\n**Conclusion:** This is a confirmed clonal outbreak involving 2 of 3 patients.`
+			title: 'Phylogenetic Results - Outbreak Confirmed',
+			text: `**SNP Distance Matrix:**\n\n|           | Patient 01 | Patient 02 | Patient 03 |\n|-----------|------------|------------|------------|\n| Patient 01 | 0          | 3          | 847        |\n| Patient 02 | 3          | 0          | 851        |\n| Patient 03 | 847        | 851        | 0          |\n\n**Interpretation:**\n- **Patients 01 & 02:** Only 3 SNP differences - confirms direct transmission or very recent common source\n- **Patient 03:** >800 SNPs difference - completely unrelated, sporadic infection\n\n**Timeline Estimate:**\nAt ~1-2 SNPs/genome/year for K. pneumoniae, 3 SNPs suggests transmission occurred within the past 1-3 weeks - consistent with the ICU timeline.\n\n**Conclusion:** This is a confirmed clonal outbreak involving 2 of 3 patients.`
 		}
 	];
 }
 
 // Hospital-specific additional tools
-function createHospitalAdditionalTools(): StorylineSection[] {
+export function createHospitalAdditionalTools(): StorylineSection[] {
 	return [
 		{
 			type: 'task',
@@ -430,7 +407,7 @@ function createHospitalAdditionalTools(): StorylineSection[] {
 }
 
 // Foodborne-specific additional tools
-function createFoodborneAdditionalTools(): StorylineSection[] {
+export function createFoodborneAdditionalTools(): StorylineSection[] {
 	return [
 		{
 			type: 'task',
@@ -470,7 +447,7 @@ function createFoodborneAdditionalTools(): StorylineSection[] {
 }
 
 // Plant-specific additional tools
-function createPlantAdditionalTools(): StorylineSection[] {
+export function createPlantAdditionalTools(): StorylineSection[] {
 	return [
 		{
 			type: 'task',
@@ -488,7 +465,7 @@ function createPlantAdditionalTools(): StorylineSection[] {
 }
 
 // Fish-specific additional tools
-function createFishAdditionalTools(): StorylineSection[] {
+export function createFishAdditionalTools(): StorylineSection[] {
 	return [
 		{
 			type: 'task',
@@ -509,7 +486,7 @@ function createFishAdditionalTools(): StorylineSection[] {
 // PACBIO HYBRID ASSEMBLY SECTIONS (for Fish)
 // ============================================
 
-function createPacBioHybridSections(): StorylineSection[] {
+export function createPacBioHybridSections(): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -582,7 +559,7 @@ function createPacBioHybridSections(): StorylineSection[] {
 		},
 		{
 			type: 'context',
-			text: `✅ Hybrid assembly successful!\n\nResults:\n- 2 circular contigs (Chromosome I: 3.2 Mb, Chromosome II: 1.9 Mb)\n- N50 improved from 180 kb to 3.2 Mb\n- Assembly is now complete\n\nContinuing analysis with the improved assembly...`
+			text: `Hybrid assembly successful!\n\nResults:\n- 2 circular contigs (Chromosome I: 3.2 Mb, Chromosome II: 1.9 Mb)\n- N50 improved from 180 kb to 3.2 Mb\n- Assembly is now complete\n\nContinuing analysis with the improved assembly...`
 		}
 	];
 }
@@ -591,7 +568,7 @@ function createPacBioHybridSections(): StorylineSection[] {
 // PACBIO HIFI LONG-READ WORKFLOW SECTIONS
 // ============================================
 
-function createPacBioPhase1Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createPacBioPhase1Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -677,7 +654,7 @@ function createPacBioPhase1Sections(dataDir: string = '/data/outbreak_investigat
 	];
 }
 
-function createLongReadPhase2Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createLongReadPhase2Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -746,7 +723,7 @@ function createLongReadPhase2Sections(dataDir: string = '/data/outbreak_investig
 	];
 }
 
-function createLongReadPhase3Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createLongReadPhase3Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -816,7 +793,7 @@ function createLongReadPhase3Sections(dataDir: string = '/data/outbreak_investig
 	];
 }
 
-function createLongReadPhase4Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createLongReadPhase4Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -881,7 +858,7 @@ function createLongReadPhase4Sections(dataDir: string = '/data/outbreak_investig
 // NANOPORE LONG-READ WORKFLOW SECTIONS
 // ============================================
 
-function createNanoporePhase1Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createNanoporePhase1Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -992,7 +969,7 @@ function createNanoporePhase1Sections(dataDir: string = '/data/outbreak_investig
 	];
 }
 
-function createNanoporePhase2Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createNanoporePhase2Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -1049,7 +1026,7 @@ function createNanoporePhase2Sections(dataDir: string = '/data/outbreak_investig
 	];
 }
 
-function createNanoporePhase3Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
+export function createNanoporePhase3Sections(dataDir: string = '/data/outbreak_investigation'): StorylineSection[] {
 	return [
 		{
 			type: 'phase',
@@ -1105,612 +1082,4 @@ function createNanoporePhase3Sections(dataDir: string = '/data/outbreak_investig
 			]
 		}
 	];
-}
-
-// ============================================
-// STORYLINES
-// ============================================
-
-export const storylines: Record<string, Storyline> = {
-	// WGS Bacteria storylines (tutorial moved to tutorial.ts)
-	hospital: {
-		id: 'hospital',
-		title: 'Hospital Outbreak Investigation',
-		subtitle: 'Antimicrobial Resistance in ICU',
-		organism: 'Klebsiella pneumoniae',
-		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
-		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'abricate', 'mlst', 'prokka', 'mob_recon', 'plasmidfinder', 'snippy', 'roary', 'iqtree', 'resfinder', 'integron_finder', 'isescan'],
-		sections: [
-			{
-				type: 'intro',
-				text: `**URGENT - Infection Control Alert**\n\n3 patients in the ICU have been diagnosed with carbapenem-resistant *Klebsiella pneumoniae* infections. All developed severe bloodstream infections within the past 72 hours and are not responding to last-line antibiotics.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'context',
-				text: `**Patient Information:**\n\n| Patient | Location | Onset | Sample |\n|---------|----------|-------|--------|\n| Patient 01 | ICU Bed 3 | Day 0 | Blood culture |\n| Patient 02 | ICU Bed 7 | Day 2 | Blood culture |\n| Patient 03 | ICU Bed 12 | Day 3 | Blood culture |\n\nSamples from all 3 patients have been sequenced using Illumina NovaSeq (150bp paired-end, ~100x coverage).\n\n**Your Investigation Goals:**\n1. Determine if this is a clonal outbreak (same strain) or coincidental infections\n2. Identify the antimicrobial resistance mechanisms\n3. Guide infection control response`,
-				hint: null,
-				requiredDir: null
-			},
-			...createIlluminaPhase1Sections(),
-			...createIlluminaPhase2Sections(),
-			...createIlluminaPhase3Sections(),
-			...createIlluminaPhase4Sections(),
-			...createHospitalAdditionalTools(),
-			{
-				type: 'complete',
-				title: 'Investigation Complete',
-				text: `**Hospital Outbreak Investigation - Final Report**\n\n---\n\n**OUTBREAK STATUS: CONFIRMED (Partial)**\n\n**Strain Analysis:**\n| Patient | Sequence Type | Outbreak Status |\n|---------|---------------|------------------|\n| Patient 01 | ST258 | ✓ Outbreak cluster |\n| Patient 02 | ST258 | ✓ Outbreak cluster |\n| Patient 03 | ST11 | ✗ Sporadic case |\n\n**Key Findings:**\n\n*Outbreak Cluster (Patients 01 & 02 - ST258):*\n• Only 3 SNP differences between isolates - confirms direct transmission\n• Complete genome: 5.3 Mb chromosome + 2 plasmids (pKPC-250kb, pNDM-85kb)\n• Carbapenemase genes: blaKPC-2 (IncFII plasmid), blaNDM-1 (IncX3 plasmid)\n• Transmission likely occurred via shared equipment or healthcare worker\n\n*Sporadic Case (Patient 03 - ST11):*\n• >800 SNP differences from outbreak cluster - unrelated strain\n• Different plasmid profile - carries blaCTX-M-15 (ESBL) but no carbapenemases\n• Likely community-acquired infection, NOT part of ICU outbreak\n\n**Infection Control Recommendations:**\n1. Focus containment efforts on Beds 3-7 area (outbreak cluster)\n2. Review shared equipment and procedures between Patients 01 & 02\n3. Patient 03 can be managed separately - not an outbreak risk\n4. Screen other ICU patients for ST258 carriage\n\n**Clinical Implications:**\n• Patients 01 & 02: Consider colistin + tigecycline combination\n• Patient 03: Standard ESBL treatment (carbapenems may still be effective)`
-			}
-		]
-	},
-	plant: {
-		id: 'plant',
-		title: 'Plant Pathogen Investigation',
-		subtitle: 'Citrus Canker Outbreak',
-		organism: 'Xanthomonas citri',
-		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
-		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder'],
-		sections: [
-			{
-				type: 'intro',
-				text: `ALERT - Department of Agriculture:\n\nMultiple citrus orchards in the region are showing symptoms of citrus canker. Lesions on leaves, stems, and fruit are spreading rapidly. Quarantine measures have been implemented.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'image',
-				title: 'Disease Symptoms',
-				text: 'Citrus canker lesions on infected orange fruit and leaves. Note the raised, corky lesions with characteristic yellow halos - a hallmark of Xanthomonas citri infection.',
-				imageUrl: '/images/citrus_canker.svg',
-				imageAlt: 'Citrus canker lesions showing raised brown/tan lesions with yellow halos on orange fruit and leaves'
-			},
-			{
-				type: 'context',
-				text: `Isolates from 6 affected orchards have been collected and sequenced. The suspected pathogen is Xanthomonas citri pv. citri. Your task: Confirm the pathogen identity, determine if it's a single introduction or multiple events, and identify potential virulence factors.`,
-				hint: null,
-				requiredDir: null
-			},
-			...createIlluminaPhase1Sections(),
-			...createIlluminaPhase2Sections(),
-			...createIlluminaPhase3Sections(),
-			...createIlluminaPhase4Sections(),
-			...createPlantAdditionalTools(),
-			{
-				type: 'complete',
-				title: 'Analysis Complete',
-				text: `Congratulations! You have completed the Plant Pathogen Investigation.\n\n**Assembly Result:** Complete genome - 1 circular chromosome (5.1 Mb) + 1 plasmid (pXAC64-64kb)\n\n**Key findings:**\n• Confirmed Xanthomonas citri pv. citri\n• Single introduction event (clonal population across all orchards)\n• Identified Type III secretion system effectors (xopAD, xopE, avrBs2)\n• Copper resistance genes detected on plasmid pXAC64\n• Source traced to imported plant material from Southeast Asia`
-			}
-		]
-	},
-	fish: {
-		id: 'fish',
-		title: 'Fish Mortality Event',
-		subtitle: 'Suspected Vibrio Outbreak',
-		organism: 'Vibrio vulnificus',
-		technology: 'hybrid',
-		technologyLabel: 'Hybrid (Illumina + ONT)',
-		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'NanoPlot', 'filtlong', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'virulencefinder'],
-		sections: [
-			{
-				type: 'intro',
-				text: `EMERGENCY - Fisheries Department Report:\n\nMass fish mortality event in coastal aquaculture facilities. Over 50,000 fish have died in the past week. Preliminary tests suggest bacterial infection. Water temperatures have been unusually high.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'image',
-				title: 'Affected Fish',
-				text: 'Fish showing clinical signs of Vibrio infection including skin ulcerations, hemorrhaging around fins, and necrotic lesions. These symptoms are characteristic of vibriosis in aquaculture settings.',
-				imageUrl: '/images/vibrio_fish.svg',
-				imageAlt: 'Affected fish showing skin ulcerations, hemorrhaging, and necrotic lesions typical of Vibrio infection'
-			},
-			{
-				type: 'context',
-				text: `Samples from dead fish and water have been collected from 4 affected facilities. Initial Gram staining shows curved Gram-negative rods, suggesting Vibrio species. Your task: Identify the causative agent, assess virulence potential, and determine if environmental conditions contributed to the outbreak.`,
-				hint: null,
-				requiredDir: null
-			},
-			// Phase 1: QC & Assembly (Illumina)
-			{
-				type: 'phase',
-				title: 'Phase 1: Quality Control & Assembly',
-				text: 'Assess raw sequencing data quality and assemble the genome.',
-				phase: 1
-			},
-			{
-				type: 'task',
-				title: 'Step 1: Explore the Data',
-				text: `Check the sequencing data statistics.`,
-				command: 'seqkit stats sample_01_R1.fastq.gz sample_01_R2.fastq.gz',
-				explanation: 'SeqKit provides quick statistics about sequencing files.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'stats', desc: 'Generate sequence statistics' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 2: Quality Control',
-				text: `Generate quality reports for raw reads.`,
-				command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o o_fastqc/',
-				explanation: 'FastQC identifies quality issues before assembly.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-o o_fastqc/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 3: Read Trimming',
-				text: `Remove adapters and low-quality bases.`,
-				command: 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36',
-				explanation: 'Trimmomatic removes adapter contamination and low quality bases.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'PE', desc: 'Paired-end mode' },
-					{ name: '-phred33', desc: 'Quality encoding' },
-					{ name: 'ILLUMINACLIP:...', desc: 'Adapter trimming' },
-					{ name: 'SLIDINGWINDOW:4:15', desc: 'Quality trimming' },
-					{ name: 'MINLEN:36', desc: 'Minimum length' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 4: Genome Assembly',
-				text: `Assemble cleaned reads into contigs.`,
-				command: 'unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly/',
-				explanation: 'Unicycler produces high-quality bacterial assemblies.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-1/-2', desc: 'Forward/reverse reads' },
-					{ name: '-o assembly/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 5: Visualize Assembly',
-				text: `Create a visual representation of the assembly graph.`,
-				command: 'bandage image assembly/assembly.gfa assembly/o_bandage.png',
-				explanation: 'Bandage visualizes assembly graphs to identify structure.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'image', desc: 'Generate image output' },
-					{ name: 'assembly.gfa', desc: 'Input GFA file' }
-				]
-			},
-			// ALERT: Fragmented assembly
-			{
-				type: 'alert',
-				title: '⚠️ Assembly Quality Warning',
-				text: `**Problem Detected:** Your Illumina assembly produced 15 contigs instead of the expected 2 circular chromosomes.\n\n**Why this happened:** Vibrio vulnificus has two chromosomes with repetitive regions that short Illumina reads (150 bp) cannot span. This causes the assembler to break at these repeat boundaries.\n\n**Assembly Statistics:**\n• Contigs: 15 (expected: 2)\n• N50: 180 kb (expected: ~3 Mb)\n• Total size: 5.0 Mb (correct)\n• Largest contig: 450 kb\n\nThis fragmented assembly can still identify the pathogen, but plasmid detection and complete genome analysis will be unreliable.`
-			},
-			// Decision point
-			{
-				type: 'decision',
-				title: 'Choose How to Proceed',
-				text: `Your Illumina assembly is fragmented. How would you like to proceed?`,
-				options: [
-					{
-						id: 'continue',
-						label: 'Continue with Fragmented Assembly',
-						description: 'Proceed with current assembly. Results will have caveats but pathogen ID is still possible.'
-					},
-					{
-						id: 'hybrid',
-						label: 'Perform Hybrid Assembly (PacBio)',
-						description: 'Use additional PacBio HiFi long reads to resolve the assembly into complete chromosomes.'
-					},
-					{
-						id: 'stop',
-						label: 'Stop Analysis',
-						description: 'End the analysis here and report preliminary findings only.'
-					}
-				]
-			},
-			// Continue path context
-			{
-				type: 'context',
-				text: `**Continuing with fragmented assembly...**\n\nNote: Some analyses may be incomplete due to the fragmented assembly. Plasmid detection and IS element analysis may give unreliable results. However, we can still:\n• Identify the pathogen species\n• Detect major virulence genes\n• Perform MLST typing\n• Build a preliminary phylogeny`
-			},
-			// Phase 2
-			{
-				type: 'phase',
-				title: 'Phase 2: Quality Assessment & Screening',
-				text: 'Evaluate assembly quality and screen for key markers.',
-				phase: 2
-			},
-			{
-				type: 'task',
-				title: 'Step 6: Assembly Quality',
-				text: `Assess assembly quality metrics.`,
-				command: 'quast assembly/assembly.fasta -o quast_results/',
-				explanation: 'QUAST calculates N50, total length, and other metrics.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-o quast_results/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 7: Genome Completeness',
-				text: `Check genome completeness using marker genes.`,
-				command: 'checkm lineage_wf assembly/ checkm_results/ -x fasta',
-				explanation: 'CheckM estimates completeness and contamination.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: 'lineage_wf', desc: 'Full CheckM workflow' },
-					{ name: '-x fasta', desc: 'File extension' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 8: BUSCO Assessment',
-				text: `Validate completeness with universal single-copy orthologs.`,
-				command: 'busco -i assembly/assembly.fasta -o busco_results/ -m genome -l bacteria_odb10',
-				explanation: 'BUSCO checks for conserved genes expected in all bacteria.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-m genome', desc: 'Genome mode' },
-					{ name: '-l bacteria_odb10', desc: 'Bacteria database' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 9: AMR Screening',
-				text: `Screen for antimicrobial resistance genes.`,
-				command: 'abricate --db ncbi assembly/assembly.fasta -o o_abricate/',
-				explanation: 'ABRicate identifies resistance genes from databases.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '--db ncbi', desc: 'Use NCBI database' },
-					{ name: '-o o_abricate/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 10: MLST Typing',
-				text: `Determine the sequence type.`,
-				command: 'mlst assembly/assembly.fasta > o_mlst/mlst_result.tab',
-				explanation: 'MLST assigns sequence types for epidemiological tracking.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '>', desc: 'Redirect output to file' }
-				]
-			},
-			// Phase 3: Annotation
-			{
-				type: 'phase',
-				title: 'Phase 3: Annotation & Plasmid Analysis',
-				text: 'Annotate genes and identify mobile genetic elements.',
-				phase: 3
-			},
-			{
-				type: 'task',
-				title: 'Step 11: Genome Annotation',
-				text: `Annotate genes in the assembly.`,
-				command: 'prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta',
-				explanation: 'Prokka identifies CDS, tRNA, and rRNA features.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '--outdir prokka_results/', desc: 'Output directory' },
-					{ name: '--prefix sample_01', desc: 'Output file prefix' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 12: Detailed Annotation',
-				text: `Get comprehensive annotations with Bakta.`,
-				command: 'bakta assembly/assembly.fasta --output bakta_results/',
-				explanation: 'Bakta provides rich functional annotations.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '--output bakta_results/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 13: Virulence Factor Screening',
-				text: `Screen for Vibrio virulence factors.`,
-				command: 'virulencefinder -i assembly/assembly.fasta -o virulencefinder_results/',
-				explanation: 'VirulenceFinder identifies toxins and virulence genes.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-i', desc: 'Input assembly' },
-					{ name: '-o virulencefinder_results/', desc: 'Output directory' }
-				]
-			},
-			// Phase 4
-			{
-				type: 'phase',
-				title: 'Phase 4: Phylogenetics',
-				text: 'Build evolutionary trees and analyze population structure.',
-				phase: 4
-			},
-			{
-				type: 'task',
-				title: 'Step 14: Variant Calling',
-				text: `Call SNPs against the reference genome.`,
-				command: 'snippy --ref reference.gbk --ctgs assembly/assembly.fasta --outdir snippy_results/',
-				explanation: 'Snippy identifies SNPs, insertions, and deletions.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '--ref reference.gbk', desc: 'Reference genome' },
-					{ name: '--ctgs assembly/assembly.fasta', desc: 'Query contigs' },
-					{ name: '--outdir snippy_results/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 15: Pan-genome Analysis',
-				text: `Analyze the pan-genome across isolates.`,
-				command: 'roary -f roary_results/ -e -n -v prokka_results/*.gff',
-				explanation: 'Roary identifies core and accessory genes.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-f roary_results/', desc: 'Output directory' },
-					{ name: '-e', desc: 'Create core gene alignment' },
-					{ name: '-n', desc: 'Fast alignment with MAFFT' },
-					{ name: '-v', desc: 'Verbose output' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 16: Phylogenetic Tree',
-				text: `Build a maximum-likelihood phylogenetic tree.`,
-				command: 'iqtree -s roary_results/core_gene_alignment.aln -m GTR+G -bb 1000 -nt AUTO',
-				explanation: 'IQ-TREE builds phylogenetic trees with bootstrap support.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: [
-					{ name: '-s roary_results/core_gene_alignment.aln', desc: 'Input alignment' },
-					{ name: '-m GTR+G', desc: 'Substitution model' },
-					{ name: '-bb 1000', desc: 'Bootstrap replicates' },
-					{ name: '-nt AUTO', desc: 'Auto-detect threads' }
-				]
-			},
-			{
-				type: 'complete',
-				title: 'Analysis Complete (Preliminary)',
-				text: `You have completed the Fish Mortality Investigation with a fragmented assembly.\n\n**Assembly Result:** Incomplete - 15 contigs (fragmented due to repetitive regions)\n\n**Key findings:**\n• Identified Vibrio vulnificus (biotype 2)\n• Detected virulence genes: rtxA (cytotoxin), vvhA (hemolysin), vcgC (virulence correlated gene)\n• MLST: ST117 (associated with clinical infections)\n• Temperature-sensitive virulence regulation likely triggered by elevated water temps\n\n**Recommendations:**\n• For complete genome: Perform hybrid assembly with PacBio long reads\n• Implement water temperature monitoring (<25°C)\n• Consider prophylactic measures during warm months\n\n⚠️ Note: Plasmid analysis was limited due to fragmented assembly. Complete genome would provide more definitive results.`
-			}
-		]
-	},
-	foodborne: {
-		id: 'foodborne',
-		title: 'Food Poisoning Outbreak',
-		subtitle: 'Restaurant-Associated Illness',
-		organism: 'Salmonella enterica',
-		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
-		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'platon', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder', 'virulencefinder', 'integron_finder'],
-		sections: [
-			{
-				type: 'intro',
-				text: `URGENT - Public Health Alert:\n\n23 people have reported gastroenteritis symptoms after eating at the same restaurant. 4 patients have been hospitalized. Health inspectors have collected samples from patients and the restaurant kitchen.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'context',
-				text: `Stool samples from 8 patients and environmental swabs from the restaurant have been cultured and sequenced. Preliminary culture identified Salmonella. Your task: Confirm the outbreak, link patient isolates to a food source, and assess antibiotic resistance.`,
-				hint: null,
-				requiredDir: null
-			},
-			...createIlluminaPhase1Sections(),
-			...createIlluminaPhase2Sections(),
-			...createIlluminaPhase3Sections(),
-			...createIlluminaPhase4Sections(),
-			...createFoodborneAdditionalTools(),
-			{
-				type: 'complete',
-				title: 'Analysis Complete',
-				text: `Congratulations! You have completed the Food Poisoning Investigation.\n\n**Assembly Result:** Complete genome - 1 circular chromosome (4.8 Mb), no plasmids detected\n\n**Key findings:**\n• Confirmed Salmonella enterica serovar Enteritidis (ST11)\n• All 8 patient isolates clonal (<3 SNP differences) - confirmed linked outbreak\n• Source traced to contaminated eggs from the restaurant kitchen\n• Detected Salmonella Genomic Island 1 (SGI-1) with multidrug resistance\n• ASSuT resistance pattern: Ampicillin, Streptomycin, Sulfonamides, Tetracycline\n• No plasmid-mediated resistance - all AMR genes chromosomally encoded\n\n**Public Health Actions:**\n• Restaurant temporarily closed for sanitation\n• Egg supplier traced and notified\n• Patient antibiotic therapy adjusted based on resistance profile`
-			}
-		]
-	},
-	// ============================================
-	// LONG READ STORYLINES
-	// ============================================
-	wastewater: {
-		id: 'wastewater',
-		title: 'Wastewater AMR Surveillance',
-		subtitle: 'Environmental Resistance Monitoring',
-		organism: 'Escherichia coli (mcr-positive)',
-		technology: 'pacbio',
-		technologyLabel: 'Long Read (PacBio HiFi)',
-		dataDir: '/data/wastewater_surveillance',
-		toolsUsed: ['seqkit', 'pbmarkdup', 'ccs', 'hifiasm', 'flye', 'bandage', 'quast', 'checkm', 'busco', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'plasmidfinder', 'isescan', 'snippy', 'roary', 'iqtree', 'gubbins', 'resfinder'],
-		sections: [
-			{
-				type: 'intro',
-				text: `ALERT - Environmental Health Agency:\n\nRoutine wastewater surveillance has detected high levels of colistin resistance genes (mcr) in samples from a municipal treatment plant. Colistin is a last-resort antibiotic, and environmental spread of resistance is a critical public health concern.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'image',
-				title: 'Wastewater Treatment Facility',
-				text: 'Aerial view of the municipal wastewater treatment plant where AMR surveillance sampling is conducted. Understanding resistance gene flow through wastewater systems helps predict and prevent clinical outbreaks.',
-				imageUrl: '/images/wastewater_plant.svg',
-				imageAlt: 'Aerial view of wastewater treatment facility with settling ponds and processing buildings'
-			},
-			{
-				type: 'context',
-				text: `Cultured isolates from influent (incoming) and effluent (treated) water have been sequenced using PacBio HiFi technology. Long-read sequencing is essential here because:\n\n• **Complete plasmid resolution:** mcr genes are typically plasmid-borne\n• **IS element context:** Understanding the genetic environment aids transmission tracking\n• **Chromosomal integration detection:** Some mcr variants integrate into chromosomes\n\nYour task: Characterize the mcr-positive isolates, determine the plasmid context, and assess if treatment is removing resistant bacteria.`,
-				hint: null,
-				requiredDir: null
-			},
-			...createPacBioPhase1Sections('/data/wastewater_surveillance'),
-			{
-				type: 'alert',
-				title: 'Assembly Result',
-				text: `**PacBio HiFi Assembly Successful**\n\nYour long-read assembly produced a complete, closed genome:\n• 1 circular chromosome (4.9 Mb)\n• 2 complete circular plasmids (IncI2: 65 kb, IncX4: 35 kb)\n• N50: 4.9 Mb (chromosome-level)\n\n**Advantage of long reads:** Unlike short-read assembly, we have resolved the complete plasmid sequences, allowing us to determine exactly which plasmid carries the mcr gene and analyze its transfer potential.`
-			},
-			...createLongReadPhase2Sections('/data/wastewater_surveillance'),
-			{
-				type: 'alert',
-				title: 'Critical Finding: mcr-1 Detected',
-				text: `**AMR Screening Result:**\n\nmcr-1 gene detected on the IncI2 plasmid (pMCR-65kb)\n\n**Why this matters:**\n• mcr-1 confers resistance to colistin, a last-resort antibiotic\n• IncI2 plasmids are highly conjugative (easily transferred between bacteria)\n• This plasmid type has been associated with global mcr-1 spread\n\nContinue analysis to understand the transmission context...`
-			},
-			...createLongReadPhase3Sections('/data/wastewater_surveillance'),
-			{
-				type: 'task',
-				title: 'Step 17: Detailed mcr Analysis',
-				text: `Analyze the genetic context of the mcr gene.`,
-				command: 'resfinder -i polished/consensus.fasta -o resfinder_results/ -db_res -l 0.9 -t 0.8',
-				explanation: 'ResFinder provides detailed resistance gene context and variants.',
-				requiredDir: '/data/wastewater_surveillance',
-				parameters: [
-					{ name: '-db_res', desc: 'Use resistance database' },
-					{ name: '-l 0.9', desc: 'Minimum coverage 90%' },
-					{ name: '-t 0.8', desc: 'Minimum identity 80%' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 18: Plasmid Transferability',
-				text: `Assess conjugation potential of the mcr-carrying plasmid.`,
-				command: 'mob_typer -i mob_recon_results/plasmid_pMCR.fasta -o mob_typer_results/',
-				explanation: 'MOB-typer predicts plasmid mobility and host range.',
-				requiredDir: '/data/wastewater_surveillance',
-				parameters: [
-					{ name: '-i', desc: 'Input plasmid sequence' },
-					{ name: '-o mob_typer_results/', desc: 'Output directory' }
-				]
-			},
-			...createLongReadPhase4Sections('/data/wastewater_surveillance'),
-			{
-				type: 'complete',
-				title: 'Analysis Complete',
-				text: `Congratulations! You have completed the Wastewater AMR Surveillance Investigation.\n\n**Assembly Result:** Complete genome with 2 fully resolved plasmids\n\n**Key findings:**\n• Identified E. coli ST131 (high-risk pandemic clone)\n• mcr-1 located on conjugative IncI2 plasmid (pMCR-65kb)\n• Plasmid carries complete conjugation machinery (tra genes intact)\n• Same plasmid backbone found in clinical isolates from 3 continents\n• IS element (ISApl1) flanking mcr-1 suggests recent mobilization\n\n**Environmental Insights:**\n• mcr-positive isolates found in both influent AND effluent\n• Current treatment not eliminating resistant bacteria\n• Downstream agricultural irrigation may be at risk\n\n**Recommendations:**\n• Implement enhanced disinfection protocols\n• Expand surveillance to receiving waters\n• Alert clinical laboratories to monitor for mcr-positive infections\n\n**Why long reads were essential:**\nComplete plasmid assembly revealed the IncI2 backbone, conjugation genes, and IS element context—information impossible to obtain from fragmented short-read assemblies.`
-			}
-		]
-	},
-	clinical: {
-		id: 'clinical',
-		title: 'Clinical Rapid Diagnostics',
-		subtitle: 'Same-Day Pathogen Identification',
-		organism: 'Pseudomonas aeruginosa',
-		technology: 'nanopore',
-		technologyLabel: 'Long Read (ONT)',
-		dataDir: '/data/clinical_samples',
-		toolsUsed: ['seqkit', 'NanoPlot', 'porechop', 'filtlong', 'kraken2', 'flye', 'medaka_consensus', 'bandage', 'quast', 'abricate', 'mlst', 'prokka', 'bakta', 'mob_recon', 'modkit'],
-		sections: [
-			{
-				type: 'intro',
-				text: `URGENT - Clinical Microbiology Laboratory:\n\nA critically ill patient in the burn unit has developed a rapidly progressing wound infection. Blood cultures are growing Gram-negative rods. The clinical team needs rapid identification and antimicrobial susceptibility guidance—standard culture-based methods will take 48-72 hours.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'image',
-				title: 'Oxford Nanopore MinION Sequencer',
-				text: 'The portable MinION device enables rapid, real-time sequencing at the point of care. Results can be obtained within hours rather than days, enabling faster clinical decision-making.',
-				imageUrl: '/images/minion_sequencer.svg',
-				imageAlt: 'Oxford Nanopore MinION portable sequencing device connected to a laptop'
-			},
-			{
-				type: 'context',
-				text: `DNA has been extracted directly from positive blood culture and loaded onto a MinION sequencer. Oxford Nanopore technology provides:\n\n• **Real-time sequencing:** Results stream as sequencing progresses\n• **Rapid turnaround:** Species ID within 1 hour, AMR within 4 hours\n• **Long reads:** Complete gene context without assembly fragmentation\n• **Portability:** Can be performed at bedside or in resource-limited settings\n\nYour task: Rapidly identify the pathogen, detect resistance genes, and provide actionable guidance to the clinical team.`,
-				hint: null,
-				requiredDir: null
-			},
-			...createNanoporePhase1Sections('/data/clinical_samples'),
-			{
-				type: 'alert',
-				title: 'Rapid Species Identification',
-				text: `**Kraken2 Classification Result (15 minutes):**\n\n• **Species:** Pseudomonas aeruginosa (98.7% reads classified)\n• **Confidence:** High (>95% agreement across k-mers)\n\n**Clinical Significance:**\nP. aeruginosa is an opportunistic pathogen notorious for:\n• Intrinsic resistance to many antibiotics\n• Ability to acquire additional resistance mechanisms\n• Biofilm formation in burn wounds\n• High mortality in bacteremic patients\n\nContinue analysis for resistance gene detection...`
-			},
-			...createNanoporePhase2Sections('/data/clinical_samples'),
-			{
-				type: 'alert',
-				title: 'Critical AMR Alert',
-				text: `**Resistance Gene Detection (2 hours):**\n\n**Detected resistance mechanisms:**\n• blaVIM-2: Metallo-β-lactamase (carbapenem resistance)\n• aac(6')-Ib: Aminoglycoside resistance\n• Chromosomal oprD mutation: Imipenem resistance\n\n**Predicted Resistance Profile:**\n• Carbapenems: RESISTANT (meropenem, imipenem)\n• Aminoglycosides: RESISTANT (gentamicin, tobramycin)\n• Fluoroquinolones: Likely SUSCEPTIBLE\n• Colistin: Likely SUSCEPTIBLE\n\n**Immediate Clinical Recommendation:**\n⚠️ Avoid carbapenems and aminoglycosides\n✓ Consider colistin + fluoroquinolone combination pending confirmatory susceptibility testing`
-			},
-			...createNanoporePhase3Sections('/data/clinical_samples'),
-			{
-				type: 'task',
-				title: 'Step 17: Resistance Gene Context',
-				text: `Analyze the genetic environment of resistance genes.`,
-				command: 'abricate --db card polished/consensus.fasta -o card_results/',
-				explanation: 'CARD database provides detailed resistance mechanism annotations.',
-				requiredDir: '/data/clinical_samples',
-				parameters: [
-					{ name: '--db card', desc: 'Use CARD database' },
-					{ name: '-o card_results/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'task',
-				title: 'Step 18: Integron Analysis',
-				text: `Check for integron-associated resistance.`,
-				command: 'integron_finder polished/consensus.fasta --outdir integron_results/',
-				explanation: 'IntegronFinder detects gene cassettes that may carry additional resistance genes.',
-				requiredDir: '/data/clinical_samples',
-				parameters: [
-					{ name: '--outdir integron_results/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'phase',
-				title: 'Phase 4: Clinical Correlation',
-				text: 'Compare with outbreak database and finalize recommendations.',
-				phase: 4
-			},
-			{
-				type: 'task',
-				title: 'Step 19: MLST Comparison',
-				text: `Compare sequence type with known outbreak strains.`,
-				command: 'mlst polished/consensus.fasta > o_mlst/mlst_result.tab',
-				explanation: 'MLST helps identify if this strain matches known outbreak clusters.',
-				requiredDir: '/data/clinical_samples',
-				parameters: [
-					{ name: '>', desc: 'Redirect output to file' }
-				]
-			},
-			{
-				type: 'context',
-				text: `**MLST Result:** ST235\n\n**Epidemiological Significance:**\nST235 is a globally disseminated high-risk clone of P. aeruginosa known for:\n• Association with hospital outbreaks worldwide\n• Frequent carriage of metallo-β-lactamases (VIM, IMP)\n• Enhanced virulence and transmissibility\n• Poor clinical outcomes\n\nThis finding triggers additional infection control measures.`
-			},
-			{
-				type: 'task',
-				title: 'Step 20: Generate Clinical Report',
-				text: `Create a summary report for the clinical team.`,
-				command: 'summary_report --input polished/consensus.fasta --amr o_abricate/ --mlst o_mlst/ -o clinical_report/',
-				explanation: 'Generates a clinical summary for immediate use by the care team.',
-				requiredDir: '/data/clinical_samples',
-				parameters: [
-					{ name: '--input', desc: 'Assembly file' },
-					{ name: '--amr', desc: 'AMR results directory' },
-					{ name: '-o clinical_report/', desc: 'Output directory' }
-				]
-			},
-			{
-				type: 'complete',
-				title: 'Analysis Complete',
-				text: `Congratulations! You have completed the Clinical Rapid Diagnostics Investigation.\n\n**Timeline Achieved:**\n• Species ID: 15 minutes (Kraken2)\n• Resistance detection: 2 hours (ABRicate)\n• Complete genome: 4 hours (Flye + Medaka)\n• Full report: 6 hours total\n\n**vs. Traditional Methods: 48-72 hours**\n\n**Key Findings:**\n• Pseudomonas aeruginosa ST235 (high-risk clone)\n• Carbapenem-resistant (blaVIM-2 positive)\n• Aminoglycoside-resistant (aac(6')-Ib)\n• Located on class 1 integron with additional gene cassettes\n\n**Clinical Impact:**\n• Antibiotic therapy adjusted within 6 hours (vs. 72 hours)\n• Appropriate empiric coverage initiated immediately\n• Infection control team alerted to high-risk clone\n• Contact precautions implemented for burn unit\n\n**Patient Outcome:**\nEarly appropriate therapy enabled by rapid sequencing contributed to improved clinical response. The patient showed improvement within 48 hours of targeted therapy initiation.\n\n**Why Nanopore was ideal:**\n• Real-time data streaming for rapid species ID\n• Portable format suitable for clinical lab\n• Long reads resolved the integron structure completely\n• No batching required—single sample, immediate results`
-			}
-		]
-	}
-};
-
-export function getStoryline(id: string): Storyline | undefined {
-	return storylines[id];
-}
-
-export function getStorylinesList(): { id: string; title: string; subtitle: string; technology: string; technologyLabel: string }[] {
-	return Object.values(storylines).map(s => ({
-		id: s.id,
-		title: s.title,
-		subtitle: s.subtitle,
-		technology: s.technology,
-		technologyLabel: s.technologyLabel
-	}));
 }
