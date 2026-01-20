@@ -39,15 +39,13 @@ function createPhase0Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 0c: Copy a File',
 			text: `Copy files using the cp command. Let's copy a reference file to your working directory.`,
-			command: 'ls\ncp /data/references/sample_info.txt .\nls',
-			explanation: 'The cp command copies files. The dot (.) represents the current directory as the destination. The ls commands show the directory contents before and after the copy.',
+			command: 'cp /data/references/sample_info.txt .',
+			explanation: 'The cp command copies files. The dot (.) represents the current directory as the destination.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
-				{ name: 'ls', desc: 'List directory contents (before copy)' },
 				{ name: 'cp', desc: 'Copy command' },
 				{ name: 'source', desc: 'File to copy from' },
-				{ name: '.', desc: 'Current directory (destination)' },
-				{ name: 'ls', desc: 'List directory contents (after copy)' }
+				{ name: '.', desc: 'Current directory (destination)' }
 			]
 		},
 		{
