@@ -268,11 +268,16 @@ This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance
 		// Fall back to hardcoded content for non-template files
 		const content = fileContents[file.name];
 
-		// Handle FastQC HTML files - open directly from static folder
+		// Handle FastQC HTML files - open from template API
 		if (file.type === 'html' && content === 'FASTQC_STATIC') {
-			const newWindow = window.open(`/fastqc/${file.name}`, '_blank');
-			if (!newWindow) {
-				alert(`Could not open ${file.name}`);
+			const url = getToolFileUrl('fastqc', file.name);
+			if (url) {
+				const newWindow = window.open(url, '_blank');
+				if (!newWindow) {
+					alert(`Could not open ${file.name}`);
+				}
+			} else {
+				alert(`Could not open ${file.name} - no storyline context`);
 			}
 		} else if (file.type === 'svg' && content === 'SVG_STATIC') {
 			// Handle SVG files from static/images folder - open in new window

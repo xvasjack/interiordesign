@@ -4,7 +4,7 @@
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
 	import { executedCommands, storylineDataDir, currentDirectory } from '$lib/stores/terminal';
-	import { initializeStoryline } from '$lib/services/templateService';
+	import { initializeStoryline, getToolFileUrl } from '$lib/services/templateService';
 	import type { Storyline } from '$lib/storylines/types';
 
 	let {
@@ -217,13 +217,14 @@ Component summary:
 		return unsubscribe;
 	});
 
-	async function viewFile(file: {name: string, type: string}) {
+	async function viewFile(file: {name: string, type: string, tool?: string}) {
 		const content = fileContents[file.name];
 
-		// Handle FastQC HTML files - fetch from static folder
-		if (file.type === 'html' && content === 'FASTQC_STATIC') {
+		// Handle FastQC HTML files - fetch from template API
+		if (file.type === 'html' && content === 'FASTQC_STATIC' && file.tool) {
 			try {
-				const response = await fetch(`/fastqc/${file.name}`);
+				const url = getToolFileUrl(file.tool, file.name);
+				const response = await fetch(url);
 				if (response.ok) {
 					const htmlContent = await response.text();
 					const newWindow = window.open('', '_blank');
