@@ -13,13 +13,13 @@ COMMANDS
 Phase 1: Quality Control
 ------------------------
 Step 1: Check Sequencing Statistics
-seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats
+seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o_seqkit_stats.txt
 
 Step 2: View Statistics Results
-cat o1_seqkit.stats
+cat o_seqkit_stats.txt
 
 Step 3: Quality Control Report
-fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o o2_fastqc/
+fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o o_fastqc/
 
 Phase 2: Read Preprocessing
 ---------------------------
@@ -64,12 +64,12 @@ FILES & FOLDERS GENERATED
 
 Files:
 ------
-o1_seqkit.stats          - Sequencing statistics output
+o_seqkit_stats.txt          - Sequencing statistics output
 o_bandage.png            - Assembly graph visualization
 
 Folders:
 --------
-o2_fastqc/               - FastQC quality control reports
+o_fastqc/               - FastQC quality control reports
   ├── SRR36708862_1_fastqc.html
   ├── SRR36708862_1_fastqc.zip
   ├── SRR36708862_2_fastqc.html

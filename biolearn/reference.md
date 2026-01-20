@@ -54,3 +54,16 @@
 1. **Filename mismatch**: Always search for the old filename across all files before changing
 2. **Inconsistent paths**: Input files should use source folder (e.g., `o_unicycler/assembly.fasta`)
 3. **Missing tool in bioTools**: New tools must be added to the bioTools set in terminal.ts
+
+## TODO: Apply `o_toolname` Convention to Other Storylines
+
+The following storylines still use non-standard output folder names and need to be updated:
+
+| Storyline | Current Names | Should Be |
+|-----------|---------------|-----------|
+| `outbreak_investigation` | `trimmed/`, `assembly/`, `quast_results/`, `mlst_results/`, `prokka_results/`, `plasmidfinder_results/`, `checkm_results/`, `confindr_results/`, `bakta_results/`, `mob_recon_results/`, `platon_results/`, `snippy_results/`, `roary_results/`, `gubbins_results/`, `busco_results/`, `resfinder_results/`, `virulencefinder_results/`, `integron_results/`, `isescan_results/`, `nanoplot_results/` | `o_trimmomatic/`, `o_unicycler/`, `o_quast/`, `o_mlst/`, `o_prokka/`, `o_plasmidfinder/`, `o_checkm/`, `o_confindr/`, `o_bakta/`, `o_mob_recon/`, `o_platon/`, `o_snippy/`, `o_roary/`, `o_gubbins/`, `o_busco/`, `o_resfinder/`, `o_virulencefinder/`, `o_integron_finder/`, `o_isescan/`, `o_nanoplot/` |
+| `gut_microbiome` | `qc_reports/` | `o_fastqc/` |
+| `soil_microbiome` | `qc_reports/` | `o_fastqc/` |
+| `water_samples` | `qc_reports/` | `o_fastqc/` |
+
+**Note**: Apply these changes when working on each storyline individually.

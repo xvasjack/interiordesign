@@ -129,19 +129,19 @@
 	const toolCreatedFiles: Record<string, Record<string, string[]>> = {
 		'seqkit': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['o1_seqkit.stats'],
+			'/data/kpneumoniae_demo': ['o_seqkit_stats.txt'],
 			// Hospital outbreak scenario
 			'/data/outbreak_investigation': ['o_seqkit_stats.txt']
 		},
 		'fastqc': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['o2_fastqc/'],
-			'/data/kpneumoniae_demo/o2_fastqc': [
+			'/data/kpneumoniae_demo': ['o_fastqc/'],
+			'/data/kpneumoniae_demo/o_fastqc': [
 				'SRR36708862_1_fastqc.html', 'SRR36708862_1_fastqc.zip',
 				'SRR36708862_2_fastqc.html', 'SRR36708862_2_fastqc.zip'
 			],
-			'/data/outbreak_investigation': ['o2_fastqc/'],
-			'/data/outbreak_investigation/o2_fastqc': [
+			'/data/outbreak_investigation': ['o_fastqc/'],
+			'/data/outbreak_investigation/o_fastqc': [
 				'patient_01_R1_fastqc.html', 'patient_01_R1_fastqc.zip',
 				'patient_01_R2_fastqc.html', 'patient_01_R2_fastqc.zip',
 				'patient_02_R1_fastqc.html', 'patient_02_R1_fastqc.zip',
@@ -732,7 +732,7 @@ Analysis complete for ${file2}
 \x1b[34m/// \x1b[0m
 
 \x1b[32m[INFO]\x1b[0m     multiqc : This is MultiQC v1.14
-\x1b[32m[INFO]\x1b[0m     search_modules : Searching o2_fastqc/ for analysis results
+\x1b[32m[INFO]\x1b[0m     search_modules : Searching o_fastqc/ for analysis results
 \x1b[32m[INFO]\x1b[0m     fastqc : Found 8 reports
 \x1b[32m[INFO]\x1b[0m     write_results : Compiling report
 \x1b[32m[INFO]\x1b[0m     write_results : Report written to multiqc_report.html
@@ -3686,7 +3686,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				if (currentDir === '/data/kpneumoniae_demo') {
 					const hasRedirect = args.includes('>');
 					const outputFile = hasRedirect ? args[args.indexOf('>') + 1] : null;
-					const hasCorrectOutput = outputFile === 'o1_seqkit.stats';
+					const hasCorrectOutput = outputFile === 'o_seqkit_stats.txt';
 
 					// Output redirection is required - this teaches real-world practice
 					if (!hasRedirect || !hasCorrectOutput) {
@@ -3698,9 +3698,9 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 						terminal.writeln(`\x1b[90messential for documentation and downstream analysis.\x1b[0m`);
 						terminal.writeln(``);
 						terminal.writeln(`\x1b[36mPlease redirect output to a file:\x1b[0m`);
-						terminal.writeln(`\x1b[32m  seqkit stats *.fastq.gz > o1_seqkit.stats\x1b[0m`);
+						terminal.writeln(`\x1b[32m  seqkit stats *.fastq.gz > o_seqkit_stats.txt\x1b[0m`);
 						terminal.writeln(`\x1b[90m  or\x1b[0m`);
-						terminal.writeln(`\x1b[32m  seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats\x1b[0m`);
+						terminal.writeln(`\x1b[32m  seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o_seqkit_stats.txt\x1b[0m`);
 						writePrompt();
 						return;
 					}
@@ -3765,7 +3765,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
 					if (availableFiles.length > 0) {
 						terminal.writeln(`\x1b[90mAvailable files: ${availableFiles.slice(0, 4).join(', ')}${availableFiles.length > 4 ? '...' : ''}\x1b[0m`);
-						terminal.writeln(`\x1b[90mTip: Use 'fastqc *.fastq.gz -o o2_fastqc/' to process all files\x1b[0m`);
+						terminal.writeln(`\x1b[90mTip: Use 'fastqc *.fastq.gz -o o_fastqc/' to process all files\x1b[0m`);
 					}
 					writePrompt();
 					return;
@@ -3789,16 +3789,16 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				if (oIndex === -1 || !args[oIndex + 1]) {
 					terminal.writeln(`\x1b[31mError: Missing output directory\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: fastqc <input.fastq.gz> -o <output_dir>\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o o2_fastqc/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o o_fastqc/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				// Check for exact folder name
 				const outputDir = args[oIndex + 1].replace(/\/$/, ''); // Remove trailing slash
-				if (outputDir !== 'o2_fastqc') {
+				if (outputDir !== 'o_fastqc') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIndex + 1]}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: o2_fastqc\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o o2_fastqc/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: o_fastqc\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: fastqc *.fastq.gz -o o_fastqc/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -5245,7 +5245,7 @@ Assembly completed successfully.
 Annotation identified 4,523 coding sequences.
 ...`,
 		// SeqKit stats output
-		'o1_seqkit.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
+		'o_seqkit_stats.txt': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
 SRR36708862_1.fastq.gz     FASTQ   DNA     990,478  268,416,273       35      271      301
 SRR36708862_2.fastq.gz     FASTQ   DNA     990,478  268,449,364       35      271      301`,
 		'.stats': `file                       format  type  num_seqs      sum_len  min_len  avg_len  max_len
