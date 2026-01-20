@@ -233,7 +233,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 	'abricate': [
 		{
 			name: 'AMR Genes',
-			description: 'Identifies antimicrobial resistance genes by searching against databases like CARD, ResFinder. Critical for clinical microbiology.',
+			description: 'Identifies antimicrobial resistance genes by searching against databases e.g. NCBI, CARD and others. In this tutorial, we only use NCBI database.',
 		},
 		{
 			name: 'Coverage & Identity',
@@ -294,6 +294,10 @@ export const fileNotes: Record<string, FileNote[]> = {
 		{
 			name: 'Col Plasmids',
 			description: 'Small mobilizable plasmids (~4-10 kb) originally identified as colicin-producing. Col440I and similar types often carry no resistance genes but can mobilize with conjugative plasmids.',
+		},
+		{
+			name: 'Replicons vs Plasmids',
+			description: 'The number of replicons detected may differ from the number of plasmids in the assembly. This occurs because: (1) Large conjugative plasmids (especially IncF types) are modular and can carry multiple replicon sequences on a single plasmid—e.g., IncFII(K) and IncFIB(K) often co-occur on the same ~50-200 kb IncF plasmid; (2) Some plasmids may lack known replicons in the database; (3) Fragmented assemblies may split a single plasmid across multiple contigs. In this case, 4 replicons detected on 3 plasmids suggests one large IncF plasmid carries both IncFII(K) and IncFIB(K) replicons.',
 		},
 		{
 			name: 'Interpretation',

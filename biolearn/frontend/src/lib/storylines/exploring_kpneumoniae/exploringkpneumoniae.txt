@@ -1,0 +1,157 @@
+================================================================================
+EXPLORING K. PNEUMONIAE - WGS ANALYSIS TUTORIAL
+================================================================================
+
+Storyline: Exploring K. pneumoniae
+Dataset: SRR36708862 (Klebsiella pneumoniae)
+Platform: Illumina NextSeq 2000 (2x150bp paired-end)
+
+================================================================================
+COMMANDS
+================================================================================
+
+Phase 1: Quality Control
+------------------------
+Step 1: Check Sequencing Statistics
+seqkit stats SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz > o1_seqkit.stats
+
+Step 2: View Statistics Results
+cat o1_seqkit.stats
+
+Step 3: Quality Control Report
+fastqc SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz -o o2_fastqc/
+
+Phase 2: Read Preprocessing
+---------------------------
+Step 4: Adapter Trimming
+trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz trimmed/SRR36708862_R1_paired.fq.gz trimmed/SRR36708862_R1_unpaired.fq.gz trimmed/SRR36708862_R2_paired.fq.gz trimmed/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36
+
+Phase 3: Genome Assembly
+------------------------
+Step 5: De Novo Assembly
+unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o o_unicycler/
+
+Step 6: Visualize Assembly Graph
+bandage image o_unicycler/assembly.gfa o_bandage.png
+
+Phase 4: Assembly Quality Assessment
+------------------------------------
+Step 7: Assembly Metrics
+quast o_unicycler/assembly.fasta -o o_quast/
+
+Step 8: Genome Completeness
+checkm2 predict --input o_unicycler/ --output-directory o_checkm2/ -x fasta
+
+Step 9: Plasmid Identification
+plasmidfinder.py -i o_unicycler/assembly.fasta -x -o o_plasmidfinder
+
+Phase 5: AMR Screening & Typing
+-------------------------------
+Step 10: AMR Gene Detection
+abricate --db ncbi o_unicycler/assembly.fasta -o o_abricate/
+
+Step 11: MLST Typing
+mlst o_unicycler/assembly.fasta > o_mlst/mlst_result.tab
+
+Phase 6: Genome Annotation
+--------------------------
+Step 12: Gene Annotation
+prokka --outdir o_prokka --prefix PROKKA o_unicycler/assembly.fasta
+
+================================================================================
+FILES & FOLDERS GENERATED
+================================================================================
+
+Files:
+------
+o1_seqkit.stats          - Sequencing statistics output
+o_bandage.png            - Assembly graph visualization
+
+Folders:
+--------
+o2_fastqc/               - FastQC quality control reports
+  ├── SRR36708862_1_fastqc.html
+  ├── SRR36708862_1_fastqc.zip
+  ├── SRR36708862_2_fastqc.html
+  └── SRR36708862_2_fastqc.zip
+
+trimmed/                 - Trimmed paired-end reads
+  ├── SRR36708862_R1_paired.fq.gz
+  ├── SRR36708862_R1_unpaired.fq.gz
+  ├── SRR36708862_R2_paired.fq.gz
+  └── SRR36708862_R2_unpaired.fq.gz
+
+o_unicycler/             - Unicycler assembly output
+  ├── assembly.fasta     - Final assembled contigs
+  ├── assembly.gfa       - Assembly graph
+  └── unicycler.log      - Assembly log
+
+o_quast/                 - QUAST assembly quality metrics
+  ├── report.html
+  ├── report.tsv
+  ├── report.txt
+  └── report.pdf
+
+o_checkm2/               - CheckM2 genome completeness assessment
+  └── quality_report.tsv
+
+o_plasmidfinder/         - PlasmidFinder replicon detection
+  ├── results_tab.tsv
+  ├── Hit_in_genome_seq.fsa
+  └── data.json
+
+o_abricate/              - ABRicate AMR gene detection
+  └── amr_output.tab
+
+o_mlst/                  - MLST sequence typing results
+  └── mlst_result.tab
+
+o_prokka/                - Prokka genome annotation
+  ├── PROKKA.gff         - Annotation in GFF3 format
+  ├── PROKKA.gbk         - Annotation in GenBank format
+  ├── PROKKA.fna         - Nucleotide sequences
+  ├── PROKKA.faa         - Protein sequences
+  ├── PROKKA.ffn         - CDS nucleotide sequences
+  ├── PROKKA.tsv         - Tab-separated annotation table
+  ├── PROKKA.txt         - Annotation statistics
+  └── PROKKA.log         - Annotation log
+
+================================================================================
+RESULTS SUMMARY
+================================================================================
+
+Assembly:
+- Contigs: 117
+- Total bases: 5,564,255 bp
+- N50: 371,705 bp
+- GC Content: 57.18%
+
+Quality:
+- Completeness: 100.0%
+- Contamination: 0.16%
+
+Sequence Type:
+- ST307 (Klebsiella pneumoniae)
+- Allelic profile: gapA(4) infB(1) mdh(2) pgi(52) phoE(1) rpoB(1) tonB(7)
+
+Plasmids (4 replicons on 3 plasmids):
+- IncFII(K) (95.95%)
+- IncX3 (100%)
+- IncFIB(K) (98.93%)
+- Col440I (97.37%)
+Note: IncFII(K) and IncFIB(K) are likely co-located on one large IncF plasmid
+
+AMR Genes:
+- blaKPC-2 (carbapenemase)
+- blaSHV-11 (beta-lactamase)
+- fosA (fosfomycin resistance)
+- oqxA (quinolone efflux)
+- oqxB (quinolone efflux)
+
+Annotation:
+- CDS: 5,174
+- tRNA: 77
+- rRNA: 6
+- tmRNA: 1
+
+================================================================================

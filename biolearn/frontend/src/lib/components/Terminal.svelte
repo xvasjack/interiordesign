@@ -198,8 +198,8 @@
 		},
 		'unicycler': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['assembly/'],
-			'/data/kpneumoniae_demo/assembly': [
+			'/data/kpneumoniae_demo': ['o_unicycler/'],
+			'/data/kpneumoniae_demo/o_unicycler': [
 				'001_spades_graph_k027.gfa', '001_spades_graph_k053.gfa', '001_spades_graph_k071.gfa',
 				'001_spades_graph_k087.gfa', '001_spades_graph_k099.gfa', '001_spades_graph_k111.gfa',
 				'001_spades_graph_k119.gfa', '001_spades_graph_k127.gfa', '002_depth_filter.gfa',
@@ -235,7 +235,7 @@
 		'bandage': {
 			// Trial/Demo scenario
 			'/data/kpneumoniae_demo': ['o_bandage.png'],
-			'/data/kpneumoniae_demo/assembly': ['o_bandage.png'],
+			'/data/kpneumoniae_demo/o_unicycler': ['o_bandage.png'],
 			'/data/outbreak_investigation/assembly': [
 				'patient_01_graph.png', 'patient_02_graph.png', 'patient_03_graph.png'
 			],
@@ -251,8 +251,8 @@
 		},
 		'prokka': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['prokka_output/'],
-			'/data/kpneumoniae_demo/prokka_output': [
+			'/data/kpneumoniae_demo': ['o_prokka/'],
+			'/data/kpneumoniae_demo/o_prokka': [
 				'PROKKA.gff', 'PROKKA.gbk', 'PROKKA.fna', 'PROKKA.faa',
 				'PROKKA.ffn', 'PROKKA.tsv', 'PROKKA.txt', 'PROKKA.log'
 			],
@@ -277,11 +277,11 @@
 			// Trial/Demo scenario
 			'/data/kpneumoniae_demo': ['o_abricate/'],
 			'/data/kpneumoniae_demo/o_abricate': [
-				'abricate_report.tsv', 'abricate_summary.txt'
+				'amr_output.tab'
 			],
 			'/data/outbreak_investigation': ['o_abricate/'],
 			'/data/outbreak_investigation/o_abricate': [
-				'all_patients_amr.tsv', 'amr_summary.txt'
+				'all_patients_amr.tab'
 			]
 		},
 		'quast': {
@@ -301,8 +301,8 @@
 		},
 		'checkm2': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['checkm2_output/'],
-			'/data/kpneumoniae_demo/checkm2_output': [
+			'/data/kpneumoniae_demo': ['o_checkm2/'],
+			'/data/kpneumoniae_demo/o_checkm2': [
 				'quality_report.tsv', 'protein_files/', 'diamond_output/'
 			]
 		},
@@ -327,8 +327,8 @@
 		},
 		'mlst': {
 			// Trial/Demo scenario
-			'/data/kpneumoniae_demo': ['mlst_output/'],
-			'/data/kpneumoniae_demo/mlst_output': [
+			'/data/kpneumoniae_demo': ['o_mlst/'],
+			'/data/kpneumoniae_demo/o_mlst': [
 				'mlst_result.tab'
 			],
 			'/data/outbreak_investigation': ['mlst_results/'],
@@ -1093,27 +1093,28 @@ Thank you for using QUAST!
 [07:38:44] Option --cpu asked for 8 cores, but system only has 4
 [07:38:44] Will use maximum of 4 cores.
 [07:38:44] Annotating as >>> Bacteria <<<
+[07:38:44] Genus species strain: Klebsiella pneumoniae
 [07:38:44] Generating locus_tag from 'o_unicycler/assembly.fasta' contents.
 [07:38:44] Setting --locustag MPDNNGLK from MD5 69d77054a115e56ce609fd2185af8559
 [07:38:44] Creating new output folder: o_prokka
 [07:38:44] Running: mkdir -p o_prokka
-[07:38:44] Using filename prefix: PROKKA_01122026.XXX
+[07:38:44] Using filename prefix: PROKKA.XXX
 [07:38:44] Setting HMMER_NCPU=1
-[07:38:44] Writing log to: o_prokka/PROKKA_01122026.log
-[07:38:44] Command: /home/pop/miniconda3/envs/env_abricate/bin/prokka --outdir o_prokka o_unicycler/assembly.fasta
+[07:38:44] Writing log to: o_prokka/PROKKA.log
+[07:38:44] Command: /home/pop/miniconda3/envs/env_abricate/bin/prokka --outdir o_prokka --prefix PROKKA o_unicycler/assembly.fasta
 [07:46:19] Output files:
-[07:46:19] o_prokka/PROKKA_01122026.tsv
-[07:46:19] o_prokka/PROKKA_01122026.fna
-[07:46:19] o_prokka/PROKKA_01122026.gff
-[07:46:19] o_prokka/PROKKA_01122026.log
-[07:46:19] o_prokka/PROKKA_01122026.faa
-[07:46:19] o_prokka/PROKKA_01122026.gbk
-[07:46:19] o_prokka/PROKKA_01122026.fsa
-[07:46:19] o_prokka/PROKKA_01122026.tbl
-[07:46:19] o_prokka/PROKKA_01122026.ffn
-[07:46:19] o_prokka/PROKKA_01122026.sqn
-[07:46:19] o_prokka/PROKKA_01122026.err
-[07:46:19] o_prokka/PROKKA_01122026.txt
+[07:46:19] o_prokka/PROKKA.tsv
+[07:46:19] o_prokka/PROKKA.fna
+[07:46:19] o_prokka/PROKKA.gff
+[07:46:19] o_prokka/PROKKA.log
+[07:46:19] o_prokka/PROKKA.faa
+[07:46:19] o_prokka/PROKKA.gbk
+[07:46:19] o_prokka/PROKKA.fsa
+[07:46:19] o_prokka/PROKKA.tbl
+[07:46:19] o_prokka/PROKKA.ffn
+[07:46:19] o_prokka/PROKKA.sqn
+[07:46:19] o_prokka/PROKKA.err
+[07:46:19] o_prokka/PROKKA.txt
 [07:46:19] Annotation finished successfully.
 [07:46:19] Walltime used: 7.58 minutes
 [07:46:19] If you use this result please cite the Prokka paper:
@@ -1122,31 +1123,30 @@ Thank you for using QUAST!
 [07:46:19] Share and enjoy!
 `,
 				summary: {
-					'Total Features': '5,413',
-					'CDS': '5,287',
-					'tRNA': '86',
-					'rRNA': '25',
-					'tmRNA': '1',
-					'misc_RNA': '14',
-					'Functional Annotation': '88.0%',
-					'Hypothetical': '12.0%'
+					'Organism': 'Genus species strain',
+					'Contigs': '117',
+					'Bases': '5,564,255',
+					'CDS': '5,174',
+					'rRNA': '6',
+					'tRNA': '77',
+					'tmRNA': '1'
 				},
 				chartData: {
 					title: 'Genome Annotation Summary',
-					x: ['CDS', 'tRNA', 'rRNA', 'Other'],
-					y: [5287, 86, 25, 15],
+					x: ['CDS', 'tRNA', 'rRNA', 'tmRNA'],
+					y: [5174, 77, 6, 1],
 					type: 'bar',
 					xLabel: 'Feature Type',
 					yLabel: 'Count'
 				},
 				files: [
-					{ name: 'PROKKA_01122026.gff', type: 'gff', size: '2.9 MB' },
-					{ name: 'PROKKA_01122026.gbk', type: 'gbk', size: '9.2 MB' },
-					{ name: 'PROKKA_01122026.faa', type: 'faa', size: '1.8 MB' },
-					{ name: 'PROKKA_01122026.fna', type: 'fna', size: '5.4 MB' },
-					{ name: 'PROKKA_01122026.ffn', type: 'ffn', size: '4.8 MB' },
-					{ name: 'PROKKA_01122026.tsv', type: 'tsv', size: '1.2 MB' },
-					{ name: 'PROKKA_01122026.txt', type: 'txt', size: '1.4 KB' }
+					{ name: 'PROKKA.gff', type: 'gff', size: '2.9 MB' },
+					{ name: 'PROKKA.gbk', type: 'gbk', size: '9.2 MB' },
+					{ name: 'PROKKA.faa', type: 'faa', size: '1.8 MB' },
+					{ name: 'PROKKA.fna', type: 'fna', size: '5.4 MB' },
+					{ name: 'PROKKA.ffn', type: 'ffn', size: '4.8 MB' },
+					{ name: 'PROKKA.tsv', type: 'tsv', size: '1.2 MB' },
+					{ name: 'PROKKA.txt', type: 'txt', size: '256 B' }
 				]
 			},
 			'abricate': {
@@ -1180,8 +1180,7 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 					yLabel: 'Identity (%)'
 				},
 				files: [
-					{ name: 'abricate_report.tsv', type: 'tsv', size: '2.8 KB' },
-					{ name: 'abricate_summary.txt', type: 'txt', size: '1.2 KB' }
+					{ name: 'amr_output.tab', type: 'tab', size: '1.5 KB' }
 				]
 			},
 			'checkm': {
@@ -1401,38 +1400,39 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 [07:16:00] Found 'any2fasta' => /home/pop/miniconda3/envs/env_abricate/bin/any2fasta
 [07:16:01] Found blastn: 2.12.0+ (002012)
 [07:16:01] Excluding 3 schemes: ecoli vcholerae_2 abaumannii
-[07:16:05] Found exact allele match klebsiella.gapA-3
-[07:16:05] Found exact allele match klebsiella.infB-3
-[07:16:05] Found exact allele match klebsiella.mdh-1
-[07:16:05] Found exact allele match klebsiella.pgi-1
+[07:16:05] Found exact allele match klebsiella.gapA-4
+[07:16:05] Found exact allele match klebsiella.infB-1
+[07:16:05] Found exact allele match klebsiella.mdh-2
+[07:16:05] Found exact allele match klebsiella.pgi-52
 [07:16:05] Found exact allele match klebsiella.phoE-1
 [07:16:05] Found exact allele match klebsiella.rpoB-1
-[07:16:05] Found exact allele match klebsiella.tonB-79
+[07:16:05] Found exact allele match klebsiella.tonB-7
 [07:16:05] Use --quiet or -q to avoid all the message output, including these witticisms.
 [07:16:05] Done.
+o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)	rpoB(1)	tonB(7)
 `,
 				summary: {
-					'Scheme': 'K. pneumoniae',
-					'Sequence Type': 'ST258',
-					'gapA': '3',
-					'infB': '3',
-					'mdh': '1',
-					'pgi': '1',
+					'Scheme': 'klebsiella',
+					'Sequence Type': 'ST307',
+					'gapA': '4',
+					'infB': '1',
+					'mdh': '2',
+					'pgi': '52',
 					'phoE': '1',
 					'rpoB': '1',
-					'tonB': '79',
-					'Clinical Significance': 'High-risk KPC clone'
+					'tonB': '7',
+					'Clinical Significance': 'High-risk international clone'
 				},
 				chartData: {
 					title: 'MLST Allelic Profile',
 					x: ['gapA', 'infB', 'mdh', 'pgi', 'phoE', 'rpoB', 'tonB'],
-					y: [3, 3, 1, 1, 1, 1, 79],
+					y: [4, 1, 2, 52, 1, 1, 7],
 					type: 'bar',
 					xLabel: 'Locus',
 					yLabel: 'Allele Number'
 				},
 				files: [
-					{ name: 'mlst_report.tsv', type: 'tsv', size: '512 B' }
+					{ name: 'mlst_result.tab', type: 'tab', size: '128 B' }
 				]
 			},
 			// Phase 3: Plasmid Analysis
@@ -1949,11 +1949,13 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 `,
 				summary: {
 					'Replicons Found': '4',
-					'Plasmid 1': 'IncFII(K) (95.95%)',
-					'Plasmid 2': 'IncX3 (100%)',
-					'Plasmid 3': 'IncFIB(K) (98.93%)',
-					'Plasmid 4': 'Col440I (97.37%)',
+					'Plasmids Detected': '3 (from Unicycler assembly)',
+					'Replicon 1': 'IncFII(K) (95.95%) - contig 19',
+					'Replicon 2': 'IncX3 (100%) - contig 22',
+					'Replicon 3': 'IncFIB(K) (98.93%) - contig 23',
+					'Replicon 4': 'Col440I (97.37%) - contig 35',
 					'Type': 'Inc-type and Col-type plasmids',
+					'Interpretation': '4 replicons on 3 plasmids: IncFII(K) and IncFIB(K) likely co-located on one large IncF plasmid',
 					'Clinical Significance': 'High (IncX3 associated with AMR)'
 				},
 				chartData: {
@@ -3317,30 +3319,30 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			'trimmed/patient_03_R1_paired.fq.gz', 'trimmed/patient_03_R2_paired.fq.gz'
 		],
 		'bandage': [
-			'assembly/assembly.gfa',
+			'o_unicycler/assembly.gfa', 'assembly/assembly.gfa',
 			'assembly/patient_01/assembly.gfa', 'assembly/patient_02/assembly.gfa', 'assembly/patient_03/assembly.gfa'
 		],
 		'prokka': [
-			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'o_unicycler/assembly.fasta', 'assembly/assembly.fasta', 'polished/consensus.fasta',
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
 		'abricate': [
-			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'o_unicycler/assembly.fasta', 'assembly/assembly.fasta', 'polished/consensus.fasta',
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
 		'quast': [
-			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'o_unicycler/assembly.fasta', 'assembly/assembly.fasta', 'polished/consensus.fasta',
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
-		'checkm': ['assembly/', 'polished/'],
-		'checkm2': ['assembly/', 'polished/'],
+		'checkm': ['assembly/', 'polished/', 'o_unicycler/'],
+		'checkm2': ['assembly/', 'polished/', 'o_unicycler/'],
 		'confindr': ['assembly/assembly.fasta'],
 		'bakta': [
 			'assembly/assembly.fasta', 'polished/consensus.fasta',
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
 		'mlst': [
-			'assembly/assembly.fasta', 'polished/consensus.fasta',
+			'o_unicycler/assembly.fasta', 'assembly/assembly.fasta', 'polished/consensus.fasta',
 			'assembly/patient_01/assembly.fasta', 'assembly/patient_02/assembly.fasta', 'assembly/patient_03/assembly.fasta'
 		],
 		// Phase 3: Plasmid Analysis
@@ -3983,8 +3985,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'prokka') {
-				// prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta
-				const expectedCmd = 'prokka --outdir prokka_results/ --prefix sample_01 assembly/assembly.fasta';
+				// prokka --outdir o_prokka --prefix PROKKA o_unicycler/assembly.fasta
+				const expectedCmd = 'prokka --outdir o_prokka --prefix PROKKA o_unicycler/assembly.fasta';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
@@ -3994,29 +3996,29 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				}
 				if (!isValidFileForTool('prokka', inputFile)) {
 					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for prokka\x1b[0m`);
-					terminal.writeln(`\x1b[90mProkka requires: assembly/assembly.fasta\x1b[0m`);
+					terminal.writeln(`\x1b[90mProkka requires: o_unicycler/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				// Check output directory
 				if (!args.includes('--outdir')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (--outdir flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mRequired: --outdir prokka_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --outdir o_prokka\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				const oIdx = args.indexOf('--outdir');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'prokka_results') {
+				if (outDir !== 'o_prokka') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: prokka_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --outdir o_prokka\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				// Check prefix
 				if (!args.includes('--prefix')) {
 					terminal.writeln(`\x1b[31mError: Missing output file prefix (--prefix flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mRequired: --prefix sample_01\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --prefix PROKKA\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4179,8 +4181,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'mlst') {
-				// mlst assembly/assembly.fasta -o mlst_results/
-				const expectedCmd = 'mlst assembly/assembly.fasta -o mlst_results/';
+				// mlst outputs to stdout, use redirect: mlst input.fasta > o_mlst/mlst_result.tab
+				const expectedCmd = 'mlst o_unicycler/assembly.fasta > o_mlst/mlst_result.tab';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
@@ -4190,22 +4192,22 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				}
 				if (!isValidFileForTool('mlst', inputFile)) {
 					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for mlst\x1b[0m`);
-					terminal.writeln(`\x1b[90mMLST requires: assembly/assembly.fasta\x1b[0m`);
+					terminal.writeln(`\x1b[90mMLST requires: o_unicycler/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				// Check output directory
-				if (!args.includes('-o')) {
-					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mRequired: -o mlst_results/\x1b[0m`);
+				// Check output redirection - mlst outputs to stdout
+				const redirectIdx = args.indexOf('>');
+				if (redirectIdx === -1) {
+					terminal.writeln(`\x1b[31mError: Missing output redirect (>)\x1b[0m`);
+					terminal.writeln(`\x1b[33mMLST outputs to stdout. Use: > o_mlst/mlst_result.tab\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				const oIdx = args.indexOf('-o');
-				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'mlst_results') {
-					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use: mlst_results/\x1b[0m`);
+				const outPath = args[redirectIdx + 1];
+				if (!outPath || !outPath.startsWith('o_mlst/')) {
+					terminal.writeln(`\x1b[31mError: Invalid output path '${outPath || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: > o_mlst/mlst_result.tab\x1b[0m`);
 					writePrompt();
 					return;
 				}

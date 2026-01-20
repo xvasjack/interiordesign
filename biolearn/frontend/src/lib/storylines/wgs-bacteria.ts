@@ -1226,24 +1226,24 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 5: De Novo Assembly',
 				text: `Assemble the trimmed reads into contigs using Unicycler.`,
-				command: 'unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o assembly/',
+				command: 'unicycler -1 trimmed/SRR36708862_R1_paired.fq.gz -2 trimmed/SRR36708862_R2_paired.fq.gz -o o_unicycler/',
 				explanation: 'Unicycler uses SPAdes with multiple k-mer sizes and optimizes the assembly graph.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
 					{ name: '-1/-2', desc: 'Forward and reverse paired reads' },
-					{ name: '-o assembly/', desc: 'Output directory' }
+					{ name: '-o o_unicycler/', desc: 'Output directory' }
 				]
 			},
 			{
 				type: 'task',
 				title: 'Step 6: Visualize Assembly Graph',
 				text: `Create a visual representation of the assembly graph to understand genome structure.`,
-				command: 'bandage image assembly/assembly.gfa o_bandage.png',
+				command: 'bandage image o_unicycler/assembly.gfa o_bandage.png',
 				explanation: 'Bandage visualizes the assembly graph showing how contigs connect.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
 					{ name: 'image', desc: 'Generate PNG image' },
-					{ name: 'assembly.gfa', desc: 'Input graph file' }
+					{ name: 'o_unicycler/assembly.gfa', desc: 'Input graph file' }
 				]
 			},
 			{
@@ -1256,10 +1256,11 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 7: Assembly Metrics',
 				text: `Calculate assembly statistics including N50, total length, and contig count.`,
-				command: 'quast assembly/assembly.fasta -o o_quast/',
+				command: 'quast o_unicycler/assembly.fasta -o o_quast/',
 				explanation: 'QUAST calculates key assembly metrics to assess quality.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
+					{ name: 'o_unicycler/assembly.fasta', desc: 'Input assembly file' },
 					{ name: '-o o_quast/', desc: 'Output directory' }
 				]
 			},
@@ -1267,11 +1268,12 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 8: Genome Completeness',
 				text: `Assess genome completeness and contamination using CheckM2.`,
-				command: 'checkm2 predict --input assembly/ --output-directory checkm2_output/ -x fasta',
+				command: 'checkm2 predict --input o_unicycler/ --output-directory o_checkm2/ -x fasta',
 				explanation: 'CheckM2 uses machine learning to estimate completeness and contamination.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
-					{ name: '--input assembly/', desc: 'Directory with assembly' },
+					{ name: '--input o_unicycler/', desc: 'Directory with assembly' },
+					{ name: '--output-directory o_checkm2/', desc: 'Output directory' },
 					{ name: '-x fasta', desc: 'File extension' }
 				]
 			},
@@ -1309,11 +1311,12 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 11: MLST Typing',
 				text: `Determine the sequence type (ST) for epidemiological classification.`,
-				command: 'mlst assembly/assembly.fasta > mlst_output/mlst_result.tab',
+				command: 'mlst o_unicycler/assembly.fasta > o_mlst/mlst_result.tab',
 				explanation: 'MLST identifies the allelic profile of 7 housekeeping genes to assign a sequence type.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
-					{ name: '>', desc: 'Redirect output to file' }
+					{ name: 'o_unicycler/assembly.fasta', desc: 'Input assembly file' },
+					{ name: '> o_mlst/mlst_result.tab', desc: 'Redirect output to file' }
 				]
 			},
 			{
@@ -1326,17 +1329,19 @@ This dataset (SRR36708862) comes from a study investigating antibiotic resistanc
 				type: 'task',
 				title: 'Step 12: Gene Annotation',
 				text: `Annotate the genome to identify coding sequences, tRNAs, and rRNAs.`,
-				command: 'prokka --outdir prokka_output/ assembly/assembly.fasta',
+				command: 'prokka --outdir o_prokka --prefix PROKKA o_unicycler/assembly.fasta',
 				explanation: 'Prokka performs rapid prokaryotic genome annotation.',
 				requiredDir: '/data/kpneumoniae_demo',
 				parameters: [
-					{ name: '--outdir prokka_output/', desc: 'Output directory' }
+					{ name: '--outdir o_prokka', desc: 'Output directory' },
+					{ name: '--prefix PROKKA', desc: 'Output file prefix' },
+					{ name: 'o_unicycler/assembly.fasta', desc: 'Input assembly file' }
 				]
 			},
 			{
 				type: 'complete',
 				title: 'Tutorial Complete!',
-				text: `**Congratulations!** You've completed the WGS analysis tutorial.\n\n---\n\n**Your Results Summary:**\n\n| Metric | Value |\n|--------|-------|\n| Input Reads | 990,478 pairs |\n| After Trimming | 982,838 pairs (99.23%) |\n| Assembly Size | 5,553,065 bp |\n| Contigs | 189 |\n| N50 | 371,705 bp |\n| GC Content | 57.18% |\n| Completeness | 99.8% |\n| Contamination | 0.2% |\n\n**Sequence Type:** ST307 (Klebsiella pneumoniae)\n\n**AMR Genes Detected:**\n• blaSHV-28 (β-lactamase)\n• oqxA/oqxB (fluoroquinolone efflux)\n• fosA (fosfomycin resistance)\n\n**Annotation Summary:**\n• 5,234 coding sequences (CDS)\n• 86 tRNAs\n• 25 rRNAs\n\n---\n\n**What's Next?**\nTry the **Hospital Outbreak Investigation** scenario to apply these skills to a real-world epidemiological investigation with multiple samples!`
+				text: `**Congratulations!** You've completed the WGS analysis tutorial.\n\n---\n\n**Your Results Summary:**\n\n| Metric | Value |\n|--------|-------|\n| Input Reads | 990,478 pairs |\n| After Trimming | 982,838 pairs (99.23%) |\n| Assembly Size | 5,564,255 bp |\n| Contigs | 117 |\n| N50 | 371,705 bp |\n| GC Content | 57.18% |\n| Completeness | 100.0% |\n| Contamination | 0.16% |\n\n**Sequence Type:** ST307 (Klebsiella pneumoniae)\n\n**AMR Genes Detected:**\n• blaKPC-2 (carbapenemase)\n• blaSHV-11 (β-lactamase)\n• oqxA/oqxB (fluoroquinolone efflux)\n• fosA (fosfomycin resistance)\n\n**Annotation Summary:**\n• 5,174 coding sequences (CDS)\n• 77 tRNAs\n• 6 rRNAs\n• 1 tmRNA\n\n---\n\n**What's Next?**\nTry the **Hospital Outbreak Investigation** scenario to apply these skills to a real-world epidemiological investigation with multiple samples!`
 			}
 		]
 	},
