@@ -3644,12 +3644,20 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'ls') {
 			handleLs(args);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('ls')) return [...cmds, 'ls'];
+				return cmds;
+			});
 			writePrompt();
 			return;
 		}
 
 		if (command === 'cd') {
 			handleCd(args);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('cd')) return [...cmds, 'cd'];
+				return cmds;
+			});
 			writePrompt();
 			return;
 		}
