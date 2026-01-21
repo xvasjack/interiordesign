@@ -3682,11 +3682,17 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'ls') {
 			handleLs(args);
-			// Track ls with execution count (ls:1, ls:2, etc.) to support
-			// multi-line commands that require ls to be executed multiple times
+			// Track both count (ls:1, ls:2 for multi-line commands) and full command
+			// (ls sequences/*.fastq for specific step matching)
+			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
 				const lsCount = cmds.filter(c => c.startsWith('ls:')).length;
-				return [...cmds, `ls:${lsCount + 1}`];
+				const newCmds = [...cmds, `ls:${lsCount + 1}`];
+				// Also track full command if not already present
+				if (!newCmds.includes(fullCmd)) {
+					newCmds.push(fullCmd);
+				}
+				return newCmds;
 			});
 			writePrompt();
 			return;
@@ -3863,8 +3869,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		// Handle grep command
 		if (command === 'grep') {
 			handleGrep(args, cmd);
+			// Track the full command (e.g., 'grep "FFFFF" file.txt', 'grep -c "@" file.txt')
+			// to ensure each grep step in tutorials is tracked separately
+			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
-				if (!cmds.includes('grep')) return [...cmds, 'grep'];
+				if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
 				return cmds;
 			});
 			writePrompt();
