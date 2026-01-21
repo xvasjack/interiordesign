@@ -72,11 +72,26 @@
 		// Map commands to steps based on task index
 		activeStoryline.sections.forEach((section, index) => {
 			if (section.type === 'task' && section.command) {
-				// Extract tool name from command
-				const toolName = section.command.split(' ')[0];
-				const altToolName = section.command.split(' ')[0].replace('_', '-');
-				if (cmds.includes(toolName) || cmds.includes(altToolName)) {
-					completedSteps.add(index);
+				// Handle multi-line commands (split by newline)
+				const commandLines = section.command.split('\n').filter(line => line.trim());
+
+				if (commandLines.length > 1) {
+					// Multi-line command: ALL unique commands must be executed
+					const allCommandsExecuted = commandLines.every(line => {
+						const toolName = line.trim().split(' ')[0];
+						const altToolName = toolName.replace('_', '-');
+						return cmds.includes(toolName) || cmds.includes(altToolName);
+					});
+					if (allCommandsExecuted) {
+						completedSteps.add(index);
+					}
+				} else {
+					// Single command: existing logic
+					const toolName = section.command.split(' ')[0];
+					const altToolName = section.command.split(' ')[0].replace('_', '-');
+					if (cmds.includes(toolName) || cmds.includes(altToolName)) {
+						completedSteps.add(index);
+					}
 				}
 				// Also check for specific tools
 				if (section.command.includes('mob_recon') && cmds.includes('mob_recon')) {
