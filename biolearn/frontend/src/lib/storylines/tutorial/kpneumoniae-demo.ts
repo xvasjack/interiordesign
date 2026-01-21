@@ -26,7 +26,7 @@ In this introductory module, you'll learn the fundamentals of whole-genome seque
 
 <em>Klebsiella pneumoniae</em> is a common opportunistic, Gram-negative, encapsulated bacterium that is a major cause of hospital-acquired infections including pneumonia, urinary tract infections, and bloodstream infections. It is a critical public health concern due to the emergence of multidrug-resistant (MDR) and hypervirulent strains that are difficult to treat and associated with high mortality rates.
 
-This dataset (SRR36708862) comes from a study investigating antibiotic resistance and virulence profiles of clinical <em>K. pneumoniae</em> strains, helping researchers understand mechanisms of resistance (e.g., blaCTX-M, carbapenemases) and virulence factors (capsule production, fimbriae, siderophores) to inform treatment strategies.`,
+This dataset (SRR36708862) comes from a study investigating antibiotic resistance of clinical <em>K. pneumoniae</em> strains, helping researchers understand mechanisms of resistance (e.g., blaCTX-M, carbapenemases) and virulence factors (capsule production, fimbriae, siderophores) to inform treatment strategies.`,
 			hint: null,
 			requiredDir: null
 		},
