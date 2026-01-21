@@ -163,6 +163,8 @@ executedCommands.update(cmds => {
 **Commands requiring full match** (in `StoryPanel.svelte`):
 - `cd`, `cat`, `head`, `tail`, `seqkit`, `wc`, `grep`, `ls`
 
+**Exception: Multi-line commands** use count-based tracking instead. Steps with multiple commands (separated by newlines) check that each tool was executed the required number of times via `ls:1`, `ls:2`, etc. This is handled separately in `StoryPanel.svelte` (lines ~78-101).
+
 When adding new command handlers to Terminal.svelte, follow the pattern used by `head`/`cat`/`tail`/`wc`/`grep`/`ls`.
 
 ## Common Issues & Fixes
