@@ -5734,7 +5734,11 @@ Use --help or -h for more information about available options.
 Refer to the tool documentation for detailed usage instructions.`;
 		}
 
-		terminal.writeln(helpText);
+		// Write each line separately for better terminal rendering
+		const lines = helpText.split('\n');
+		for (const line of lines) {
+			terminal.writeln(line);
+		}
 		executedCommands.update(cmds => {
 			if (!cmds.includes(tool)) return [...cmds, tool];
 			return cmds;
