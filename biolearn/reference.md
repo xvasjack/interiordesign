@@ -185,3 +185,47 @@ biolearn/frontend/src/routes/
 1. **Filename mismatch**: Always search for the old filename across all files before changing
 2. **Inconsistent paths**: Input files should use source folder (e.g., `o_unicycler/assembly.fasta`)
 3. **Missing tool in bioTools**: New tools must be added to the bioTools set in terminal.ts
+
+## Linux Basics Tutorial - Step 5a and 5b Reference
+
+**Location**: `biolearn/frontend/src/lib/storylines/tutorial/linux-basics.ts`
+
+### Step 5a: Redirect Output to File
+```typescript
+{
+    type: 'task',
+    title: 'Step 5a: Redirect Output to File',
+    text: `Use > to save command output to a file instead of displaying it on screen.`,
+    command: 'head -n 8 sequences/sample_R1.fastq > results/first_reads.txt',
+    explanation: 'The > operator redirects output to a file, creating it if needed or overwriting if it exists.',
+    requiredDir: '/data/linux_tutorial',
+    parameters: [
+        { name: '>', desc: 'Redirect output (overwrite)' }
+    ]
+}
+```
+
+### Step 5b: Append to File
+```typescript
+{
+    type: 'task',
+    title: 'Step 5b: Append to File',
+    text: `Use >> to add output to an existing file without overwriting it.`,
+    command: 'head -n 8 sequences/sample_R2.fastq >> results/first_reads.txt',
+    explanation: 'The >> operator appends to a file, preserving existing content.',
+    requiredDir: '/data/linux_tutorial',
+    parameters: [
+        { name: '>>', desc: 'Redirect output (append)' }
+    ]
+}
+```
+
+### Expected Output
+- **Step 5a**: 8 lines from sample_R1.fastq (2 complete FASTQ reads with `1:N:0:1` headers)
+- **Step 5b**: 8 lines appended from sample_R2.fastq (2 complete FASTQ reads with `2:N:0:1` headers)
+- **Total in first_reads.txt**: 16 lines (8+8)
+
+### FASTQ Content Location
+- `Terminal.svelte` contains `sample_R1.fastq` and `sample_R2.fastq` content definitions
+- R1 uses `1:N:0:1` headers (forward reads)
+- R2 uses `2:N:0:1` headers (reverse reads)
