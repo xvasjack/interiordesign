@@ -51,7 +51,7 @@ function createPhase0Sections(): StorylineSection[] {
 		{
 			type: 'task',
 			title: 'Step 0d: Copy a Directory',
-			text: `To copy directories with their contents, use the -r (recursive) flag. Do 1 line at a time.`,
+			text: `To copy directories with their contents, use the -r (recursive) flag. Type 1 line at a time.`,
 			command: 'ls\ncp -r /data/references/scripts ./my_scripts\nls',
 			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files. The ls commands show the directory contents before and after the copy.',
 			requiredDir: '/data/linux_tutorial',
