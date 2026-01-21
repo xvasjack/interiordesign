@@ -3695,7 +3695,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			handleCd(args);
 			// Track the specific cd command (e.g., 'cd sequences', 'cd ..', 'cd ~')
 			// to ensure each cd step in tutorials is tracked separately
-			const cdCmd = args.length > 0 ? `cd ${args[0]}` : 'cd';
+			// Normalize path by removing trailing slash so 'cd sequences/' matches 'cd sequences'
+			const cdCmd = args.length > 0 ? `cd ${args[0].replace(/\/$/, '')}` : 'cd';
 			executedCommands.update(cmds => {
 				if (!cmds.includes(cdCmd)) return [...cmds, cdCmd];
 				return cmds;
