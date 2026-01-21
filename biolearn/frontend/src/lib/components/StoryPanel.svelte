@@ -89,7 +89,15 @@
 					// Single command: existing logic
 					const toolName = section.command.split(' ')[0];
 					const altToolName = section.command.split(' ')[0].replace('_', '-');
-					if (cmds.includes(toolName) || cmds.includes(altToolName)) {
+
+					// For 'cd' commands, match the full command (e.g., 'cd sequences', 'cd ..', 'cd ~')
+					// to ensure each cd step is tracked separately
+					if (toolName === 'cd') {
+						const fullCdCmd = section.command.trim();
+						if (cmds.includes(fullCdCmd)) {
+							completedSteps.add(index);
+						}
+					} else if (cmds.includes(toolName) || cmds.includes(altToolName)) {
 						completedSteps.add(index);
 					}
 				}
