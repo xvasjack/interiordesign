@@ -40,7 +40,7 @@
 	const baseFilesystem: Record<string, string[]> = {
 		// Linux Tutorial directory
 		'/data/linux_tutorial': [
-			'sample_info.txt', 'sequences/', 'references/'
+			'sample_info.txt', 'sequences/', 'references/', 'results/'
 		],
 		'/data/linux_tutorial/sequences': [
 			'sample_R1.fastq', 'sample_R2.fastq'
@@ -48,6 +48,7 @@
 		'/data/linux_tutorial/references': [
 			'genome.fasta', 'annotations.gff'
 		],
+		'/data/linux_tutorial/results': [],
 		'/data/references': [
 			'sample_info.txt', 'scripts/'
 		],
@@ -687,6 +688,16 @@
 			}
 			// Also create empty entry for the new directory itself
 			if (!fs[dirPath]) fs[dirPath] = [];
+		}
+
+		// Add files created by redirection (>, >>)
+		for (const filePath of Object.keys(createdFiles)) {
+			const parentPath = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
+			const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+			if (!fs[parentPath]) fs[parentPath] = [];
+			if (!fs[parentPath].includes(fileName)) {
+				fs[parentPath].push(fileName);
+			}
 		}
 
 		return fs;
@@ -3560,25 +3571,49 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		return validFiles.some(f => f === filename || f.endsWith(filename) || filename.endsWith(f.split('/').pop() || ''));
 	}
 
-	// Expand glob patterns (like *.fastq.gz) based on current directory files
+	// Expand glob patterns (like *.fastq.gz or sequences/*.fastq) based on directory files
 	function expandGlobPattern(pattern: string): string[] {
 		// If not a glob pattern, return as-is
 		if (!pattern.includes('*') && !pattern.includes('?')) {
 			return [pattern];
 		}
 
-		// Get files in current directory
-		const dirFiles = getFilesForDirectory(currentDir);
+		// Determine target directory and file pattern
+		let targetDir: string;
+		let filePattern: string;
+		let dirPrefix: string = '';
+
+		if (pattern.includes('/')) {
+			// Pattern has directory component: "sequences/*.fastq"
+			const lastSlash = pattern.lastIndexOf('/');
+			const dirPart = pattern.substring(0, lastSlash);
+			filePattern = pattern.substring(lastSlash + 1);
+			dirPrefix = dirPart + '/';
+			targetDir = dirPart.startsWith('/')
+				? dirPart
+				: `${currentDir}/${dirPart}`.replace(/\/+/g, '/');
+		} else {
+			// Just a pattern in current directory: "*.fastq"
+			targetDir = currentDir;
+			filePattern = pattern;
+		}
+
+		// Get files in target directory
+		const dirFiles = getFilesForDirectory(targetDir);
 
 		// Convert glob pattern to regex
-		const regexPattern = pattern
+		const regexPattern = filePattern
 			.replace(/\./g, '\\.')
 			.replace(/\*/g, '.*')
 			.replace(/\?/g, '.');
 		const regex = new RegExp(`^${regexPattern}$`);
 
-		// Filter matching files
-		const matches = dirFiles.filter(f => regex.test(f));
+		// Filter matching files (exclude directories)
+		const matches = dirFiles
+			.filter(f => !f.endsWith('/'))
+			.filter(f => regex.test(f))
+			.map(f => dirPrefix + f);
+
 		return matches.length > 0 ? matches : [pattern]; // Return original if no matches
 	}
 
@@ -3684,7 +3719,93 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		}
 
 		if (command === 'cat' || command === 'head' || command === 'tail') {
-			handleFileView(command, args);
+			// Check for output redirection
+			const hasAppendRedirect = cmd.includes('>>');
+			const hasOverwriteRedirect = !hasAppendRedirect && cmd.includes('>');
+			const hasRedirect = hasAppendRedirect || hasOverwriteRedirect;
+
+			if (hasRedirect) {
+				// Parse the command to extract output file
+				const redirectOp = hasAppendRedirect ? '>>' : '>';
+				const redirectParts = cmd.split(redirectOp);
+				if (redirectParts.length >= 2) {
+					const outputFile = redirectParts[1].trim().split(/\s+/)[0];
+
+					// Extract input args (before the redirect)
+					const inputPart = redirectParts[0];
+					const inputArgs = inputPart.trim().split(/\s+/).slice(1); // Remove command name
+
+					// Check if input file exists
+					let inputFilename: string | undefined;
+					for (let i = 0; i < inputArgs.length; i++) {
+						if (inputArgs[i] === '-n' && i + 1 < inputArgs.length) {
+							i++; // skip the number
+						} else if (inputArgs[i].startsWith('-n')) {
+							// Handle -n8 format (no space) - skip
+						} else if (!inputArgs[i].startsWith('-')) {
+							inputFilename = inputArgs[i];
+						}
+					}
+
+					if (inputFilename) {
+						const filesystem = getFilesystem();
+
+						// Resolve input path
+						let dirPath: string;
+						let baseName: string;
+
+						if (inputFilename.includes('/')) {
+							const parts = inputFilename.split('/');
+							baseName = parts.pop() || '';
+							const relativeDirPath = parts.join('/');
+							dirPath = relativeDirPath.startsWith('/')
+								? relativeDirPath
+								: `${currentDir}/${relativeDirPath}`.replace(/\/+/g, '/');
+						} else {
+							baseName = inputFilename;
+							dirPath = currentDir;
+						}
+
+						const filesInDir = filesystem[dirPath] || [];
+						const fileExists = filesInDir.some(f => f === baseName);
+
+						if (!fileExists) {
+							terminal.writeln(`\x1b[31m${command}: ${inputFilename}: No such file or directory\x1b[0m`);
+							writePrompt();
+							return;
+						}
+
+						// Resolve output path
+						let outputPath: string;
+						if (outputFile.includes('/')) {
+							const parts = outputFile.split('/');
+							const outputName = parts.pop() || '';
+							const outputDirRel = parts.join('/');
+							const outputDirPath = outputDirRel.startsWith('/')
+								? outputDirRel
+								: `${currentDir}/${outputDirRel}`.replace(/\/+/g, '/');
+							outputPath = `${outputDirPath}/${outputName}`;
+
+							// Check if output directory exists
+							if (!filesystem[outputDirPath] && !createdDirs.has(outputDirPath)) {
+								terminal.writeln(`\x1b[31m${command}: ${outputFile}: No such file or directory\x1b[0m`);
+								writePrompt();
+								return;
+							}
+						} else {
+							outputPath = `${currentDir}/${outputFile}`;
+						}
+
+						// Create the output file
+						createdFiles[outputPath] = `${dirPath}/${baseName}`;
+
+						terminal.writeln(`\x1b[32m✓ Output saved to ${outputFile}\x1b[0m`);
+					}
+				}
+			} else {
+				handleFileView(command, args);
+			}
+
 			// Track command for step completion (e.g., viewing output files)
 			executedCommands.update(cmds => {
 				if (!cmds.includes(command)) {
@@ -4968,6 +5089,72 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 	function handleLs(args: string[]) {
 		const filesystem = getFilesystem();
 		const path = args[0] || currentDir;
+
+		// Check if path contains a wildcard pattern
+		if (path.includes('*') || path.includes('?')) {
+			// Handle wildcard patterns like "sequences/*.fastq"
+			let dirPath: string;
+			let pattern: string;
+
+			if (path.includes('/')) {
+				// Path has directory component: "sequences/*.fastq"
+				const lastSlash = path.lastIndexOf('/');
+				const dirPart = path.substring(0, lastSlash);
+				pattern = path.substring(lastSlash + 1);
+				dirPath = dirPart.startsWith('/')
+					? dirPart
+					: `${currentDir}/${dirPart}`.replace(/\/+/g, '/');
+			} else {
+				// Just a pattern in current directory: "*.fastq"
+				dirPath = currentDir;
+				pattern = path;
+			}
+
+			// Get files in the target directory
+			const dirFiles = filesystem[dirPath] || [];
+
+			if (dirFiles.length === 0) {
+				terminal.writeln(`\x1b[31mls: cannot access '${path}': No such file or directory\x1b[0m`);
+				return;
+			}
+
+			// Convert glob pattern to regex
+			const regexPattern = pattern
+				.replace(/\./g, '\\.')
+				.replace(/\*/g, '.*')
+				.replace(/\?/g, '.');
+			const regex = new RegExp(`^${regexPattern}$`);
+
+			// Filter matching files (exclude directories for glob patterns)
+			const matches = dirFiles.filter(f => {
+				const fileName = f.endsWith('/') ? f.slice(0, -1) : f;
+				return regex.test(fileName) && !f.endsWith('/');
+			});
+
+			if (matches.length === 0) {
+				terminal.writeln(`\x1b[31mls: cannot access '${path}': No such file or directory\x1b[0m`);
+				return;
+			}
+
+			// Format and display matching files with directory prefix
+			const dirPrefix = path.includes('/') ? path.substring(0, path.lastIndexOf('/') + 1) : '';
+			const formatted = matches.map(f => {
+				const fullName = dirPrefix + f;
+				if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) {
+					return `\x1b[32m${fullName}\x1b[0m`;
+				} else if (f.endsWith('.html') || f.endsWith('.log')) {
+					return `\x1b[33m${fullName}\x1b[0m`;
+				} else if (f.endsWith('.png') || f.endsWith('.svg')) {
+					return `\x1b[35m${fullName}\x1b[0m`;
+				}
+				return fullName;
+			});
+
+			terminal.writeln(formatted.join('  '));
+			return;
+		}
+
+		// Standard directory listing (no wildcards)
 		const fullPath = path.startsWith('/') ? path : `${currentDir}/${path}`.replace(/\/+/g, '/').replace(/\/$/, '');
 		const files = filesystem[fullPath] || [];
 
@@ -5682,7 +5869,9 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 		}
 
 		// Check for redirect
-		const hasRedirect = fullCmd.includes('>');
+		const hasAppendRedirect = fullCmd.includes('>>');
+		const hasOverwriteRedirect = !hasAppendRedirect && fullCmd.includes('>');
+		const hasRedirect = hasAppendRedirect || hasOverwriteRedirect;
 
 		// Simulate grep results based on pattern and file type
 		let matchCount = 0;
@@ -5718,7 +5907,38 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 		}
 
 		if (hasRedirect) {
-			terminal.writeln(`\x1b[32m✓ Results saved to file\x1b[0m`);
+			// Extract output file and track it
+			const redirectOp = hasAppendRedirect ? '>>' : '>';
+			const redirectParts = fullCmd.split(redirectOp);
+			if (redirectParts.length >= 2) {
+				const outputFile = redirectParts[1].trim().split(/\s+/)[0];
+
+				// Resolve output path
+				let outputPath: string;
+				if (outputFile.includes('/')) {
+					const parts = outputFile.split('/');
+					const outputName = parts.pop() || '';
+					const outputDirRel = parts.join('/');
+					const outputDirPath = outputDirRel.startsWith('/')
+						? outputDirRel
+						: `${currentDir}/${outputDirRel}`.replace(/\/+/g, '/');
+					outputPath = `${outputDirPath}/${outputName}`;
+
+					// Check if output directory exists
+					if (!filesystem[outputDirPath] && !createdDirs.has(outputDirPath)) {
+						terminal.writeln(`\x1b[31mgrep: ${outputFile}: No such file or directory\x1b[0m`);
+						return;
+					}
+				} else {
+					outputPath = `${currentDir}/${outputFile}`;
+				}
+
+				// Track the created file
+				createdFiles[outputPath] = `grep_output`;
+				terminal.writeln(`\x1b[32m✓ Results saved to ${outputFile}\x1b[0m`);
+			} else {
+				terminal.writeln(`\x1b[32m✓ Results saved to file\x1b[0m`);
+			}
 		} else if (hasCount) {
 			terminal.writeln(matchCount.toString());
 		} else {
