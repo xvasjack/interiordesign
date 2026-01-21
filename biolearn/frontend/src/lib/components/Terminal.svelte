@@ -5581,6 +5581,19 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 			fullPath = `${currentDir}/${filename}`;
 		}
 
+		// Check if file was created during this session (e.g., grep output)
+		if (createdFiles[fullPath]) {
+			const content = createdFiles[fullPath];
+			const lines = content.split('\n');
+			const maxLines = cmd === 'head' ? numLines : (cmd === 'tail' ? numLines : lines.length);
+			const startLine = cmd === 'tail' ? Math.max(0, lines.length - maxLines) : 0;
+
+			for (let i = startLine; i < Math.min(startLine + maxLines, lines.length); i++) {
+				terminal.writeln(lines[i]);
+			}
+			return;
+		}
+
 		// Check if file exists in filesystem
 		const filesInDir = filesystem[dirPath] || [];
 		const fileExists = filesInDir.some(f => f === baseName || f === baseName + '/');
@@ -5890,7 +5903,12 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 					'@M00123:45:000000000-ABC12:1:1101:15235:1001 1:N:0:1',
 					'@M00123:45:000000000-ABC12:1:1101:15236:1002 1:N:0:1',
 					'@M00123:45:000000000-ABC12:1:1101:15237:1003 1:N:0:1',
-					'@M00123:45:000000000-ABC12:1:1101:15238:1004 1:N:0:1'
+					'@M00123:45:000000000-ABC12:1:1101:15238:1004 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15239:1005 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15240:1006 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15241:1007 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15242:1008 1:N:0:1',
+					'@M00123:45:000000000-ABC12:1:1101:15243:1009 1:N:0:1'
 				];
 			} else if (pattern.includes('F')) {
 				matchCount = 10;
@@ -5938,8 +5956,8 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 					outputPath = `${currentDir}/${outputFile}`;
 				}
 
-				// Track the created file
-				createdFiles[outputPath] = `grep_output`;
+				// Track the created file with actual content
+				createdFiles[outputPath] = matches.join('\n');
 				terminal.writeln(`\x1b[32m✓ Results saved to ${outputFile}\x1b[0m`);
 			} else {
 				terminal.writeln(`\x1b[32m✓ Results saved to file\x1b[0m`);
