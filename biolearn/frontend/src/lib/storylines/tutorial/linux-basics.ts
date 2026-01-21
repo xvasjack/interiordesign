@@ -302,7 +302,7 @@ function createPhase5Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 5a: Redirect Output to File',
 			text: `Use > to save command output to a file instead of displaying it on screen.`,
-			command: 'head -n 20 sequences/sample_R1.fastq > results/first_reads.txt',
+			command: 'head -n 8 sequences/sample_R1.fastq > results/first_reads.txt',
 			explanation: 'The > operator redirects output to a file, creating it if needed or overwriting if it exists.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
@@ -313,7 +313,7 @@ function createPhase5Sections(): StorylineSection[] {
 			type: 'task',
 			title: 'Step 5b: Append to File',
 			text: `Use >> to add output to an existing file without overwriting it.`,
-			command: 'head -n 20 sequences/sample_R2.fastq >> results/first_reads.txt',
+			command: 'head -n 8 sequences/sample_R2.fastq >> results/first_reads.txt',
 			explanation: 'The >> operator appends to a file, preserving existing content.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
