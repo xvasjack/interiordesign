@@ -133,6 +133,38 @@ npm run dev
 
 Access at: http://localhost:5173
 
+## Step Completion Tracking
+
+### Rule: Always Track Full Commands
+
+When tracking executed commands in `Terminal.svelte` for step completion, **always track the full command string**, not just the tool name.
+
+```typescript
+// BAD - causes premature step completion
+executedCommands.update(cmds => {
+    if (!cmds.includes('grep')) return [...cmds, 'grep'];
+    return cmds;
+});
+
+// GOOD - each step requires its exact command
+const fullCmd = cmd.trim();
+executedCommands.update(cmds => {
+    if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
+    return cmds;
+});
+```
+
+**Why:** If multiple steps use the same tool (e.g., `grep "FFFFF" file.txt` and `grep "@" file.txt`), tracking only the tool name causes all steps using that tool to be marked complete when any one is executed.
+
+**Files involved:**
+- `Terminal.svelte` - tracks commands via `executedCommands.update()`
+- `StoryPanel.svelte` - matches commands for step completion (line ~107-118)
+
+**Commands requiring full match** (in `StoryPanel.svelte`):
+- `cd`, `cat`, `head`, `tail`, `seqkit`, `wc`, `grep`, `ls`
+
+When adding new command handlers to Terminal.svelte, follow the pattern used by `head`/`cat`/`tail`/`wc`/`grep`/`ls`.
+
 ## Common Issues & Fixes
 
 ### Issue: Terminal help text displays with incorrect line positioning
@@ -142,3 +174,7 @@ Access at: http://localhost:5173
 ### Issue: Inconsistent whitespace in source files
 **Cause:** Mixed tabs and spaces in TypeScript files
 **Fix:** Use tabs for indentation consistently; linter will auto-fix
+
+### Issue: Steps marked complete before executed
+**Cause:** Command tracked by tool name only instead of full command
+**Fix:** Track full command string (see "Step Completion Tracking" section above)
