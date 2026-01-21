@@ -10,7 +10,6 @@ export const helpTexts: Record<string, Record<string, string>> = {
 	'seqkit': {
 		'main': [
 			'\x1b[1mseqkit\x1b[0m - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation',
-			'',
 			'\x1b[1mUsage:\x1b[0m',
 			'  seqkit [command]',
 			'',
