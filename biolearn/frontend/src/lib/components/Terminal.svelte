@@ -38,9 +38,9 @@
 
 	// Base filesystem - sequencing data files exist at start (from sequencer)
 	const baseFilesystem: Record<string, string[]> = {
-		// Linux Tutorial directory
+		// Linux Tutorial directory (results/ is NOT present initially - created by mkdir step)
 		'/data/linux_tutorial': [
-			'sample_info.txt', 'sequences/', 'references/', 'results/'
+			'sample_info.txt', 'sequences/', 'references/'
 		],
 		'/data/linux_tutorial/sequences': [
 			'sample_R1.fastq', 'sample_R2.fastq'
@@ -48,7 +48,6 @@
 		'/data/linux_tutorial/references': [
 			'genome.fasta', 'annotations.gff'
 		],
-		'/data/linux_tutorial/results': [],
 		'/data/references': [
 			'sample_info.txt', 'scripts/'
 		],
