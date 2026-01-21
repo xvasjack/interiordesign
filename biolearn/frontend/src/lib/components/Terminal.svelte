@@ -3807,8 +3807,64 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 							outputPath = `${currentDir}/${outputFile}`;
 						}
 
-						// Create the output file
-						createdFiles[outputPath] = `${dirPath}/${baseName}`;
+						// Get actual file content (same logic as handleFileView)
+						let sourceContent: string | null = null;
+						// Check for exact filename matches first
+						for (const [key, value] of Object.entries(fileContents)) {
+							if (baseName === key || baseName.endsWith(key)) {
+								sourceContent = value;
+								break;
+							}
+						}
+						// If no match, try extension
+						if (!sourceContent) {
+							const ext = '.' + baseName.split('.').pop();
+							sourceContent = fileContents[ext] || null;
+						}
+						// Special handling for specific file types
+						if (!sourceContent) {
+							if (baseName.endsWith('.fastq.gz') || baseName.endsWith('.fq.gz')) {
+								sourceContent = fileContents['.fastq.gz'];
+							} else if (baseName.endsWith('.fastq')) {
+								sourceContent = fileContents['.fastq'] || fileContents[baseName] || null;
+							} else if (baseName.endsWith('.fasta') || baseName.endsWith('.fna') || baseName.endsWith('.faa') || baseName.endsWith('.ffn')) {
+								sourceContent = fileContents['assembly.fasta'];
+							} else {
+								sourceContent = fileContents['.txt'];
+							}
+						}
+
+						if (sourceContent) {
+							// Parse -n flag for head/tail
+							let numLines = 10; // default
+							for (let i = 0; i < inputArgs.length; i++) {
+								if (inputArgs[i] === '-n' && i + 1 < inputArgs.length) {
+									numLines = parseInt(inputArgs[i + 1], 10) || 10;
+									i++;
+								} else if (inputArgs[i].startsWith('-n')) {
+									numLines = parseInt(inputArgs[i].substring(2), 10) || 10;
+								}
+							}
+
+							// Apply head/tail logic
+							const lines = sourceContent.split('\n');
+							let outputLines: string[];
+							if (command === 'head') {
+								outputLines = lines.slice(0, numLines);
+							} else if (command === 'tail') {
+								outputLines = lines.slice(-numLines);
+							} else {
+								outputLines = lines;
+							}
+							const outputContent = outputLines.join('\n');
+
+							// Handle append (>>) vs overwrite (>)
+							if (hasAppendRedirect && createdFiles[outputPath]) {
+								createdFiles[outputPath] = createdFiles[outputPath] + '\n' + outputContent;
+							} else {
+								createdFiles[outputPath] = outputContent;
+							}
+						}
 
 						terminal.writeln(`\x1b[32m✓ Output saved to ${outputFile}\x1b[0m`);
 					}
@@ -3847,8 +3903,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		// Handle mkdir command
 		if (command === 'mkdir') {
 			handleMkdir(args);
+			// Track the full command (e.g., 'mkdir results', 'mkdir -p results/qc/fastqc')
+			// to ensure each mkdir step in tutorials is tracked separately
+			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
-				if (!cmds.includes('mkdir')) return [...cmds, 'mkdir'];
+				if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
 				return cmds;
 			});
 			writePrompt();
