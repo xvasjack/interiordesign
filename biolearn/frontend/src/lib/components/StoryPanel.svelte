@@ -102,8 +102,11 @@
 				} else {
 					// Single command: match full command for precise step tracking
 					// This ensures students run the exact command specified in the lesson
-					const fullCmd = section.command.trim();
-					if (cmds.includes(fullCmd)) {
+					// Normalize trailing slashes so 'o_fastqc' matches 'o_fastqc/'
+					const normalizeCmd = (cmd: string) => cmd.trim().replace(/\/(\s|$)/g, '$1');
+					const fullCmd = normalizeCmd(section.command);
+					const matched = cmds.some(c => normalizeCmd(c) === fullCmd);
+					if (matched) {
 						completedSteps.add(index);
 					}
 				}
