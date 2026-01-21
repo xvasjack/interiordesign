@@ -3638,6 +3638,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'pwd') {
 			terminal.writeln(currentDir);
+			executedCommands.update(cmds => {
+				if (!cmds.includes('pwd')) return [...cmds, 'pwd'];
+				return cmds;
+			});
 			writePrompt();
 			return;
 		}
@@ -3681,15 +3685,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'cat' || command === 'head' || command === 'tail') {
 			handleFileView(command, args);
-			// Track cat command for step completion (e.g., viewing output files)
-			if (command === 'cat') {
-				executedCommands.update(cmds => {
-					if (!cmds.includes('cat')) {
-						return [...cmds, 'cat'];
-					}
-					return cmds;
-				});
-			}
+			// Track command for step completion (e.g., viewing output files)
+			executedCommands.update(cmds => {
+				if (!cmds.includes(command)) {
+					return [...cmds, command];
+				}
+				return cmds;
+			});
 			writePrompt();
 			return;
 		}
