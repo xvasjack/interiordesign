@@ -6389,6 +6389,10 @@ Refer to the tool documentation for detailed usage instructions.`;
 			{/each}
 		</div>
 	</div>
+	<!-- Terminal notice -->
+	<div class="flex-shrink-0 px-3 py-1 bg-gray-800/50 text-[10px] text-gray-500 italic" style="flex-shrink: 0; padding: 4px 12px; background: rgba(31, 41, 55, 0.5); font-size: 10px; color: #6b7280; font-style: italic;">
+		This terminal is optimized for commands referenced in the lesson panel. Other commands may have limited functionality.
+	</div>
 	<!-- Terminal -->
 	<div bind:this={terminalContainer} class="flex-1 min-h-0 bg-[#1e1e1e] overflow-hidden" style="flex: 1; min-height: 0; background: #1e1e1e; overflow: hidden;"></div>
 </div>
