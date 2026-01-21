@@ -3827,8 +3827,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		// Handle wc (word count) command
 		if (command === 'wc') {
 			handleWc(args, cmd);
+			// Track the full command (e.g., 'wc -l sequences/sample_R1.fastq', 'wc sample_info.txt')
+			// to ensure each wc step in tutorials is tracked separately
+			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
-				if (!cmds.includes('wc')) return [...cmds, 'wc'];
+				if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
 				return cmds;
 			});
 			writePrompt();
