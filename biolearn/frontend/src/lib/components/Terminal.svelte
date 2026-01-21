@@ -6236,16 +6236,22 @@ Refer to the tool documentation for detailed usage instructions.`;
 				terminal.writeln(`\x1b[90mOutput saved to: ${redirectFile}\x1b[0m`);
 				terminal.writeln(`\x1b[90mUse 'cat ${redirectFile}' to view the results.\x1b[0m`);
 			}
-			// Track executed command for dynamic filesystem
-			// For tools that need full command matching (seqkit), track the full command
-			// Otherwise, just track the tool name for tools that only check tool presence
+			// Track executed command for dynamic filesystem and step completion
+			// For tools that need full command matching (seqkit), track BOTH:
+			// 1. The tool name (for getFilesystem() to create output files)
+			// 2. The full command (for StoryPanel step completion matching)
 			const specialCommandTools = ['seqkit'];
-			const trackValue = specialCommandTools.includes(tool) ? fullCmd : tool;
 			executedCommands.update(cmds => {
-				if (!cmds.includes(trackValue)) {
-					return [...cmds, trackValue];
+				const newCmds = [...cmds];
+				// Always track tool name for filesystem creation
+				if (!newCmds.includes(tool)) {
+					newCmds.push(tool);
 				}
-				return cmds;
+				// For special commands, also track full command for step completion
+				if (specialCommandTools.includes(tool) && !newCmds.includes(fullCmd)) {
+					newCmds.push(fullCmd);
+				}
+				return newCmds;
 			});
 
 			// Fetch template files from API if available
