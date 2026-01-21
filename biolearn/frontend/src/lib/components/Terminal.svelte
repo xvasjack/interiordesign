@@ -3683,9 +3683,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 		if (command === 'ls') {
 			handleLs(args);
+			// Track ls with execution count (ls:1, ls:2, etc.) to support
+			// multi-line commands that require ls to be executed multiple times
 			executedCommands.update(cmds => {
-				if (!cmds.includes('ls')) return [...cmds, 'ls'];
-				return cmds;
+				const lsCount = cmds.filter(c => c.startsWith('ls:')).length;
+				return [...cmds, `ls:${lsCount + 1}`];
 			});
 			writePrompt();
 			return;

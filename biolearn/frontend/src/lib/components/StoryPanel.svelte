@@ -76,11 +76,25 @@
 				const commandLines = section.command.split('\n').filter(line => line.trim());
 
 				if (commandLines.length > 1) {
-					// Multi-line command: ALL unique commands must be executed
-					const allCommandsExecuted = commandLines.every(line => {
+					// Multi-line command: ALL commands must be executed the required number of times
+					// Count required occurrences of each tool
+					const requiredCounts: Record<string, number> = {};
+					commandLines.forEach(line => {
 						const toolName = line.trim().split(' ')[0];
-						const altToolName = toolName.replace('_', '-');
-						return cmds.includes(toolName) || cmds.includes(altToolName);
+						requiredCounts[toolName] = (requiredCounts[toolName] || 0) + 1;
+					});
+
+					// Check if all tools have been executed the required number of times
+					const allCommandsExecuted = Object.entries(requiredCounts).every(([toolName, requiredCount]) => {
+						if (toolName === 'ls') {
+							// ls is tracked with count (ls:1, ls:2, etc.)
+							const lsExecutions = cmds.filter(c => c.startsWith('ls:')).length;
+							return lsExecutions >= requiredCount;
+						} else {
+							// Other tools just need to be present
+							const altToolName = toolName.replace('_', '-');
+							return cmds.includes(toolName) || cmds.includes(altToolName);
+						}
 					});
 					if (allCommandsExecuted) {
 						completedSteps.add(index);
@@ -96,6 +110,11 @@
 					if (toolName === 'cd' || toolName === 'cat' || toolName === 'head' || toolName === 'tail' || toolName === 'seqkit') {
 						const fullCmd = section.command.trim();
 						if (cmds.includes(fullCmd)) {
+							completedSteps.add(index);
+						}
+					} else if (toolName === 'ls') {
+						// ls is tracked with count (ls:1, ls:2, etc.)
+						if (cmds.some(c => c.startsWith('ls:'))) {
 							completedSteps.add(index);
 						}
 					} else if (cmds.includes(toolName) || cmds.includes(altToolName)) {
