@@ -6237,9 +6237,13 @@ Refer to the tool documentation for detailed usage instructions.`;
 				terminal.writeln(`\x1b[90mUse 'cat ${redirectFile}' to view the results.\x1b[0m`);
 			}
 			// Track executed command for dynamic filesystem
+			// For tools that need full command matching (seqkit), track the full command
+			// Otherwise, just track the tool name for tools that only check tool presence
+			const specialCommandTools = ['seqkit'];
+			const trackValue = specialCommandTools.includes(tool) ? fullCmd : tool;
 			executedCommands.update(cmds => {
-				if (!cmds.includes(tool)) {
-					return [...cmds, tool];
+				if (!cmds.includes(trackValue)) {
+					return [...cmds, trackValue];
 				}
 				return cmds;
 			});
