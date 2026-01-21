@@ -51,7 +51,7 @@ function createPhase0Sections(): StorylineSection[] {
 		{
 			type: 'task',
 			title: 'Step 0d: Copy a Directory',
-			text: `To copy directories with their contents, use the -r (recursive) flag.`,
+			text: `To copy directories with their contents, use the -r (recursive) flag. Do 1 line at a time.`,
 			command: 'ls\ncp -r /data/references/scripts ./my_scripts\nls',
 			explanation: 'The -r flag tells cp to copy directories recursively, including all subdirectories and files. The ls commands show the directory contents before and after the copy.',
 			requiredDir: '/data/linux_tutorial',
@@ -143,9 +143,9 @@ function createPhase2Sections(): StorylineSection[] {
 		{
 			type: 'task',
 			title: 'Step 2a: View Entire File',
-			text: `Use cat to display the complete contents of a small file.`,
+			text: `Use cat to view file content.`,
 			command: 'cat sample_info.txt',
-			explanation: 'cat (concatenate) outputs the entire file contents. Use only for small files.',
+			explanation: 'cat (concatenate) outputs the file contents. Note: Use only for small files.',
 			requiredDir: '/data/linux_tutorial',
 			parameters: [
 				{ name: 'cat', desc: 'Display file contents' }
