@@ -90,11 +90,12 @@
 					const toolName = section.command.split(' ')[0];
 					const altToolName = section.command.split(' ')[0].replace('_', '-');
 
-					// For 'cd' commands, match the full command (e.g., 'cd sequences', 'cd ..', 'cd ~')
-					// to ensure each cd step is tracked separately
-					if (toolName === 'cd') {
-						const fullCdCmd = section.command.trim();
-						if (cmds.includes(fullCdCmd)) {
+					// For 'cd', 'cat', 'head', and 'tail' commands, match the full command
+					// (e.g., 'cd sequences', 'cat sample_info.txt', 'head -n 8 file.txt')
+					// to ensure each step is tracked separately
+					if (toolName === 'cd' || toolName === 'cat' || toolName === 'head' || toolName === 'tail') {
+						const fullCmd = section.command.trim();
+						if (cmds.includes(fullCmd)) {
 							completedSteps.add(index);
 						}
 					} else if (cmds.includes(toolName) || cmds.includes(altToolName)) {

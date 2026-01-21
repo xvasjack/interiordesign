@@ -3809,10 +3809,12 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				handleFileView(command, args);
 			}
 
-			// Track command for step completion (e.g., viewing output files)
+			// Track the full command for step completion (e.g., 'cat sample_info.txt', 'head -n 8 file.txt')
+			// to ensure each cat/head/tail step in tutorials is tracked separately
+			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
-				if (!cmds.includes(command)) {
-					return [...cmds, command];
+				if (!cmds.includes(fullCmd)) {
+					return [...cmds, fullCmd];
 				}
 				return cmds;
 			});
