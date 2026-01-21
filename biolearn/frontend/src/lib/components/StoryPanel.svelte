@@ -90,10 +90,10 @@
 					const toolName = section.command.split(' ')[0];
 					const altToolName = section.command.split(' ')[0].replace('_', '-');
 
-					// For 'cd', 'cat', 'head', and 'tail' commands, match the full command
-					// (e.g., 'cd sequences', 'cat sample_info.txt', 'head -n 8 file.txt')
+					// For 'cd', 'cat', 'head', 'tail', and 'seqkit' commands, match the full command
+					// (e.g., 'cd sequences', 'cat sample_info.txt', 'seqkit --help', 'seqkit stats --help')
 					// to ensure each step is tracked separately
-					if (toolName === 'cd' || toolName === 'cat' || toolName === 'head' || toolName === 'tail') {
+					if (toolName === 'cd' || toolName === 'cat' || toolName === 'head' || toolName === 'tail' || toolName === 'seqkit') {
 						const fullCmd = section.command.trim();
 						if (cmds.includes(fullCmd)) {
 							completedSteps.add(index);

@@ -6013,8 +6013,11 @@ Refer to the tool documentation for detailed usage instructions.`;
 		for (const line of lines) {
 			terminal.writeln(line);
 		}
+		// Store the full command (e.g., 'seqkit --help', 'seqkit stats --help')
+		// to ensure each help step is tracked separately
+		const fullCmd = `${tool} ${args.join(' ')}`.trim();
 		executedCommands.update(cmds => {
-			if (!cmds.includes(tool)) return [...cmds, tool];
+			if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
 			return cmds;
 		});
 	}
