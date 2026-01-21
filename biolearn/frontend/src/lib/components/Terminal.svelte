@@ -627,6 +627,32 @@
 		}
 	};
 
+	// Normalize a path by resolving . and .. components
+	function normalizePath(path: string): string {
+		// Handle relative paths starting with ./
+		if (path.startsWith('./')) {
+			path = `${currentDir}/${path.slice(2)}`;
+		} else if (!path.startsWith('/')) {
+			path = `${currentDir}/${path}`;
+		}
+
+		// Split into parts and resolve . and ..
+		const parts = path.split('/').filter(p => p && p !== '.');
+		const resolved: string[] = [];
+
+		for (const part of parts) {
+			if (part === '..') {
+				if (resolved.length > 0) {
+					resolved.pop();
+				}
+			} else {
+				resolved.push(part);
+			}
+		}
+
+		return '/' + resolved.join('/');
+	}
+
 	// Get dynamic filesystem based on executed commands
 	function getFilesystem(): Record<string, string[]> {
 		const fs: Record<string, string[]> = {};
@@ -5529,9 +5555,8 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 		}
 
 		for (const dir of filteredArgs) {
-			const fullPath = dir.startsWith('/')
-				? dir
-				: `${currentDir}/${dir}`.replace(/\/+/g, '/');
+			// Use normalizePath to handle ./ and ../ properly
+			const fullPath = normalizePath(dir);
 
 			if (hasParentFlag) {
 				// Create all parent directories
@@ -5571,10 +5596,8 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 		const dest = filteredArgs[1];
 		const filesystem = getFilesystem();
 
-		// Resolve source path
-		const sourcePath = source.startsWith('/')
-			? source
-			: `${currentDir}/${source}`.replace(/\/+/g, '/');
+		// Resolve source path using normalizePath to handle ./ and ../
+		const sourcePath = normalizePath(source);
 
 		// Check if source is a directory
 		const sourceIsDir = filesystem[sourcePath] !== undefined;
@@ -5584,12 +5607,10 @@ sample_01_R2.fastq.gz      FASTQ   DNA     990,478  268,449,364       35      27
 			return;
 		}
 
-		// Resolve destination path
+		// Resolve destination path using normalizePath to handle ./ and ../
 		const destPath = dest === '.'
 			? currentDir
-			: (dest.startsWith('/')
-				? dest
-				: `${currentDir}/${dest}`.replace(/\/+/g, '/'));
+			: normalizePath(dest);
 
 		// Simulate copy success
 		if (sourceIsDir) {
