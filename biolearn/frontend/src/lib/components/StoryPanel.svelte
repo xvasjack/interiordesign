@@ -100,20 +100,10 @@
 						completedSteps.add(index);
 					}
 				} else {
-					// Single command: existing logic
-					const toolName = section.command.split(' ')[0];
-					const altToolName = section.command.split(' ')[0].replace('_', '-');
-
-					// For 'cd', 'cat', 'head', 'tail', 'seqkit', 'wc', 'grep', 'ls', and 'mkdir' commands, match the full command
-					// (e.g., 'cd sequences', 'cat sample_info.txt', 'seqkit --help', 'wc -l file.txt',
-					// 'grep "pattern" file.txt', 'ls sequences/*.fastq', 'mkdir results', 'mkdir -p nested/path')
-					// to ensure each step is tracked separately
-					if (toolName === 'cd' || toolName === 'cat' || toolName === 'head' || toolName === 'tail' || toolName === 'seqkit' || toolName === 'wc' || toolName === 'grep' || toolName === 'ls' || toolName === 'mkdir') {
-						const fullCmd = section.command.trim();
-						if (cmds.includes(fullCmd)) {
-							completedSteps.add(index);
-						}
-					} else if (cmds.includes(toolName) || cmds.includes(altToolName)) {
+					// Single command: match full command for precise step tracking
+					// This ensures students run the exact command specified in the lesson
+					const fullCmd = section.command.trim();
+					if (cmds.includes(fullCmd)) {
 						completedSteps.add(index);
 					}
 				}

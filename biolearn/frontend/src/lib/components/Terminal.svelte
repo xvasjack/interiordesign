@@ -6237,18 +6237,17 @@ Refer to the tool documentation for detailed usage instructions.`;
 				terminal.writeln(`\x1b[90mUse 'cat ${redirectFile}' to view the results.\x1b[0m`);
 			}
 			// Track executed command for dynamic filesystem and step completion
-			// For tools that need full command matching (seqkit), track BOTH:
+			// Track BOTH for all bio tools:
 			// 1. The tool name (for getFilesystem() to create output files)
 			// 2. The full command (for StoryPanel step completion matching)
-			const specialCommandTools = ['seqkit'];
 			executedCommands.update(cmds => {
 				const newCmds = [...cmds];
-				// Always track tool name for filesystem creation
+				// Track tool name for filesystem creation
 				if (!newCmds.includes(tool)) {
 					newCmds.push(tool);
 				}
-				// For special commands, also track full command for step completion
-				if (specialCommandTools.includes(tool) && !newCmds.includes(fullCmd)) {
+				// Track full command for step completion
+				if (!newCmds.includes(fullCmd)) {
 					newCmds.push(fullCmd);
 				}
 				return newCmds;
