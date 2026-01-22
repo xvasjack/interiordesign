@@ -7,6 +7,7 @@
 	// Import terminal outputs from storylines
 	import { helpTexts as tutorialHelpTexts } from '$lib/storylines/tutorial/terminal-outputs';
 	import { helpTexts as wgsBacteriaHelpTexts } from '$lib/storylines/wgs-bacteria/terminal-outputs';
+	import { getStorylineStats } from '$lib/storylines/tool-outputs-index';
 
 	// Props
 	let { initialDir = '/data/outbreak_investigation' }: { initialDir?: string } = $props();
@@ -704,6 +705,10 @@
 
 	// Generate dynamic tool output based on input file
 	function getToolOutput(tool: string, args: string[], fullCmd: string): any {
+		// Get storyline-specific stats from the current context
+		const context = get(storylineContext);
+		const stats = getStorylineStats(context?.category || 'tutorial', context?.storyline || 'kpneumoniae-demo');
+
 		// Extract input file from command
 		const inputFile = args.find(a => a.endsWith('.fastq.gz') || a.endsWith('.fq.gz')) || 'sample_01_R1.fastq.gz';
 		const isR2 = inputFile.includes('R2');
@@ -716,18 +721,16 @@
 		const isNanopore = inputFile.includes('_nanopore');
 		const isLongRead = isHiFi || isNanopore;
 
-		// Realistic bacterial sequencing stats (~5 Mb genome, 50-100x coverage)
-		// HiFi: ~30k reads × 15kb = ~450 Mb (90x coverage)
-		// Nanopore: ~80k reads × 8kb = ~640 Mb (128x coverage)
-		// Illumina: ~990k reads × 271bp avg = ~268 Mb (54x coverage)
-		const totalReads = isHiFi ? 32456 : (isNanopore ? 78234 : 990478);
-		const gcContent = isR2 ? 54.8 : 55.2;
+		// Use storyline-specific stats (with fallbacks for long-read technologies)
+		// Long-read technologies override some stats when detected from filename
+		const totalReads = isHiFi ? 32456 : (isNanopore ? 78234 : stats.totalReads);
+		const gcContent = isR2 ? (stats.gcContent - 0.4) : stats.gcContent;
 		const adapterPercent = isR2 ? 2.8 : 3.2;
 
-		// Read length varies by technology
-		const readLength = isHiFi ? 14523 : (isNanopore ? 8234 : 271);
-		const minLen = isHiFi ? 1234 : (isNanopore ? 456 : 35);
-		const maxLen = isHiFi ? 45678 : (isNanopore ? 32456 : 301);
+		// Read length varies by technology (use stats for Illumina, hardcoded for long-read)
+		const readLength = isHiFi ? 14523 : (isNanopore ? 8234 : stats.readLength);
+		const minLen = isHiFi ? 1234 : (isNanopore ? 456 : stats.minLen);
+		const maxLen = isHiFi ? 45678 : (isNanopore ? 32456 : stats.maxLen);
 		const totalBases = totalReads * readLength;
 
 		// Generate file names for paired-end reads
@@ -735,10 +738,10 @@
 		const file2 = inputFile.replace('_R1', '_R2').replace('_1.fastq', '_2.fastq');
 		const totalBasesAll = totalBases * 2;
 
-		// Trimmomatic results (matching real analysis: 99.23%, 0.47%, 0.03%, 0.27%)
-		const trimBothSurviving = Math.round(totalReads * 0.9923);
-		const trimForwardOnly = Math.round(totalReads * 0.0047);
-		const trimReverseOnly = Math.round(totalReads * 0.0003);
+		// Trimmomatic results using storyline-specific percentages
+		const trimBothSurviving = Math.round(totalReads * (stats.trimBothSurvivingPercent / 100));
+		const trimForwardOnly = Math.round(totalReads * (stats.trimForwardOnlyPercent / 100));
+		const trimReverseOnly = Math.round(totalReads * (stats.trimReverseOnlyPercent / 100));
 		const trimDropped = totalReads - trimBothSurviving - trimForwardOnly - trimReverseOnly;
 
 		const outputs: Record<string, any> = {
@@ -752,8 +755,8 @@ ${file2.padEnd(30)} FASTQ   DNA    ${totalReads.toLocaleString()}  ${totalBases.
   Total reads:     ${(totalReads * 2).toLocaleString()} (${totalReads.toLocaleString()} pairs)
   Total bases:     ${totalBasesAll.toLocaleString()}
   GC content:      ${gcContent}%
-  Q20 bases:       ${isLongRead ? '99.8' : '97.2'}%
-  Q30 bases:       ${isLongRead ? '98.2' : '93.8'}%
+  Q20 bases:       ${isLongRead ? '99.8' : stats.q20Percent}%
+  Q30 bases:       ${isLongRead ? '98.2' : stats.q30Percent}%
 `,
 				summary: undefined,
 				files: []
