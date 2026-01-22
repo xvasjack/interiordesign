@@ -4126,10 +4126,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					writePrompt();
 					return;
 				}
-				const invalidOutput = outputFiles.find(f => !f.startsWith('trimmed/'));
+				const invalidOutput = outputFiles.find(f => !f.startsWith('trimmed/') && !f.startsWith('o_trimmomatic/'));
 				if (invalidOutput) {
 					terminal.writeln(`\x1b[31mError: Invalid output path '${invalidOutput}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, output files must be in the 'trimmed/' folder\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, output files must be in the 'trimmed/' or 'o_trimmomatic/' folder\x1b[0m`);
 					writePrompt();
 					return;
 				}
