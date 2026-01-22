@@ -3,6 +3,7 @@
 	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir, templateFiles, storylineContext, API_BASE_URL } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize } from '$lib/services/templateService';
+	import { formatAmrGeneRows, formatMlstRow, formatFileColor } from '$lib/utils/format-utils';
 
 	// Import terminal outputs from storylines
 	import { helpTexts as tutorialHelpTexts } from '$lib/storylines/tutorial/terminal-outputs';
@@ -1244,7 +1245,7 @@ Processing: o_unicycler/assembly.fasta
 Found ${stats.amrGenes.length} genes in o_unicycler/assembly.fasta
 
 #FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
-${stats.amrGenes.map(g => `assembly.fasta\t${g.contig}\t${g.start}\t${g.end}\t${g.strand}\t${g.gene}\t1-${g.end - g.start}/${g.end - g.start}\t0/0\t${g.coverage.toFixed(2)}\t${g.identity.toFixed(2)}\t${stats.amrDatabase}\t${g.accession}\t${g.product}\t${g.resistance}`).join('\n')}
+${formatAmrGeneRows(stats.amrGenes, stats.amrDatabase)}
 `,
 				summary: (() => {
 					const resistanceGroups: Record<string, string[]> = {};
@@ -1494,7 +1495,7 @@ ${stats.amrGenes.map(g => `assembly.fasta\t${g.contig}\t${g.start}\t${g.end}\t${
 ${Object.entries(stats.mlst.alleles).map(([locus, num]) => `[07:16:05] Found exact allele match ${stats.mlst.scheme}.${locus}-${num}`).join('\n')}
 [07:16:05] Use --quiet or -q to avoid all the message output, including these witticisms.
 [07:16:05] Done.
-o_unicycler/assembly.fasta	${stats.mlst.scheme}	${stats.mlst.st.replace('ST', '')}	${Object.entries(stats.mlst.alleles).map(([locus, num]) => `${locus}(${num})`).join('\t')}
+${formatMlstRow(stats.mlst)}
 `,
 				summary: (() => {
 					const summaryObj: Record<string, string> = {
@@ -3344,11 +3345,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		} else {
 			// Multiple matches - show them
 			terminal.write('\r\n');
-			const formatted = matches.map(f => {
-				if (f.endsWith('/')) return `\x1b[34m${f}\x1b[0m`;
-				if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) return `\x1b[32m${f}\x1b[0m`;
-				return f;
-			});
+			const formatted = matches.map(formatFileColor);
 			terminal.writeln(formatted.join('  '));
 			writePrompt();
 			terminal.write(commandBuffer);
@@ -5303,17 +5300,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 			// Format and display matching files with directory prefix
 			const dirPrefix = path.includes('/') ? path.substring(0, path.lastIndexOf('/') + 1) : '';
-			const formatted = matches.map(f => {
-				const fullName = dirPrefix + f;
-				if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) {
-					return `\x1b[32m${fullName}\x1b[0m`;
-				} else if (f.endsWith('.html') || f.endsWith('.log')) {
-					return `\x1b[33m${fullName}\x1b[0m`;
-				} else if (f.endsWith('.png') || f.endsWith('.svg')) {
-					return `\x1b[35m${fullName}\x1b[0m`;
-				}
-				return fullName;
-			});
+			const formatted = matches.map(f => formatFileColor(dirPrefix + f));
 
 			terminal.writeln(formatted.join('  '));
 			return;
@@ -5328,18 +5315,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			return;
 		}
 
-		const formatted = files.map(f => {
-			if (f.endsWith('/')) {
-				return `\x1b[34m${f}\x1b[0m`;
-			} else if (f.endsWith('.gz') || f.endsWith('.fastq') || f.endsWith('.fasta')) {
-				return `\x1b[32m${f}\x1b[0m`;
-			} else if (f.endsWith('.html') || f.endsWith('.log')) {
-				return `\x1b[33m${f}\x1b[0m`;
-			} else if (f.endsWith('.png') || f.endsWith('.svg')) {
-				return `\x1b[35m${f}\x1b[0m`;
-			}
-			return f;
-		});
+		const formatted = files.map(formatFileColor);
 
 		// Display in columns
 		terminal.writeln(formatted.join('  '));
