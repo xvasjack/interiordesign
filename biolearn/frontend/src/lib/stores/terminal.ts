@@ -114,7 +114,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'GC Content',
-			description: 'Expected GC% varies by organism. For bacteria: 25-75% is normal. ~50% GC is typical for E. coli/Klebsiella. Unexpected GC may indicate contamination.',
+			description: 'Expected GC% varies by organism. Many bacteria cluster ~40-60%. Unexpected GC% may indicate contamination.',
 		},
 		{
 			name: 'Adapter Content',
@@ -122,7 +122,7 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'FastQC Report',
-			description: 'HTML report showing per-base quality, GC content, adapter contamination, and sequence duplication levels',
+			description: 'HTML report showing sequence quality, sequence length distribution, GC content, adapter contamination, and sequence duplication levels',
 			format: '.html'
 		}
 	],
@@ -149,15 +149,10 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Quality Trimming',
-			description: 'SLIDINGWINDOW:4:15 scans with 4bp window, cuts when average quality drops below Q15 (Q15 = 96.8% base call accuracy, or 1 error per ~32 bases). LEADING/TRAILING removes low quality bases from ends.',
+			description: 'e.g. SLIDINGWINDOW:4:15 scans with 4bp window, cuts when average quality drops below Q15 (Q15 = 96.8% base call accuracy, or 1 error per ~32 bases). LEADING/TRAILING removes low quality bases from ends.',
 		}
 	],
 	'unicycler': [
-		{
-			name: 'Assembly Graph',
-			description: 'GFA file shows connections between contigs - useful for visualizing repeat regions and resolving complex structures',
-			format: '.gfa'
-		},
 		{
 			name: 'Contigs vs Scaffolds',
 			description: 'Contigs are contiguous sequences assembled from overlapping reads. Scaffolds are ordered contigs connected by gaps (Ns) using paired-end or mate-pair information. Unicycler can circularize bacterial chromosomes and plasmids, which is ideal for complete genome assembly.',
@@ -166,10 +161,6 @@ export const fileNotes: Record<string, FileNote[]> = {
 		{
 			name: 'N50 Metric',
 			description: 'N50 is the length such that 50% of the assembly is in contigs of this length or longer. Higher N50 = better assembly continuity.',
-		},
-		{
-			name: 'GC Content Interpretation',
-			description: '55.2% GC is typical for Klebsiella pneumoniae (range: 50-58%). Matching expected GC suggests correct organism and no major contamination.',
 		}
 	],
 	'bandage': [
@@ -217,19 +208,19 @@ export const fileNotes: Record<string, FileNote[]> = {
 		},
 		{
 			name: 'Total Length',
-			description: 'Should match expected genome size for your organism. K. pneumoniae: ~5.5 Mb, E. coli: ~5.0 Mb. Large deviations may indicate contamination or incomplete assembly.',
+			description: 'Should match expected genome size for your organism. e.g. K. pneumoniae: ~5.5 Mb, E. coli: ~5.0 Mb. Large deviations may indicate contamination or incomplete assembly.',
 		},
 		{
 			name: 'GC Content',
-			description: 'GC% should match your organism. K. pneumoniae: 55-58%, E. coli: 50-51%. Unexpected GC suggests contamination or misidentification.',
+			description: 'GC% should match your organism. e.g. K. pneumoniae: 55-58%, E. coli: 50-51%. Unexpected GC suggests contamination or misidentification.',
 		},
 		{
 			name: 'Quality Assessment',
 			description: 'EXCELLENT: N50 >300kb, L50 ≤10, total length matches expected, correct GC%. GOOD: N50 >100kb, L50 ≤20. FAIR: N50 >50kb. POOR: highly fragmented assembly.',
 		},
 		{
-			name: 'Interpretation',
-			description: 'ASSEMBLY QUALITY: Compare total length to expected genome size for your organism (K. pneumoniae ~5.5 Mb, E. coli ~5.0 Mb). N50 >100kb with L50 ≤10 indicates good contiguity suitable for most downstream analyses. COMPLETENESS CHECK: Use CheckM2 or BUSCO alongside QUAST to assess gene content. CONTAMINATION: Unexpected GC%, total length significantly larger than expected, or duplicate contigs may indicate contamination—consider running CheckM2 or ConFindr. ACTIONABLE: If N50 <50kb, consider increasing sequencing depth or using long-read data for hybrid assembly.',
+			name: 'Extra',
+			description: 'ASSEMBLY QUALITY: Compare total length to expected genome size for your organism. N50 >100kb with L50 ≤10 indicates good contiguity suitable for most downstream analyses. COMPLETENESS CHECK: Use CheckM2 or BUSCO alongside QUAST to assess gene content. CONTAMINATION: Unexpected GC%, total length significantly larger than expected, or duplicate contigs may indicate contamination—consider running CheckM2 or ConFindr. ACTIONABLE: If N50 <50kb, consider re-sequencing with higher sequencing depth or using long-read data for hybrid assembly.',
 		}
 	],
 	'prokka': [
@@ -256,10 +247,6 @@ export const fileNotes: Record<string, FileNote[]> = {
 		{
 			name: 'Coverage & Identity',
 			description: 'Coverage >90% and Identity >90% = high confidence match. Lower values may indicate partial genes or novel variants.',
-		},
-		{
-			name: 'Clinical Interpretation',
-			description: 'Presence of resistance genes predicts phenotypic resistance. blaSHV = ampicillin resistance, blaCTX-M = extended-spectrum beta-lactamase (ESBL).',
 		}
 	],
 	'checkm2': [
@@ -302,45 +289,27 @@ export const fileNotes: Record<string, FileNote[]> = {
 			description: 'Percentage of the reference replicon sequence covered by the query. 100% coverage means the entire replicon sequence was found in the assembly.',
 		},
 		{
-			name: 'IncF Plasmids',
-			description: 'Large conjugative plasmids (50-200 kb) common in Enterobacteriaceae. Often carry multiple resistance genes. IncFII(K) and IncFIB(K) are Klebsiella-associated variants.',
-		},
-		{
-			name: 'IncX3 Plasmids',
-			description: 'Medium-sized plasmids (~30-50 kb) frequently associated with carbapenemase genes (blaNDM, blaKPC). High clinical significance for antimicrobial resistance surveillance.',
-		},
-		{
-			name: 'Col Plasmids',
-			description: 'Small mobilizable plasmids (~4-10 kb) originally identified as colicin-producing. Col440I and similar types often carry no resistance genes but can mobilize with conjugative plasmids.',
-		},
-		{
 			name: 'Replicons vs Plasmids',
-			description: 'The number of replicons detected may differ from the number of plasmids in the assembly. This occurs because: (1) Large conjugative plasmids (especially IncF types) are modular and can carry multiple replicon sequences on a single plasmid—e.g., IncFII(K) and IncFIB(K) often co-occur on the same ~50-200 kb IncF plasmid; (2) Some plasmids may lack known replicons in the database; (3) Fragmented assemblies may split a single plasmid across multiple contigs. In this case, 4 replicons detected on 3 plasmids suggests one large IncF plasmid carries both IncFII(K) and IncFIB(K) replicons.',
-		},
-		{
-			name: 'Interpretation',
-			description: 'CLINICAL SIGNIFICANCE: Multiple replicons indicate plasmid diversity and potential for horizontal gene transfer. IncF and IncX3 plasmids are epidemiologically important as they frequently carry antimicrobial resistance genes including carbapenemases (NDM, KPC) and ESBLs. Finding multiple Inc types suggests the isolate may harbor multiple resistance plasmids. QUALITY: Identity ≥95% and coverage ≥95% indicate confident plasmid typing; lower values may suggest novel variants requiring further investigation.',
+			description: 'The number of replicons detected may differ from the number of plasmids in the assembly. This occurs because: (1) Large conjugative plasmids (especially IncF types) are modular and can carry multiple replicon sequences on a single plasmid—e.g., IncFII(K) and IncFIB(K) often co-occur on the same ~50-200 kb IncF plasmid; (2) Some plasmids may lack known replicons in the database; (3) Fragmented assemblies may split a single plasmid across multiple contigs.',
 		}
 	]
 };
 
 // Tool execution times (in seconds) - realistic estimates
 export const toolExecutionTimes: Record<string, { min: number; max: number }> = {
-	'seqkit': { min: 2, max: 5 },
+	'seqkit': { min: 1, max: 3 },
 	'fastqc': { min: 8, max: 15 },
 	'multiqc': { min: 5, max: 10 },
-	'trimmomatic': { min: 30, max: 60 },
-	'fastp': { min: 20, max: 45 },
-	'unicycler': { min: 180, max: 300 },  // 3-5 minutes
-	'spades': { min: 180, max: 300 },
-	'bandage': { min: 3, max: 8 },  // Graph visualization
+	'trimmomatic': { min: 20, max: 40 },
+	'fastp': { min: 15, max: 30 },
+	'unicycler': { min: 120, max: 180 },  // 2-3 mins
+	'bandage': { min: 2, max: 5 },  // Graph visualization
 	'quast': { min: 15, max: 30 },
-	'checkm': { min: 60, max: 120 },
-	'checkm2': { min: 180, max: 300 },
+	'checkm2': { min: 120, max: 180 },
 	'confindr': { min: 30, max: 60 },
-	'prokka': { min: 60, max: 120 },
-	'bakta': { min: 60, max: 120 },  // Similar to prokka
-	'abricate': { min: 5, max: 15 },
+	'prokka': { min: 30, max: 100 },
+	'bakta': { min: 40, max: 100 },  // Similar to prokka
+	'abricate': { min: 2, max: 5 },
 	'mlst': { min: 3, max: 8 },
 	'mob_recon': { min: 30, max: 60 },
 	'platon': { min: 20, max: 45 },
@@ -394,7 +363,7 @@ export const blockedCommands = new Set([
 // Bioinformatics tools
 export const bioTools = new Set([
 	'seqkit', 'fastqc', 'multiqc', 'trimmomatic', 'fastp',
-	'unicycler', 'spades', 'bandage', 'quast', 'checkm', 'checkm2', 'busco', 'confindr',
+	'unicycler', 'bandage', 'quast', 'checkm2', 'busco', 'confindr',
 	'prokka', 'bakta', 'abricate', 'resfinder', 'virulencefinder', 'mlst',
 	'mob_recon', 'platon', 'plasmidfinder', 'plasmidfinder.py', 'integron_finder', 'isescan',
 	'snippy', 'snippy-core', 'roary', 'iqtree', 'gubbins',
