@@ -4404,6 +4404,62 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				}
 			}
 
+			if (command === 'checkm2') {
+				// checkm2 predict --input o_unicycler/ --output-directory o_checkm2/ -x fasta
+				const expectedCmd = 'checkm2 predict --input o_unicycler/ --output-directory o_checkm2/ -x fasta';
+				if (!args.includes('predict')) {
+					terminal.writeln(`\x1b[31mError: Missing 'predict' workflow command\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check input directory
+				if (!args.includes('--input')) {
+					terminal.writeln(`\x1b[31mError: Missing input directory (--input flag)\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const inputIdx = args.indexOf('--input');
+				const inputDir = args[inputIdx + 1]?.replace(/\/$/, '');
+				if (!inputDir || !isValidFileForTool('checkm2', inputDir + '/')) {
+					terminal.writeln(`\x1b[31mError: Invalid or missing input directory\x1b[0m`);
+					terminal.writeln(`\x1b[90mCheckM2 requires: --input o_unicycler/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check output directory
+				if (!args.includes('--output-directory')) {
+					terminal.writeln(`\x1b[31mError: Missing output directory (--output-directory flag)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: --output-directory o_checkm2/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const outIdx = args.indexOf('--output-directory');
+				const outDir = args[outIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'o_checkm2') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[outIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: --output-directory o_checkm2/\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				// Check -x fasta extension flag
+				if (!args.includes('-x')) {
+					terminal.writeln(`\x1b[31mError: Missing file extension flag (-x)\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -x fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const xIdx = args.indexOf('-x');
+				const ext = args[xIdx + 1];
+				if (ext !== 'fasta') {
+					terminal.writeln(`\x1b[31mError: Invalid extension '${ext || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -x fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
+			}
+
 			if (command === 'confindr') {
 				// ConFindr: confindr -i assembly/assembly.fasta -o confindr_results/
 				if (!args.includes('-i')) {
@@ -4788,9 +4844,23 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					writePrompt();
 					return;
 				}
+				if (!isValidFileForTool('plasmidfinder', inputFile)) {
+					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for plasmidfinder\x1b[0m`);
+					terminal.writeln(`\x1b[90mPlasmidFinder requires: o_unicycler/assembly.fasta\x1b[0m`);
+					writePrompt();
+					return;
+				}
 				if (!args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
 					terminal.writeln(`\x1b[33mRequired: -o o_plasmidfinder\x1b[0m`);
+					writePrompt();
+					return;
+				}
+				const oIdx = args.indexOf('-o');
+				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
+				if (outDir !== 'o_plasmidfinder') {
+					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use: -o o_plasmidfinder\x1b[0m`);
 					writePrompt();
 					return;
 				}
