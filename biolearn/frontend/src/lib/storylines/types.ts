@@ -38,45 +38,188 @@ export interface StorylineSummary {
 }
 
 /**
+ * AMR gene entry for abricate output
+ */
+export interface AmrGeneEntry {
+	gene: string;           // Gene name (e.g., "blaKPC-2")
+	coverage: number;       // Coverage percentage (e.g., 100.00)
+	identity: number;       // Identity percentage (e.g., 99.77)
+	accession: string;      // Database accession (e.g., "NG_049253.1")
+	product: string;        // Gene product description
+	resistance: string;     // Resistance class (e.g., "CARBAPENEM")
+	contig: string;         // Contig name
+	start: number;          // Start position
+	end: number;            // End position
+	strand: '+' | '-';      // Strand orientation
+}
+
+/**
+ * MLST allele profile
+ */
+export interface MlstProfile {
+	scheme: string;         // MLST scheme name
+	st: string;             // Sequence type (e.g., "ST307")
+	alleles: Record<string, number>;  // Allele numbers by locus (e.g., { gapA: 4, infB: 1 })
+	significance?: string;  // Clinical significance note
+}
+
+/**
+ * Plasmid finding result
+ */
+export interface PlasmidResult {
+	plasmid: string;        // Plasmid name/type
+	identity: number;       // Identity percentage
+	accession: string;      // Database accession
+	contig: string;         // Contig where found
+	coverage: number;       // Coverage percentage
+}
+
+/**
+ * CheckM2 quality metrics
+ */
+export interface CheckmResult {
+	completeness: number;   // Genome completeness (%)
+	contamination: number;  // Contamination level (%)
+	strain_heterogeneity: number;  // Strain heterogeneity (%)
+	quality: 'High' | 'Medium' | 'Low';  // Overall quality assessment
+}
+
+/**
  * Configurable statistics for storyline-specific terminal outputs.
  * These values are used to generate realistic tool outputs that match
  * each storyline's dataset characteristics.
  */
 export interface StorylineStats {
-	// Basic sequencing stats
+	// ============================================
+	// BASIC SAMPLE INFO
+	// ============================================
+	samplePrefix: string;        // Sample file prefix (e.g., "SRR36708862")
+	organism: string;            // Full organism name (e.g., "Klebsiella pneumoniae")
+	organismShort: string;       // Short name for outputs (e.g., "K. pneumoniae")
+
+	// ============================================
+	// SEQKIT / FASTQC - Raw read statistics
+	// ============================================
 	totalReads: number;          // Total read pairs (e.g., 990478)
-	readLength: number;          // Average read length in bp (e.g., 271 for Illumina)
+	readLength: number;          // Average read length in bp (e.g., 271)
 	minLen: number;              // Minimum read length (e.g., 35)
 	maxLen: number;              // Maximum read length (e.g., 301)
 	gcContent: number;           // GC content percentage (e.g., 55.2)
-
-	// Quality metrics
 	q20Percent: number;          // Percentage of Q20+ bases (e.g., 97.2)
 	q30Percent: number;          // Percentage of Q30+ bases (e.g., 93.8)
 
-	// Trimmomatic results (percentages)
+	// ============================================
+	// TRIMMOMATIC - Read trimming results
+	// ============================================
 	trimBothSurvivingPercent: number;   // e.g., 99.23
 	trimForwardOnlyPercent: number;     // e.g., 0.47
 	trimReverseOnlyPercent: number;     // e.g., 0.03
 	trimDroppedPercent: number;         // e.g., 0.27
 
-	// Assembly stats
-	assemblySize: number;        // Total assembly size in bp (e.g., 5234567)
-	numContigs: number;          // Number of contigs (e.g., 1 for complete, more for draft)
-	n50: number;                 // N50 value (e.g., 5234567 for complete)
-	largestContig: number;       // Largest contig size (e.g., 5234567)
+	// ============================================
+	// UNICYCLER / ASSEMBLY - Assembly statistics
+	// ============================================
+	assemblySize: number;        // Total assembly size in bp
+	numContigs: number;          // Number of contigs
+	numContigsAll: number;       // All contigs including small ones
+	n50: number;                 // N50 value
+	n75: number;                 // N75 value
+	l50: number;                 // L50 value (number of contigs for N50)
+	l75: number;                 // L75 value
+	largestContig: number;       // Largest contig size
+	assemblyGC: number;          // Assembly GC content
+	numCircular: number;         // Number of circular contigs (complete)
+	numComponents: number;       // Number of graph components
 
-	// Annotation stats
-	numCDS: number;              // Coding sequences (e.g., 4876)
-	numtRNA: number;             // tRNA genes (e.g., 86)
-	numrRNA: number;             // rRNA genes (e.g., 25)
+	// ============================================
+	// PROKKA - Annotation statistics
+	// ============================================
+	numCDS: number;              // Coding sequences
+	numtRNA: number;             // tRNA genes
+	numrRNA: number;             // rRNA genes
+	numtmRNA: number;            // tmRNA genes
+	numMiscRNA: number;          // Other RNA features
+	numCRISPR: number;           // CRISPR arrays
 
-	// AMR/MLST results
-	mlstST: string;              // MLST sequence type (e.g., "ST15")
-	mlstScheme: string;          // MLST scheme (e.g., "kpneumoniae")
-	amrGenes: string[];          // List of AMR genes found
+	// ============================================
+	// CHECKM2 - Quality assessment
+	// ============================================
+	checkm: CheckmResult;
 
-	// File naming
-	samplePrefix: string;        // Sample file prefix (e.g., "SRR36708862")
-	organism: string;            // Organism name for outputs
+	// ============================================
+	// MLST - Multilocus sequence typing
+	// ============================================
+	mlst: MlstProfile;
+
+	// ============================================
+	// ABRICATE - AMR gene detection
+	// ============================================
+	amrGenes: AmrGeneEntry[];
+	amrDatabase: string;         // Database used (e.g., "ncbi", "card", "resfinder")
+
+	// ============================================
+	// PLASMIDFINDER - Plasmid detection
+	// ============================================
+	plasmids: PlasmidResult[];
+
+	// ============================================
+	// QUAST - Assembly quality assessment
+	// ============================================
+	quast: {
+		contigsGe500: number;      // Contigs >= 500bp
+		contigsGe1000: number;     // Contigs >= 1000bp
+		contigsGe5000: number;     // Contigs >= 5000bp
+		contigsGe10000: number;    // Contigs >= 10000bp
+		contigsGe25000: number;    // Contigs >= 25000bp
+		contigsGe50000: number;    // Contigs >= 50000bp
+		totalLengthGe0: number;    // Total length all contigs
+		totalLengthGe1000: number; // Total length >= 1000bp
+		nsPer100kb: number;        // N's per 100kb
+	};
+
+	// ============================================
+	// MOB_RECON / PLATON - Plasmid analysis
+	// ============================================
+	plasmidContigs: {
+		name: string;
+		size: number;
+		type: string;             // e.g., "IncFIB", "ColRNAI"
+		mobility: string;         // e.g., "conjugative", "mobilizable", "non-mobilizable"
+	}[];
+
+	// ============================================
+	// BANDAGE - Assembly graph statistics
+	// ============================================
+	bandage: {
+		nodes: number;
+		edges: number;
+		components: number;
+		deadEnds: number;
+		circularContigs: number;
+		largestComponentSize: number;
+		largestComponentSegments: number;
+	};
+
+	// ============================================
+	// SNIPPY - Variant calling (for outbreak)
+	// ============================================
+	snippy?: {
+		totalVariants: number;
+		snps: number;
+		insertions: number;
+		deletions: number;
+		complex: number;
+	};
+
+	// ============================================
+	// ROARY - Pan-genome analysis
+	// ============================================
+	roary?: {
+		totalGenes: number;
+		coreGenes: number;          // Present in all isolates
+		softCoreGenes: number;      // Present in 95-99%
+		shellGenes: number;         // Present in 15-95%
+		cloudGenes: number;         // Present in <15%
+		numIsolates: number;
+	};
 }

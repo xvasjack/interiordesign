@@ -954,11 +954,9 @@ Saving o_unicycler/004_bridges_applied.gfa
 Saving o_unicycler/005_final_clean.gfa
 
 Component   Segments   Links   Length        N50       Longest segment   Status
-    total        189     264   5,566,069   371,705           837,178
-        1        186     261   5,553,813   371,705           837,178   incomplete
-        2          1       1       5,409     5,409             5,409     complete
-        3          1       1       4,315     4,315             4,315     complete
-        4          1       1       2,532     2,532             2,532     complete
+    total        ${stats.bandage.nodes}     ${stats.bandage.edges}   ${stats.quast.totalLengthGe0.toLocaleString()}   ${stats.n50.toLocaleString()}           ${stats.largestContig.toLocaleString()}
+        1        ${stats.bandage.largestComponentSegments}     ${stats.bandage.edges - stats.bandage.circularContigs}   ${stats.bandage.largestComponentSize.toLocaleString()}   ${stats.n50.toLocaleString()}           ${stats.largestContig.toLocaleString()}   incomplete
+${stats.plasmidContigs.map((p, i) => `        ${i + 2}          1       1       ${p.size.toLocaleString()}     ${p.size.toLocaleString()}             ${p.size.toLocaleString()}     complete`).join('\n')}
 
 
 \x1b[1mRotating completed replicons\x1b[0m
@@ -967,27 +965,25 @@ Component   Segments   Links   Length        N50       Longest segment   Status
     altering the sequence. Unicycler searches for a starting gene (dnaA or repA).
 
 Segment   Length   Depth    Starting gene   Position   Strand   Identity   Coverage
-     33    5,409    3.90x   none found
-     35    4,315   17.66x   none found
-     41    2,532   19.88x   none found
+${stats.plasmidContigs.map((p, i) => `     ${30 + i * 2}    ${p.size.toLocaleString()}    ${(Math.random() * 15 + 3).toFixed(2)}x   none found`).join('\n')}
 
 \x1b[1;32mAssembly complete!\x1b[0m
 
 \x1b[33mTip: Use 'bandage image o_unicycler/assembly.gfa o_bandage.png' to visualize the assembly graph\x1b[0m
 `,
 				summary: {
-					'Total Segments': '189',
-					'Total Length': '5,566,069 bp',
-					'N50': '371,705 bp',
-					'Longest Segment': '837,178 bp',
-					'Complete (circular)': '3 components',
-					'Incomplete': '1 component (186 segments)',
+					'Total Segments': stats.bandage.nodes.toString(),
+					'Total Length': `${stats.quast.totalLengthGe0.toLocaleString()} bp`,
+					'N50': `${stats.n50.toLocaleString()} bp`,
+					'Longest Segment': `${stats.largestContig.toLocaleString()} bp`,
+					'Complete (circular)': `${stats.numCircular} components`,
+					'Incomplete': `1 component (${stats.bandage.largestComponentSegments} segments)`,
 					'Status': 'incomplete'
 				},
 				chartData: {
 					title: 'Component Length Distribution',
-					x: ['Component 1 (incomplete)', 'Component 2', 'Component 3', 'Component 4'],
-					y: [5553813, 5409, 4315, 2532],
+					x: ['Component 1 (incomplete)', ...stats.plasmidContigs.map((_, i) => `Component ${i + 2}`)],
+					y: [stats.bandage.largestComponentSize, ...stats.plasmidContigs.map(p => p.size)],
 					type: 'bar',
 					xLabel: 'Component',
 					yLabel: 'Length (bp)'
@@ -1013,8 +1009,8 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 			'bandage': {
 				output: `\x1b[36mBandage v0.8.1\x1b[0m
 Loading assembly graph: assembly.gfa
-  Nodes loaded: 189
-  Edges loaded: 243
+  Nodes loaded: ${stats.bandage.nodes}
+  Edges loaded: ${stats.bandage.edges}
 
 \x1b[36mGenerating visualization...\x1b[0m
   Layout algorithm: Force-directed
@@ -1024,16 +1020,14 @@ Loading assembly graph: assembly.gfa
   Output: o_bandage.png (800x600 px)
 
 \x1b[33mGraph Statistics:\x1b[0m
-  Connected components: 4
-  Largest component: 5.55 Mb (186 segments)
-  Circular contigs: 3
-  Dead ends: 6
+  Connected components: ${stats.bandage.components}
+  Largest component: ${(stats.bandage.largestComponentSize / 1000000).toFixed(2)} Mb (${stats.bandage.largestComponentSegments} segments)
+  Circular contigs: ${stats.bandage.circularContigs}
+  Dead ends: ${stats.bandage.deadEnds}
 
 \x1b[33mComponent Details:\x1b[0m
-  1. Component 1: 5,553,813 bp (186 segments, 6 dead ends) - incomplete
-  2. Component 2:     5,409 bp (1 segment, circular) - complete
-  3. Component 3:     4,315 bp (1 segment, circular) - complete
-  4. Component 4:     2,532 bp (1 segment, circular) - complete
+  1. Component 1: ${stats.bandage.largestComponentSize.toLocaleString()} bp (${stats.bandage.largestComponentSegments} segments, ${stats.bandage.deadEnds} dead ends) - incomplete
+${stats.plasmidContigs.map((p, i) => `  ${i + 2}. Component ${i + 2}: ${p.size.toLocaleString().padStart(9)} bp (1 segment, circular) - complete`).join('\n')}
 
 \x1b[33mNote:\x1b[0m Large incomplete component is likely the chromosome.
       Small circular components may be plasmids - use PlasmidFinder to confirm.
@@ -1041,12 +1035,12 @@ Loading assembly graph: assembly.gfa
 \x1b[32m✓ Analysis complete\x1b[0m
 `,
 				summary: {
-					'Nodes (Contigs)': '189 segments in assembly graph',
-					'Edges (Links)': '243 connections between contigs',
-					'Components': '4 total (1 large incomplete + 3 small circular)',
-					'Circular Contigs': '3 (complete assemblies)',
-					'Dead Ends': '6 (from incomplete component)',
-					'Interpretation': 'The 189 nodes match the 189 contigs from the assembly. The 6 dead ends indicate the large component is fragmented (likely chromosome). The 3 small circular components may be plasmids - use PlasmidFinder to identify replicon types.'
+					'Nodes (Contigs)': `${stats.bandage.nodes} segments in assembly graph`,
+					'Edges (Links)': `${stats.bandage.edges} connections between contigs`,
+					'Components': `${stats.bandage.components} total (1 large incomplete + ${stats.bandage.circularContigs} small circular)`,
+					'Circular Contigs': `${stats.bandage.circularContigs} (complete assemblies)`,
+					'Dead Ends': `${stats.bandage.deadEnds} (from incomplete component)`,
+					'Interpretation': `The ${stats.bandage.nodes} nodes match the contigs from the assembly. The ${stats.bandage.deadEnds} dead ends indicate the large component is fragmented (likely chromosome). The ${stats.bandage.circularContigs} small circular components may be plasmids - use PlasmidFinder to identify replicon types.`
 				},
 				chartData: {
 					title: 'Assembly Graph Visualization',
@@ -1070,10 +1064,10 @@ System information:
 
 Started: 2026-01-12 05:48:06
 
-Logging to /data/kpneumoniae_demo/o_quast/quast.log
+Logging to ${currentDir}/o_quast/quast.log
 NOTICE: Maximum number of threads is set to 1 (use --threads option to set it manually)
 
-CWD: /data/kpneumoniae_demo
+CWD: ${currentDir}
 Main parameters:
   MODE: default, threads: 1, minimum contig length: 500, minimum alignment length: 65, \\
   ambiguity: one, threshold for extensive misassembly size: 1000
@@ -1087,15 +1081,15 @@ Running Basic statistics processor...
   Contig files:
     assembly
   Calculating N50 and L50...
-    assembly, N50 = 371705, L50 = 6, Total length = 5566069, GC % = 57.18, # N's per 100 kbp =  0.00
+    assembly, N50 = ${stats.n50.toLocaleString()}, L50 = ${stats.l50}, Total length = ${stats.quast.totalLengthGe0.toLocaleString()}, GC % = ${stats.assemblyGC.toFixed(2)}, # N's per 100 kbp =  ${stats.quast.nsPer100kb.toFixed(2)}
   Drawing Nx plot...
-    saved to /data/kpneumoniae_demo/o_quast/basic_stats/Nx_plot.pdf
+    saved to ${currentDir}/o_quast/basic_stats/Nx_plot.pdf
   Drawing cumulative plot...
-    saved to /data/kpneumoniae_demo/o_quast/basic_stats/cumulative_plot.pdf
+    saved to ${currentDir}/o_quast/basic_stats/cumulative_plot.pdf
   Drawing GC content plot...
-    saved to /data/kpneumoniae_demo/o_quast/basic_stats/GC_content_plot.pdf
+    saved to ${currentDir}/o_quast/basic_stats/GC_content_plot.pdf
   Drawing assembly GC content plot...
-    saved to /data/kpneumoniae_demo/o_quast/basic_stats/assembly_GC_content_plot.pdf
+    saved to ${currentDir}/o_quast/basic_stats/assembly_GC_content_plot.pdf
 Done.
 
 NOTICE: Genes are not predicted by default. Use --gene-finding or --glimmer option to enable it.
@@ -1112,30 +1106,30 @@ RESULTS:
   All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
 
 Assembly                   assembly
-# contigs (>= 0 bp)        117
-# contigs (>= 1000 bp)     57
-# contigs (>= 5000 bp)     33
-# contigs (>= 10000 bp)    29
-# contigs (>= 25000 bp)    24
-# contigs (>= 50000 bp)    18
-Total length (>= 0 bp)     5564255
-Total length (>= 1000 bp)  5547651
-# contigs                  65
-Largest contig             837178
-Total length               5553065
-GC (%)                     57.18
-N50                        371705
-N75                        224673
-L50                        6
-L75                        10
-# N's per 100 kbp          0.00
+# contigs (>= 0 bp)        ${stats.numContigsAll}
+# contigs (>= 1000 bp)     ${stats.quast.contigsGe1000}
+# contigs (>= 5000 bp)     ${stats.quast.contigsGe5000}
+# contigs (>= 10000 bp)    ${stats.quast.contigsGe10000}
+# contigs (>= 25000 bp)    ${stats.quast.contigsGe25000}
+# contigs (>= 50000 bp)    ${stats.quast.contigsGe50000}
+Total length (>= 0 bp)     ${stats.quast.totalLengthGe0}
+Total length (>= 1000 bp)  ${stats.quast.totalLengthGe1000}
+# contigs                  ${stats.numContigs}
+Largest contig             ${stats.largestContig}
+Total length               ${stats.assemblySize}
+GC (%)                     ${stats.assemblyGC.toFixed(2)}
+N50                        ${stats.n50}
+N75                        ${stats.n75}
+L50                        ${stats.l50}
+L75                        ${stats.l75}
+# N's per 100 kbp          ${stats.quast.nsPer100kb.toFixed(2)}
 
-  Text versions of total report are saved to /data/kpneumoniae_demo/o_quast/report.txt, report.tsv, and report.tex
-  Text versions of transposed total report are saved to /data/kpneumoniae_demo/o_quast/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
-  HTML version (interactive tables and plots) is saved to /data/kpneumoniae_demo/o_quast/report.html
-  PDF version (tables and plots) is saved to /data/kpneumoniae_demo/o_quast/report.pdf
-  Icarus (contig browser) is saved to /data/kpneumoniae_demo/o_quast/icarus.html
-  Log is saved to /data/kpneumoniae_demo/o_quast/quast.log
+  Text versions of total report are saved to ${currentDir}/o_quast/report.txt, report.tsv, and report.tex
+  Text versions of transposed total report are saved to ${currentDir}/o_quast/transposed_report.txt, transposed_report.tsv, and transposed_report.tex
+  HTML version (interactive tables and plots) is saved to ${currentDir}/o_quast/report.html
+  PDF version (tables and plots) is saved to ${currentDir}/o_quast/report.pdf
+  Icarus (contig browser) is saved to ${currentDir}/o_quast/icarus.html
+  Log is saved to ${currentDir}/o_quast/quast.log
 
 Finished: 2026-01-12 05:48:10
 Elapsed time: 0:00:03.963635
@@ -1144,19 +1138,19 @@ NOTICEs: 2; WARNINGs: 1; non-fatal ERRORs: 0
 Thank you for using QUAST!
 `,
 				summary: {
-					'Contigs (≥500 bp)': '65',
-					'Contigs (all)': '117',
-					'Total Length': '5,553,065 bp',
-					'Largest Contig': '837,178 bp',
-					'N50': '371,705 bp',
-					'L50': '6',
-					'GC Content': '57.18%',
-					'Quality': 'EXCELLENT'
+					'Contigs (≥500 bp)': stats.numContigs.toLocaleString(),
+					'Contigs (all)': stats.numContigsAll.toLocaleString(),
+					'Total Length': `${stats.assemblySize.toLocaleString()} bp`,
+					'Largest Contig': `${stats.largestContig.toLocaleString()} bp`,
+					'N50': `${stats.n50.toLocaleString()} bp`,
+					'L50': stats.l50.toString(),
+					'GC Content': `${stats.assemblyGC.toFixed(2)}%`,
+					'Quality': stats.checkm.quality === 'High' ? 'EXCELLENT' : (stats.checkm.quality === 'Medium' ? 'GOOD' : 'FAIR')
 				},
 				chartData: {
 					title: 'Assembly Quality Metrics',
 					x: ['Total Length', 'N50', 'Largest Contig'],
-					y: [5553065, 371705, 837178],
+					y: [stats.assemblySize, stats.n50, stats.largestContig],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Length (bp)'
@@ -1188,7 +1182,7 @@ Thank you for using QUAST!
 [07:38:44] Option --cpu asked for 8 cores, but system only has 4
 [07:38:44] Will use maximum of 4 cores.
 [07:38:44] Annotating as >>> Bacteria <<<
-[07:38:44] Genus species strain: Klebsiella pneumoniae
+[07:38:44] Genus species strain: ${stats.organism}
 [07:38:44] Generating locus_tag from 'o_unicycler/assembly.fasta' contents.
 [07:38:44] Setting --locustag MPDNNGLK from MD5 69d77054a115e56ce609fd2185af8559
 [07:38:44] Creating new output folder: o_prokka
@@ -1218,18 +1212,18 @@ Thank you for using QUAST!
 [07:46:19] Share and enjoy!
 `,
 				summary: {
-					'Organism': 'Genus species strain',
-					'Contigs': '117',
-					'Bases': '5,564,255',
-					'CDS': '5,174',
-					'rRNA': '6',
-					'tRNA': '77',
-					'tmRNA': '1'
+					'Organism': stats.organism,
+					'Contigs': stats.numContigsAll.toLocaleString(),
+					'Bases': stats.quast.totalLengthGe0.toLocaleString(),
+					'CDS': stats.numCDS.toLocaleString(),
+					'rRNA': stats.numrRNA.toString(),
+					'tRNA': stats.numtRNA.toString(),
+					'tmRNA': stats.numtmRNA.toString()
 				},
 				chartData: {
 					title: 'Genome Annotation Summary',
 					x: ['CDS', 'tRNA', 'rRNA', 'tmRNA'],
-					y: [5174, 77, 6, 1],
+					y: [stats.numCDS, stats.numtRNA, stats.numrRNA, stats.numtmRNA],
 					type: 'bar',
 					xLabel: 'Feature Type',
 					yLabel: 'Count'
@@ -1245,31 +1239,33 @@ Thank you for using QUAST!
 				]
 			},
 			'abricate': {
-				output: `Using database ncbi:	5386 sequences -  2024-Jan-10
+				output: `Using database ${stats.amrDatabase}:	5386 sequences -  2024-Jan-10
 Processing: o_unicycler/assembly.fasta
-Found 5 genes in o_unicycler/assembly.fasta
+Found ${stats.amrGenes.length} genes in o_unicycler/assembly.fasta
 
 #FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
-assembly.fasta	contig_1	2345678	2346559	+	blaKPC-2	1-882/882	0/0	100.00	100.00	ncbi	NG_049253.1	KPC-2 carbapenemase	CARBAPENEM
-assembly.fasta	contig_1	1234567	1235432	+	blaSHV-11	1-866/866	0/0	100.00	99.77	ncbi	NG_049956.1	SHV-11 beta-lactamase	BETA-LACTAM
-assembly.fasta	contig_1	3456789	3457208	-	fosA	1-420/420	0/0	100.00	100.00	ncbi	NG_047840.1	FosA fosfomycin resistance	FOSFOMYCIN
-assembly.fasta	contig_1	4567890	4569056	+	oqxA	1-1167/1167	0/0	100.00	99.91	ncbi	NG_048024.1	OqxA efflux pump	QUINOLONE
-assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi	NG_048025.1	OqxB efflux pump	QUINOLONE
+${stats.amrGenes.map(g => `assembly.fasta\t${g.contig}\t${g.start}\t${g.end}\t${g.strand}\t${g.gene}\t1-${g.end - g.start}/${g.end - g.start}\t0/0\t${g.coverage.toFixed(2)}\t${g.identity.toFixed(2)}\t${stats.amrDatabase}\t${g.accession}\t${g.product}\t${g.resistance}`).join('\n')}
 `,
-				summary: {
-					'AMR Genes Found': '5',
-					'Database': 'NCBI AMRFinderPlus',
-					'Carbapenem': 'blaKPC-2 (100%)',
-					'Beta-lactam': 'blaSHV-11 (99.77%)',
-					'Fosfomycin': 'fosA (100%)',
-					'Quinolone Efflux': 'oqxAB (99.9%)',
-					'Location': 'All chromosomal',
-					'Clinical Alert': 'CRE - KPC carbapenemase'
-				},
+				summary: (() => {
+					const resistanceGroups: Record<string, string[]> = {};
+					stats.amrGenes.forEach(g => {
+						const res = g.resistance.split(';')[0];
+						if (!resistanceGroups[res]) resistanceGroups[res] = [];
+						resistanceGroups[res].push(`${g.gene} (${g.identity.toFixed(0)}%)`);
+					});
+					const summaryObj: Record<string, string> = {
+						'AMR Genes Found': stats.amrGenes.length.toString(),
+						'Database': stats.amrDatabase.toUpperCase()
+					};
+					Object.entries(resistanceGroups).forEach(([res, genes]) => {
+						summaryObj[res.charAt(0) + res.slice(1).toLowerCase()] = genes.join(', ');
+					});
+					return summaryObj;
+				})(),
 				chartData: {
 					title: 'AMR Gene Identity',
-					x: ['blaKPC-2', 'blaSHV-11', 'fosA', 'oqxA', 'oqxB'],
-					y: [100.00, 99.77, 100.00, 99.91, 99.87],
+					x: stats.amrGenes.map(g => g.gene),
+					y: stats.amrGenes.map(g => g.identity),
 					type: 'bar',
 					xLabel: 'Gene',
 					yLabel: 'Identity (%)'
@@ -1293,37 +1289,37 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
   Marker lineage: f__Enterobacteriaceae
 
 \x1b[36mCalculating genome statistics...\x1b[0m
-  Genome size: 5,566,069 bp
-  # contigs: 189
-  N50: 371,705 bp
-  GC: 57.18%
+  Genome size: ${stats.quast.totalLengthGe0.toLocaleString()} bp
+  # contigs: ${stats.bandage.nodes}
+  N50: ${stats.n50.toLocaleString()} bp
+  GC: ${stats.assemblyGC.toFixed(2)}%
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  QUALITY ASSESSMENT RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  \x1b[32mCompleteness:    99.45%\x1b[0m  (Near complete)
-  \x1b[32mContamination:   0.28%\x1b[0m   (Low contamination)
-  \x1b[32mStrain heterog.: 0.00%\x1b[0m
+  \x1b[32mCompleteness:    ${stats.checkm.completeness.toFixed(2)}%\x1b[0m  (Near complete)
+  \x1b[32mContamination:   ${stats.checkm.contamination.toFixed(2)}%\x1b[0m   (Low contamination)
+  \x1b[32mStrain heterog.: ${stats.checkm.strain_heterogeneity.toFixed(2)}%\x1b[0m
 
-  Quality tier: \x1b[1;32mHIGH-QUALITY DRAFT\x1b[0m
-  MIMAG standard: \x1b[32mMeets high-quality criteria\x1b[0m
+  Quality tier: \x1b[1;32m${stats.checkm.quality.toUpperCase()}-QUALITY DRAFT\x1b[0m
+  MIMAG standard: \x1b[32mMeets ${stats.checkm.quality.toLowerCase()}-quality criteria\x1b[0m
 
 \x1b[33mTip: Completeness >90% and Contamination <5% indicates a high-quality genome\x1b[0m
 `,
 				summary: {
-					'Completeness': '99.45%',
-					'Contamination': '0.28%',
-					'Strain Heterogeneity': '0.00%',
+					'Completeness': `${stats.checkm.completeness.toFixed(2)}%`,
+					'Contamination': `${stats.checkm.contamination.toFixed(2)}%`,
+					'Strain Heterogeneity': `${stats.checkm.strain_heterogeneity.toFixed(2)}%`,
 					'Lineage': 'f__Enterobacteriaceae',
 					'Marker Genes': '104/104 found',
-					'Quality': 'HIGH-QUALITY DRAFT',
-					'MIMAG Standard': 'High-quality'
+					'Quality': `${stats.checkm.quality.toUpperCase()}-QUALITY DRAFT`,
+					'MIMAG Standard': `${stats.checkm.quality}-quality`
 				},
 				chartData: {
 					title: 'Genome Quality Assessment',
 					x: ['Completeness', 'Contamination', 'Strain Heterog.'],
-					y: [99.45, 0.28, 0],
+					y: [stats.checkm.completeness, stats.checkm.contamination, stats.checkm.strain_heterogeneity],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Percentage (%)'
@@ -1346,17 +1342,17 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 [01/12/2026 06:27:54 AM] INFO: CheckM2 finished successfully.
 `,
 				summary: {
-					'Completeness': '100.0%',
-					'Contamination': '0.16%',
-					'Genome Size': '5,564,255 bp',
-					'GC Content': '57%',
+					'Completeness': `${stats.checkm.completeness.toFixed(1)}%`,
+					'Contamination': `${stats.checkm.contamination.toFixed(2)}%`,
+					'Genome Size': `${stats.quast.totalLengthGe0.toLocaleString()} bp`,
+					'GC Content': `${Math.round(stats.assemblyGC)}%`,
 					'Coding Density': '88.2%',
-					'Quality': 'HIGH-QUALITY'
+					'Quality': stats.checkm.quality.toUpperCase()
 				},
 				chartData: {
 					title: 'CheckM2 Quality Assessment',
 					x: ['Completeness', 'Contamination'],
-					y: [100.0, 0.16],
+					y: [stats.checkm.completeness, stats.checkm.contamination],
 					type: 'bar',
 					xLabel: 'Metric',
 					yLabel: 'Percentage (%)'
@@ -1495,33 +1491,28 @@ assembly.fasta	contig_1	4569123	4572278	+	oqxB	1-3156/3156	0/0	100.00	99.87	ncbi
 [07:16:00] Found 'any2fasta' => /home/pop/miniconda3/envs/env_abricate/bin/any2fasta
 [07:16:01] Found blastn: 2.12.0+ (002012)
 [07:16:01] Excluding 3 schemes: ecoli vcholerae_2 abaumannii
-[07:16:05] Found exact allele match klebsiella.gapA-4
-[07:16:05] Found exact allele match klebsiella.infB-1
-[07:16:05] Found exact allele match klebsiella.mdh-2
-[07:16:05] Found exact allele match klebsiella.pgi-52
-[07:16:05] Found exact allele match klebsiella.phoE-1
-[07:16:05] Found exact allele match klebsiella.rpoB-1
-[07:16:05] Found exact allele match klebsiella.tonB-7
+${Object.entries(stats.mlst.alleles).map(([locus, num]) => `[07:16:05] Found exact allele match ${stats.mlst.scheme}.${locus}-${num}`).join('\n')}
 [07:16:05] Use --quiet or -q to avoid all the message output, including these witticisms.
 [07:16:05] Done.
-o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)	rpoB(1)	tonB(7)
+o_unicycler/assembly.fasta	${stats.mlst.scheme}	${stats.mlst.st.replace('ST', '')}	${Object.entries(stats.mlst.alleles).map(([locus, num]) => `${locus}(${num})`).join('\t')}
 `,
-				summary: {
-					'Scheme': 'klebsiella',
-					'Sequence Type': 'ST307',
-					'gapA': '4',
-					'infB': '1',
-					'mdh': '2',
-					'pgi': '52',
-					'phoE': '1',
-					'rpoB': '1',
-					'tonB': '7',
-					'Clinical Significance': 'High-risk international clone'
-				},
+				summary: (() => {
+					const summaryObj: Record<string, string> = {
+						'Scheme': stats.mlst.scheme,
+						'Sequence Type': stats.mlst.st
+					};
+					Object.entries(stats.mlst.alleles).forEach(([locus, num]) => {
+						summaryObj[locus] = num.toString();
+					});
+					if (stats.mlst.significance) {
+						summaryObj['Clinical Significance'] = stats.mlst.significance;
+					}
+					return summaryObj;
+				})(),
 				chartData: {
 					title: 'MLST Allelic Profile',
-					x: ['gapA', 'infB', 'mdh', 'pgi', 'phoE', 'rpoB', 'tonB'],
-					y: [4, 1, 2, 52, 1, 1, 7],
+					x: Object.keys(stats.mlst.alleles),
+					y: Object.values(stats.mlst.alleles),
 					type: 'bar',
 					xLabel: 'Locus',
 					yLabel: 'Allele Number'
@@ -1531,13 +1522,17 @@ o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)
 				]
 			},
 			// Phase 3: Plasmid Analysis
-			'mob_recon': {
-				output: `\x1b[36mMOB-suite v3.1.4\x1b[0m
+			'mob_recon': (() => {
+				const plasmidsWithAMR = stats.plasmidContigs.filter(p => p.mobility === 'conjugative' || p.mobility === 'mobilizable');
+				const chromSize = stats.bandage.largestComponentSize;
+				const plasmidTypesList = stats.plasmids.map(p => p.plasmid).join(', ') || 'Unknown';
+				return {
+					output: `\x1b[36mMOB-suite v3.1.4\x1b[0m
 [2024-01-15 12:00:00] INFO: Starting plasmid reconstruction
 
 \x1b[36mInput:\x1b[0m
   Assembly: assembly/assembly.fasta
-  Contigs: 2
+  Contigs: ${stats.numContigs}
 
 \x1b[36mRunning MOB-recon...\x1b[0m
   Identifying plasmid-associated sequences...
@@ -1553,54 +1548,59 @@ o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)
 \x1b[1;32m  PLASMID RECONSTRUCTION RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  Chromosome: 1 (4,892,156 bp)
-  Plasmids detected: 1
+  Chromosome: 1 (${chromSize.toLocaleString()} bp)
+  Plasmids detected: ${stats.plasmidContigs.length}
 
-  \x1b[33mPlasmid AA001:\x1b[0m
-    Size: 95,234 bp
-    Replicon type: IncFIB(K), IncFII(K)
-    Mobility: Conjugative
-    Relaxase type: MOBF
-    Mate-pair formation: MPF_F
-    Predicted host: Klebsiella/Escherichia
+${stats.plasmidContigs.map((p, i) => `  \x1b[33mPlasmid AA00${i + 1}:\x1b[0m
+    Size: ${p.size.toLocaleString()} bp
+    Replicon type: ${p.type}
+    Mobility: ${p.mobility.charAt(0).toUpperCase() + p.mobility.slice(1)}
+    Relaxase type: ${p.mobility === 'conjugative' ? 'MOBF' : p.mobility === 'mobilizable' ? 'MOBP' : 'None'}
+    Mate-pair formation: ${p.mobility === 'conjugative' ? 'MPF_F' : 'None'}
+    Predicted host: ${stats.organism.split(' ')[0]}`).join('\n\n')}
 
-\x1b[31m⚠ This plasmid carries AMR genes:\x1b[0m
-    - blaCTX-M-15 (ESBL)
-    - tet(A) (Tetracycline resistance)
+${stats.amrGenes.length > 0 ? `\x1b[31m⚠ This plasmid carries AMR genes:\x1b[0m
+${stats.amrGenes.slice(0, 2).map(g => `    - ${g.gene} (${g.resistance})`).join('\n')}` : ''}
 
-\x1b[33mNote: IncF plasmids are highly transmissible in clinical settings\x1b[0m
+\x1b[33mNote: ${plasmidTypesList.includes('IncF') ? 'IncF plasmids are highly transmissible in clinical settings' : 'Plasmid types detected from assembly'}\x1b[0m
 `,
-				summary: {
-					'Chromosome': '1 (4.89 Mb)',
-					'Plasmids Found': '1',
-					'Plasmid Size': '95,234 bp',
-					'Replicon Type': 'IncFIB(K), IncFII(K)',
-					'Mobility': 'Conjugative',
-					'Relaxase': 'MOBF',
-					'AMR Genes on Plasmid': '2'
-				},
-				chartData: {
-					title: 'Genome Composition',
-					x: ['Chromosome', 'Plasmid AA001'],
-					y: [4892156, 95234],
-					type: 'bar',
-					xLabel: 'Replicon',
-					yLabel: 'Size (bp)'
-				},
-				files: [
-					{ name: 'plasmid_report.tsv', type: 'tsv', size: '2.1 KB' },
-					{ name: 'chromosome.fasta', type: 'fasta', size: '4.7 MB' },
-					{ name: 'plasmid_AA001.fasta', type: 'fasta', size: '92 KB' },
-					{ name: 'mobtyper_results.txt', type: 'txt', size: '1.5 KB' }
-				]
-			},
-			'platon': {
-				output: `\x1b[36mPlaton v1.6.0\x1b[0m
+					summary: {
+						'Chromosome': `1 (${(chromSize / 1000000).toFixed(2)} Mb)`,
+						'Plasmids Found': stats.plasmidContigs.length.toString(),
+						'Plasmid Size': stats.plasmidContigs.length > 0 ? `${stats.plasmidContigs[0].size.toLocaleString()} bp` : 'N/A',
+						'Replicon Type': plasmidTypesList || 'Unknown',
+						'Mobility': stats.plasmidContigs.length > 0 ? stats.plasmidContigs[0].mobility.charAt(0).toUpperCase() + stats.plasmidContigs[0].mobility.slice(1) : 'N/A',
+						'Relaxase': stats.plasmidContigs.some(p => p.mobility === 'conjugative') ? 'MOBF' : 'MOBP',
+						'AMR Genes on Plasmid': plasmidsWithAMR.length > 0 ? stats.amrGenes.length.toString() : '0'
+					},
+					chartData: {
+						title: 'Genome Composition',
+						x: ['Chromosome', ...stats.plasmidContigs.map((_, i) => `Plasmid AA00${i + 1}`)],
+						y: [chromSize, ...stats.plasmidContigs.map(p => p.size)],
+						type: 'bar',
+						xLabel: 'Replicon',
+						yLabel: 'Size (bp)'
+					},
+					files: [
+						{ name: 'plasmid_report.tsv', type: 'tsv', size: '2.1 KB' },
+						{ name: 'chromosome.fasta', type: 'fasta', size: `${(chromSize / 1000000).toFixed(1)} MB` },
+						...stats.plasmidContigs.map((p, i) => ({ name: `plasmid_AA00${i + 1}.fasta`, type: 'fasta', size: `${Math.round(p.size / 1000)} KB` })),
+						{ name: 'mobtyper_results.txt', type: 'txt', size: '1.5 KB' }
+					]
+				};
+			})(),
+			'platon': (() => {
+				const chromSize = stats.bandage.largestComponentSize;
+				const plasmidTotalSize = stats.plasmidContigs.reduce((sum, p) => sum + p.size, 0);
+				const conjugative = stats.plasmidContigs.filter(p => p.mobility === 'conjugative');
+				const mobilizable = stats.plasmidContigs.filter(p => p.mobility === 'mobilizable');
+				return {
+					output: `\x1b[36mPlaton v1.6.0\x1b[0m
 [2024-01-15 12:10:00] INFO: Starting plasmid detection
 
 \x1b[36mInput:\x1b[0m
   Assembly: assembly/assembly.fasta
-  Contigs: 2
+  Contigs: ${stats.numContigs}
 
 \x1b[36mClassifying contigs...\x1b[0m
   Using machine learning model: gradient boosting
@@ -1612,63 +1612,69 @@ o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)
 
 \x1b[36mFeature detection:\x1b[0m
   contig_1: Chromosome markers detected
-  contig_2: Plasmid markers detected (score: 0.987)
+${stats.plasmidContigs.map((p, i) => `  contig_${i + 2}: Plasmid markers detected (score: ${(0.95 + Math.random() * 0.04).toFixed(3)})`).join('\n')}
 
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 \x1b[1;32m  PLASMID DETECTION RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
   Classification Summary:
-    Chromosomal contigs: 1 (4,892,156 bp)
-    Plasmid contigs: 1 (95,234 bp)
+    Chromosomal contigs: 1 (${chromSize.toLocaleString()} bp)
+    Plasmid contigs: ${stats.plasmidContigs.length} (${plasmidTotalSize.toLocaleString()} bp)
 
-  \x1b[33mPlasmid contig_2:\x1b[0m
-    Confidence: 98.7%
-    Replication genes: repA, repB
-    Mobilization genes: mobA, mobC
-    Conjugation: traI, traD, traM
+${stats.plasmidContigs.map((p, i) => `  \x1b[33mPlasmid contig_${i + 2} (${p.type}):\x1b[0m
+    Confidence: ${(95 + Math.random() * 4).toFixed(1)}%
+    Replication genes: ${p.type.includes('Inc') ? 'repA, repB' : 'repA'}
+    Mobilization genes: ${p.mobility !== 'non-mobilizable' ? 'mobA, mobC' : 'None'}
+    Conjugation: ${p.mobility === 'conjugative' ? 'traI, traD, traM' : 'None'}`).join('\n\n')}
 
-\x1b[32m✓ High confidence plasmid prediction\x1b[0m
+\x1b[32m✓ ${stats.plasmidContigs.length > 0 ? 'High confidence plasmid prediction' : 'No plasmids detected'}\x1b[0m
 `,
-				summary: {
-					'Chromosomal Contigs': '1',
-					'Plasmid Contigs': '1',
-					'Confidence': '98.7%',
-					'Replication Genes': 'repA, repB',
-					'Mobilization': 'mobA, mobC',
-					'Conjugation': 'traI, traD, traM'
-				},
-				chartData: {
-					title: 'Plasmid Prediction Confidence',
-					x: ['contig_1 (Chromosome)', 'contig_2 (Plasmid)'],
-					y: [2.3, 98.7],
-					type: 'bar',
-					xLabel: 'Contig',
-					yLabel: 'Plasmid Score (%)'
-				},
-				files: [
-					{ name: 'plasmid_predictions.tsv', type: 'tsv', size: '1.2 KB' },
-					{ name: 'plasmid_sequences.fasta', type: 'fasta', size: '92 KB' },
-					{ name: 'chromosome_sequences.fasta', type: 'fasta', size: '4.7 MB' }
-				]
-			},
+					summary: {
+						'Chromosomal Contigs': '1',
+						'Plasmid Contigs': stats.plasmidContigs.length.toString(),
+						'Confidence': stats.plasmidContigs.length > 0 ? `${(95 + Math.random() * 4).toFixed(1)}%` : 'N/A',
+						'Replication Genes': stats.plasmidContigs.length > 0 ? 'repA, repB' : 'N/A',
+						'Mobilization': mobilizable.length > 0 || conjugative.length > 0 ? 'mobA, mobC' : 'None',
+						'Conjugation': conjugative.length > 0 ? 'traI, traD, traM' : 'None'
+					},
+					chartData: {
+						title: 'Plasmid Prediction Confidence',
+						x: ['contig_1 (Chromosome)', ...stats.plasmidContigs.map((p, i) => `contig_${i + 2} (${p.type})`)],
+						y: [2.3, ...stats.plasmidContigs.map(() => 95 + Math.random() * 4)],
+						type: 'bar',
+						xLabel: 'Contig',
+						yLabel: 'Plasmid Score (%)'
+					},
+					files: [
+						{ name: 'plasmid_predictions.tsv', type: 'tsv', size: '1.2 KB' },
+						{ name: 'plasmid_sequences.fasta', type: 'fasta', size: `${Math.round(plasmidTotalSize / 1000)} KB` },
+						{ name: 'chromosome_sequences.fasta', type: 'fasta', size: `${(chromSize / 1000000).toFixed(1)} MB` }
+					]
+				};
+			})(),
 			// Phase 4: Phylogenetics
-			'snippy': {
-				output: `\x1b[36mSnippy v4.6.0\x1b[0m
+			'snippy': (() => {
+				const snippyStats = stats.snippy || { totalVariants: 1247, snps: 1189, insertions: 32, deletions: 26, complex: 0 };
+				const snpPercent = ((snippyStats.snps / snippyStats.totalVariants) * 100).toFixed(1);
+				const insPercent = ((snippyStats.insertions / snippyStats.totalVariants) * 100).toFixed(1);
+				const delPercent = ((snippyStats.deletions / snippyStats.totalVariants) * 100).toFixed(1);
+				return {
+					output: `\x1b[36mSnippy v4.6.0\x1b[0m
 [2024-01-15 12:20:00] INFO: Starting variant calling
 
 \x1b[36mReference:\x1b[0m
-  Genome: reference.fasta (E. coli K-12 MG1655)
-  Size: 4,641,652 bp
+  Genome: reference.fasta (${stats.organism})
+  Size: ${stats.assemblySize.toLocaleString()} bp
 
 \x1b[36mReads:\x1b[0m
   R1: sample_01_R1_paired.fq.gz
   R2: sample_01_R2_paired.fq.gz
 
 \x1b[36mAlignment (BWA-MEM)...\x1b[0m
-  Reads mapped: 2,389,456 (99.8%)
-  Mean coverage: 77.3x
-  Median coverage: 76x
+  Reads mapped: ${Math.floor(stats.totalReads * 0.998).toLocaleString()} (99.8%)
+  Mean coverage: ${(stats.totalReads * stats.readLength / stats.assemblySize).toFixed(1)}x
+  Median coverage: ${Math.floor(stats.totalReads * stats.readLength / stats.assemblySize)}x
 
 \x1b[36mVariant calling (Freebayes)...\x1b[0m
   Processing regions...
@@ -1679,53 +1685,60 @@ o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)
 \x1b[1;32m  VARIANT CALLING RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  Total variants: 1,247
-    SNPs: 1,189 (95.3%)
-    Insertions: 32 (2.6%)
-    Deletions: 26 (2.1%)
+  Total variants: ${snippyStats.totalVariants.toLocaleString()}
+    SNPs: ${snippyStats.snps.toLocaleString()} (${snpPercent}%)
+    Insertions: ${snippyStats.insertions} (${insPercent}%)
+    Deletions: ${snippyStats.deletions} (${delPercent}%)
 
-  Variant density: 0.27 per kb
+  Variant density: ${(snippyStats.totalVariants / (stats.assemblySize / 1000)).toFixed(2)} per kb
   Transition/Transversion: 2.34
 
-  \x1b[33mCore genome SNPs: 1,156\x1b[0m
+  \x1b[33mCore genome SNPs: ${Math.floor(snippyStats.snps * 0.97).toLocaleString()}\x1b[0m
   (used for phylogenetic analysis)
 
 \x1b[32m✓ Consensus sequence generated\x1b[0m
 `,
-				summary: {
-					'Reference': 'E. coli K-12 MG1655',
-					'Coverage': '77.3x',
-					'Total Variants': '1,247',
-					'SNPs': '1,189',
-					'Insertions': '32',
-					'Deletions': '26',
-					'Core SNPs': '1,156',
-					'Ti/Tv Ratio': '2.34'
-				},
-				chartData: {
-					title: 'Variant Types Distribution',
-					x: ['SNPs', 'Insertions', 'Deletions'],
-					y: [1189, 32, 26],
-					type: 'bar',
-					xLabel: 'Variant Type',
-					yLabel: 'Count'
-				},
-				files: [
-					{ name: 'snps.vcf', type: 'vcf', size: '156 KB' },
-					{ name: 'snps.tab', type: 'tsv', size: '89 KB' },
-					{ name: 'snps.aligned.fa', type: 'fasta', size: '4.5 MB' },
-					{ name: 'snps.consensus.fa', type: 'fasta', size: '4.5 MB' }
-				]
-			},
-			'roary': {
-				output: `\x1b[36mRoary v3.13.0\x1b[0m
+					summary: {
+						'Reference': stats.organism,
+						'Coverage': `${(stats.totalReads * stats.readLength / stats.assemblySize).toFixed(1)}x`,
+						'Total Variants': snippyStats.totalVariants.toLocaleString(),
+						'SNPs': snippyStats.snps.toLocaleString(),
+						'Insertions': snippyStats.insertions.toString(),
+						'Deletions': snippyStats.deletions.toString(),
+						'Core SNPs': Math.floor(snippyStats.snps * 0.97).toLocaleString(),
+						'Ti/Tv Ratio': '2.34'
+					},
+					chartData: {
+						title: 'Variant Types Distribution',
+						x: ['SNPs', 'Insertions', 'Deletions'],
+						y: [snippyStats.snps, snippyStats.insertions, snippyStats.deletions],
+						type: 'bar',
+						xLabel: 'Variant Type',
+						yLabel: 'Count'
+					},
+					files: [
+						{ name: 'snps.vcf', type: 'vcf', size: '156 KB' },
+						{ name: 'snps.tab', type: 'tsv', size: '89 KB' },
+						{ name: 'snps.aligned.fa', type: 'fasta', size: '4.5 MB' },
+						{ name: 'snps.consensus.fa', type: 'fasta', size: '4.5 MB' }
+					]
+				};
+			})(),
+			'roary': (() => {
+				const roaryStats = stats.roary || { totalGenes: 5234, coreGenes: 3987, softCoreGenes: 312, shellGenes: 489, cloudGenes: 446, numIsolates: 4 };
+				const corePercent = ((roaryStats.coreGenes / roaryStats.totalGenes) * 100).toFixed(1);
+				const softCorePercent = ((roaryStats.softCoreGenes / roaryStats.totalGenes) * 100).toFixed(1);
+				const shellPercent = ((roaryStats.shellGenes / roaryStats.totalGenes) * 100).toFixed(1);
+				const cloudPercent = ((roaryStats.cloudGenes / roaryStats.totalGenes) * 100).toFixed(1);
+				return {
+					output: `\x1b[36mRoary v3.13.0\x1b[0m
 [2024-01-15 12:30:00] INFO: Starting pan-genome analysis
 
 \x1b[36mInput GFF files:\x1b[0m
-  - sample_01.gff (4,523 genes)
-  - sample_02.gff (4,498 genes)
-  - sample_03.gff (4,512 genes)
-  - reference.gff (4,489 genes)
+  - sample_01.gff (${stats.numCDS.toLocaleString()} genes)
+  - sample_02.gff (${(stats.numCDS - 25).toLocaleString()} genes)
+  - sample_03.gff (${(stats.numCDS - 11).toLocaleString()} genes)
+  - reference.gff (${(stats.numCDS - 34).toLocaleString()} genes)
 
 \x1b[36mClustering genes...\x1b[0m
   Identity threshold: 95%
@@ -1742,42 +1755,43 @@ o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)
 \x1b[1;32m  PAN-GENOME ANALYSIS RESULTS\x1b[0m
 \x1b[1;32m═══════════════════════════════════════════════════════════\x1b[0m
 
-  Total genes in pan-genome: 5,234
+  Total genes in pan-genome: ${roaryStats.totalGenes.toLocaleString()}
 
-  \x1b[32mCore genes:      3,987 (76.2%)\x1b[0m
-  Soft-core genes:   312 (6.0%)
-  Shell genes:       489 (9.3%)
-  \x1b[31mCloud genes:       446 (8.5%)\x1b[0m
+  \x1b[32mCore genes:      ${roaryStats.coreGenes.toLocaleString()} (${corePercent}%)\x1b[0m
+  Soft-core genes:   ${roaryStats.softCoreGenes} (${softCorePercent}%)
+  Shell genes:       ${roaryStats.shellGenes} (${shellPercent}%)
+  \x1b[31mCloud genes:       ${roaryStats.cloudGenes} (${cloudPercent}%)\x1b[0m
 
-  Core genome alignment: 3,456,789 bp
-  Informative sites: 12,345
+  Core genome alignment: ${(stats.assemblySize * 0.62 / 1000000).toFixed(2)} Mb
+  Informative sites: ${Math.floor(roaryStats.coreGenes * 3.1).toLocaleString()}
 
 \x1b[33mTip: Core gene alignment can be used for phylogenetic analysis\x1b[0m
 `,
-				summary: {
-					'Isolates Analyzed': '4',
-					'Total Pan-genome': '5,234 genes',
-					'Core Genes': '3,987 (76.2%)',
-					'Soft-core': '312 (6.0%)',
-					'Shell': '489 (9.3%)',
-					'Cloud': '446 (8.5%)',
-					'Core Alignment': '3.46 Mb'
-				},
-				chartData: {
-					title: 'Pan-genome Composition',
-					x: ['Core', 'Soft-core', 'Shell', 'Cloud'],
-					y: [3987, 312, 489, 446],
-					type: 'bar',
-					xLabel: 'Gene Category',
-					yLabel: 'Number of Genes'
-				},
-				files: [
-					{ name: 'gene_presence_absence.csv', type: 'csv', size: '2.3 MB' },
-					{ name: 'core_gene_alignment.aln', type: 'aln', size: '3.5 MB' },
-					{ name: 'pan_genome_reference.fa', type: 'fasta', size: '5.2 MB' },
-					{ name: 'summary_statistics.txt', type: 'txt', size: '1.8 KB' }
-				]
-			},
+					summary: {
+						'Isolates Analyzed': roaryStats.numIsolates.toString(),
+						'Total Pan-genome': `${roaryStats.totalGenes.toLocaleString()} genes`,
+						'Core Genes': `${roaryStats.coreGenes.toLocaleString()} (${corePercent}%)`,
+						'Soft-core': `${roaryStats.softCoreGenes} (${softCorePercent}%)`,
+						'Shell': `${roaryStats.shellGenes} (${shellPercent}%)`,
+						'Cloud': `${roaryStats.cloudGenes} (${cloudPercent}%)`,
+						'Core Alignment': `${(stats.assemblySize * 0.62 / 1000000).toFixed(2)} Mb`
+					},
+					chartData: {
+						title: 'Pan-genome Composition',
+						x: ['Core', 'Soft-core', 'Shell', 'Cloud'],
+						y: [roaryStats.coreGenes, roaryStats.softCoreGenes, roaryStats.shellGenes, roaryStats.cloudGenes],
+						type: 'bar',
+						xLabel: 'Gene Category',
+						yLabel: 'Number of Genes'
+					},
+					files: [
+						{ name: 'gene_presence_absence.csv', type: 'csv', size: '2.3 MB' },
+						{ name: 'core_gene_alignment.aln', type: 'aln', size: '3.5 MB' },
+						{ name: 'pan_genome_reference.fa', type: 'fasta', size: '5.2 MB' },
+						{ name: 'summary_statistics.txt', type: 'txt', size: '1.8 KB' }
+					]
+				};
+			})(),
 			'iqtree': {
 				output: `\x1b[36mIQ-TREE v2.2.0\x1b[0m
 [2024-01-15 12:45:00] INFO: Starting phylogenetic analysis
@@ -2042,21 +2056,21 @@ o_unicycler/assembly.fasta	klebsiella	307	gapA(4)	infB(1)	mdh(2)	pgi(52)	phoE(1)
                                   'filename(s)': ['o_unicycler/assembly.fasta'],
                                   'method': 'blast'}}}
 `,
-				summary: {
-					'Replicons Found': '4',
-					'Plasmids Detected': '3 (from Unicycler assembly)',
-					'Replicon 1': 'IncFII(K) (95.95%) - contig 19',
-					'Replicon 2': 'IncX3 (100%) - contig 22',
-					'Replicon 3': 'IncFIB(K) (98.93%) - contig 23',
-					'Replicon 4': 'Col440I (97.37%) - contig 35',
-					'Type': 'Inc-type and Col-type plasmids',
-					'Interpretation': '4 replicons on 3 plasmids: IncFII(K) and IncFIB(K) likely co-located on one large IncF plasmid',
-					'Clinical Significance': 'High (IncX3 associated with AMR)'
-				},
+				summary: (() => {
+					const summaryObj: Record<string, string> = {
+						'Replicons Found': stats.plasmids.length.toString(),
+						'Plasmids Detected': `${stats.plasmidContigs.length} (from Unicycler assembly)`
+					};
+					stats.plasmids.forEach((p, i) => {
+						summaryObj[`Replicon ${i + 1}`] = `${p.plasmid} (${p.identity.toFixed(2)}%) - ${p.contig}`;
+					});
+					summaryObj['Type'] = stats.plasmids.length > 0 ? 'Inc-type plasmids' : 'No replicons detected';
+					return summaryObj;
+				})(),
 				chartData: {
 					title: 'Replicon Identity',
-					x: ['IncFII(K)', 'IncX3', 'IncFIB(K)', 'Col440I'],
-					y: [95.95, 100.0, 98.93, 97.37],
+					x: stats.plasmids.map(p => p.plasmid),
+					y: stats.plasmids.map(p => p.identity),
 					type: 'bar',
 					xLabel: 'Replicon',
 					yLabel: 'Identity (%)'
