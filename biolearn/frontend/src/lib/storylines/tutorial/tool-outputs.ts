@@ -234,117 +234,6 @@ export const kpneumoniaeDemo: StorylineStats = {
 };
 
 /**
- * Linux Basics Tutorial
- *
- * Simple demo dataset for learning Linux commands
- */
-export const linuxBasics: StorylineStats = {
-	// Basic info
-	samplePrefix: 'sample',
-	organism: 'Demo organism',
-	organismShort: 'Demo',
-
-	// Sequencing stats
-	totalReads: 100000,
-	readLength: 150,
-	minLen: 35,
-	maxLen: 151,
-	gcContent: 50.0,
-	q20Percent: 95.0,
-	q30Percent: 90.0,
-
-	// Trimmomatic
-	trimBothSurvivingPercent: 98.5,
-	trimForwardOnlyPercent: 0.8,
-	trimReverseOnlyPercent: 0.2,
-	trimDroppedPercent: 0.5,
-
-	// Assembly
-	assemblySize: 1000000,
-	numContigs: 5,
-	numContigsAll: 10,
-	n50: 500000,
-	n75: 300000,
-	l50: 1,
-	l75: 2,
-	largestContig: 600000,
-	assemblyGC: 50.0,
-	numCircular: 1,
-	numComponents: 2,
-
-	// Annotation
-	numCDS: 1000,
-	numtRNA: 20,
-	numrRNA: 6,
-	numtmRNA: 1,
-	numMiscRNA: 0,
-	numCRISPR: 0,
-
-	// CheckM2
-	checkm: {
-		completeness: 98.5,
-		contamination: 0.5,
-		strain_heterogeneity: 0.0,
-		quality: 'High'
-	},
-
-	// MLST
-	mlst: {
-		scheme: 'demo',
-		st: 'ST1',
-		alleles: { locus1: 1, locus2: 1, locus3: 1 },
-		significance: 'Demo type'
-	},
-
-	// AMR
-	amrDatabase: 'ncbi',
-	amrGenes: [
-		{
-			gene: 'blaDemo-1',
-			coverage: 100.0,
-			identity: 100.0,
-			accession: 'DEMO001',
-			product: 'Demo beta-lactamase',
-			resistance: 'BETA-LACTAM',
-			contig: 'contig_1',
-			start: 1000,
-			end: 2000,
-			strand: '+'
-		}
-	],
-
-	// Plasmids
-	plasmids: [],
-
-	// QUAST
-	quast: {
-		contigsGe500: 5,
-		contigsGe1000: 5,
-		contigsGe5000: 4,
-		contigsGe10000: 3,
-		contigsGe25000: 2,
-		contigsGe50000: 1,
-		totalLengthGe0: 1000000,
-		totalLengthGe1000: 1000000,
-		nsPer100kb: 0.0
-	},
-
-	// Plasmid contigs
-	plasmidContigs: [],
-
-	// Bandage
-	bandage: {
-		nodes: 10,
-		edges: 12,
-		components: 2,
-		deadEnds: 2,
-		circularContigs: 1,
-		largestComponentSize: 900000,
-		largestComponentSegments: 8
-	}
-};
-
-/**
  * Get stats for a tutorial storyline by ID
  */
 export function getTutorialStats(storylineId: string): StorylineStats {
@@ -352,9 +241,6 @@ export function getTutorialStats(storylineId: string): StorylineStats {
 		case 'kpneumoniae-demo':
 		case 'kpneumoniae_demo':
 			return kpneumoniaeDemo;
-		case 'linux-basics':
-		case 'linux_basics':
-			return linuxBasics;
 		default:
 			return kpneumoniaeDemo;
 	}
@@ -363,7 +249,5 @@ export function getTutorialStats(storylineId: string): StorylineStats {
 // Export all stats for direct access
 export const tutorialStats: Record<string, StorylineStats> = {
 	'kpneumoniae-demo': kpneumoniaeDemo,
-	'kpneumoniae_demo': kpneumoniaeDemo,
-	'linux-basics': linuxBasics,
-	'linux_basics': linuxBasics
+	'kpneumoniae_demo': kpneumoniaeDemo
 };
