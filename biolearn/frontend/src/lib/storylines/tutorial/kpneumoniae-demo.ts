@@ -8,7 +8,7 @@ export const kpneumoniaeDemo: Storyline = {
 	subtitle: 'Introduction to WGS Analysis',
 	organism: 'Klebsiella pneumoniae',
 	technology: 'illumina',
-	technologyLabel: 'Illumina NextSeq 2000 (2×150bp)',
+	technologyLabel: 'Illumina NextSeq 2000',
 	dataDir: '/data/kpneumoniae_demo',
 	toolsUsed: ['seqkit', 'fastqc', 'trimmomatic', 'unicycler', 'bandage', 'quast', 'checkm2', 'plasmidfinder', 'abricate', 'mlst', 'prokka'],
 	sections: [
