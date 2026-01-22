@@ -4,7 +4,7 @@
 	import StoryPanel from './StoryPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
 	import { executedCommands, storylineDataDir, currentDirectory } from '$lib/stores/terminal';
-	import { initializeStoryline, getToolFileUrl } from '$lib/services/templateService';
+	import { initializeStoryline, getToolFileUrl, getRootFileUrl, fetchFileContent } from '$lib/services/templateService';
 	import type { Storyline } from '$lib/storylines/types';
 
 	let {
@@ -27,12 +27,10 @@
 	let filesDropdownOpen = $state(false);
 	let allGeneratedFiles = $state<{name: string, type: string, tool: string}[]>([]);
 
-	// File contents for viewing
+	// File contents for viewing (fallback when templates are not available)
+	// Template files are loaded from the API first - see viewFile function
 	const fileContents: Record<string, string> = {
-		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nSRR36708862_1.fastq.gz\tFASTQ\tDNA\t990,478\t268,416,273\t35\t271\t301\nSRR36708862_2.fastq.gz\tFASTQ\tDNA\t990,478\t268,449,364\t35\t271\t301`,
-		// FastQC reports - loaded from static folder (real FastQC output format)
-		'SRR36708862_1_fastqc.html': 'FASTQC_STATIC',
-		'SRR36708862_2_fastqc.html': 'FASTQC_STATIC',
+		// Note: o_seqkit_stats.txt, fastqc HTML files, and o_bandage.png are loaded from templates
 		'assembly.fasta': `>contig_1 length=837178 depth=45.2x\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n>contig_2 length=721456 depth=44.8x\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_3 length=512089 depth=46.1x\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n... (65 contigs total)`,
 		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:837178\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:721456\nS\t3\tATGCGTACGTAGCTAGCTAGCTAGCTAGCT\tLN:i:512089\nL\t1\t+\t2\t+\t0M\nL\t2\t+\t3\t+\t0M\n... (65 segments, 78 links)`,
 		'unicycler.log': `
@@ -218,36 +216,82 @@ Component summary:
 	});
 
 	async function viewFile(file: {name: string, type: string, tool?: string}) {
-		const content = fileContents[file.name];
-
-		// Handle FastQC HTML files - fetch from template API
-		if (file.type === 'html' && content === 'FASTQC_STATIC' && file.tool) {
+		// Try to load from template API first when tool is specified
+		if (file.tool) {
 			try {
 				const url = getToolFileUrl(file.tool, file.name);
-				const response = await fetch(url);
-				if (response.ok) {
-					const htmlContent = await response.text();
-					const newWindow = window.open('', '_blank');
-					if (newWindow) {
-						newWindow.document.write(htmlContent);
-						newWindow.document.close();
+
+				// Handle different file types appropriately
+				if (file.type === 'html') {
+					const response = await fetch(url);
+					if (response.ok) {
+						const htmlContent = await response.text();
+						const newWindow = window.open('', '_blank');
+						if (newWindow) {
+							newWindow.document.write(htmlContent);
+							newWindow.document.close();
+						}
+						filesDropdownOpen = false;
+						return;
 					}
+				} else if (file.type === 'png' || file.type === 'svg' || file.type === 'pdf') {
+					// Open binary/rich content directly from template URL
+					const newWindow = window.open(url, '_blank');
+					if (newWindow) {
+						filesDropdownOpen = false;
+						return;
+					}
+				} else if (file.type === 'zip') {
+					// Trigger download for zip files
+					const a = document.createElement('a');
+					a.href = url;
+					a.download = file.name;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					filesDropdownOpen = false;
+					return;
 				} else {
-					alert(`Could not load ${file.name}`);
+					// Try to fetch text content from template
+					const response = await fetch(url);
+					if (response.ok) {
+						const textContent = await response.text();
+						alert(`File: ${file.name}\n\n${textContent.substring(0, 2000)}${textContent.length > 2000 ? '\n...(truncated)' : ''}`);
+						filesDropdownOpen = false;
+						return;
+					}
 				}
 			} catch (error) {
-				alert(`Error loading ${file.name}`);
+				// Template fetch failed, fall back to hardcoded content
+				console.log(`Template not available for ${file.name}, using fallback`);
 			}
-		} else if (file.type === 'html' && content) {
+		}
+
+		// Handle root-level template files (like o_bandage.png)
+		if (file.name.startsWith('o_') && file.type === 'png') {
+			const url = getRootFileUrl(file.name);
+			if (url) {
+				const newWindow = window.open(url, '_blank');
+				if (newWindow) {
+					filesDropdownOpen = false;
+					return;
+				}
+			}
+		}
+
+		// Fall back to hardcoded content
+		const content = fileContents[file.name];
+
+		if (file.type === 'html' && content && content !== 'FASTQC_STATIC') {
 			const newWindow = window.open('', '_blank');
 			if (newWindow) {
 				newWindow.document.write(content);
 				newWindow.document.close();
 			}
-		} else if (content) {
+		} else if (content && content !== 'FASTQC_STATIC') {
 			alert(`File: ${file.name}\n\n${content}`);
 		} else if (file.type === 'png') {
-			// Open image in new window
+			// Open image from static folder
 			const newWindow = window.open('', '_blank', 'width=1200,height=900');
 			if (newWindow) {
 				newWindow.document.write(`

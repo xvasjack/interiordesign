@@ -66,18 +66,10 @@
 		};
 	});
 
-	// Sample file contents for different file types
+	// Fallback file contents - template files are loaded from API first (see viewFile function)
+	// Files like o_seqkit_stats.txt, FastQC HTML/ZIP files, and o_bandage.png are served from templates
 	const fileContents: Record<string, string> = {
-		// SeqKit stats
-		'o_seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t990,478\t268,416,273\t35\t271\t301\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t990,478\t268,449,364\t35\t271\t301`,
-
-		// FastQC reports - loaded from static folder (real FastQC output format)
-		'SRR36708862_1_fastqc.html': 'FASTQC_STATIC',
-		'SRR36708862_2_fastqc.html': 'FASTQC_STATIC',
-		'SRR36708862_1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
-		'SRR36708862_2_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
-
-		// Trimmomatic outputs
+		// Trimmomatic outputs (fallback content)
 		'sample_01_R1_paired.fq.gz': `@SEQ_ID_1\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
 		'sample_01_R2_paired.fq.gz': `@SEQ_ID_1\nTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
 		'sample_01_R1_unpaired.fq.gz': `@UNPAIRED_1\nATGCATGCATGCATGC\n+\nIIIIIIIIIIIIIIII`,
@@ -125,8 +117,7 @@ Component summary:
     - Col156: 2,532 bp
 `,
 
-		// Bandage output (served from template API - storyline-specific)
-		'o_bandage.png': 'PNG_TEMPLATE',
+		// Note: o_bandage.png is loaded from template API (see viewFile function)
 
 		// QUAST outputs
 		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
@@ -265,53 +256,42 @@ This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance
 			}
 		}
 
-		// Fall back to hardcoded content for non-template files
-		const content = fileContents[file.name];
-
-		// Handle FastQC HTML files - open from template API
-		if (file.type === 'html' && content === 'FASTQC_STATIC') {
-			const url = getToolFileUrl('fastqc', file.name);
-			if (url) {
-				const newWindow = window.open(url, '_blank');
-				if (!newWindow) {
-					alert(`Could not open ${file.name}`);
-				}
-			} else {
-				alert(`Could not open ${file.name} - no storyline context`);
-			}
-		} else if (file.type === 'svg' && content === 'SVG_STATIC') {
-			// Handle SVG files from static/images folder - open in new window
-			const newWindow = window.open(`/images/${file.name}`, '_blank');
-			if (!newWindow) {
-				alert(`Could not open ${file.name}`);
-			}
-		} else if (file.type === 'png' && content === 'PNG_STATIC') {
-			// Handle PNG files from static/images folder - open in new window
-			const newWindow = window.open(`/images/${file.name}`, '_blank');
-			if (!newWindow) {
-				alert(`Could not open ${file.name}`);
-			}
-		} else if (file.type === 'png' && content === 'PNG_TEMPLATE') {
-			// Handle PNG files from template API (storyline-specific)
+		// Handle root-level template files (like o_bandage.png)
+		if (file.name.startsWith('o_') && (file.type === 'png' || file.type === 'svg')) {
 			const url = getRootFileUrl(file.name);
 			if (url) {
 				const newWindow = window.open(url, '_blank');
 				if (!newWindow) {
 					alert(`Could not open ${file.name}`);
 				}
-			} else {
-				alert(`Could not open ${file.name} - no storyline context`);
+				return;
 			}
-		} else if (file.type === 'html' && content) {
+		}
+
+		// Fall back to hardcoded content for non-template files
+		const content = fileContents[file.name];
+
+		// Skip placeholder values - these indicate template files that should have been loaded above
+		const isPlaceholder = content === 'FASTQC_STATIC' || content === 'SVG_STATIC' ||
+		                      content === 'PNG_STATIC' || content === 'PNG_TEMPLATE' ||
+		                      content === 'FASTQC_ZIP_PLACEHOLDER';
+
+		if (file.type === 'html' && content && !isPlaceholder) {
 			// Open HTML in new window
 			const newWindow = window.open('', '_blank');
 			if (newWindow) {
 				newWindow.document.write(content);
 				newWindow.document.close();
 			}
-		} else if (content) {
+		} else if (content && !isPlaceholder) {
 			// Show text content in alert (could be improved with modal)
 			alert(`File: ${file.name}\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
+		} else if (file.type === 'png' || file.type === 'svg') {
+			// Try static images folder as last resort
+			const newWindow = window.open(`/images/${file.name}`, '_blank');
+			if (!newWindow) {
+				alert(`Could not open ${file.name}`);
+			}
 		} else {
 			alert(`Preview not available for ${file.name}\n\nThis is a simulated file in the training environment.`);
 		}
