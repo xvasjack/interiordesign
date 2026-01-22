@@ -1,11 +1,35 @@
-import type { Storyline, StorylineSection } from '../types';
+import type { Storyline } from '../types';
 
-// ============================================
-// LINUX BASICS SECTION CREATORS
-// ============================================
+export const linuxBasics: Storyline = {
+	id: 'linux-basics',
+	category: 'tutorial',
+	templateId: 'basic_linux_commands',
+	title: 'Linux Command Line Basics',
+	subtitle: 'Essential Command Line Skills for Bioinformatics',
+	organism: 'N/A',
+	technology: 'linux-basics',
+	technologyLabel: 'Command Line Fundamentals',
+	dataDir: '/data/linux_tutorial',
+	toolsUsed: ['pwd', 'ls', 'cd', 'cat', 'head', 'tail', 'wc', 'mkdir', 'cp', 'grep'],
+	sections: [
+		{
+			type: 'intro',
+			text: `<strong>Welcome to the Basic Linux Tutorial!</strong>
 
-function createPhase0Sections(): StorylineSection[] {
-	return [
+Before diving into bioinformatics analysis, you need to be comfortable with the Linux command line. This tutorial covers the essential commands you'll use daily when working with sequencing data.`,
+			hint: null,
+			requiredDir: null
+		},
+		{
+			type: 'context',
+			text: `<strong>What you'll learn:</strong>
+
+<ol><li>Getting help with commands</li><li>Navigating the filesystem</li><li>Viewing and inspecting files</li><li>Creating directories</li><li>Searching file contents</li><li>Redirecting output</li></ol>
+
+Let's begin!`,
+			hint: null,
+			requiredDir: null
+		},
 		{
 			type: 'phase',
 			title: 'Phase 0: Getting Started',
@@ -61,12 +85,7 @@ function createPhase0Sections(): StorylineSection[] {
 				{ name: './my_scripts', desc: 'New directory name' },
 				{ name: 'ls', desc: 'List directory contents (after copy)' }
 			]
-		}
-	];
-}
-
-function createPhase1Sections(): StorylineSection[] {
-	return [
+		},
 		{
 			type: 'phase',
 			title: 'Phase 1: Navigation & Exploration',
@@ -128,12 +147,7 @@ function createPhase1Sections(): StorylineSection[] {
 			parameters: [
 				{ name: '~', desc: 'Home directory shortcut' }
 			]
-		}
-	];
-}
-
-function createPhase2Sections(): StorylineSection[] {
-	return [
+		},
 		{
 			type: 'phase',
 			title: 'Phase 2: File Inspection',
@@ -206,12 +220,7 @@ function createPhase2Sections(): StorylineSection[] {
 			parameters: [
 				{ name: 'wc', desc: 'Show lines, words, bytes' }
 			]
-		}
-	];
-}
-
-function createPhase3Sections(): StorylineSection[] {
-	return [
+		},
 		{
 			type: 'phase',
 			title: 'Phase 3: File Management',
@@ -241,12 +250,7 @@ function createPhase3Sections(): StorylineSection[] {
 				{ name: '-p', desc: 'Create parent directories' },
 				{ name: 'results/qc/fastqc', desc: 'Nested path to create' }
 			]
-		}
-	];
-}
-
-function createPhase4Sections(): StorylineSection[] {
-	return [
+		},
 		{
 			type: 'phase',
 			title: 'Phase 4: Text Processing',
@@ -286,12 +290,7 @@ function createPhase4Sections(): StorylineSection[] {
 			parameters: [
 				{ name: '-c', desc: 'Count matching lines' }
 			]
-		}
-	];
-}
-
-function createPhase5Sections(): StorylineSection[] {
-	return [
+		},
 		{
 			type: 'phase',
 			title: 'Phase 5: Redirection & Wildcards',
@@ -354,62 +353,29 @@ function createPhase5Sections(): StorylineSection[] {
 				{ name: 'grep "@"', desc: 'Find header lines' },
 				{ name: '> results/', desc: 'Save to results directory' }
 			]
-		}
-	];
-}
-
-// ============================================
-// STORYLINE DEFINITION
-// ============================================
-
-export const linuxBasics: Storyline = {
-	id: 'linux-basics',
-	category: 'tutorial',
-	templateId: 'basic_linux_commands',
-	title: 'Linux Command Line Basics',
-	subtitle: 'Essential Command Line Skills for Bioinformatics',
-	organism: 'N/A',
-	technology: 'linux-basics',
-	technologyLabel: 'Command Line Fundamentals',
-	dataDir: '/data/linux_tutorial',
-	sections: [
-		{
-			type: 'intro',
-			title: 'Linux Command Line Essentials',
-			text: `Welcome to the Basic Linux Tutorial!
-
-Before diving into bioinformatics analysis, you need to be comfortable with the Linux command line. This tutorial covers the essential commands you'll use daily when working with sequencing data.
-
-**What you'll learn:**
-- Getting help with commands
-- Navigating the filesystem
-- Viewing and inspecting files
-- Creating directories
-- Searching file contents
-- Redirecting output
-
-Let's begin!`
 		},
-		...createPhase0Sections(),
-		...createPhase1Sections(),
-		...createPhase2Sections(),
-		...createPhase3Sections(),
-		...createPhase4Sections(),
-		...createPhase5Sections(),
 		{
 			type: 'complete',
 			title: 'Tutorial Complete!',
-			text: `Congratulations! You've mastered the essential Linux commands for bioinformatics:
+			text: `**Congratulations!** You've mastered the essential Linux commands for bioinformatics.
 
-**Navigation:** pwd, ls, cd
-**File Inspection:** cat, head, tail, wc
-**File Management:** mkdir, cp
-**Text Processing:** grep
-**Redirection:** >, >>
-**Wildcards:** *
+---
 
-You're now ready to tackle real bioinformatics workflows!`
+**Commands Learned:**
+
+| Category | Commands |
+|----------|----------|
+| Navigation | pwd, ls, cd |
+| File Inspection | cat, head, tail, wc |
+| File Management | mkdir, cp |
+| Text Processing | grep |
+| Redirection | >, >> |
+| Wildcards | * |
+
+---
+
+**What's Next?**
+You're now ready to tackle real bioinformatics workflows! Try the **Exploring K. pneumoniae** tutorial to apply these skills to whole-genome sequencing analysis.`
 		}
-	],
-	toolsUsed: ['pwd', 'ls', 'cd', 'cat', 'head', 'tail', 'wc', 'mkdir', 'cp', 'grep']
+	]
 };
