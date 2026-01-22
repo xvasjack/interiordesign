@@ -4122,14 +4122,14 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const outputFiles = args.filter(a => a.includes('_paired.fq.gz') || a.includes('_unpaired.fq.gz'));
 				if (outputFiles.length === 0) {
 					terminal.writeln(`\x1b[31mError: Missing output files\x1b[0m`);
-					terminal.writeln(`\x1b[90mOutput files should be: trimmed/sample_01_R1_paired.fq.gz, trimmed/sample_01_R1_unpaired.fq.gz, etc.\x1b[0m`);
+					terminal.writeln(`\x1b[90mOutput files should be: o_trimmomatic/sample_01_R1_paired.fq.gz, o_trimmomatic/sample_01_R1_unpaired.fq.gz, etc.\x1b[0m`);
 					writePrompt();
 					return;
 				}
-				const invalidOutput = outputFiles.find(f => !f.startsWith('trimmed/') && !f.startsWith('o_trimmomatic/'));
+				const invalidOutput = outputFiles.find(f => !f.startsWith('o_trimmomatic/'));
 				if (invalidOutput) {
 					terminal.writeln(`\x1b[31mError: Invalid output path '${invalidOutput}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, output files must be in the 'trimmed/' or 'o_trimmomatic/' folder\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, output files must be in the 'o_trimmomatic/' folder\x1b[0m`);
 					writePrompt();
 					return;
 				}
