@@ -970,7 +970,7 @@ Segment   Length   Depth    Starting gene   Position   Strand   Identity   Cover
 
 \x1b[1;32mAssembly complete!\x1b[0m
 
-\x1b[33mTip: Use 'bandage image assembly.gfa o_bandage.png' to visualize the assembly graph\x1b[0m
+\x1b[33mTip: Use 'bandage image o_unicycler/assembly.gfa o_bandage.png' to visualize the assembly graph\x1b[0m
 `,
 				summary: {
 					'Total Segments': '189',
