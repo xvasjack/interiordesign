@@ -4096,7 +4096,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'trimmomatic') {
-				const expectedCmd = 'trimmomatic PE -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz trimmed/sample_01_R1_paired.fq.gz trimmed/sample_01_R1_unpaired.fq.gz trimmed/sample_01_R2_paired.fq.gz trimmed/sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36';
+				const expectedCmd = 'trimmomatic PE -threads 2 -phred33 SRR36708862_1.fastq.gz SRR36708862_2.fastq.gz o_trimmomatic/SRR36708862_R1_paired.fq.gz o_trimmomatic/SRR36708862_R1_unpaired.fq.gz o_trimmomatic/SRR36708862_R2_paired.fq.gz o_trimmomatic/SRR36708862_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:4:15 MINLEN:36';
 				if (args.length < 5) {
 					terminal.writeln(`\x1b[31mError: Incomplete command\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: trimmomatic PE -phred33 <R1.fq.gz> <R2.fq.gz> <outputs...> ILLUMINACLIP:... SLIDINGWINDOW:... MINLEN:...\x1b[0m`);
@@ -4162,7 +4162,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			if (command === 'unicycler') {
 				if (!args.includes('-1') || !args.includes('-2')) {
 					terminal.writeln(`\x1b[31mUsage: unicycler -1 <R1_paired.fq.gz> -2 <R2_paired.fq.gz> -o <output_dir>\x1b[0m`);
-					terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads from the trimmed/ folder.\x1b[0m`);
+					terminal.writeln(`\x1b[90mThis tool requires paired-end trimmed reads from the o_trimmomatic/ folder.\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4174,13 +4174,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				// Check files are valid for unicycler
 				if (!r1File || !isValidFileForTool('unicycler', r1File)) {
 					terminal.writeln(`\x1b[31mError: '${r1File || 'missing'}' is not a valid input for unicycler\x1b[0m`);
-					terminal.writeln(`\x1b[90mUnicycler requires: trimmed/sample_01_R1_paired.fq.gz\x1b[0m`);
+					terminal.writeln(`\x1b[90mUnicycler requires: o_trimmomatic/SRR36708862_R1_paired.fq.gz\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!r2File || !isValidFileForTool('unicycler', r2File)) {
 					terminal.writeln(`\x1b[31mError: '${r2File || 'missing'}' is not a valid input for unicycler\x1b[0m`);
-					terminal.writeln(`\x1b[90mUnicycler requires: trimmed/sample_01_R2_paired.fq.gz\x1b[0m`);
+					terminal.writeln(`\x1b[90mUnicycler requires: o_trimmomatic/SRR36708862_R2_paired.fq.gz\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4194,10 +4194,10 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				// Enforce exact output directory name
 				const oIdx = args.indexOf('-o');
 				const outDir = args[oIdx + 1]?.replace(/\/$/, '');
-				if (outDir !== 'assembly') {
+				if (outDir !== 'o_unicycler') {
 					terminal.writeln(`\x1b[31mError: Invalid output directory '${args[oIdx + 1] || 'missing'}'\x1b[0m`);
-					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: assembly\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly\x1b[0m`);
+					terminal.writeln(`\x1b[33mFor this training, please use the exact folder name: o_unicycler\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: unicycler -1 o_trimmomatic/SRR36708862_R1_paired.fq.gz -2 o_trimmomatic/SRR36708862_R2_paired.fq.gz -o o_unicycler/\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4205,8 +4205,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 			if (command === 'bandage') {
 				if (!args.includes('image')) {
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image o_unicycler/assembly.gfa o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image o_unicycler/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4214,13 +4214,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const gfaFile = args.find(a => a.endsWith('.gfa'));
 				if (!gfaFile) {
 					terminal.writeln(`\x1b[31mError: Missing .gfa file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image o_unicycler/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!isValidFileForTool('bandage', gfaFile)) {
 					terminal.writeln(`\x1b[31mError: '${gfaFile}' is not a valid input for bandage\x1b[0m`);
-					terminal.writeln(`\x1b[90mBandage requires: assembly/assembly.gfa (from unicycler output)\x1b[0m`);
+					terminal.writeln(`\x1b[90mBandage requires: o_unicycler/assembly.gfa (from unicycler output)\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4228,7 +4228,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const pngFile = args.find(a => a.endsWith('.png'));
 				if (!pngFile) {
 					terminal.writeln(`\x1b[31mError: Missing output .png file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: bandage image o_unicycler/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4236,25 +4236,25 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				if (pngFile !== 'o_bandage.png') {
 					terminal.writeln(`\x1b[31mError: Invalid output file name '${pngFile}'\x1b[0m`);
 					terminal.writeln(`\x1b[33mFor this training, please use: o_bandage.png\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: bandage image assembly/assembly.gfa o_bandage.png\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: bandage image o_unicycler/assembly.gfa o_bandage.png\x1b[0m`);
 					writePrompt();
 					return;
 				}
 			}
 
 			if (command === 'quast') {
-				// quast assembly/assembly.fasta -o o_quast/
+				// quast o_unicycler/assembly.fasta -o o_quast/
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
-					terminal.writeln(`\x1b[31mUsage: quast assembly/assembly.fasta -o o_quast/\x1b[0m`);
-					terminal.writeln(`\x1b[90mExample: quast assembly/assembly.fasta -o o_quast/\x1b[0m`);
+					terminal.writeln(`\x1b[31mUsage: quast o_unicycler/assembly.fasta -o o_quast/\x1b[0m`);
+					terminal.writeln(`\x1b[90mExample: quast o_unicycler/assembly.fasta -o o_quast/\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!isValidFileForTool('quast', inputFile)) {
 					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for quast\x1b[0m`);
-					terminal.writeln(`\x1b[90mQuast requires: assembly/assembly.fasta\x1b[0m`);
+					terminal.writeln(`\x1b[90mQuast requires: o_unicycler/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4316,8 +4316,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'abricate') {
-				// abricate --db ncbi assembly/assembly.fasta -o o_abricate/
-				const expectedCmd = 'abricate --db ncbi assembly/assembly.fasta -o o_abricate/';
+				// abricate --db ncbi o_unicycler/assembly.fasta -o o_abricate/
+				const expectedCmd = 'abricate --db ncbi o_unicycler/assembly.fasta -o o_abricate/';
 				const inputFile = args.find(a => a.endsWith('.fasta'));
 				if (!inputFile) {
 					terminal.writeln(`\x1b[31mError: Missing input assembly file\x1b[0m`);
@@ -4327,7 +4327,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				}
 				if (!isValidFileForTool('abricate', inputFile)) {
 					terminal.writeln(`\x1b[31mError: '${inputFile}' is not a valid input for abricate\x1b[0m`);
-					terminal.writeln(`\x1b[90mABRicate requires: assembly/assembly.fasta\x1b[0m`);
+					terminal.writeln(`\x1b[90mABRicate requires: o_unicycler/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
@@ -4772,8 +4772,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			}
 
 			if (command === 'plasmidfinder' || command === 'plasmidfinder.py') {
-				// plasmidfinder -i assembly/assembly.fasta -o plasmidfinder_results/
-				const expectedCmd = `${command} -i assembly/assembly.fasta -o plasmidfinder_results/`;
+				// plasmidfinder.py -i o_unicycler/assembly.fasta -x -o o_plasmidfinder
+				const expectedCmd = `${command} -i o_unicycler/assembly.fasta -x -o o_plasmidfinder`;
 				if (!args.includes('-i')) {
 					terminal.writeln(`\x1b[31mError: Missing input file (-i flag)\x1b[0m`);
 					terminal.writeln(`\x1b[31mUsage: ${expectedCmd}\x1b[0m`);
@@ -4784,13 +4784,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				const inputFile = args[iIdx + 1];
 				if (!inputFile || !inputFile.endsWith('.fasta')) {
 					terminal.writeln(`\x1b[31mError: Missing or invalid input file\x1b[0m`);
-					terminal.writeln(`\x1b[90mPlasmidFinder requires: assembly/assembly.fasta\x1b[0m`);
+					terminal.writeln(`\x1b[90mPlasmidFinder requires: o_unicycler/assembly.fasta\x1b[0m`);
 					writePrompt();
 					return;
 				}
 				if (!args.includes('-o')) {
 					terminal.writeln(`\x1b[31mError: Missing output directory (-o flag)\x1b[0m`);
-					terminal.writeln(`\x1b[33mRequired: -o plasmidfinder_results/\x1b[0m`);
+					terminal.writeln(`\x1b[33mRequired: -o o_plasmidfinder\x1b[0m`);
 					writePrompt();
 					return;
 				}
