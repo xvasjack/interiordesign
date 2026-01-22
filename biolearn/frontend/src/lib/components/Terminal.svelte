@@ -6235,6 +6235,27 @@ Refer to the tool documentation for detailed usage instructions.`;
 				terminal.writeln(`\x1b[32m✓ Analysis complete\x1b[0m`);
 				terminal.writeln(`\x1b[90mOutput saved to: ${redirectFile}\x1b[0m`);
 				terminal.writeln(`\x1b[90mUse 'cat ${redirectFile}' to view the results.\x1b[0m`);
+
+				// Store redirected output in createdFiles for cat to read later
+				// Try to fetch from template file first, fall back to generated output
+				const outputPath = redirectFile.startsWith('/') ? redirectFile : `${currentDir}/${redirectFile}`;
+				try {
+					const templateUrl = getRootFileUrl(redirectFile);
+					if (templateUrl) {
+						const response = await fetch(templateUrl);
+						if (response.ok) {
+							createdFiles[outputPath] = await response.text();
+						} else {
+							// Fall back to generated clean output (strip ANSI codes from toolData.output)
+							const cleanOutput = toolData.output?.replace(/\x1b\[[0-9;]*m/g, '').trim() || '';
+							createdFiles[outputPath] = cleanOutput;
+						}
+					}
+				} catch {
+					// Fall back to generated clean output
+					const cleanOutput = toolData.output?.replace(/\x1b\[[0-9;]*m/g, '').trim() || '';
+					createdFiles[outputPath] = cleanOutput;
+				}
 			}
 			// Track executed command for dynamic filesystem and step completion
 			// Track BOTH for all bio tools:
