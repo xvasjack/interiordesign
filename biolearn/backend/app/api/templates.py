@@ -1,130 +1,234 @@
-"""Template content API endpoints."""
+"""Template file serving endpoints."""
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
+from fastapi.responses import FileResponse
+from pathlib import Path
 from typing import Optional
-
-from ..services.template_loader import (
-    get_file_content,
-    get_terminal_output,
-    get_tool_config,
-    get_tool_files,
-    get_summary,
-    get_chart_data,
-    get_all_tools,
-    list_storylines,
-    load_manifest,
-)
+from pydantic import BaseModel
+import os
 
 router = APIRouter()
 
-
-class ToolInfo(BaseModel):
-    """Tool information from manifest."""
-    name: str
-    execution_time: float
-    files: list[str]
-    summary: Optional[dict] = None
-    chart_data: Optional[dict] = None
+# Template directory relative to backend
+TEMPLATE_DIR = Path(__file__).parent.parent.parent.parent / "template"
 
 
-class StorylineInfo(BaseModel):
-    """Storyline information."""
-    id: str
-    title: str
-    description: str
+class TemplateInfo(BaseModel):
+    """Information about a template directory."""
+    category: str
+    storyline: str
     tools: list[str]
+    file_count: int
 
 
-@router.get("/storylines")
-async def get_storylines() -> list[StorylineInfo]:
-    """List all available storylines."""
-    storylines = []
-    for storyline_id in list_storylines():
-        manifest = load_manifest(storyline_id)
-        if manifest:
-            storylines.append(StorylineInfo(
-                id=storyline_id,
-                title=manifest.get("title", storyline_id),
-                description=manifest.get("description", ""),
-                tools=get_all_tools(storyline_id),
-            ))
-    return storylines
+class TemplateFile(BaseModel):
+    """Information about a template file."""
+    name: str
+    path: str
+    size: int
+    is_directory: bool
 
 
-@router.get("/storylines/{storyline_id}/tools")
-async def get_tools(storyline_id: str) -> list[ToolInfo]:
-    """Get all tools for a storyline."""
-    tools = get_all_tools(storyline_id)
-    if not tools:
-        raise HTTPException(status_code=404, detail=f"Storyline '{storyline_id}' not found")
-
-    result = []
-    for tool_name in tools:
-        config = get_tool_config(storyline_id, tool_name)
-        if config:
-            result.append(ToolInfo(
-                name=tool_name,
-                execution_time=config.get("execution_time", 10),
-                files=config.get("files", []),
-                summary=config.get("summary"),
-                chart_data=config.get("chart_data"),
-            ))
-    return result
+def get_template_path(category: str, storyline: str, tool: Optional[str] = None, filename: Optional[str] = None) -> Path:
+    """Build the path to a template file or directory."""
+    path = TEMPLATE_DIR / category / storyline
+    if tool:
+        path = path / f"o_{tool}"
+    if filename:
+        path = path / filename
+    return path
 
 
-@router.get("/storylines/{storyline_id}/tools/{tool_name}")
-async def get_tool(storyline_id: str, tool_name: str) -> ToolInfo:
-    """Get tool information."""
-    config = get_tool_config(storyline_id, tool_name)
-    if not config:
-        raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found in storyline '{storyline_id}'")
+@router.get("/")
+async def list_categories() -> list[str]:
+    """List all template categories."""
+    if not TEMPLATE_DIR.exists():
+        return []
+    return [d.name for d in TEMPLATE_DIR.iterdir() if d.is_dir()]
 
-    return ToolInfo(
-        name=tool_name,
-        execution_time=config.get("execution_time", 10),
-        files=config.get("files", []),
-        summary=config.get("summary"),
-        chart_data=config.get("chart_data"),
+
+@router.get("/{category}")
+async def list_storylines(category: str) -> list[str]:
+    """List all storylines in a category."""
+    category_path = TEMPLATE_DIR / category
+    if not category_path.exists():
+        raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+    return [d.name for d in category_path.iterdir() if d.is_dir()]
+
+
+class StorylineFiles(BaseModel):
+    """All files available in a storyline, organized by tool."""
+    category: str
+    storyline: str
+    tools: dict[str, list[str]]  # tool_name -> list of filenames
+    root_files: list[str]  # Files directly in storyline folder (like o_bandage.png)
+
+
+@router.get("/{category}/{storyline}")
+async def get_storyline_info(category: str, storyline: str) -> TemplateInfo:
+    """Get information about a storyline's templates."""
+    storyline_path = get_template_path(category, storyline)
+    if not storyline_path.exists():
+        raise HTTPException(status_code=404, detail=f"Storyline '{storyline}' not found in category '{category}'")
+
+    # List tool output directories (o_toolname format)
+    tools = []
+    file_count = 0
+    for item in storyline_path.iterdir():
+        if item.is_dir() and item.name.startswith("o_"):
+            tool_name = item.name[2:]  # Remove 'o_' prefix
+            tools.append(tool_name)
+            # Count files in tool directory
+            file_count += sum(1 for f in item.iterdir() if f.is_file() and f.name != ".gitkeep")
+
+    return TemplateInfo(
+        category=category,
+        storyline=storyline,
+        tools=sorted(tools),
+        file_count=file_count
     )
 
 
-@router.get("/storylines/{storyline_id}/tools/{tool_name}/terminal", response_class=PlainTextResponse)
-async def get_tool_terminal(storyline_id: str, tool_name: str) -> str:
-    """Get terminal output for a tool."""
-    output = get_terminal_output(storyline_id, tool_name)
-    if not output:
-        raise HTTPException(status_code=404, detail=f"Terminal output not found for '{tool_name}'")
-    return output
+@router.get("/{category}/{storyline}/files")
+async def get_storyline_files(category: str, storyline: str) -> StorylineFiles:
+    """Get all files in a storyline, organized by tool.
+
+    This returns all files that can be used for output display:
+    - Files in o_toolname/ directories
+    - Files directly in the storyline folder (like o_bandage.png)
+    """
+    storyline_path = get_template_path(category, storyline)
+    if not storyline_path.exists():
+        raise HTTPException(status_code=404, detail=f"Storyline '{storyline}' not found in category '{category}'")
+
+    tools: dict[str, list[str]] = {}
+    root_files: list[str] = []
+
+    for item in storyline_path.iterdir():
+        if item.name == ".gitkeep":
+            continue
+
+        if item.is_dir() and item.name.startswith("o_"):
+            # This is a tool output directory
+            tool_name = item.name[2:]  # Remove 'o_' prefix
+            files = [f.name for f in item.iterdir() if f.is_file() and f.name != ".gitkeep"]
+            if files:
+                tools[tool_name] = sorted(files)
+        elif item.is_file() and item.name.startswith("o_"):
+            # This is a root-level output file (like o_bandage.png)
+            root_files.append(item.name)
+
+    return StorylineFiles(
+        category=category,
+        storyline=storyline,
+        tools=tools,
+        root_files=sorted(root_files)
+    )
 
 
-@router.get("/storylines/{storyline_id}/files/{filename:path}", response_class=PlainTextResponse)
-async def get_file(storyline_id: str, filename: str) -> str:
-    """Get output file content."""
-    content = get_file_content(storyline_id, filename)
-    if not content:
+@router.get("/{category}/{storyline}/root/{filename:path}")
+async def get_root_file(category: str, storyline: str, filename: str) -> FileResponse:
+    """Serve a file directly from the storyline folder (not in an o_tool/ subdirectory).
+
+    This handles files like o_bandage.png that are stored directly in the storyline folder.
+    """
+    storyline_path = get_template_path(category, storyline)
+    file_path = storyline_path / filename
+
+    if not file_path.exists():
         raise HTTPException(status_code=404, detail=f"File '{filename}' not found")
-    return content
+
+    if not file_path.is_file():
+        raise HTTPException(status_code=400, detail=f"'{filename}' is not a file")
+
+    # Determine media type based on extension
+    media_types = {
+        ".html": "text/html",
+        ".txt": "text/plain",
+        ".tsv": "text/tab-separated-values",
+        ".csv": "text/csv",
+        ".json": "application/json",
+        ".fasta": "text/plain",
+        ".fa": "text/plain",
+        ".fna": "text/plain",
+        ".faa": "text/plain",
+        ".fastq": "text/plain",
+        ".fq": "text/plain",
+        ".gff": "text/plain",
+        ".gbk": "text/plain",
+        ".png": "image/png",
+        ".svg": "image/svg+xml",
+        ".pdf": "application/pdf",
+        ".zip": "application/zip",
+    }
+
+    ext = file_path.suffix.lower()
+    media_type = media_types.get(ext, "application/octet-stream")
+
+    return FileResponse(
+        path=file_path,
+        media_type=media_type,
+        filename=filename
+    )
 
 
-@router.get("/storylines/{storyline_id}/tools/{tool_name}/files")
-async def get_tool_file_list(storyline_id: str, tool_name: str) -> list[str]:
-    """Get list of output files for a tool."""
-    files = get_tool_files(storyline_id, tool_name)
-    if not files:
-        config = get_tool_config(storyline_id, tool_name)
-        if not config:
-            raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
-    return files
+@router.get("/{category}/{storyline}/{tool}")
+async def list_tool_files(category: str, storyline: str, tool: str) -> list[TemplateFile]:
+    """List all files in a tool's output directory."""
+    tool_path = get_template_path(category, storyline, tool)
+    if not tool_path.exists():
+        raise HTTPException(status_code=404, detail=f"Tool output 'o_{tool}' not found")
+
+    files = []
+    for item in tool_path.iterdir():
+        if item.name == ".gitkeep":
+            continue
+        files.append(TemplateFile(
+            name=item.name,
+            path=str(item.relative_to(TEMPLATE_DIR)),
+            size=item.stat().st_size if item.is_file() else 0,
+            is_directory=item.is_dir()
+        ))
+
+    return sorted(files, key=lambda f: f.name)
 
 
-@router.get("/storylines/{storyline_id}/tools/{tool_name}/summary")
-async def get_tool_summary(storyline_id: str, tool_name: str) -> dict:
-    """Get summary statistics for a tool."""
-    summary = get_summary(storyline_id, tool_name)
-    if summary is None:
-        config = get_tool_config(storyline_id, tool_name)
-        if not config:
-            raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
-        return {}
-    return summary
+@router.get("/{category}/{storyline}/{tool}/{filename:path}")
+async def get_template_file(category: str, storyline: str, tool: str, filename: str) -> FileResponse:
+    """Serve a specific template file."""
+    file_path = get_template_path(category, storyline, tool, filename)
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"File '{filename}' not found")
+
+    if not file_path.is_file():
+        raise HTTPException(status_code=400, detail=f"'{filename}' is not a file")
+
+    # Determine media type based on extension
+    media_types = {
+        ".html": "text/html",
+        ".txt": "text/plain",
+        ".tsv": "text/tab-separated-values",
+        ".csv": "text/csv",
+        ".json": "application/json",
+        ".fasta": "text/plain",
+        ".fa": "text/plain",
+        ".fna": "text/plain",
+        ".faa": "text/plain",
+        ".fastq": "text/plain",
+        ".fq": "text/plain",
+        ".gff": "text/plain",
+        ".gbk": "text/plain",
+        ".png": "image/png",
+        ".svg": "image/svg+xml",
+        ".pdf": "application/pdf",
+        ".zip": "application/zip",
+    }
+
+    ext = file_path.suffix.lower()
+    media_type = media_types.get(ext, "application/octet-stream")
+
+    return FileResponse(
+        path=file_path,
+        media_type=media_type,
+        filename=filename
+    )

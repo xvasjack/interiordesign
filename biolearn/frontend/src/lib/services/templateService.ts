@@ -1,172 +1,231 @@
 /**
- * Template service for loading storyline content from the backend API.
+ * Template Service - Handles fetching template files from the backend API
  *
  * This service provides functions to:
- * - Get tool information (execution time, files, summary)
- * - Get terminal output for tools
- * - Get output file contents
- *
- * All content is loaded from the template directory via the backend API.
+ * - Get list of files available for each tool in a storyline
+ * - Fetch file contents for display in OutputPanel
+ * - Handle both tool-specific files (in o_tool/ folders) and root files (like o_bandage.png)
  */
 
-const API_BASE = '/api/templates';
+import { get } from 'svelte/store';
+import { storylineContext, API_BASE_URL, templateFiles, templateRootFiles } from '$lib/stores/terminal';
 
-export interface ToolInfo {
+export interface StorylineFiles {
+	category: string;
+	storyline: string;
+	tools: Record<string, string[]>; // tool_name -> list of filenames
+	root_files: string[]; // Files directly in storyline folder
+}
+
+export interface TemplateFile {
 	name: string;
-	execution_time: number;
-	files: string[];
-	summary?: Record<string, string>;
-	chart_data?: Record<string, unknown>;
+	path: string;
+	size: number;
+	is_directory: boolean;
 }
 
-export interface StorylineInfo {
-	id: string;
-	title: string;
-	description: string;
-	tools: string[];
-}
-
-// Cache for file contents to avoid repeated API calls
-const fileContentCache: Map<string, string> = new Map();
-const toolInfoCache: Map<string, ToolInfo> = new Map();
+// Cache for storyline files to avoid repeated API calls
+let filesCache: StorylineFiles | null = null;
+let cacheKey: string | null = null;
 
 /**
- * Get list of all available storylines.
+ * Get all files available in the current storyline
  */
-export async function getStorylines(): Promise<StorylineInfo[]> {
-	const response = await fetch(`${API_BASE}/storylines`);
-	if (!response.ok) {
-		console.error('Failed to fetch storylines');
-		return [];
+export async function getStorylineFiles(): Promise<StorylineFiles | null> {
+	const context = get(storylineContext);
+	if (!context) {
+		console.warn('No storyline context set');
+		return null;
 	}
-	return response.json();
-}
 
-/**
- * Get tool information from the manifest.
- */
-export async function getToolInfo(storylineId: string, toolName: string): Promise<ToolInfo | null> {
-	const cacheKey = `${storylineId}:${toolName}`;
-	if (toolInfoCache.has(cacheKey)) {
-		return toolInfoCache.get(cacheKey)!;
+	const key = `${context.category}/${context.storyline}`;
+
+	// Return cached result if available
+	if (filesCache && cacheKey === key) {
+		return filesCache;
 	}
 
 	try {
-		const response = await fetch(`${API_BASE}/storylines/${storylineId}/tools/${toolName}`);
+		const response = await fetch(`${API_BASE_URL}/templates/${context.category}/${context.storyline}/files`);
 		if (!response.ok) {
+			console.error('Failed to fetch storyline files:', response.statusText);
 			return null;
 		}
-		const info = await response.json();
-		toolInfoCache.set(cacheKey, info);
-		return info;
+
+		filesCache = await response.json();
+		cacheKey = key;
+		return filesCache;
 	} catch (error) {
-		console.error(`Failed to fetch tool info for ${toolName}:`, error);
+		console.error('Error fetching storyline files:', error);
 		return null;
 	}
 }
 
 /**
- * Get terminal output for a tool.
+ * Get files for a specific tool
  */
-export async function getTerminalOutput(storylineId: string, toolName: string): Promise<string | null> {
+export async function getToolFiles(tool: string): Promise<string[]> {
+	const files = await getStorylineFiles();
+	if (!files) return [];
+
+	return files.tools[tool] || [];
+}
+
+/**
+ * Get the URL for a tool output file
+ */
+export function getToolFileUrl(tool: string, filename: string): string {
+	const context = get(storylineContext);
+	if (!context) return '';
+
+	return `${API_BASE_URL}/templates/${context.category}/${context.storyline}/${tool}/${filename}`;
+}
+
+/**
+ * Get the URL for a root file (file directly in storyline folder)
+ */
+export function getRootFileUrl(filename: string): string {
+	const context = get(storylineContext);
+	if (!context) return '';
+
+	return `${API_BASE_URL}/templates/${context.category}/${context.storyline}/root/${filename}`;
+}
+
+/**
+ * Fetch file content as text
+ */
+export async function fetchFileContent(tool: string, filename: string): Promise<string | null> {
+	const url = getToolFileUrl(tool, filename);
+	if (!url) return null;
+
 	try {
-		const response = await fetch(`${API_BASE}/storylines/${storylineId}/tools/${toolName}/terminal`);
+		const response = await fetch(url);
 		if (!response.ok) {
+			console.error('Failed to fetch file content:', response.statusText);
 			return null;
 		}
-		return response.text();
+
+		return await response.text();
 	} catch (error) {
-		console.error(`Failed to fetch terminal output for ${toolName}:`, error);
+		console.error('Error fetching file content:', error);
 		return null;
 	}
 }
 
 /**
- * Get output file content.
+ * Fetch root file content as text
  */
-export async function getFileContent(storylineId: string, filename: string): Promise<string | null> {
-	const cacheKey = `${storylineId}:${filename}`;
-	if (fileContentCache.has(cacheKey)) {
-		return fileContentCache.get(cacheKey)!;
-	}
+export async function fetchRootFileContent(filename: string): Promise<string | null> {
+	const url = getRootFileUrl(filename);
+	if (!url) return null;
 
 	try {
-		const response = await fetch(`${API_BASE}/storylines/${storylineId}/files/${filename}`);
+		const response = await fetch(url);
 		if (!response.ok) {
+			console.error('Failed to fetch root file content:', response.statusText);
 			return null;
 		}
-		const content = await response.text();
-		fileContentCache.set(cacheKey, content);
-		return content;
+
+		return await response.text();
 	} catch (error) {
-		console.error(`Failed to fetch file content for ${filename}:`, error);
+		console.error('Error fetching root file content:', error);
 		return null;
 	}
 }
 
 /**
- * Get list of output files for a tool.
+ * Check if a tool has template files available
  */
-export async function getToolFiles(storylineId: string, toolName: string): Promise<string[]> {
-	const info = await getToolInfo(storylineId, toolName);
-	return info?.files ?? [];
+export async function hasToolFiles(tool: string): Promise<boolean> {
+	const files = await getToolFiles(tool);
+	return files.length > 0;
 }
 
 /**
- * Get execution time for a tool.
- */
-export async function getExecutionTime(storylineId: string, toolName: string): Promise<number> {
-	const info = await getToolInfo(storylineId, toolName);
-	return info?.execution_time ?? 10;
-}
-
-/**
- * Get summary statistics for a tool.
- */
-export async function getSummary(storylineId: string, toolName: string): Promise<Record<string, string> | null> {
-	const info = await getToolInfo(storylineId, toolName);
-	return info?.summary ?? null;
-}
-
-/**
- * Clear all caches (useful for development/testing).
+ * Clear the cache (call when switching storylines)
  */
 export function clearCache(): void {
-	fileContentCache.clear();
-	toolInfoCache.clear();
+	filesCache = null;
+	cacheKey = null;
 }
 
 /**
- * Get file type from filename extension.
+ * Load template files for the current storyline and populate stores
+ * Call this when initializing a storyline
+ */
+export async function loadTemplateFiles(): Promise<boolean> {
+	const files = await getStorylineFiles();
+	if (!files) {
+		templateFiles.set({});
+		templateRootFiles.set([]);
+		return false;
+	}
+
+	templateFiles.set(files.tools);
+	templateRootFiles.set(files.root_files);
+	return true;
+}
+
+/**
+ * Set the storyline context and load template files
+ */
+export async function initializeStoryline(category: string, storyline: string): Promise<boolean> {
+	// Clear existing cache and stores
+	clearCache();
+	templateFiles.set({});
+	templateRootFiles.set([]);
+
+	// Set the new context
+	storylineContext.set({ category, storyline });
+
+	// Load template files for this storyline
+	return await loadTemplateFiles();
+}
+
+/**
+ * Get file extension from filename
+ */
+export function getFileExtension(filename: string): string {
+	const lastDot = filename.lastIndexOf('.');
+	return lastDot > 0 ? filename.substring(lastDot + 1).toLowerCase() : '';
+}
+
+/**
+ * Get file type category for display
  */
 export function getFileType(filename: string): string {
-	const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+	const ext = getFileExtension(filename);
 	const typeMap: Record<string, string> = {
 		'html': 'html',
-		'txt': 'txt',
+		'txt': 'text',
 		'tsv': 'tsv',
 		'csv': 'csv',
+		'json': 'json',
 		'fasta': 'fasta',
 		'fa': 'fasta',
 		'fna': 'fasta',
 		'faa': 'fasta',
 		'fastq': 'fastq',
 		'fq': 'fastq',
-		'gfa': 'gfa',
 		'gff': 'gff',
-		'gff3': 'gff',
-		'gbk': 'gbk',
-		'gbff': 'gbk',
-		'vcf': 'vcf',
+		'gbk': 'genbank',
+		'gfa': 'gfa',
 		'log': 'log',
-		'json': 'json',
 		'png': 'png',
+		'svg': 'svg',
+		'pdf': 'pdf',
 		'zip': 'zip',
-		'gz': 'gz',
-		'nwk': 'nwk',
-		'tre': 'nwk',
-		'treefile': 'nwk',
-		'aln': 'aln',
 	};
-	return typeMap[ext] ?? 'txt';
+	return typeMap[ext] || 'unknown';
+}
+
+/**
+ * Format file size for display
+ */
+export function formatFileSize(bytes: number): string {
+	if (bytes === 0) return '0 B';
+	const k = 1024;
+	const sizes = ['B', 'KB', 'MB', 'GB'];
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }

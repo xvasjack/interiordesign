@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { outputData, terminalState, fileNotes, stopSignal } from '$lib/stores/terminal';
-	import { getFileContent } from '$lib/services/templateService';
+	import { outputData, terminalState, fileNotes, stopSignal, storylineContext, API_BASE_URL } from '$lib/stores/terminal';
+	import { getToolFileUrl, getRootFileUrl } from '$lib/services/templateService';
+	import { get } from 'svelte/store';
+
+	let { isReportPage = false }: { isReportPage?: boolean } = $props();
 
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
@@ -11,9 +14,7 @@
 	let loadingTool = $state('');
 	let currentNotes = $state<any[]>([]);
 	let chartRendered = $state(false);
-
-	// Current storyline ID for API calls
-	const storylineId = 'hospital-outbreak';
+	let showPdfModal = $state(false);
 
 	function handleStop() {
 		// Increment stop signal to trigger cancellation
@@ -27,6 +28,13 @@
 			tick().then(() => {
 				renderChart(currentOutput);
 			});
+		}
+	});
+
+	// Auto-switch to report tab when PDF is generated (only on report pages)
+	$effect(() => {
+		if (isReportPage && currentOutput?.isPdfReport) {
+			activeTab = 'report';
 		}
 	});
 
@@ -58,50 +66,239 @@
 		};
 	});
 
+	// Fallback file contents - template files are loaded from API first (see viewFile function)
+	// Files like o_seqkit_stats.txt, FastQC HTML/ZIP files, and o_bandage.png are served from templates
+	const fileContents: Record<string, string> = {
+		// Trimmomatic outputs (fallback content)
+		'sample_01_R1_paired.fq.gz': `@SEQ_ID_1\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
+		'sample_01_R2_paired.fq.gz': `@SEQ_ID_1\nTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
+		'sample_01_R1_unpaired.fq.gz': `@UNPAIRED_1\nATGCATGCATGCATGC\n+\nIIIIIIIIIIIIIIII`,
+		'sample_01_R2_unpaired.fq.gz': `@UNPAIRED_1\nGCATGCATGCATGCAT\n+\nIIIIIIIIIIIIIIII`,
+
+		// Unicycler outputs - SPAdes k-mer graphs
+		'001_spades_graph_k027.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGT\tLN:i:16\tKC:i:1234\nS\t2\tTGCATGCATGCATGCA\tLN:i:16\tKC:i:5678\nL\t1\t+\t2\t+\t8M\n...`,
+		'001_spades_graph_k053.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:32\tKC:i:2345\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:32\tKC:i:6789\nL\t1\t+\t2\t+\t16M\n...`,
+		'001_spades_graph_k071.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:40\tKC:i:3456\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:40\tKC:i:7890\nL\t1\t+\t2\t+\t20M\n...`,
+		'001_spades_graph_k087.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:48\tKC:i:4567\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:48\tKC:i:8901\nL\t1\t+\t2\t+\t24M\n...`,
+		'001_spades_graph_k099.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:56\tKC:i:5678\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:56\tKC:i:9012\nL\t1\t+\t2\t+\t28M\n...`,
+		'001_spades_graph_k111.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:64\tKC:i:6789\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:64\tKC:i:1234\nL\t1\t+\t2\t+\t32M\n...`,
+		'001_spades_graph_k119.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:72\tKC:i:7890\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:72\tKC:i:2345\nL\t1\t+\t2\t+\t36M\n...`,
+		'001_spades_graph_k127.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:80\tKC:i:8901\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:80\tKC:i:3456\nL\t1\t+\t2\t+\t40M\n...`,
+		'002_depth_filter.gfa': `H\tVN:Z:1.0\n# Depth-filtered assembly graph\nS\t1\tACGTACGT...\tLN:i:5358379\tdp:f:1.0\nS\t33\tTGCATGCA...\tLN:i:5409\tdp:f:3.9\nS\t35\tGCTAGCTA...\tLN:i:4315\tdp:f:17.66\nS\t41\tATGCATGC...\tLN:i:2532\tdp:f:19.88\nL\t1\t+\t1\t-\t0M\n...`,
+		'003_overlaps_removed.gfa': `H\tVN:Z:1.0\n# Overlaps removed from graph\nS\t1\tACGTACGT...\tLN:i:5358379\nS\t33\tTGCATGCA...\tLN:i:5409\nS\t35\tGCTAGCTA...\tLN:i:4315\nS\t41\tATGCATGC...\tLN:i:2532\nL\t1\t+\t1\t-\t0M\tRC:i:89234\n...`,
+		'004_bridges_applied.gfa': `H\tVN:Z:1.0\n# Bridges applied to resolve repeats\nS\t1\tACGTACGT...\tLN:i:5553813\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\nL\t1\t+\t1\t-\t0M\n...`,
+		'005_final_clean.gfa': `H\tVN:Z:1.0\n# Final cleaned assembly graph\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\tcl:Z:chromosome\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\tcl:Z:plasmid\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\tcl:Z:plasmid\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\tcl:Z:plasmid\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
+		'assembly.fasta': `>1 length=5553813 depth=1.00x circular=false\nACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n...\n>33 length=5409 depth=3.90x circular=true\nTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\n...\n>35 length=4315 depth=17.66x circular=true\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n...\n>41 length=2532 depth=19.88x circular=true\nATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC\n...`,
+		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
+		'unicycler.log': `
+Unicycler v0.5.0
+Command: unicycler -1 o_trimmomatic/SRR36708862_R1_paired.fq.gz -2 o_trimmomatic/SRR36708862_R2_paired.fq.gz -o o_unicycler/
+
+[2026-01-12 04:15:32] Starting Unicycler
+[2026-01-12 04:15:33] Loading reads
+[2026-01-12 04:15:45] SPAdes assembly with k=27,53,71,87,99,111,119,127
+[2026-01-12 04:18:23] Building bridges
+[2026-01-12 04:20:21] Applying bridges
+[2026-01-12 04:20:21] Polishing assembly
+[2026-01-12 04:25:18] Assembly complete
+
+Assembly Statistics:
+  Total length: 5,553,065 bp
+  Number of contigs: 65
+  Largest contig: 837,178 bp
+  N50: 371,705 bp
+  GC content: 57.18%
+
+Component summary:
+  1 linear component (chromosome - incomplete)
+  3 circular components (plasmids)
+    - ColRNAI: 5,409 bp
+    - Col(pHAD28): 4,315 bp
+    - Col156: 2,532 bp
+`,
+
+		// Note: o_bandage.png is loaded from template API (see viewFile function)
+
+		// QUAST outputs
+		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
+		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;background:#f5f5f5;} .container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);} h1{color:#333;border-bottom:2px solid #4CAF50;padding-bottom:10px;} table{border-collapse:collapse;width:100%;margin-top:20px;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f9f9f9;} tr:hover{background:#f1f1f1;} .metric{font-weight:bold;}</style></head><body><div class="container"><h1>QUAST Report - assembly</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td class="metric"># contigs (>= 0 bp)</td><td>117</td></tr><tr><td class="metric"># contigs (>= 1000 bp)</td><td>57</td></tr><tr><td class="metric"># contigs (>= 5000 bp)</td><td>33</td></tr><tr><td class="metric"># contigs (>= 10000 bp)</td><td>29</td></tr><tr><td class="metric"># contigs (>= 25000 bp)</td><td>24</td></tr><tr><td class="metric"># contigs (>= 50000 bp)</td><td>18</td></tr><tr><td class="metric">Total length (>= 0 bp)</td><td>5,564,255</td></tr><tr><td class="metric">Total length (>= 1000 bp)</td><td>5,547,651</td></tr><tr><td class="metric"># contigs</td><td>65</td></tr><tr><td class="metric">Largest contig</td><td>837,178</td></tr><tr><td class="metric">Total length</td><td>5,553,065</td></tr><tr><td class="metric">GC (%)</td><td>57.18</td></tr><tr><td class="metric">N50</td><td>371,705</td></tr><tr><td class="metric">N75</td><td>224,673</td></tr><tr><td class="metric">L50</td><td>6</td></tr><tr><td class="metric">L75</td><td>10</td></tr><tr><td class="metric"># N's per 100 kbp</td><td>0.00</td></tr></table></div></body></html>`,
+
+		// Abricate outputs
+		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE
+o_unicycler/assembly.fasta\t30\t423\t1238\t+\tsul2\t1-816/816\t===============\t0/0\t100.00\t100.00\tncbi\tNG_051852.1\tsulfonamide-resistant dihydropteroate synthase Sul2\tSULFONAMIDE
+o_unicycler/assembly.fasta\t30\t1300\t2102\t+\taph(3'')-Ib\t2-804/804\t===============\t0/0\t99.88\t99.88\tncbi\tNG_047413.1\taminoglycoside O-phosphotransferase APH(3'')-Ib\tSTREPTOMYCIN
+o_unicycler/assembly.fasta\t30\t2102\t2938\t+\taph(6)-Id\t1-837/837\t===============\t0/0\t100.00\t100.00\tncbi\tNG_047464.1\taminoglycoside O-phosphotransferase APH(6)-Id\tSTREPTOMYCIN
+o_unicycler/assembly.fasta\t30\t3659\t4519\t-\tblaTEM-1\t1-861/861\t===============\t0/0\t100.00\t100.00\tncbi\tNG_050145.1\tbroad-spectrum class A beta-lactamase TEM-1\tBETA-LACTAM
+o_unicycler/assembly.fasta\t30\t7341\t8216\t+\tblaCTX-M-15\t1-876/876\t===============\t0/0\t100.00\t100.00\tncbi\tNG_048935.1\textended-spectrum class A beta-lactamase CTX-M-15\tCEPHALOSPORIN
+o_unicycler/assembly.fasta\t31\t1713\t2186\t+\tdfrA14\t1-474/474\t===============\t0/0\t100.00\t100.00\tncbi\tNG_056035.1\ttrimethoprim-resistant dihydrofolate reductase DfrA14\tTRIMETHOPRIM
+o_unicycler/assembly.fasta\t32\t2466\t3278\t+\tblaNDM-7\t1-813/813\t===============\t0/0\t100.00\t100.00\tncbi\tNG_049339.1\tsubclass B1 metallo-beta-lactamase NDM-7\tCARBAPENEM
+o_unicycler/assembly.fasta\t32\t3282\t3647\t+\tble-MBL\t1-366/366\t===============\t0/0\t100.00\t100.00\tncbi\tNG_047559.1\tbleomycin binding protein Ble-MBL\tBLEOMYCIN
+o_unicycler/assembly.fasta\t4\t37001\t38176\t+\toqxA5\t1-1176/1176\t===============\t0/0\t100.00\t99.41\tncbi\tNG_050423.1\tmultidrug efflux RND transporter periplasmic adaptor subunit OqxA5\tPHENICOL;QUINOLONE
+o_unicycler/assembly.fasta\t4\t38200\t41352\t+\toqxB19\t1-3153/3153\t===============\t0/0\t100.00\t99.40\tncbi\tNG_050437.1\tmultidrug efflux RND transporter permease subunit OqxB19\tPHENICOL;QUINOLONE
+o_unicycler/assembly.fasta\t40\t105\t965\t+\taac(3)-IIe\t1-861/861\t===============\t0/0\t100.00\t99.77\tncbi\tNG_047244.1\taminoglycoside N-acetyltransferase AAC(3)-IIe\tGENTAMICIN
+o_unicycler/assembly.fasta\t44\t92\t646\t+\taac(6')-Ib-D181Y\t1-555/555\t===============\t0/0\t100.00\t99.82\tncbi\tNG_067946.1\tAAC(6')-Ib family aminoglycoside 6'-N-acetyltransferase\tAMIKACIN;KANAMYCIN;TOBRAMYCIN
+o_unicycler/assembly.fasta\t44\t777\t1607\t+\tblaOXA-1\t1-831/831\t===============\t0/0\t100.00\t100.00\tncbi\tNG_049392.1\toxacillin-hydrolyzing class D beta-lactamase OXA-1\tCEPHALOSPORIN
+o_unicycler/assembly.fasta\t46\t492\t1136\t+\tqnrB1\t1-645/645\t===============\t0/0\t100.00\t100.00\tncbi\tNG_050469.1\tquinolone resistance pentapeptide repeat protein QnrB1\tQUINOLONE
+o_unicycler/assembly.fasta\t5\t354542\t354961\t-\tfosA6\t1-420/420\t===============\t0/0\t100.00\t99.76\tncbi\tNG_051497.1\tfosfomycin resistance glutathione transferase FosA6\tFOSFOMYCIN
+o_unicycler/assembly.fasta\t7\t245723\t246583\t-\tblaSHV-106\t1-861/861\t===============\t0/0\t100.00\t99.88\tncbi\tNG_049996.1\textended-spectrum class A beta-lactamase SHV-106\tCEPHALOSPORIN`,
+		'amr_summary.txt': `AMR Gene Summary Report
+=======================
+Generated: 2024-01-15
+Sample: o_unicycler/assembly.fasta
+Database: NCBI AMRFinderPlus
+
+Total AMR genes found: 16
+
+BETA-LACTAM RESISTANCE:
+1. blaNDM-7 (Carbapenemase)
+   Location: contig_32:2466-3278
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: CARBAPENEM (meropenem, imipenem, ertapenem)
+   Clinical significance: CRITICAL - Carbapenem-resistant Enterobacteriaceae (CRE)
+
+2. blaCTX-M-15 (ESBL)
+   Location: contig_30:7341-8216
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: Extended-spectrum cephalosporins (3rd/4th gen)
+   Clinical significance: HIGH
+
+3. blaTEM-1 (Penicillinase)
+   Location: contig_30:3659-4519
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: Ampicillin, penicillins
+
+4. blaSHV-106 (ESBL)
+   Location: contig_7:245723-246583
+   Coverage: 100.00% | Identity: 99.88%
+   Resistance: Extended-spectrum cephalosporins
+
+5. blaOXA-1 (Oxacillinase)
+   Location: contig_44:777-1607
+   Coverage: 100.00% | Identity: 100.00%
+   Resistance: Cephalosporins
+
+AMINOGLYCOSIDE RESISTANCE:
+6. aac(6')-Ib-D181Y | aac(3)-IIe | aph(3'')-Ib | aph(6)-Id
+   Resistance: Amikacin, kanamycin, tobramycin, gentamicin, streptomycin
+
+QUINOLONE RESISTANCE:
+7. qnrB1 | oqxA5 | oqxB19
+   Resistance: Fluoroquinolones (ciprofloxacin, levofloxacin)
+
+OTHER RESISTANCE:
+8. sul2 - Sulfonamide resistance
+9. dfrA14 - Trimethoprim resistance
+10. fosA6 - Fosfomycin resistance
+11. ble-MBL - Bleomycin resistance
+
+CLINICAL INTERPRETATION:
+This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance.
+- AVOID: Carbapenems, cephalosporins, penicillins, aminoglycosides, fluoroquinolones, sulfonamides, trimethoprim
+- CONSIDER: Colistin, tigecycline (susceptibility testing required)
+- Report to infection control for CRE surveillance`
+	};
+
 	// MIME types for different file extensions
 	const mimeTypes: Record<string, string> = {
 		'html': 'text/html',
 		'txt': 'text/plain',
 		'tsv': 'text/tab-separated-values',
-		'csv': 'text/csv',
 		'fasta': 'text/plain',
 		'gfa': 'text/plain',
 		'log': 'text/plain',
 		'png': 'image/png',
+		'svg': 'image/svg+xml',
 		'zip': 'application/zip',
 		'gff': 'text/plain',
 		'gbk': 'text/plain',
 		'fna': 'text/plain',
 		'faa': 'text/plain',
-		'ffn': 'text/plain',
-		'json': 'application/json',
-		'vcf': 'text/plain'
+		'ffn': 'text/plain'
 	};
 
 	async function viewFile(file: any) {
-		// Fetch file content from template API
-		const content = await getFileContent(storylineId, file.name);
+		// Check if this is a template file (from API)
+		if (file.isTemplate && file.tool) {
+			const context = get(storylineContext);
+			if (context) {
+				const url = `${API_BASE_URL}/templates/${context.category}/${context.storyline}/${file.tool}/${file.name}`;
 
-		if (file.type === 'html' && content) {
+				// Handle different file types
+				if (file.type === 'html' || file.type === 'png' || file.type === 'svg' || file.type === 'pdf') {
+					// Open binary/rich content in new window
+					const newWindow = window.open(url, '_blank');
+					if (!newWindow) {
+						alert(`Could not open ${file.name}`);
+					}
+				} else if (file.type === 'zip') {
+					// Trigger download for zip files
+					const a = document.createElement('a');
+					a.href = url;
+					a.download = file.name;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+				} else {
+					// Fetch and display text content
+					try {
+						const response = await fetch(url);
+						if (response.ok) {
+							const content = await response.text();
+							alert(`File: ${file.name}\n\n${content.substring(0, 2000)}${content.length > 2000 ? '\n...(truncated)' : ''}`);
+						} else {
+							alert(`Failed to fetch ${file.name}: ${response.statusText}`);
+						}
+					} catch (error) {
+						alert(`Error fetching ${file.name}: ${error}`);
+					}
+				}
+				return;
+			}
+		}
+
+		// Handle root-level template files (like o_bandage.png)
+		if (file.name.startsWith('o_') && (file.type === 'png' || file.type === 'svg')) {
+			const url = getRootFileUrl(file.name);
+			if (url) {
+				const newWindow = window.open(url, '_blank');
+				if (!newWindow) {
+					alert(`Could not open ${file.name}`);
+				}
+				return;
+			}
+		}
+
+		// Fall back to hardcoded content for non-template files
+		const content = fileContents[file.name];
+
+		// Skip placeholder values - these indicate template files that should have been loaded above
+		const isPlaceholder = content === 'FASTQC_STATIC' || content === 'SVG_STATIC' ||
+		                      content === 'PNG_STATIC' || content === 'PNG_TEMPLATE' ||
+		                      content === 'FASTQC_ZIP_PLACEHOLDER';
+
+		if (file.type === 'html' && content && !isPlaceholder) {
 			// Open HTML in new window
 			const newWindow = window.open('', '_blank');
 			if (newWindow) {
 				newWindow.document.write(content);
 				newWindow.document.close();
 			}
-		} else if (content) {
+		} else if (content && !isPlaceholder) {
 			// Show text content in alert (could be improved with modal)
 			alert(`File: ${file.name}\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
+		} else if (file.type === 'png' || file.type === 'svg') {
+			// Try static images folder as last resort
+			const newWindow = window.open(`/images/${file.name}`, '_blank');
+			if (!newWindow) {
+				alert(`Could not open ${file.name}`);
+			}
 		} else {
-			alert(`Preview not available for ${file.name}\n\nAdd this file to:\nbiolearn/template/storylines/${storylineId}/files/`);
+			alert(`Preview not available for ${file.name}\n\nThis is a simulated file in the training environment.`);
 		}
 	}
 
-	async function downloadFile(file: any) {
-		// Fetch file content from template API
-		const content = await getFileContent(storylineId, file.name) ||
-			`# Simulated content for ${file.name}\n# Add real content to biolearn/template/storylines/${storylineId}/files/`;
-
+	function downloadFile(file: any) {
+		const content = fileContents[file.name] || `# Simulated content for ${file.name}\n# This file was generated in the BioLearn training environment`;
 		const mimeType = mimeTypes[file.type] || 'text/plain';
 		const blob = new Blob([content], { type: mimeType });
 		const url = URL.createObjectURL(blob);
@@ -117,8 +314,20 @@
 	async function renderChart(data: any) {
 		if (!plotContainer || !data?.chartData) return;
 
-		const Plotly = await import('plotly.js-dist-min');
 		const chartData = data.chartData;
+
+		// Handle image type - display image directly instead of using Plotly
+		if (chartData.type === 'image') {
+			plotContainer.innerHTML = `
+				<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 1rem;">
+					<h3 style="font-size: 1rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem;">${chartData.title || 'Image'}</h3>
+					<img src="${chartData.imagePath}" alt="${chartData.title || 'Chart'}" style="max-width: 100%; max-height: calc(100% - 3rem); object-fit: contain; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />
+				</div>
+			`;
+			return;
+		}
+
+		const Plotly = await import('plotly.js-dist-min');
 
 		let traces: any[] = [];
 		let layout: any = {
@@ -271,16 +480,35 @@
 			layout.yaxis.rangemode = 'tozero';
 		} else {
 			// Line chart for FastQC quality scores
-			traces.push({
-				x: chartData.positions || chartData.x,
-				y: chartData.scores || chartData.y,
-				type: 'scatter',
-				mode: 'lines',
-				fill: 'tozeroy',
-				fillcolor: 'rgba(16, 185, 129, 0.2)',
-				line: { color: '#10b981', width: 2 },
-				name: chartData.name || 'Quality Score'
-			});
+			const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+
+			if (chartData.datasets && Array.isArray(chartData.datasets)) {
+				// Multiple datasets (e.g., R1 and R2)
+				chartData.datasets.forEach((dataset: any, idx: number) => {
+					traces.push({
+						x: dataset.positions || chartData.x,
+						y: dataset.scores || chartData.y,
+						type: 'scatter',
+						mode: 'lines',
+						fill: idx === 0 ? 'tozeroy' : 'none',
+						fillcolor: idx === 0 ? 'rgba(16, 185, 129, 0.15)' : undefined,
+						line: { color: colors[idx % colors.length], width: 2 },
+						name: dataset.label || `Dataset ${idx + 1}`
+					});
+				});
+			} else {
+				// Single dataset
+				traces.push({
+					x: chartData.positions || chartData.x,
+					y: chartData.scores || chartData.y,
+					type: 'scatter',
+					mode: 'lines',
+					fill: 'tozeroy',
+					fillcolor: 'rgba(16, 185, 129, 0.2)',
+					line: { color: '#10b981', width: 2 },
+					name: chartData.name || 'Quality Score'
+				});
+			}
 
 			// Add quality threshold lines for FastQC
 			if (chartData.yLabel?.includes('Phred') || chartData.yLabel?.includes('Quality')) {
@@ -290,7 +518,7 @@
 					y: [30, 30],
 					type: 'scatter',
 					mode: 'lines',
-					line: { color: '#10b981', width: 1, dash: 'dash' },
+					line: { color: '#9ca3af', width: 1, dash: 'dash' },
 					name: 'Q30 (Excellent)',
 					showlegend: true
 				});
@@ -300,7 +528,7 @@
 					y: [20, 20],
 					type: 'scatter',
 					mode: 'lines',
-					line: { color: '#f59e0b', width: 1, dash: 'dash' },
+					line: { color: '#d1d5db', width: 1, dash: 'dash' },
 					name: 'Q20 (Acceptable)',
 					showlegend: true
 				});
@@ -327,29 +555,31 @@
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'chart' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'chart' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'chart')}
 		>
-			Chart
+			📊 Chart
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'table' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'table' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'table')}
 		>
-			Summary
-		</button>
-		<button
-			class="px-4 py-2 text-sm font-medium transition-colors"
-			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'files' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'files' ? '#2563eb' : '#4b5563'};"
-			onclick={() => (activeTab = 'files')}
-		>
-			Files
+			📋 Summary
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'notes' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'notes' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'notes')}
 		>
-			Notes
+			📝 Notes
 		</button>
+		{#if isReportPage && currentOutput?.isPdfReport}
+			<button
+				class="px-4 py-2 text-sm font-medium transition-colors"
+				style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'report' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'report' ? '#2563eb' : '#4b5563'};"
+				onclick={() => (activeTab = 'report')}
+			>
+				📑 Report
+			</button>
+		{/if}
 	</div>
 
 	<!-- Content -->
@@ -411,8 +641,8 @@
 						<dl class="grid grid-cols-2 gap-4">
 							{#each Object.entries(currentOutput.summary) as [key, value]}
 								<div>
-									<dt class="text-sm text-gray-500">{key}</dt>
-									<dd class="text-lg font-semibold text-gray-800">{value}</dd>
+									<dt class="text-sm font-semibold text-gray-800">{key}</dt>
+									<dd class="text-base text-gray-600">{value}</dd>
 								</div>
 							{/each}
 						</dl>
@@ -421,47 +651,6 @@
 			{:else}
 				<div class="h-full flex items-center justify-center text-gray-400">
 					<p>No summary data available</p>
-				</div>
-			{/if}
-		{:else if activeTab === 'files'}
-			{#if currentOutput.files && currentOutput.files.length > 0}
-				<div class="bg-white rounded-lg shadow-sm border">
-					<div class="px-4 py-3 border-b">
-						<h3 class="font-semibold text-gray-800">Generated Files</h3>
-					</div>
-					<ul class="divide-y">
-						{#each currentOutput.files as file}
-							<li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
-								<div class="flex items-center gap-3">
-									<span class="text-2xl">{file.type === 'html' ? '📄' : file.type === 'zip' ? '📦' : '📁'}</span>
-									<div>
-										<p class="font-medium text-gray-800">{file.name}</p>
-										<p class="text-sm text-gray-500">{file.type.toUpperCase()} • {file.size}</p>
-									</div>
-								</div>
-								<div class="flex gap-2">
-									{#if file.type === 'html'}
-										<button
-											class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded text-sm font-medium transition-colors"
-											onclick={() => viewFile(file)}
-										>
-											View
-										</button>
-									{/if}
-									<button
-										class="px-3 py-1 text-green-600 hover:bg-green-50 rounded text-sm font-medium transition-colors"
-										onclick={() => downloadFile(file)}
-									>
-										Download
-									</button>
-								</div>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{:else}
-				<div class="h-full flex items-center justify-center text-gray-400">
-					<p>No files generated</p>
 				</div>
 			{/if}
 		{:else if activeTab === 'notes'}
@@ -475,7 +664,7 @@
 						{#each currentNotes as note}
 							<li class="px-4 py-3">
 								<div class="flex items-start gap-3">
-									<span class="text-blue-500 mt-0.5">i</span>
+									<span class="text-blue-500 mt-0.5">💡</span>
 									<div>
 										<p class="font-medium text-gray-800">{note.name}</p>
 										{#if note.format}
@@ -496,6 +685,283 @@
 					</div>
 				</div>
 			{/if}
+		{:else if activeTab === 'report'}
+			{#if isReportPage && currentOutput?.isPdfReport}
+				<div class="bg-white rounded-lg shadow-lg border overflow-hidden" style="max-height: 100%; overflow: auto;">
+					<!-- PDF Header -->
+					<div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4" style="background: linear-gradient(to right, #dc2626, #b91c1c); color: white; padding: 1rem;">
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-3">
+								<span style="font-size: 2rem;">📄</span>
+								<div>
+									<h2 class="text-xl font-bold" style="font-size: 1.25rem; font-weight: 700;">{currentOutput.pdfTitle || 'Generated Report'}</h2>
+									<p class="text-red-100 text-sm" style="color: #fecaca; font-size: 0.875rem;">PDF Report • {currentOutput.pdfPages || 10} pages • {currentOutput.pdfSize || '1.5 MB'}</p>
+								</div>
+							</div>
+							<button
+								onclick={() => showPdfModal = true}
+								style="background: white; color: #dc2626; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"
+							>
+								<span>🔍</span> View Full Report
+							</button>
+						</div>
+					</div>
+
+					<!-- Report Preview -->
+					<div style="padding: 1.5rem; background: #f8f8f8;">
+						<div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 2rem; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+							<!-- Document Title -->
+							<div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+								<h1 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0;">{currentOutput.pdfTitle || '16S Microbiome Analysis Report'}</h1>
+								<p style="color: #6b7280; margin-top: 0.5rem;">BioLearn • {new Date().toLocaleDateString()}</p>
+							</div>
+
+							<!-- Table of Contents -->
+							<div style="margin-bottom: 1.5rem;">
+								<h3 style="font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Contents</h3>
+								<div style="display: grid; gap: 0.25rem; font-size: 0.875rem; color: #4b5563;">
+									{#each currentOutput.pdfSections || ['Alpha Diversity', 'Beta Diversity', 'Taxonomic Composition', 'Functional Analysis'] as section, i}
+										<div style="display: flex; align-items: center; gap: 0.5rem;">
+											<span style="color: #2563eb;">{i + 1}.</span>
+											<span>{section}</span>
+											<span style="flex: 1; border-bottom: 1px dotted #d1d5db;"></span>
+											<span style="color: #9ca3af;">{i + 2}</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+
+							<!-- Sample Figures Preview -->
+							<div style="margin-bottom: 1.5rem;">
+								<h3 style="font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">Figure Previews</h3>
+								<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+									<!-- Alpha Diversity Box Plot -->
+									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
+										<div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); height: 80px; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+											<div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+												<div style="width: 20px; height: 40px; background: #3b82f6; border-radius: 0.125rem;"></div>
+												<div style="width: 20px; height: 55px; background: #10b981; border-radius: 0.125rem;"></div>
+												<div style="width: 20px; height: 35px; background: #f59e0b; border-radius: 0.125rem;"></div>
+											</div>
+										</div>
+										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 1. Shannon Diversity</p>
+									</div>
+
+									<!-- PCoA Plot -->
+									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
+										<div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); height: 80px; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; position: relative;">
+											<div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; position: absolute; top: 25%; left: 30%;"></div>
+											<div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; position: absolute; top: 35%; left: 35%;"></div>
+											<div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; position: absolute; top: 60%; left: 60%;"></div>
+											<div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; position: absolute; top: 65%; left: 55%;"></div>
+										</div>
+										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 2. PCoA Ordination</p>
+									</div>
+
+									<!-- Bar Chart -->
+									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
+										<div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); height: 80px; border-radius: 0.25rem; display: flex; align-items: flex-end; justify-content: center; gap: 0.25rem; padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+											<div style="width: 16px; display: flex; flex-direction: column;">
+												<div style="height: 20px; background: #3b82f6;"></div>
+												<div style="height: 25px; background: #10b981;"></div>
+												<div style="height: 15px; background: #f59e0b;"></div>
+											</div>
+											<div style="width: 16px; display: flex; flex-direction: column;">
+												<div style="height: 15px; background: #3b82f6;"></div>
+												<div style="height: 30px; background: #10b981;"></div>
+												<div style="height: 20px; background: #f59e0b;"></div>
+											</div>
+											<div style="width: 16px; display: flex; flex-direction: column;">
+												<div style="height: 25px; background: #3b82f6;"></div>
+												<div style="height: 20px; background: #10b981;"></div>
+												<div style="height: 10px; background: #f59e0b;"></div>
+											</div>
+										</div>
+										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 3. Taxonomic Composition</p>
+									</div>
+
+									<!-- Heatmap -->
+									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
+										<div style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); height: 80px; border-radius: 0.25rem; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1px; padding: 0.25rem; margin-bottom: 0.5rem;">
+											{#each Array(20) as _, i}
+												<div style="background: {['#fee2e2', '#fecaca', '#fca5a5', '#f87171', '#ef4444', '#dc2626', '#b91c1c', '#fef3c7', '#fde68a', '#fcd34d'][i % 10]}; border-radius: 1px;"></div>
+											{/each}
+										</div>
+										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 4. Function Heatmap</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- Key Findings -->
+							<div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 0.375rem; padding: 1rem;">
+								<h3 style="font-size: 0.875rem; font-weight: 600; color: #166534; margin-bottom: 0.5rem;">✓ Report Generated Successfully</h3>
+								<p style="font-size: 0.813rem; color: #15803d;">
+									This PDF report contains all your analysis results including diversity metrics,
+									statistical tests, and publication-ready visualizations.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			{:else}
+				<div class="h-full flex items-center justify-center text-gray-400">
+					<p>No report generated yet</p>
+				</div>
+			{/if}
 		{/if}
 	</div>
+
+	<!-- Full PDF Modal -->
+	{#if showPdfModal && isReportPage && currentOutput?.isPdfReport}
+		<div
+			style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 2rem;"
+			onclick={() => showPdfModal = false}
+		>
+			<div
+				style="background: white; border-radius: 0.5rem; max-width: 900px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;"
+				onclick={(e) => e.stopPropagation()}
+			>
+				<!-- Modal Header -->
+				<div style="background: #1f2937; color: white; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: between;">
+					<div style="flex: 1;">
+						<h2 style="font-size: 1.125rem; font-weight: 600; margin: 0;">{currentOutput.pdfTitle || 'Generated Report'}</h2>
+						<p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">PDF Preview</p>
+					</div>
+					<button
+						onclick={() => showPdfModal = false}
+						style="background: transparent; border: none; color: white; cursor: pointer; padding: 0.5rem; font-size: 1.5rem;"
+					>×</button>
+				</div>
+
+				<!-- Modal Content - Scrollable PDF Preview -->
+				<div style="flex: 1; overflow-y: auto; background: #525659; padding: 1.5rem;">
+					<div style="background: white; max-width: 700px; margin: 0 auto; padding: 3rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+						<!-- Page 1: Title -->
+						<div style="text-align: center; padding: 4rem 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 2rem;">
+							<h1 style="font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">{currentOutput.pdfTitle || '16S Microbiome Analysis Report'}</h1>
+							<p style="color: #6b7280; font-size: 1.125rem;">BioLearn Analysis Platform</p>
+							<p style="color: #9ca3af; margin-top: 2rem;">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+						</div>
+
+						<!-- Alpha Diversity Section -->
+						<div style="margin-bottom: 2rem;">
+							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">1. Alpha Diversity (Taxa)</h2>
+							<p style="color: #4b5563; margin-bottom: 1rem; font-size: 0.875rem;">
+								Alpha diversity measures within-sample diversity. Shannon index accounts for both richness and evenness,
+								while Observed ASVs counts the total unique amplicon sequence variants.
+							</p>
+							<div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+								<div style="display: flex; justify-content: center; gap: 2rem; align-items: flex-end; height: 150px; margin-bottom: 1rem;">
+									<div style="text-align: center;">
+										<div style="width: 60px; height: 100px; background: linear-gradient(to top, #3b82f6, #60a5fa); border-radius: 0.25rem;"></div>
+										<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Control</p>
+									</div>
+									<div style="text-align: center;">
+										<div style="width: 60px; height: 130px; background: linear-gradient(to top, #10b981, #34d399); border-radius: 0.25rem;"></div>
+										<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Treatment</p>
+									</div>
+								</div>
+								<p style="font-size: 0.75rem; color: #6b7280; font-style: italic;">Figure 1: Shannon Diversity by Group (p = 0.023)</p>
+							</div>
+						</div>
+
+						<!-- Beta Diversity Section -->
+						<div style="margin-bottom: 2rem;">
+							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">2. Beta Diversity (Taxa)</h2>
+							<p style="color: #4b5563; margin-bottom: 1rem; font-size: 0.875rem;">
+								Principal Coordinates Analysis (PCoA) of Bray-Curtis distances reveals distinct clustering between groups.
+								PERMANOVA: R² = 0.234, p = 0.001
+							</p>
+							<div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+								<div style="position: relative; height: 180px; margin-bottom: 1rem;">
+									<!-- Axes -->
+									<div style="position: absolute; left: 50%; top: 10%; bottom: 10%; width: 1px; background: #d1d5db;"></div>
+									<div style="position: absolute; top: 50%; left: 10%; right: 10%; height: 1px; background: #d1d5db;"></div>
+									<!-- Points - Group 1 -->
+									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 25%; left: 25%;"></div>
+									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 30%; left: 32%;"></div>
+									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 35%; left: 28%;"></div>
+									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 40%; left: 35%;"></div>
+									<!-- Points - Group 2 -->
+									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 60%; left: 65%;"></div>
+									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 65%; left: 58%;"></div>
+									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 55%; left: 62%;"></div>
+									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 70%; left: 70%;"></div>
+									<!-- Labels -->
+									<span style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: #6b7280;">PCo1 (32.4%)</span>
+									<span style="position: absolute; left: 0; top: 50%; transform: rotate(-90deg) translateX(-50%); font-size: 0.75rem; color: #6b7280;">PCo2 (18.7%)</span>
+								</div>
+								<p style="font-size: 0.75rem; color: #6b7280; font-style: italic;">Figure 2: PCoA of Bray-Curtis Distances with 95% Confidence Ellipses</p>
+							</div>
+						</div>
+
+						<!-- Functional Analysis Section -->
+						<div style="margin-bottom: 2rem;">
+							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">3. Functional Profiling</h2>
+							<p style="color: #4b5563; margin-bottom: 1rem; font-size: 0.875rem;">
+								Predicted functional potential inferred from 16S data using PICRUSt2.
+								<em>Note: These are predictions, not direct measurements.</em>
+							</p>
+							<div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 0.375rem; padding: 0.75rem; margin-bottom: 1rem;">
+								<p style="font-size: 0.813rem; color: #92400e;">
+									⚠️ Functional predictions from PICRUSt2 should be interpreted with caution and validated with metagenomic sequencing when possible.
+								</p>
+							</div>
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+								<div style="background: #f9fafb; padding: 1rem; border-radius: 0.5rem;">
+									<p style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Top Differential KOs:</p>
+									<ul style="font-size: 0.75rem; color: #4b5563; list-style: none; padding: 0; margin: 0;">
+										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">K00001 - Alcohol dehydrogenase</li>
+										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">K01190 - Beta-galactosidase</li>
+										<li style="padding: 0.25rem 0;">K00134 - GAPDH</li>
+									</ul>
+								</div>
+								<div style="background: #f9fafb; padding: 1rem; border-radius: 0.5rem;">
+									<p style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Pathway Summary:</p>
+									<ul style="font-size: 0.75rem; color: #4b5563; list-style: none; padding: 0; margin: 0;">
+										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">Biosynthesis: 45%</li>
+										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">Degradation: 28%</li>
+										<li style="padding: 0.25rem 0;">Energy metabolism: 18%</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<!-- Taxonomic Composition Section -->
+						<div style="margin-bottom: 2rem;">
+							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">4. Taxonomic Composition</h2>
+							<div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+								<div style="display: flex; justify-content: center; gap: 0.5rem; height: 150px; align-items: flex-end; margin-bottom: 1rem;">
+									{#each ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'] as sample}
+										<div style="display: flex; flex-direction: column; width: 40px;">
+											<div style="height: 30px; background: #3b82f6;"></div>
+											<div style="height: 45px; background: #10b981;"></div>
+											<div style="height: 25px; background: #f59e0b;"></div>
+											<div style="height: 15px; background: #ef4444;"></div>
+											<div style="height: 20px; background: #8b5cf6;"></div>
+											<p style="font-size: 0.625rem; color: #6b7280; margin-top: 0.25rem;">{sample}</p>
+										</div>
+									{/each}
+								</div>
+								<div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #3b82f6;"></span>Firmicutes</span>
+									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #10b981;"></span>Bacteroidetes</span>
+									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #f59e0b;"></span>Proteobacteria</span>
+									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #ef4444;"></span>Actinobacteria</span>
+									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #8b5cf6;"></span>Other</span>
+								</div>
+								<p style="font-size: 0.75rem; color: #6b7280; font-style: italic; margin-top: 1rem;">Figure 3: Phylum-level Relative Abundance</p>
+							</div>
+						</div>
+
+						<!-- Footer -->
+						<div style="border-top: 1px solid #e5e7eb; padding-top: 1.5rem; margin-top: 2rem; text-align: center; color: #9ca3af; font-size: 0.75rem;">
+							<p>Generated by BioLearn Analysis Platform</p>
+							<p style="margin-top: 0.25rem;">This is a simulated report for educational purposes</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>

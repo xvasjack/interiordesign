@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { executedCommands, executedSteps, currentDirectory } from '$lib/stores/terminal';
-	import type { Storyline, StorylineSection } from '$lib/storylines/wgs-bacteria';
+	import { executedCommands, executedSteps, currentDirectory, storylineDataDir } from '$lib/stores/terminal';
+	import { get } from 'svelte/store';
+	import type { Storyline, StorylineSection } from '$lib/storylines/types';
 
 	let { storyline = null }: { storyline?: Storyline | null } = $props();
 
@@ -14,10 +15,13 @@
 	// Default storyline if none provided
 	const defaultStoryline: Storyline = {
 		id: 'default',
+		category: 'tutorial',
 		title: 'Hospital Outbreak Investigation',
 		subtitle: 'WGS Analysis Pipeline',
 		organism: 'Klebsiella pneumoniae',
 		technology: 'illumina',
+		technologyLabel: 'Short Read (Illumina)',
+		dataDir: '/data/outbreak_investigation',
 		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
 		sections: [
 			{
@@ -68,11 +72,43 @@
 		// Map commands to steps based on task index
 		activeStoryline.sections.forEach((section, index) => {
 			if (section.type === 'task' && section.command) {
-				// Extract tool name from command
-				const toolName = section.command.split(' ')[0];
-				const altToolName = section.command.split(' ')[0].replace('_', '-');
-				if (cmds.includes(toolName) || cmds.includes(altToolName)) {
-					completedSteps.add(index);
+				// Handle multi-line commands (split by newline)
+				const commandLines = section.command.split('\n').filter(line => line.trim());
+
+				if (commandLines.length > 1) {
+					// Multi-line command: ALL commands must be executed the required number of times
+					// Count required occurrences of each tool
+					const requiredCounts: Record<string, number> = {};
+					commandLines.forEach(line => {
+						const toolName = line.trim().split(' ')[0];
+						requiredCounts[toolName] = (requiredCounts[toolName] || 0) + 1;
+					});
+
+					// Check if all tools have been executed the required number of times
+					const allCommandsExecuted = Object.entries(requiredCounts).every(([toolName, requiredCount]) => {
+						if (toolName === 'ls') {
+							// ls is tracked with count (ls:1, ls:2, etc.)
+							const lsExecutions = cmds.filter(c => c.startsWith('ls:')).length;
+							return lsExecutions >= requiredCount;
+						} else {
+							// Other tools just need to be present
+							const altToolName = toolName.replace('_', '-');
+							return cmds.includes(toolName) || cmds.includes(altToolName);
+						}
+					});
+					if (allCommandsExecuted) {
+						completedSteps.add(index);
+					}
+				} else {
+					// Single command: match full command for precise step tracking
+					// This ensures students run the exact command specified in the lesson
+					// Normalize trailing slashes so 'o_fastqc' matches 'o_fastqc/'
+					const normalizeCmd = (cmd: string) => cmd.trim().replace(/\/(\s|$)/g, '$1');
+					const fullCmd = normalizeCmd(section.command);
+					const matched = cmds.some(c => normalizeCmd(c) === fullCmd);
+					if (matched) {
+						completedSteps.add(index);
+					}
 				}
 				// Also check for specific tools
 				if (section.command.includes('mob_recon') && cmds.includes('mob_recon')) {
@@ -86,21 +122,37 @@
 		completedSteps = new Set(completedSteps);
 	});
 
+	// Normalize path for comparison (trim whitespace, remove trailing slashes)
+	function normalizePath(path: string): string {
+		return path.trim().replace(/\/+$/, '').replace(/\/+/g, '/');
+	}
+
 	// Check if user is in the correct directory for a task
 	function isInCorrectDir(requiredDir: string | null | undefined): boolean {
 		if (!requiredDir) return true;
-		return userCurrentDir === requiredDir;
+		// Normalize both paths to handle edge cases (trailing slashes, whitespace)
+		return normalizePath(userCurrentDir) === normalizePath(requiredDir);
 	}
 
-	// Get short directory name for display
+	// Get short directory name for display (uses the store set by ThreePanelLayout)
 	function getShortDir(dir: string): string {
-		return dir.replace('/data/outbreak_investigation', '~');
+		const dataDir = get(storylineDataDir);
+		return dir.replace(dataDir, '~');
 	}
 
 	// Check if user can proceed to next step
 	function canProceed(stepIndex: number): boolean {
+		if (stepIndex <= 1) return true;
+
+		// Always check if the previous step (current step) is a task that needs completion
+		const prevStepIndex = stepIndex - 1;
+		const prevSection = activeStoryline.sections[prevStepIndex];
+		if (prevSection?.type === 'task' && !completedSteps.has(prevStepIndex)) {
+			return false;
+		}
+
 		const section = activeStoryline.sections[stepIndex];
-		// Phase headers and non-task sections don't need completion
+		// Phase headers and non-task sections don't need completion themselves
 		if (section?.type === 'phase' || section?.type === 'intro' || section?.type === 'context' || section?.type === 'complete' || section?.type === 'alert' || section?.type === 'image') {
 			return true;
 		}
@@ -108,13 +160,7 @@
 		if (section?.type === 'decision') {
 			return selectedDecision !== null;
 		}
-		if (stepIndex <= 1) return true;
-		// For task steps, check if previous task step is completed
-		const prevTaskIndex = stepIndex - 1;
-		if (prevTaskIndex <= 1) return true;
-		const prevSection = activeStoryline.sections[prevTaskIndex];
-		if (prevSection?.type !== 'task') return true;
-		return completedSteps.has(prevTaskIndex);
+		return true;
 	}
 
 	function nextStep() {
@@ -156,15 +202,20 @@
 <div class="h-full flex flex-col" style="display: flex; flex-direction: column; height: 100%;">
 	<!-- Header -->
 	<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 1.5rem; flex-shrink: 0;">
-		<div class="flex items-center gap-3 mb-2" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+		<div class="flex items-center gap-3 mb-2 flex-wrap" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
 			<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				WGS Analysis
 			</span>
+			{#if activeStoryline.technologyLabel}
+				<span class="px-3 py-1 rounded-full text-sm font-medium" style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: {activeStoryline.technologyLabel.includes('Long Read') ? 'rgba(168,85,247,0.9)' : 'rgba(59,130,246,0.9)'};">
+					{activeStoryline.technologyLabel}
+				</span>
+			{/if}
 			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(34,197,94,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				Phase {currentPhase()}
 			</span>
 			{#if activeStoryline.organism}
-				<span class="bg-purple-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(168,85,247,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
+				<span class="bg-amber-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(245,158,11,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 					{activeStoryline.organism}
 				</span>
 			{/if}
@@ -194,11 +245,11 @@
 				<div class="mb-6 animate-fade-in" style="margin-bottom: 1.5rem; opacity: {i < currentStep && section.type !== 'phase' ? '0.5' : '1'};">
 					{#if section.type === 'intro'}
 						<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r" style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
-							<p class="text-gray-700 leading-relaxed font-medium whitespace-pre-line" style="color: #374151; line-height: 1.625; font-weight: 500; white-space: pre-line;">{section.text}</p>
+							<div class="text-gray-700 leading-relaxed story-content" style="color: #374151; line-height: 1.625;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br/>')}</div>
 						</div>
 					{:else if section.type === 'context'}
 						<div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r" style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1.25rem; border-radius: 0 0.25rem 0.25rem 0;">
-							<p class="text-gray-700 whitespace-pre-line" style="color: #374151; white-space: pre-line;">{section.text}</p>
+							<div class="text-gray-700 story-content" style="color: #374151;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br/>')}</div>
 						</div>
 					{:else if section.type === 'phase'}
 						<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg shadow-md" style="background: linear-gradient(to right, #6366f1, #9333ea); color: white; padding: 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
@@ -211,7 +262,7 @@
 								<span class="text-4xl" style="font-size: 2.25rem;">Completed!</span>
 							</div>
 							<h2 class="text-xl font-bold text-center" style="font-size: 1.25rem; font-weight: 700; text-align: center;">{section.title}</h2>
-							<p class="text-green-100 mt-4 whitespace-pre-line" style="color: #dcfce7; margin-top: 1rem; white-space: pre-line;">{section.text}</p>
+							<p class="text-green-100 mt-4 whitespace-pre-line" style="color: #dcfce7; margin-top: 1rem; white-space: pre-line;">{@html section.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>')}</p>
 							<div class="mt-6 text-center" style="margin-top: 1.5rem; text-align: center;">
 								<button
 									onclick={handleFinish}
@@ -295,9 +346,9 @@
 												<p class="text-amber-700 text-sm" style="color: #b45309; font-size: 0.875rem;">
 													You are in <code class="bg-amber-100 px-1 rounded" style="background: #fef3c7; padding: 0 0.25rem; border-radius: 0.25rem;">{getShortDir(userCurrentDir)}</code>
 												</p>
-												<p class="text-amber-700 text-sm mt-1" style="color: #b45309; font-size: 0.875rem; margin-top: 0.25rem;">Return to the project directory first:</p>
+												<p class="text-amber-700 text-sm mt-1" style="color: #b45309; font-size: 0.875rem; margin-top: 0.25rem;">Navigate to the required directory:</p>
 												<div class="bg-gray-900 rounded p-2 mt-1 font-mono text-sm" style="background: #111827; border-radius: 0.25rem; padding: 0.5rem; margin-top: 0.25rem; font-family: monospace; font-size: 0.875rem;">
-													<code class="text-yellow-400" style="color: #facc15;">cd ~</code>
+													<code class="text-yellow-400" style="color: #facc15;">cd {getShortDir(section.requiredDir)}</code>
 												</div>
 											</div>
 										</div>
@@ -305,7 +356,15 @@
 								{:else if section.requiredDir && isInCorrectDir(section.requiredDir) && !completedSteps.has(i)}
 									<div class="flex items-center gap-2 text-green-600 text-sm mb-2" style="display: flex; align-items: center; gap: 0.5rem; color: #16a34a; font-size: 0.875rem; margin-bottom: 0.5rem;">
 										<span>OK</span>
-										<span>You are in the correct directory (~)</span>
+										<span>You are in the correct directory ({getShortDir(section.requiredDir)})</span>
+									</div>
+								{/if}
+
+								<!-- Instruction for users -->
+								{#if !completedSteps.has(i)}
+									<div class="bg-blue-50 border border-blue-200 rounded p-2 mb-3 flex items-center gap-2" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.25rem; padding: 0.5rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+										<span style="font-size: 1rem;">→</span>
+										<span class="text-blue-700 text-sm" style="color: #1d4ed8; font-size: 0.875rem;">Type the command below into the terminal on the left screen</span>
 									</div>
 								{/if}
 
@@ -413,5 +472,46 @@
 			opacity: 1;
 			transform: translateY(0);
 		}
+	}
+
+	/* Story content table styling */
+	:global(.story-content table) {
+		border-collapse: collapse;
+		margin: 0.75rem 0;
+		font-size: 0.875rem;
+		width: auto;
+		min-width: 300px;
+	}
+
+	:global(.story-content th),
+	:global(.story-content td) {
+		border: 1px solid #d1d5db;
+		padding: 0.5rem 1rem;
+		text-align: left;
+	}
+
+	:global(.story-content th) {
+		background: #f3f4f6;
+		font-weight: 600;
+	}
+
+	:global(.story-content tr:nth-child(even)) {
+		background: #f9fafb;
+	}
+
+	:global(.story-content ol) {
+		list-style-type: decimal;
+		padding-left: 1.5rem;
+		margin: 0.5rem 0;
+	}
+
+	:global(.story-content ul) {
+		list-style-type: disc;
+		padding-left: 1.5rem;
+		margin: 0.5rem 0;
+	}
+
+	:global(.story-content li) {
+		margin: 0.25rem 0;
 	}
 </style>
