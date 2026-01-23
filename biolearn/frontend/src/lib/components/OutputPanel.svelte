@@ -14,7 +14,6 @@
 	let loadingTool = $state('');
 	let currentNotes = $state<any[]>([]);
 	let chartRendered = $state(false);
-	let showPdfModal = $state(false);
 
 	function handleStop() {
 		// Increment stop signal to trigger cancellation
@@ -28,13 +27,6 @@
 			tick().then(() => {
 				renderChart(currentOutput);
 			});
-		}
-	});
-
-	// Auto-switch to report tab when PDF is generated (only on report pages)
-	$effect(() => {
-		if (isReportPage && currentOutput?.isPdfReport) {
-			activeTab = 'report';
 		}
 	});
 
@@ -401,7 +393,7 @@
 		>
 			📝 Notes
 		</button>
-		{#if isReportPage && currentOutput?.isPdfReport}
+		{#if isReportPage}
 			<button
 				class="px-4 py-2 text-sm font-medium transition-colors"
 				style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'report' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'report' ? '#2563eb' : '#4b5563'};"
@@ -516,282 +508,14 @@
 				</div>
 			{/if}
 		{:else if activeTab === 'report'}
-			{#if isReportPage && currentOutput?.isPdfReport}
-				<div class="bg-white rounded-lg shadow-lg border overflow-hidden" style="max-height: 100%; overflow: auto;">
-					<!-- PDF Header -->
-					<div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4" style="background: linear-gradient(to right, #dc2626, #b91c1c); color: white; padding: 1rem;">
-						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-3">
-								<span style="font-size: 2rem;">📄</span>
-								<div>
-									<h2 class="text-xl font-bold" style="font-size: 1.25rem; font-weight: 700;">{currentOutput.pdfTitle || 'Generated Report'}</h2>
-									<p class="text-red-100 text-sm" style="color: #fecaca; font-size: 0.875rem;">PDF Report • {currentOutput.pdfPages || 10} pages • {currentOutput.pdfSize || '1.5 MB'}</p>
-								</div>
-							</div>
-							<button
-								onclick={() => showPdfModal = true}
-								style="background: white; color: #dc2626; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"
-							>
-								<span>🔍</span> View Full Report
-							</button>
-						</div>
-					</div>
-
-					<!-- Report Preview -->
-					<div style="padding: 1.5rem; background: #f8f8f8;">
-						<div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 2rem; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-							<!-- Document Title -->
-							<div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-								<h1 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0;">{currentOutput.pdfTitle || '16S Microbiome Analysis Report'}</h1>
-								<p style="color: #6b7280; margin-top: 0.5rem;">BioLearn • {new Date().toLocaleDateString()}</p>
-							</div>
-
-							<!-- Table of Contents -->
-							<div style="margin-bottom: 1.5rem;">
-								<h3 style="font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Contents</h3>
-								<div style="display: grid; gap: 0.25rem; font-size: 0.875rem; color: #4b5563;">
-									{#each currentOutput.pdfSections || ['Alpha Diversity', 'Beta Diversity', 'Taxonomic Composition', 'Functional Analysis'] as section, i}
-										<div style="display: flex; align-items: center; gap: 0.5rem;">
-											<span style="color: #2563eb;">{i + 1}.</span>
-											<span>{section}</span>
-											<span style="flex: 1; border-bottom: 1px dotted #d1d5db;"></span>
-											<span style="color: #9ca3af;">{i + 2}</span>
-										</div>
-									{/each}
-								</div>
-							</div>
-
-							<!-- Sample Figures Preview -->
-							<div style="margin-bottom: 1.5rem;">
-								<h3 style="font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">Figure Previews</h3>
-								<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-									<!-- Alpha Diversity Box Plot -->
-									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
-										<div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); height: 80px; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
-											<div style="display: flex; gap: 0.5rem; align-items: flex-end;">
-												<div style="width: 20px; height: 40px; background: #3b82f6; border-radius: 0.125rem;"></div>
-												<div style="width: 20px; height: 55px; background: #10b981; border-radius: 0.125rem;"></div>
-												<div style="width: 20px; height: 35px; background: #f59e0b; border-radius: 0.125rem;"></div>
-											</div>
-										</div>
-										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 1. Shannon Diversity</p>
-									</div>
-
-									<!-- PCoA Plot -->
-									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
-										<div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); height: 80px; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; position: relative;">
-											<div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; position: absolute; top: 25%; left: 30%;"></div>
-											<div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; position: absolute; top: 35%; left: 35%;"></div>
-											<div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; position: absolute; top: 60%; left: 60%;"></div>
-											<div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; position: absolute; top: 65%; left: 55%;"></div>
-										</div>
-										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 2. PCoA Ordination</p>
-									</div>
-
-									<!-- Bar Chart -->
-									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
-										<div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); height: 80px; border-radius: 0.25rem; display: flex; align-items: flex-end; justify-content: center; gap: 0.25rem; padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
-											<div style="width: 16px; display: flex; flex-direction: column;">
-												<div style="height: 20px; background: #3b82f6;"></div>
-												<div style="height: 25px; background: #10b981;"></div>
-												<div style="height: 15px; background: #f59e0b;"></div>
-											</div>
-											<div style="width: 16px; display: flex; flex-direction: column;">
-												<div style="height: 15px; background: #3b82f6;"></div>
-												<div style="height: 30px; background: #10b981;"></div>
-												<div style="height: 20px; background: #f59e0b;"></div>
-											</div>
-											<div style="width: 16px; display: flex; flex-direction: column;">
-												<div style="height: 25px; background: #3b82f6;"></div>
-												<div style="height: 20px; background: #10b981;"></div>
-												<div style="height: 10px; background: #f59e0b;"></div>
-											</div>
-										</div>
-										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 3. Taxonomic Composition</p>
-									</div>
-
-									<!-- Heatmap -->
-									<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;">
-										<div style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); height: 80px; border-radius: 0.25rem; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1px; padding: 0.25rem; margin-bottom: 0.5rem;">
-											{#each Array(20) as _, i}
-												<div style="background: {['#fee2e2', '#fecaca', '#fca5a5', '#f87171', '#ef4444', '#dc2626', '#b91c1c', '#fef3c7', '#fde68a', '#fcd34d'][i % 10]}; border-radius: 1px;"></div>
-											{/each}
-										</div>
-										<p style="font-size: 0.75rem; color: #6b7280; text-align: center;">Fig 4. Function Heatmap</p>
-									</div>
-								</div>
-							</div>
-
-							<!-- Key Findings -->
-							<div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 0.375rem; padding: 1rem;">
-								<h3 style="font-size: 0.875rem; font-weight: 600; color: #166534; margin-bottom: 0.5rem;">✓ Report Generated Successfully</h3>
-								<p style="font-size: 0.813rem; color: #15803d;">
-									This PDF report contains all your analysis results including diversity metrics,
-									statistical tests, and publication-ready visualizations.
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			{:else}
-				<div class="h-full flex items-center justify-center text-gray-400">
-					<p>No report generated yet</p>
-				</div>
-			{/if}
+			<div class="h-full flex flex-col items-center justify-center text-gray-400" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #9ca3af;">
+				<svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 64px; height: 64px; margin-bottom: 16px;">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+				</svg>
+				<p class="text-lg font-medium" style="font-size: 1.125rem; font-weight: 500; color: #6b7280;">Coming Soon</p>
+				<p class="text-sm mt-1" style="font-size: 0.875rem; margin-top: 0.25rem;">Report generation lessons are under development</p>
+			</div>
 		{/if}
 	</div>
 
-	<!-- Full PDF Modal -->
-	{#if showPdfModal && isReportPage && currentOutput?.isPdfReport}
-		<div
-			style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 2rem;"
-			onclick={() => showPdfModal = false}
-		>
-			<div
-				style="background: white; border-radius: 0.5rem; max-width: 900px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;"
-				onclick={(e) => e.stopPropagation()}
-			>
-				<!-- Modal Header -->
-				<div style="background: #1f2937; color: white; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: between;">
-					<div style="flex: 1;">
-						<h2 style="font-size: 1.125rem; font-weight: 600; margin: 0;">{currentOutput.pdfTitle || 'Generated Report'}</h2>
-						<p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">PDF Preview</p>
-					</div>
-					<button
-						onclick={() => showPdfModal = false}
-						style="background: transparent; border: none; color: white; cursor: pointer; padding: 0.5rem; font-size: 1.5rem;"
-					>×</button>
-				</div>
-
-				<!-- Modal Content - Scrollable PDF Preview -->
-				<div style="flex: 1; overflow-y: auto; background: #525659; padding: 1.5rem;">
-					<div style="background: white; max-width: 700px; margin: 0 auto; padding: 3rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-						<!-- Page 1: Title -->
-						<div style="text-align: center; padding: 4rem 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 2rem;">
-							<h1 style="font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">{currentOutput.pdfTitle || '16S Microbiome Analysis Report'}</h1>
-							<p style="color: #6b7280; font-size: 1.125rem;">BioLearn Analysis Platform</p>
-							<p style="color: #9ca3af; margin-top: 2rem;">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-						</div>
-
-						<!-- Alpha Diversity Section -->
-						<div style="margin-bottom: 2rem;">
-							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">1. Alpha Diversity (Taxa)</h2>
-							<p style="color: #4b5563; margin-bottom: 1rem; font-size: 0.875rem;">
-								Alpha diversity measures within-sample diversity. Shannon index accounts for both richness and evenness,
-								while Observed ASVs counts the total unique amplicon sequence variants.
-							</p>
-							<div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
-								<div style="display: flex; justify-content: center; gap: 2rem; align-items: flex-end; height: 150px; margin-bottom: 1rem;">
-									<div style="text-align: center;">
-										<div style="width: 60px; height: 100px; background: linear-gradient(to top, #3b82f6, #60a5fa); border-radius: 0.25rem;"></div>
-										<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Control</p>
-									</div>
-									<div style="text-align: center;">
-										<div style="width: 60px; height: 130px; background: linear-gradient(to top, #10b981, #34d399); border-radius: 0.25rem;"></div>
-										<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Treatment</p>
-									</div>
-								</div>
-								<p style="font-size: 0.75rem; color: #6b7280; font-style: italic;">Figure 1: Shannon Diversity by Group (p = 0.023)</p>
-							</div>
-						</div>
-
-						<!-- Beta Diversity Section -->
-						<div style="margin-bottom: 2rem;">
-							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">2. Beta Diversity (Taxa)</h2>
-							<p style="color: #4b5563; margin-bottom: 1rem; font-size: 0.875rem;">
-								Principal Coordinates Analysis (PCoA) of Bray-Curtis distances reveals distinct clustering between groups.
-								PERMANOVA: R² = 0.234, p = 0.001
-							</p>
-							<div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
-								<div style="position: relative; height: 180px; margin-bottom: 1rem;">
-									<!-- Axes -->
-									<div style="position: absolute; left: 50%; top: 10%; bottom: 10%; width: 1px; background: #d1d5db;"></div>
-									<div style="position: absolute; top: 50%; left: 10%; right: 10%; height: 1px; background: #d1d5db;"></div>
-									<!-- Points - Group 1 -->
-									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 25%; left: 25%;"></div>
-									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 30%; left: 32%;"></div>
-									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 35%; left: 28%;"></div>
-									<div style="position: absolute; width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; top: 40%; left: 35%;"></div>
-									<!-- Points - Group 2 -->
-									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 60%; left: 65%;"></div>
-									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 65%; left: 58%;"></div>
-									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 55%; left: 62%;"></div>
-									<div style="position: absolute; width: 14px; height: 14px; background: #10b981; border-radius: 50%; top: 70%; left: 70%;"></div>
-									<!-- Labels -->
-									<span style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: #6b7280;">PCo1 (32.4%)</span>
-									<span style="position: absolute; left: 0; top: 50%; transform: rotate(-90deg) translateX(-50%); font-size: 0.75rem; color: #6b7280;">PCo2 (18.7%)</span>
-								</div>
-								<p style="font-size: 0.75rem; color: #6b7280; font-style: italic;">Figure 2: PCoA of Bray-Curtis Distances with 95% Confidence Ellipses</p>
-							</div>
-						</div>
-
-						<!-- Functional Analysis Section -->
-						<div style="margin-bottom: 2rem;">
-							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">3. Functional Profiling</h2>
-							<p style="color: #4b5563; margin-bottom: 1rem; font-size: 0.875rem;">
-								Predicted functional potential inferred from 16S data using PICRUSt2.
-								<em>Note: These are predictions, not direct measurements.</em>
-							</p>
-							<div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 0.375rem; padding: 0.75rem; margin-bottom: 1rem;">
-								<p style="font-size: 0.813rem; color: #92400e;">
-									⚠️ Functional predictions from PICRUSt2 should be interpreted with caution and validated with metagenomic sequencing when possible.
-								</p>
-							</div>
-							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-								<div style="background: #f9fafb; padding: 1rem; border-radius: 0.5rem;">
-									<p style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Top Differential KOs:</p>
-									<ul style="font-size: 0.75rem; color: #4b5563; list-style: none; padding: 0; margin: 0;">
-										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">K00001 - Alcohol dehydrogenase</li>
-										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">K01190 - Beta-galactosidase</li>
-										<li style="padding: 0.25rem 0;">K00134 - GAPDH</li>
-									</ul>
-								</div>
-								<div style="background: #f9fafb; padding: 1rem; border-radius: 0.5rem;">
-									<p style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Pathway Summary:</p>
-									<ul style="font-size: 0.75rem; color: #4b5563; list-style: none; padding: 0; margin: 0;">
-										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">Biosynthesis: 45%</li>
-										<li style="padding: 0.25rem 0; border-bottom: 1px solid #e5e7eb;">Degradation: 28%</li>
-										<li style="padding: 0.25rem 0;">Energy metabolism: 18%</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-
-						<!-- Taxonomic Composition Section -->
-						<div style="margin-bottom: 2rem;">
-							<h2 style="font-size: 1.25rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">4. Taxonomic Composition</h2>
-							<div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
-								<div style="display: flex; justify-content: center; gap: 0.5rem; height: 150px; align-items: flex-end; margin-bottom: 1rem;">
-									{#each ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'] as sample}
-										<div style="display: flex; flex-direction: column; width: 40px;">
-											<div style="height: 30px; background: #3b82f6;"></div>
-											<div style="height: 45px; background: #10b981;"></div>
-											<div style="height: 25px; background: #f59e0b;"></div>
-											<div style="height: 15px; background: #ef4444;"></div>
-											<div style="height: 20px; background: #8b5cf6;"></div>
-											<p style="font-size: 0.625rem; color: #6b7280; margin-top: 0.25rem;">{sample}</p>
-										</div>
-									{/each}
-								</div>
-								<div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #3b82f6;"></span>Firmicutes</span>
-									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #10b981;"></span>Bacteroidetes</span>
-									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #f59e0b;"></span>Proteobacteria</span>
-									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #ef4444;"></span>Actinobacteria</span>
-									<span style="font-size: 0.625rem; display: flex; align-items: center; gap: 0.25rem;"><span style="width: 10px; height: 10px; background: #8b5cf6;"></span>Other</span>
-								</div>
-								<p style="font-size: 0.75rem; color: #6b7280; font-style: italic; margin-top: 1rem;">Figure 3: Phylum-level Relative Abundance</p>
-							</div>
-						</div>
-
-						<!-- Footer -->
-						<div style="border-top: 1px solid #e5e7eb; padding-top: 1.5rem; margin-top: 2rem; text-align: center; color: #9ca3af; font-size: 0.75rem;">
-							<p>Generated by BioLearn Analysis Platform</p>
-							<p style="margin-top: 0.25rem;">This is a simulated report for educational purposes</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/if}
 </div>
