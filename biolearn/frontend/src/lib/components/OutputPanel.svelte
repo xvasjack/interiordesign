@@ -4,8 +4,6 @@
 	import { getToolFileUrl, getRootFileUrl } from '$lib/services/templateService';
 	import { get } from 'svelte/store';
 
-	let { isReportPage = false }: { isReportPage?: boolean } = $props();
-
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
 	let currentOutput = $state<any>(null);
@@ -393,15 +391,6 @@
 		>
 			📝 Notes
 		</button>
-		{#if isReportPage}
-			<button
-				class="px-4 py-2 text-sm font-medium transition-colors"
-				style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'report' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'report' ? '#2563eb' : '#4b5563'};"
-				onclick={() => (activeTab = 'report')}
-			>
-				📑 Report
-			</button>
-		{/if}
 	</div>
 
 	<!-- Content -->
@@ -507,14 +496,6 @@
 					</div>
 				</div>
 			{/if}
-		{:else if activeTab === 'report'}
-			<div class="h-full flex flex-col items-center justify-center text-gray-400" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #9ca3af;">
-				<svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 64px; height: 64px; margin-bottom: 16px;">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-				</svg>
-				<p class="text-lg font-medium" style="font-size: 1.125rem; font-weight: 500; color: #6b7280;">Coming Soon</p>
-				<p class="text-sm mt-1" style="font-size: 0.875rem; margin-top: 0.25rem;">Report generation lessons are under development</p>
-			</div>
 		{/if}
 	</div>
 
