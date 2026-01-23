@@ -32,6 +32,9 @@
 	// Subscribe to executed commands to track step completion
 	executedCommands.subscribe(cmds => {
 		if (!storyline) return;
+		// Normalize command for comparison
+		const normalizeCmd = (cmd: string) => cmd.trim().replace(/\/(\s|$)/g, '$1');
+
 		// Map commands to steps based on task index
 		storyline.sections.forEach((section, index) => {
 			if (section.type === 'task' && section.command) {
@@ -39,34 +42,24 @@
 				const commandLines = section.command.split('\n').filter(line => line.trim());
 
 				if (commandLines.length > 1) {
-					// Multi-line command: ALL commands must be executed the required number of times
-					// Count required occurrences of each tool
-					const requiredCounts: Record<string, number> = {};
-					commandLines.forEach(line => {
+					// Multi-line command: ALL commands must be executed
+					const allCommandsExecuted = commandLines.every(line => {
+						const normalizedLine = normalizeCmd(line);
 						const toolName = line.trim().split(' ')[0];
-						requiredCounts[toolName] = (requiredCounts[toolName] || 0) + 1;
-					});
 
-					// Check if all tools have been executed the required number of times
-					const allCommandsExecuted = Object.entries(requiredCounts).every(([toolName, requiredCount]) => {
 						if (toolName === 'ls') {
 							// ls is tracked with count (ls:1, ls:2, etc.)
 							const lsExecutions = cmds.filter(c => c.startsWith('ls:')).length;
-							return lsExecutions >= requiredCount;
-						} else {
-							// Other tools just need to be present
-							const altToolName = toolName.replace('_', '-');
-							return cmds.includes(toolName) || cmds.includes(altToolName);
+							return lsExecutions >= 1;
 						}
+						// Check for exact match or tool name match (for commands stored as full strings)
+						return cmds.some(c => normalizeCmd(c) === normalizedLine || c.startsWith(toolName + ' ') || c === toolName);
 					});
 					if (allCommandsExecuted) {
 						completedSteps.add(index);
 					}
 				} else {
 					// Single command: match full command for precise step tracking
-					// This ensures students run the exact command specified in the lesson
-					// Normalize trailing slashes so 'o_fastqc' matches 'o_fastqc/'
-					const normalizeCmd = (cmd: string) => cmd.trim().replace(/\/(\s|$)/g, '$1');
 					const fullCmd = normalizeCmd(section.command);
 					const matched = cmds.some(c => normalizeCmd(c) === fullCmd);
 					if (matched) {
@@ -74,10 +67,10 @@
 					}
 				}
 				// Also check for specific tools
-				if (section.command.includes('mob_recon') && cmds.includes('mob_recon')) {
+				if (section.command.includes('mob_recon') && cmds.some(c => c.includes('mob_recon'))) {
 					completedSteps.add(index);
 				}
-				if (section.command.includes('run_gubbins') && cmds.includes('gubbins')) {
+				if (section.command.includes('run_gubbins') && cmds.some(c => c.includes('gubbins'))) {
 					completedSteps.add(index);
 				}
 			}
