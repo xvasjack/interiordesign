@@ -12,44 +12,9 @@
 	let isFinished = $state(false);
 	let selectedDecision = $state<string | null>(null);
 
-	// Default storyline if none provided
-	const defaultStoryline: Storyline = {
-		id: 'default',
-		category: 'tutorial',
-		title: 'Hospital Outbreak Investigation',
-		subtitle: 'WGS Analysis Pipeline',
-		organism: 'Klebsiella pneumoniae',
-		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
-		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
-		sections: [
-			{
-				type: 'intro',
-				text: `UM Medical Centre Saturday Report: 5 patients in the ICU did not respond to antibiotics.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'context',
-				text: `Samples were collected and sent for whole genome sequencing. Your task is to analyze the data.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'task',
-				title: 'Step 1: Quality Control',
-				text: `Check the quality of raw sequencing data.`,
-				command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o qc_reports/',
-				explanation: 'FastQC generates quality reports for raw sequence data.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: []
-			}
-		]
-	};
 
 	// Use provided storyline or default
-	const activeStoryline = $derived(storyline ?? defaultStoryline);
+	const activeStoryline = $derived(storyline);
 
 	// Get current phase from the current section
 	const currentPhase = $derived(() => {
