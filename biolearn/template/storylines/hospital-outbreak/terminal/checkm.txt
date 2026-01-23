@@ -1,0 +1,15 @@
+CheckM v1.2.2
+
+[2024-01-15 12:00:00] INFO: Running lineage_wf
+[2024-01-15 12:00:05] INFO: Identifying marker genes
+[2024-01-15 12:00:30] INFO: Placing bins in reference genome tree
+[2024-01-15 12:01:00] INFO: Inferring marker set
+[2024-01-15 12:01:15] INFO: Calculating bin statistics
+
+----------------------------------------------------------------------------------
+  Bin Id            Marker lineage       Completeness  Contamination  Strain het
+----------------------------------------------------------------------------------
+  assembly    f__Enterobacteriaceae         99.45          0.28          0.00
+----------------------------------------------------------------------------------
+
+[2024-01-15 12:01:30] INFO: CheckM finished successfully

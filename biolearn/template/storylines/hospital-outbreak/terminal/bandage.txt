@@ -1,0 +1,19 @@
+Bandage v0.8.1
+Loading graph from assembly.gfa...
+Graph loaded successfully.
+
+Graph statistics:
+  Total nodes: 2
+  Total edges: 2
+  Dead ends: 0
+  Connected components: 2
+
+Component 1 (Chromosome):
+  Length: 4,892,156 bp
+  Circular: Yes
+
+Component 2 (Plasmid):
+  Length: 95,234 bp
+  Circular: Yes
+
+Image saved to assembly_graph.png

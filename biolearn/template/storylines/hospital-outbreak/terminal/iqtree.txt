@@ -1,0 +1,30 @@
+IQ-TREE v2.2.0
+
+Input alignment: core_gene_alignment.aln
+Sequences: 5
+Sites: 3,456,789
+
+ModelFinder: Testing 286 models...
+Best-fit model: GTR+F+I+G4 (BIC score: 45678.123)
+
+Building ML tree...
+  Initial tree: -22456.789
+  Optimizing tree topology...
+  Round 1: -22389.456
+  Round 2: -22356.234
+  Round 3: -22345.678
+
+Ultrafast bootstrap (1000 replicates)...
+  Bootstrap support: >=98% for all nodes
+
+Final tree:
+  Log-likelihood: -22345.678
+  Tree length: 0.0234
+
+Output files:
+  core_alignment.treefile - Newick tree
+  core_alignment.iqtree - Full report
+  core_alignment.log - Log file
+
+IQ-TREE finished successfully.
+Total CPU time: 45.6 seconds

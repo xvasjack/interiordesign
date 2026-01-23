@@ -1,0 +1,24 @@
+Platon v1.6.0
+
+Analyzing assembly.fasta for plasmid sequences...
+
+Contig analysis:
+  contig_1: 4,892,156 bp - Score: 0.023 -> Chromosome
+  contig_2: 95,234 bp - Score: 0.987 -> Plasmid
+
+Classification summary:
+  Chromosomes: 1
+  Plasmids: 1
+
+Plasmid features detected in contig_2:
+  - Replication initiation protein
+  - Conjugal transfer proteins
+  - IncFIB replicon
+  - IncFII replicon
+
+Output files written:
+  plasmid_predictions.tsv
+  plasmid_sequences.fasta
+  chromosome_sequences.fasta
+
+Platon finished successfully.

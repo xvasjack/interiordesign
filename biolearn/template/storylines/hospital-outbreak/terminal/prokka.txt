@@ -1,0 +1,29 @@
+Prokka v1.14.6
+
+[12:00:00] This is prokka 1.14.6
+[12:00:00] Written by Torsten Seemann
+[12:00:00] Homepage is https://github.com/tseemann/prokka
+[12:00:00] Local time is Mon Jan 15 12:00:00 2024
+[12:00:00] You are user
+[12:00:00] Operating system is linux
+[12:00:00] Using 4 cores
+[12:00:01] Parsing assembly.fasta
+[12:00:02] Found 2 contigs
+[12:00:02] Predicting genes with Prodigal
+[12:00:15] Running tRNAscan-SE
+[12:00:20] Running Aragorn
+[12:00:22] Running Barrnap
+[12:00:30] Running BLASTP vs UniProt
+[12:01:00] Running HMMER3 vs Pfam
+[12:01:30] Annotating CDS
+
+Annotation summary:
+  contigs: 2
+  bases: 4987390
+  CDS: 4523
+  tRNA: 86
+  rRNA: 22
+  tmRNA: 1
+
+[12:01:45] Output files written to sample_01/
+[12:01:45] Prokka finished successfully

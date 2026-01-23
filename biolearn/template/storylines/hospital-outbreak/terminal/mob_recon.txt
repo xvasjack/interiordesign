@@ -1,0 +1,28 @@
+MOB-suite v3.1.4
+
+Running MOB-recon on assembly.fasta...
+
+Identifying chromosome and plasmid sequences...
+  Analyzing contig_1 (4,892,156 bp)... chromosome
+  Analyzing contig_2 (95,234 bp)... plasmid
+
+Plasmid typing with MOB-typer...
+
+Results:
+  Chromosome: 1 contig (4,892,156 bp)
+  Plasmids: 1 detected
+
+Plasmid AA001:
+  Size: 95,234 bp
+  Replicon type: IncFIB(K), IncFII(K)
+  Mobility: Conjugative
+  Relaxase type: MOBF
+  Mate-pair formation: MPF_F
+
+Output files:
+  chromosome.fasta
+  plasmid_AA001.fasta
+  plasmid_report.tsv
+  mobtyper_results.txt
+
+MOB-recon finished successfully.

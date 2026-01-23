@@ -1,0 +1,11 @@
+TrimmomaticPE: Started with arguments:
+ -phred33 sample_01_R1.fastq.gz sample_01_R2.fastq.gz sample_01_R1_paired.fq.gz sample_01_R1_unpaired.fq.gz sample_01_R2_paired.fq.gz sample_01_R2_unpaired.fq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 2 forward/reverse sequences, 0 common sequences
+Quality encoding detected as phred33
+Input Read Pairs: 2847293
+Both Surviving: 2683521 (94.25%)
+Forward Only Surviving: 89234 (3.13%)
+Reverse Only Surviving: 52145 (1.83%)
+Dropped: 22393 (0.79%)
+TrimmomaticPE: Completed successfully

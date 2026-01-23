@@ -1,0 +1,15 @@
+mlst v2.23.0
+
+Scanning assembly/assembly.fasta against PubMLST schemes...
+
+FILE                        SCHEME              ST    adk  fumC  gyrB  icd  mdh  purA  recA
+assembly/assembly.fasta     ecoli_achtman       131   10   11    4     8    8    8     2
+
+Sequence Type: ST131
+This is a high-risk international clone associated with:
+  - Extended-spectrum beta-lactamase (ESBL) production
+  - Fluoroquinolone resistance
+  - Urinary tract infections
+  - Bloodstream infections
+
+Results written to mlst_report.tsv

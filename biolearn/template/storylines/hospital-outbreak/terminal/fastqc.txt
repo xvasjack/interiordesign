@@ -1,0 +1,12 @@
+Started analysis of sample_01_R1.fastq.gz
+Approx 5% complete for sample_01_R1.fastq.gz
+Approx 25% complete for sample_01_R1.fastq.gz
+Approx 50% complete for sample_01_R1.fastq.gz
+Approx 75% complete for sample_01_R1.fastq.gz
+Analysis complete for sample_01_R1.fastq.gz
+Started analysis of sample_01_R2.fastq.gz
+Approx 5% complete for sample_01_R2.fastq.gz
+Approx 25% complete for sample_01_R2.fastq.gz
+Approx 50% complete for sample_01_R2.fastq.gz
+Approx 75% complete for sample_01_R2.fastq.gz
+Analysis complete for sample_01_R2.fastq.gz

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { outputData, terminalState, fileNotes, stopSignal } from '$lib/stores/terminal';
+	import { getFileContent } from '$lib/services/templateService';
 
 	let plotContainer: HTMLDivElement;
 	let activeTab = $state('chart');
@@ -10,6 +11,9 @@
 	let loadingTool = $state('');
 	let currentNotes = $state<any[]>([]);
 	let chartRendered = $state(false);
+
+	// Current storyline ID for API calls
+	const storylineId = 'hospital-outbreak';
 
 	function handleStop() {
 		// Increment stop signal to trigger cancellation
@@ -54,45 +58,12 @@
 		};
 	});
 
-	// Sample file contents for different file types
-	const fileContents: Record<string, string> = {
-		// SeqKit stats
-		'seqkit_stats.txt': `file\tformat\ttype\tnum_seqs\tsum_len\tmin_len\tavg_len\tmax_len\nsample_01_R1.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150\nsample_01_R2.fastq.gz\tFASTQ\tDNA\t2,847,293\t427,093,950\t150\t150\t150`,
-
-		// FastQC reports
-		'sample_01_R1_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R1</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p><p><span class="pass">✓</span> Per base sequence content</p><p><span class="warn">⚠</span> Per sequence GC content</p><p><span class="pass">✓</span> Per base N content</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R1.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
-		'sample_01_R2_fastqc.html': `<!DOCTYPE html><html><head><title>FastQC Report - sample_01_R2</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} .summary{background:#f5f5f5;padding:15px;border-radius:5px;} .pass{color:green;} .warn{color:orange;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ddd;padding:8px;}</style></head><body><h1>FastQC Report</h1><div class="summary"><h2>Summary</h2><p><span class="pass">✓</span> Basic Statistics</p><p><span class="pass">✓</span> Per base sequence quality</p><p><span class="pass">✓</span> Per sequence quality scores</p><p><span class="pass">✓</span> Per base sequence content</p><p><span class="warn">⚠</span> Per sequence GC content</p><p><span class="pass">✓</span> Per base N content</p></div><h2>Basic Statistics</h2><table><tr><th>Measure</th><th>Value</th></tr><tr><td>Filename</td><td>sample_01_R2.fastq.gz</td></tr><tr><td>Total Sequences</td><td>2,847,293</td></tr><tr><td>Sequence Length</td><td>150</td></tr><tr><td>%GC</td><td>52</td></tr></table></body></html>`,
-		'sample_01_R1_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
-		'sample_01_R2_fastqc.zip': 'FASTQC_ZIP_PLACEHOLDER',
-
-		// Trimmomatic outputs
-		'sample_01_R1_paired.fq.gz': `@SEQ_ID_1\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
-		'sample_01_R2_paired.fq.gz': `@SEQ_ID_1\nTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
-		'sample_01_R1_unpaired.fq.gz': `@UNPAIRED_1\nATGCATGCATGCATGC\n+\nIIIIIIIIIIIIIIII`,
-		'sample_01_R2_unpaired.fq.gz': `@UNPAIRED_1\nGCATGCATGCATGCAT\n+\nIIIIIIIIIIIIIIII`,
-
-		// Unicycler outputs
-		'assembly.fasta': `>contig_1 length=4892156 depth=45.2x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG\nTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n>contig_2 length=95234 depth=78.5x circular=true\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG`,
-		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\tLN:i:4892156\tRC:i:221089472\nS\t2\tGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\tLN:i:95234\tRC:i:7476869\nL\t1\t+\t1\t+\t0M\nL\t2\t+\t2\t+\t0M`,
-		'unicycler.log': `[2024-01-15 10:23:45] Starting Unicycler v0.5.0\n[2024-01-15 10:23:45] Command: unicycler -1 trimmed/sample_01_R1_paired.fq.gz -2 trimmed/sample_01_R2_paired.fq.gz -o assembly\n[2024-01-15 10:23:46] Input files validated\n[2024-01-15 10:23:47] Read count: 2,683,521 (forward), 2,683,521 (reverse)\n[2024-01-15 10:24:15] SPAdes assembly completed\n[2024-01-15 10:24:45] Rotating contigs to standard start\n[2024-01-15 10:25:00] Polishing assembly with Pilon\n[2024-01-15 10:25:12] Assembly completed successfully\n[2024-01-15 10:25:12] Final assembly: 2 contigs, total length 4,987,390 bp`,
-
-		// Bandage output (base64 placeholder for PNG)
-		'assembly_graph.png': 'PNG_IMAGE_PLACEHOLDER',
-
-		// QUAST outputs
-		'quast_report.tsv': `Assembly\t# contigs\tTotal length\tLargest contig\tGC (%)\tN50\tN75\tL50\tL75\n# misassemblies\t# misassembled contigs\nsample_01\t2\t4987390\t4892156\t52.3\t4892156\t95234\t1\t2\t0\t0`,
-		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;} h1{color:#333;} table{border-collapse:collapse;width:100%;margin:20px 0;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f2f2f2;} .good{color:green;font-weight:bold;}</style></head><body><h1>QUAST Quality Assessment Report</h1><h2>Assembly Statistics</h2><table><tr><th>Metric</th><th>Value</th></tr><tr><td>Total contigs</td><td class="good">2</td></tr><tr><td>Total length</td><td>4,987,390 bp</td></tr><tr><td>Largest contig</td><td>4,892,156 bp</td></tr><tr><td>GC content</td><td>52.3%</td></tr><tr><td>N50</td><td class="good">4,892,156 bp</td></tr><tr><td>N75</td><td>95,234 bp</td></tr></table><h2>Conclusion</h2><p>Assembly quality: <span class="good">EXCELLENT</span> - Complete circular chromosome with one plasmid detected.</p></body></html>`,
-
-		// Abricate outputs
-		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE\nassembly.fasta\tcontig_1\t1245678\t1246523\t+\tblaCTX-M-15\t1-846/846\t===============\t0/0\t100.00\t99.89\tncbi\tNG_049557.1\tclass A extended-spectrum beta-lactamase CTX-M-15\tCephalosporin\nassembly.fasta\tcontig_2\t52345\t53567\t+\ttet(A)\t1-1223/1223\t===============\t0/0\t100.00\t100.00\tncbi\tAF534183.1\ttetracycline efflux MFS transporter Tet(A)\tTetracycline`,
-		'amr_summary.txt': `AMR Gene Summary Report\n=======================\nGenerated: 2024-01-15\nSample: sample_01\nDatabase: NCBI AMRFinderPlus\n\nTotal AMR genes found: 2\n\n1. blaCTX-M-15 (Beta-lactamase)\n   Location: contig_1:1245678-1246523\n   Coverage: 100.00%\n   Identity: 99.89%\n   Resistance: Extended-spectrum cephalosporins (3rd/4th generation)\n   Clinical significance: HIGH - Associated with hospital-acquired infections\n\n2. tet(A) (Tetracycline efflux pump)\n   Location: contig_2:52345-53567  \n   Coverage: 100.00%\n   Identity: 100.00%\n   Resistance: Tetracycline, Doxycycline\n   Clinical significance: MODERATE\n\nRecommendation: Avoid cephalosporins and tetracyclines for treatment.`
-	};
-
 	// MIME types for different file extensions
 	const mimeTypes: Record<string, string> = {
 		'html': 'text/html',
 		'txt': 'text/plain',
 		'tsv': 'text/tab-separated-values',
+		'csv': 'text/csv',
 		'fasta': 'text/plain',
 		'gfa': 'text/plain',
 		'log': 'text/plain',
@@ -102,11 +73,15 @@
 		'gbk': 'text/plain',
 		'fna': 'text/plain',
 		'faa': 'text/plain',
-		'ffn': 'text/plain'
+		'ffn': 'text/plain',
+		'json': 'application/json',
+		'vcf': 'text/plain'
 	};
 
-	function viewFile(file: any) {
-		const content = fileContents[file.name];
+	async function viewFile(file: any) {
+		// Fetch file content from template API
+		const content = await getFileContent(storylineId, file.name);
+
 		if (file.type === 'html' && content) {
 			// Open HTML in new window
 			const newWindow = window.open('', '_blank');
@@ -118,12 +93,15 @@
 			// Show text content in alert (could be improved with modal)
 			alert(`File: ${file.name}\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
 		} else {
-			alert(`Preview not available for ${file.name}\n\nThis is a simulated file in the training environment.`);
+			alert(`Preview not available for ${file.name}\n\nAdd this file to:\nbiolearn/template/storylines/${storylineId}/files/`);
 		}
 	}
 
-	function downloadFile(file: any) {
-		const content = fileContents[file.name] || `# Simulated content for ${file.name}\n# This file was generated in the BioLearn training environment`;
+	async function downloadFile(file: any) {
+		// Fetch file content from template API
+		const content = await getFileContent(storylineId, file.name) ||
+			`# Simulated content for ${file.name}\n# Add real content to biolearn/template/storylines/${storylineId}/files/`;
+
 		const mimeType = mimeTypes[file.type] || 'text/plain';
 		const blob = new Blob([content], { type: mimeType });
 		const url = URL.createObjectURL(blob);
@@ -349,28 +327,28 @@
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'chart' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'chart' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'chart')}
 		>
-			📊 Chart
+			Chart
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'table' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'table' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'table')}
 		>
-			📋 Summary
+			Summary
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'files' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'files' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'files')}
 		>
-			📁 Files
+			Files
 		</button>
 		<button
 			class="px-4 py-2 text-sm font-medium transition-colors"
 			style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; border-bottom: {activeTab === 'notes' ? '2px solid #2563eb' : 'none'}; color: {activeTab === 'notes' ? '#2563eb' : '#4b5563'};"
 			onclick={() => (activeTab = 'notes')}
 		>
-			📝 Notes
+			Notes
 		</button>
 	</div>
 
@@ -497,7 +475,7 @@
 						{#each currentNotes as note}
 							<li class="px-4 py-3">
 								<div class="flex items-start gap-3">
-									<span class="text-blue-500 mt-0.5">💡</span>
+									<span class="text-blue-500 mt-0.5">i</span>
 									<div>
 										<p class="font-medium text-gray-800">{note.name}</p>
 										{#if note.format}
