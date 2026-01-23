@@ -3931,8 +3931,11 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		// Handle cp command
 		if (command === 'cp') {
 			handleCp(args);
+			// Track the full command (e.g., 'cp /data/references/sample_info.txt .')
+			// to ensure each cp step in tutorials is tracked separately
+			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
-				if (!cmds.includes('cp')) return [...cmds, 'cp'];
+				if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
 				return cmds;
 			});
 			writePrompt();
