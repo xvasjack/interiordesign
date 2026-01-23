@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir, templateFiles, storylineContext, API_BASE_URL } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
-	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize } from '$lib/services/templateService';
+	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize, fetchFileContent, fetchRootFileContent } from '$lib/services/templateService';
 	import { formatAmrGeneRows, formatMlstRow, formatFileColor } from '$lib/utils/format-utils';
 
 	// Import terminal outputs from storylines
@@ -3884,11 +3884,20 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					}
 				}
 			} else {
-				handleFileView(command, args);
+				// Track the full command for step completion (e.g., 'cat sample_info.txt', 'head -n 8 file.txt')
+				const fullCmd = cmd.trim();
+				executedCommands.update(cmds => {
+					if (!cmds.includes(fullCmd)) {
+						return [...cmds, fullCmd];
+					}
+					return cmds;
+				});
+				// Handle async file view and write prompt after
+				handleFileView(command, args).then(() => writePrompt());
+				return;
 			}
 
-			// Track the full command for step completion (e.g., 'cat sample_info.txt', 'head -n 8 file.txt')
-			// to ensure each cat/head/tail step in tutorials is tracked separately
+			// Track the full command for step completion
 			const fullCmd = cmd.trim();
 			executedCommands.update(cmds => {
 				if (!cmds.includes(fullCmd)) {
@@ -5378,7 +5387,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 	// File contents - minimal placeholder (files served from template API)
 	const fileContents: Record<string, string> = {};
 
-	function handleFileView(cmd: string, args: string[]) {
+	async function handleFileView(cmd: string, args: string[]) {
 		// Parse -n flag for head/tail
 		let numLines = 10; // default
 		let filename: string | undefined;
@@ -5459,10 +5468,43 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			terminal.writeln(`\x1b[90m[Compressed archive - download via Output Files panel]\x1b[0m`);
 			return;
 		}
+		if (baseName.endsWith('.gz')) {
+			terminal.writeln(`\x1b[90m[Compressed file - cannot display directly]\x1b[0m`);
+			return;
+		}
 
-		// Show placeholder for text files
-		terminal.writeln(`\x1b[90m[File: ${baseName}]\x1b[0m`);
-		terminal.writeln(`\x1b[90mView output files via the Output Files panel in the header.\x1b[0m`);
+		// Fetch file content from template API
+		const dataDir = get(storylineDataDir);
+		let content: string | null = null;
+
+		// Check if file is in a tool output directory (o_*)
+		const pathParts = fullPath.replace(dataDir, '').split('/').filter(p => p);
+		if (pathParts.length >= 2 && pathParts[0].startsWith('o_')) {
+			const tool = pathParts[0];
+			content = await fetchFileContent(tool, baseName);
+		} else {
+			// Try fetching as root file
+			content = await fetchRootFileContent(baseName);
+		}
+
+		if (content) {
+			const lines = content.split('\n');
+			let outputLines: string[];
+
+			if (cmd === 'head') {
+				outputLines = lines.slice(0, numLines);
+			} else if (cmd === 'tail') {
+				outputLines = lines.slice(-numLines);
+			} else {
+				outputLines = lines;
+			}
+
+			for (const line of outputLines) {
+				terminal.writeln(line);
+			}
+		} else {
+			terminal.writeln(`\x1b[31m${cmd}: ${filename}: Unable to read file\x1b[0m`);
+		}
 	}
 
 	// Track created directories and files for the session
