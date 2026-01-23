@@ -66,155 +66,6 @@
 		};
 	});
 
-	// Fallback file contents - template files are loaded from API first (see viewFile function)
-	// Files like o_seqkit_stats.txt, FastQC HTML/ZIP files, and o_bandage.png are served from templates
-	const fileContents: Record<string, string> = {
-		// Trimmomatic outputs (fallback content)
-		'sample_01_R1_paired.fq.gz': `@SEQ_ID_1\nATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
-		'sample_01_R2_paired.fq.gz': `@SEQ_ID_1\nTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n@SEQ_ID_2\nCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n+\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`,
-		'sample_01_R1_unpaired.fq.gz': `@UNPAIRED_1\nATGCATGCATGCATGC\n+\nIIIIIIIIIIIIIIII`,
-		'sample_01_R2_unpaired.fq.gz': `@UNPAIRED_1\nGCATGCATGCATGCAT\n+\nIIIIIIIIIIIIIIII`,
-
-		// Unicycler outputs - SPAdes k-mer graphs
-		'001_spades_graph_k027.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGT\tLN:i:16\tKC:i:1234\nS\t2\tTGCATGCATGCATGCA\tLN:i:16\tKC:i:5678\nL\t1\t+\t2\t+\t8M\n...`,
-		'001_spades_graph_k053.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:32\tKC:i:2345\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:32\tKC:i:6789\nL\t1\t+\t2\t+\t16M\n...`,
-		'001_spades_graph_k071.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:40\tKC:i:3456\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:40\tKC:i:7890\nL\t1\t+\t2\t+\t20M\n...`,
-		'001_spades_graph_k087.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:48\tKC:i:4567\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:48\tKC:i:8901\nL\t1\t+\t2\t+\t24M\n...`,
-		'001_spades_graph_k099.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:56\tKC:i:5678\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:56\tKC:i:9012\nL\t1\t+\t2\t+\t28M\n...`,
-		'001_spades_graph_k111.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:64\tKC:i:6789\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:64\tKC:i:1234\nL\t1\t+\t2\t+\t32M\n...`,
-		'001_spades_graph_k119.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:72\tKC:i:7890\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:72\tKC:i:2345\nL\t1\t+\t2\t+\t36M\n...`,
-		'001_spades_graph_k127.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\tLN:i:80\tKC:i:8901\nS\t2\tTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\tLN:i:80\tKC:i:3456\nL\t1\t+\t2\t+\t40M\n...`,
-		'002_depth_filter.gfa': `H\tVN:Z:1.0\n# Depth-filtered assembly graph\nS\t1\tACGTACGT...\tLN:i:5358379\tdp:f:1.0\nS\t33\tTGCATGCA...\tLN:i:5409\tdp:f:3.9\nS\t35\tGCTAGCTA...\tLN:i:4315\tdp:f:17.66\nS\t41\tATGCATGC...\tLN:i:2532\tdp:f:19.88\nL\t1\t+\t1\t-\t0M\n...`,
-		'003_overlaps_removed.gfa': `H\tVN:Z:1.0\n# Overlaps removed from graph\nS\t1\tACGTACGT...\tLN:i:5358379\nS\t33\tTGCATGCA...\tLN:i:5409\nS\t35\tGCTAGCTA...\tLN:i:4315\nS\t41\tATGCATGC...\tLN:i:2532\nL\t1\t+\t1\t-\t0M\tRC:i:89234\n...`,
-		'004_bridges_applied.gfa': `H\tVN:Z:1.0\n# Bridges applied to resolve repeats\nS\t1\tACGTACGT...\tLN:i:5553813\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\nL\t1\t+\t1\t-\t0M\n...`,
-		'005_final_clean.gfa': `H\tVN:Z:1.0\n# Final cleaned assembly graph\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\tcl:Z:chromosome\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\tcl:Z:plasmid\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\tcl:Z:plasmid\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\tcl:Z:plasmid\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
-		'assembly.fasta': `>1 length=5553813 depth=1.00x circular=false\nACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n...\n>33 length=5409 depth=3.90x circular=true\nTGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCA\n...\n>35 length=4315 depth=17.66x circular=true\nGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCT\n...\n>41 length=2532 depth=19.88x circular=true\nATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC\n...`,
-		'assembly.gfa': `H\tVN:Z:1.0\nS\t1\tACGTACGT...\tLN:i:5553813\tRC:i:5553813\nS\t33\tTGCATGCA...\tLN:i:5409\tRC:i:21089\nS\t35\tGCTAGCTA...\tLN:i:4315\tRC:i:76234\nS\t41\tATGCATGC...\tLN:i:2532\tRC:i:50345\nL\t33\t+\t33\t-\t0M\nL\t35\t+\t35\t-\t0M\nL\t41\t+\t41\t-\t0M\n...`,
-		'unicycler.log': `
-Unicycler v0.5.0
-Command: unicycler -1 o_trimmomatic/SRR36708862_R1_paired.fq.gz -2 o_trimmomatic/SRR36708862_R2_paired.fq.gz -o o_unicycler/
-
-[2026-01-12 04:15:32] Starting Unicycler
-[2026-01-12 04:15:33] Loading reads
-[2026-01-12 04:15:45] SPAdes assembly with k=27,53,71,87,99,111,119,127
-[2026-01-12 04:18:23] Building bridges
-[2026-01-12 04:20:21] Applying bridges
-[2026-01-12 04:20:21] Polishing assembly
-[2026-01-12 04:25:18] Assembly complete
-
-Assembly Statistics:
-  Total length: 5,553,065 bp
-  Number of contigs: 65
-  Largest contig: 837,178 bp
-  N50: 371,705 bp
-  GC content: 57.18%
-
-Component summary:
-  1 linear component (chromosome - incomplete)
-  3 circular components (plasmids)
-    - ColRNAI: 5,409 bp
-    - Col(pHAD28): 4,315 bp
-    - Col156: 2,532 bp
-`,
-
-		// Note: o_bandage.png is loaded from template API (see viewFile function)
-
-		// QUAST outputs
-		'quast_report.tsv': `Assembly\tassembly\n# contigs (>= 0 bp)\t117\n# contigs (>= 1000 bp)\t57\n# contigs (>= 5000 bp)\t33\n# contigs (>= 10000 bp)\t29\n# contigs (>= 25000 bp)\t24\n# contigs (>= 50000 bp)\t18\nTotal length (>= 0 bp)\t5564255\nTotal length (>= 1000 bp)\t5547651\n# contigs\t65\nLargest contig\t837178\nTotal length\t5553065\nGC (%)\t57.18\nN50\t371705\nN75\t224673\nL50\t6\nL75\t10\n# N's per 100 kbp\t0.00`,
-		'quast_report.html': `<!DOCTYPE html><html><head><title>QUAST Report</title><style>body{font-family:Arial,sans-serif;margin:20px;background:#f5f5f5;} .container{max-width:800px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);} h1{color:#333;border-bottom:2px solid #4CAF50;padding-bottom:10px;} table{border-collapse:collapse;width:100%;margin-top:20px;} td,th{border:1px solid #ddd;padding:12px;text-align:left;} th{background:#4CAF50;color:white;} tr:nth-child(even){background:#f9f9f9;} tr:hover{background:#f1f1f1;} .metric{font-weight:bold;}</style></head><body><div class="container"><h1>QUAST Report - assembly</h1><table><tr><th>Metric</th><th>Value</th></tr><tr><td class="metric"># contigs (>= 0 bp)</td><td>117</td></tr><tr><td class="metric"># contigs (>= 1000 bp)</td><td>57</td></tr><tr><td class="metric"># contigs (>= 5000 bp)</td><td>33</td></tr><tr><td class="metric"># contigs (>= 10000 bp)</td><td>29</td></tr><tr><td class="metric"># contigs (>= 25000 bp)</td><td>24</td></tr><tr><td class="metric"># contigs (>= 50000 bp)</td><td>18</td></tr><tr><td class="metric">Total length (>= 0 bp)</td><td>5,564,255</td></tr><tr><td class="metric">Total length (>= 1000 bp)</td><td>5,547,651</td></tr><tr><td class="metric"># contigs</td><td>65</td></tr><tr><td class="metric">Largest contig</td><td>837,178</td></tr><tr><td class="metric">Total length</td><td>5,553,065</td></tr><tr><td class="metric">GC (%)</td><td>57.18</td></tr><tr><td class="metric">N50</td><td>371,705</td></tr><tr><td class="metric">N75</td><td>224,673</td></tr><tr><td class="metric">L50</td><td>6</td></tr><tr><td class="metric">L75</td><td>10</td></tr><tr><td class="metric"># N's per 100 kbp</td><td>0.00</td></tr></table></div></body></html>`,
-
-		// Abricate outputs
-		'amr_report.tsv': `#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE
-o_unicycler/assembly.fasta\t30\t423\t1238\t+\tsul2\t1-816/816\t===============\t0/0\t100.00\t100.00\tncbi\tNG_051852.1\tsulfonamide-resistant dihydropteroate synthase Sul2\tSULFONAMIDE
-o_unicycler/assembly.fasta\t30\t1300\t2102\t+\taph(3'')-Ib\t2-804/804\t===============\t0/0\t99.88\t99.88\tncbi\tNG_047413.1\taminoglycoside O-phosphotransferase APH(3'')-Ib\tSTREPTOMYCIN
-o_unicycler/assembly.fasta\t30\t2102\t2938\t+\taph(6)-Id\t1-837/837\t===============\t0/0\t100.00\t100.00\tncbi\tNG_047464.1\taminoglycoside O-phosphotransferase APH(6)-Id\tSTREPTOMYCIN
-o_unicycler/assembly.fasta\t30\t3659\t4519\t-\tblaTEM-1\t1-861/861\t===============\t0/0\t100.00\t100.00\tncbi\tNG_050145.1\tbroad-spectrum class A beta-lactamase TEM-1\tBETA-LACTAM
-o_unicycler/assembly.fasta\t30\t7341\t8216\t+\tblaCTX-M-15\t1-876/876\t===============\t0/0\t100.00\t100.00\tncbi\tNG_048935.1\textended-spectrum class A beta-lactamase CTX-M-15\tCEPHALOSPORIN
-o_unicycler/assembly.fasta\t31\t1713\t2186\t+\tdfrA14\t1-474/474\t===============\t0/0\t100.00\t100.00\tncbi\tNG_056035.1\ttrimethoprim-resistant dihydrofolate reductase DfrA14\tTRIMETHOPRIM
-o_unicycler/assembly.fasta\t32\t2466\t3278\t+\tblaNDM-7\t1-813/813\t===============\t0/0\t100.00\t100.00\tncbi\tNG_049339.1\tsubclass B1 metallo-beta-lactamase NDM-7\tCARBAPENEM
-o_unicycler/assembly.fasta\t32\t3282\t3647\t+\tble-MBL\t1-366/366\t===============\t0/0\t100.00\t100.00\tncbi\tNG_047559.1\tbleomycin binding protein Ble-MBL\tBLEOMYCIN
-o_unicycler/assembly.fasta\t4\t37001\t38176\t+\toqxA5\t1-1176/1176\t===============\t0/0\t100.00\t99.41\tncbi\tNG_050423.1\tmultidrug efflux RND transporter periplasmic adaptor subunit OqxA5\tPHENICOL;QUINOLONE
-o_unicycler/assembly.fasta\t4\t38200\t41352\t+\toqxB19\t1-3153/3153\t===============\t0/0\t100.00\t99.40\tncbi\tNG_050437.1\tmultidrug efflux RND transporter permease subunit OqxB19\tPHENICOL;QUINOLONE
-o_unicycler/assembly.fasta\t40\t105\t965\t+\taac(3)-IIe\t1-861/861\t===============\t0/0\t100.00\t99.77\tncbi\tNG_047244.1\taminoglycoside N-acetyltransferase AAC(3)-IIe\tGENTAMICIN
-o_unicycler/assembly.fasta\t44\t92\t646\t+\taac(6')-Ib-D181Y\t1-555/555\t===============\t0/0\t100.00\t99.82\tncbi\tNG_067946.1\tAAC(6')-Ib family aminoglycoside 6'-N-acetyltransferase\tAMIKACIN;KANAMYCIN;TOBRAMYCIN
-o_unicycler/assembly.fasta\t44\t777\t1607\t+\tblaOXA-1\t1-831/831\t===============\t0/0\t100.00\t100.00\tncbi\tNG_049392.1\toxacillin-hydrolyzing class D beta-lactamase OXA-1\tCEPHALOSPORIN
-o_unicycler/assembly.fasta\t46\t492\t1136\t+\tqnrB1\t1-645/645\t===============\t0/0\t100.00\t100.00\tncbi\tNG_050469.1\tquinolone resistance pentapeptide repeat protein QnrB1\tQUINOLONE
-o_unicycler/assembly.fasta\t5\t354542\t354961\t-\tfosA6\t1-420/420\t===============\t0/0\t100.00\t99.76\tncbi\tNG_051497.1\tfosfomycin resistance glutathione transferase FosA6\tFOSFOMYCIN
-o_unicycler/assembly.fasta\t7\t245723\t246583\t-\tblaSHV-106\t1-861/861\t===============\t0/0\t100.00\t99.88\tncbi\tNG_049996.1\textended-spectrum class A beta-lactamase SHV-106\tCEPHALOSPORIN`,
-		'amr_summary.txt': `AMR Gene Summary Report
-=======================
-Generated: 2024-01-15
-Sample: o_unicycler/assembly.fasta
-Database: NCBI AMRFinderPlus
-
-Total AMR genes found: 16
-
-BETA-LACTAM RESISTANCE:
-1. blaNDM-7 (Carbapenemase)
-   Location: contig_32:2466-3278
-   Coverage: 100.00% | Identity: 100.00%
-   Resistance: CARBAPENEM (meropenem, imipenem, ertapenem)
-   Clinical significance: CRITICAL - Carbapenem-resistant Enterobacteriaceae (CRE)
-
-2. blaCTX-M-15 (ESBL)
-   Location: contig_30:7341-8216
-   Coverage: 100.00% | Identity: 100.00%
-   Resistance: Extended-spectrum cephalosporins (3rd/4th gen)
-   Clinical significance: HIGH
-
-3. blaTEM-1 (Penicillinase)
-   Location: contig_30:3659-4519
-   Coverage: 100.00% | Identity: 100.00%
-   Resistance: Ampicillin, penicillins
-
-4. blaSHV-106 (ESBL)
-   Location: contig_7:245723-246583
-   Coverage: 100.00% | Identity: 99.88%
-   Resistance: Extended-spectrum cephalosporins
-
-5. blaOXA-1 (Oxacillinase)
-   Location: contig_44:777-1607
-   Coverage: 100.00% | Identity: 100.00%
-   Resistance: Cephalosporins
-
-AMINOGLYCOSIDE RESISTANCE:
-6. aac(6')-Ib-D181Y | aac(3)-IIe | aph(3'')-Ib | aph(6)-Id
-   Resistance: Amikacin, kanamycin, tobramycin, gentamicin, streptomycin
-
-QUINOLONE RESISTANCE:
-7. qnrB1 | oqxA5 | oqxB19
-   Resistance: Fluoroquinolones (ciprofloxacin, levofloxacin)
-
-OTHER RESISTANCE:
-8. sul2 - Sulfonamide resistance
-9. dfrA14 - Trimethoprim resistance
-10. fosA6 - Fosfomycin resistance
-11. ble-MBL - Bleomycin resistance
-
-CLINICAL INTERPRETATION:
-This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance.
-- AVOID: Carbapenems, cephalosporins, penicillins, aminoglycosides, fluoroquinolones, sulfonamides, trimethoprim
-- CONSIDER: Colistin, tigecycline (susceptibility testing required)
-- Report to infection control for CRE surveillance`
-	};
-
-	// MIME types for different file extensions
-	const mimeTypes: Record<string, string> = {
-		'html': 'text/html',
-		'txt': 'text/plain',
-		'tsv': 'text/tab-separated-values',
-		'fasta': 'text/plain',
-		'gfa': 'text/plain',
-		'log': 'text/plain',
-		'png': 'image/png',
-		'svg': 'image/svg+xml',
-		'zip': 'application/zip',
-		'gff': 'text/plain',
-		'gbk': 'text/plain',
-		'fna': 'text/plain',
-		'faa': 'text/plain',
-		'ffn': 'text/plain'
-	};
 
 	async function viewFile(file: any) {
 		// Check if this is a template file (from API)
@@ -268,47 +119,26 @@ This isolate is a MULTI-DRUG RESISTANT (MDR) organism with carbapenem resistance
 			}
 		}
 
-		// Fall back to hardcoded content for non-template files
-		const content = fileContents[file.name];
-
-		// Skip placeholder values - these indicate template files that should have been loaded above
-		const isPlaceholder = content === 'FASTQC_STATIC' || content === 'SVG_STATIC' ||
-		                      content === 'PNG_STATIC' || content === 'PNG_TEMPLATE' ||
-		                      content === 'FASTQC_ZIP_PLACEHOLDER';
-
-		if (file.type === 'html' && content && !isPlaceholder) {
-			// Open HTML in new window
-			const newWindow = window.open('', '_blank');
-			if (newWindow) {
-				newWindow.document.write(content);
-				newWindow.document.close();
-			}
-		} else if (content && !isPlaceholder) {
-			// Show text content in alert (could be improved with modal)
-			alert(`File: ${file.name}\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
-		} else if (file.type === 'png' || file.type === 'svg') {
-			// Try static images folder as last resort
-			const newWindow = window.open(`/images/${file.name}`, '_blank');
-			if (!newWindow) {
-				alert(`Could not open ${file.name}`);
-			}
-		} else {
-			alert(`Preview not available for ${file.name}\n\nThis is a simulated file in the training environment.`);
-		}
+		// No local fallback - files should come from template API
+		alert(`Preview not available for ${file.name}\n\nThis file should be served from the template API.`);
 	}
 
 	function downloadFile(file: any) {
-		const content = fileContents[file.name] || `# Simulated content for ${file.name}\n# This file was generated in the BioLearn training environment`;
-		const mimeType = mimeTypes[file.type] || 'text/plain';
-		const blob = new Blob([content], { type: mimeType });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = file.name;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
+		// For template files, redirect to API download
+		if (file.isTemplate && file.tool) {
+			const context = get(storylineContext);
+			if (context) {
+				const url = `${API_BASE_URL}/templates/${context.category}/${context.storyline}/${file.tool}/${file.name}`;
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = file.name;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				return;
+			}
+		}
+		alert(`Download not available for ${file.name}\n\nThis file should be served from the template API.`);
 	}
 
 	async function renderChart(data: any) {
