@@ -12,49 +12,11 @@
 	let isFinished = $state(false);
 	let selectedDecision = $state<string | null>(null);
 
-	// Default storyline if none provided
-	const defaultStoryline: Storyline = {
-		id: 'default',
-		category: 'tutorial',
-		title: 'Hospital Outbreak Investigation',
-		subtitle: 'WGS Analysis Pipeline',
-		organism: 'Klebsiella pneumoniae',
-		technology: 'illumina',
-		technologyLabel: 'Short Read (Illumina)',
-		dataDir: '/data/outbreak_investigation',
-		toolsUsed: ['fastqc', 'trimmomatic', 'unicycler', 'bandage'],
-		sections: [
-			{
-				type: 'intro',
-				text: `UM Medical Centre Saturday Report: 5 patients in the ICU did not respond to antibiotics.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'context',
-				text: `Samples were collected and sent for whole genome sequencing. Your task is to analyze the data.`,
-				hint: null,
-				requiredDir: null
-			},
-			{
-				type: 'task',
-				title: 'Step 1: Quality Control',
-				text: `Check the quality of raw sequencing data.`,
-				command: 'fastqc sample_01_R1.fastq.gz sample_01_R2.fastq.gz -o qc_reports/',
-				explanation: 'FastQC generates quality reports for raw sequence data.',
-				requiredDir: '/data/outbreak_investigation',
-				parameters: []
-			}
-		]
-	};
-
-	// Use provided storyline or default
-	const activeStoryline = $derived(storyline ?? defaultStoryline);
-
 	// Get current phase from the current section
 	const currentPhase = $derived(() => {
+		if (!storyline) return 1;
 		for (let i = currentStep; i >= 0; i--) {
-			const section = activeStoryline.sections[i];
+			const section = storyline.sections[i];
 			if (section.type === 'phase' && section.phase) {
 				return section.phase;
 			}
@@ -69,8 +31,9 @@
 
 	// Subscribe to executed commands to track step completion
 	executedCommands.subscribe(cmds => {
+		if (!storyline) return;
 		// Map commands to steps based on task index
-		activeStoryline.sections.forEach((section, index) => {
+		storyline.sections.forEach((section, index) => {
 			if (section.type === 'task' && section.command) {
 				// Handle multi-line commands (split by newline)
 				const commandLines = section.command.split('\n').filter(line => line.trim());
@@ -142,16 +105,17 @@
 
 	// Check if user can proceed to next step
 	function canProceed(stepIndex: number): boolean {
+		if (!storyline) return false;
 		if (stepIndex <= 1) return true;
 
 		// Always check if the previous step (current step) is a task that needs completion
 		const prevStepIndex = stepIndex - 1;
-		const prevSection = activeStoryline.sections[prevStepIndex];
+		const prevSection = storyline.sections[prevStepIndex];
 		if (prevSection?.type === 'task' && !completedSteps.has(prevStepIndex)) {
 			return false;
 		}
 
-		const section = activeStoryline.sections[stepIndex];
+		const section = storyline.sections[stepIndex];
 		// Phase headers and non-task sections don't need completion themselves
 		if (section?.type === 'phase' || section?.type === 'intro' || section?.type === 'context' || section?.type === 'complete' || section?.type === 'alert' || section?.type === 'image') {
 			return true;
@@ -164,8 +128,9 @@
 	}
 
 	function nextStep() {
+		if (!storyline) return;
 		const nextIdx = currentStep + 1;
-		if (nextIdx < activeStoryline.sections.length && canProceed(nextIdx)) {
+		if (nextIdx < storyline.sections.length && canProceed(nextIdx)) {
 			currentStep = nextIdx;
 		}
 	}
@@ -195,10 +160,18 @@
 
 	// Check if we're at the complete section
 	const isAtComplete = $derived(
-		activeStoryline.sections[currentStep]?.type === 'complete'
+		storyline?.sections[currentStep]?.type === 'complete'
 	);
 </script>
 
+{#if !storyline}
+	<div class="h-full flex items-center justify-center text-gray-500" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+		<div class="text-center">
+			<p class="text-lg mb-2">No storyline selected</p>
+			<p class="text-sm">Select a storyline from the home page to begin.</p>
+		</div>
+	</div>
+{:else}
 <div class="h-full flex flex-col" style="display: flex; flex-direction: column; height: 100%;">
 	<!-- Header -->
 	<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6" style="background: linear-gradient(to right, #2563eb, #1d4ed8); color: white; padding: 1.5rem; flex-shrink: 0;">
@@ -206,41 +179,41 @@
 			<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				WGS Analysis
 			</span>
-			{#if activeStoryline.technologyLabel}
-				<span class="px-3 py-1 rounded-full text-sm font-medium" style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: {activeStoryline.technologyLabel.includes('Long Read') ? 'rgba(168,85,247,0.9)' : 'rgba(59,130,246,0.9)'};">
-					{activeStoryline.technologyLabel}
+			{#if storyline.technologyLabel}
+				<span class="px-3 py-1 rounded-full text-sm font-medium" style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: {storyline.technologyLabel.includes('Long Read') ? 'rgba(168,85,247,0.9)' : 'rgba(59,130,246,0.9)'};">
+					{storyline.technologyLabel}
 				</span>
 			{/if}
 			<span class="bg-green-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(34,197,94,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
 				Phase {currentPhase()}
 			</span>
-			{#if activeStoryline.organism}
+			{#if storyline.organism}
 				<span class="bg-amber-500/80 px-3 py-1 rounded-full text-sm font-medium" style="background: rgba(245,158,11,0.8); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
-					{activeStoryline.organism}
+					{storyline.organism}
 				</span>
 			{/if}
 		</div>
-		<h1 class="text-2xl font-bold" style="font-size: 1.5rem; font-weight: 700;">{activeStoryline.title}</h1>
-		<p class="text-blue-100 mt-1" style="color: #dbeafe; margin-top: 0.25rem;">{activeStoryline.subtitle}</p>
+		<h1 class="text-2xl font-bold" style="font-size: 1.5rem; font-weight: 700;">{storyline.title}</h1>
+		<p class="text-blue-100 mt-1" style="color: #dbeafe; margin-top: 0.25rem;">{storyline.subtitle}</p>
 	</div>
 
 	<!-- Progress Bar -->
 	<div class="bg-gray-100 px-6 py-3 border-b border-gray-200" style="background: #f3f4f6; padding: 0.75rem 1.5rem; border-bottom: 1px solid #e5e7eb; flex-shrink: 0;">
 		<div class="flex items-center justify-between text-sm text-gray-600 mb-2" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">
 			<span>Progress</span>
-			<span>Step {currentStep + 1} of {activeStoryline.sections.length}</span>
+			<span>Step {currentStep + 1} of {storyline.sections.length}</span>
 		</div>
 		<div class="w-full bg-gray-200 rounded-full h-2" style="width: 100%; background: #e5e7eb; border-radius: 9999px; height: 0.5rem;">
 			<div
 				class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-				style="width: {((currentStep + 1) / activeStoryline.sections.length) * 100}%; background: #2563eb; height: 0.5rem; border-radius: 9999px; transition: all 0.3s;"
+				style="width: {((currentStep + 1) / storyline.sections.length) * 100}%; background: #2563eb; height: 0.5rem; border-radius: 9999px; transition: all 0.3s;"
 			></div>
 		</div>
 	</div>
 
 	<!-- Content -->
 	<div class="flex-1 overflow-auto p-6" style="flex: 1; overflow: auto; padding: 1.5rem; min-height: 0;">
-		{#each activeStoryline.sections as section, i}
+		{#each storyline.sections as section, i}
 			{#if i <= currentStep}
 				<div class="mb-6 animate-fade-in" style="margin-bottom: 1.5rem; opacity: {i < currentStep && section.type !== 'phase' ? '0.5' : '1'};">
 					{#if section.type === 'intro'}
@@ -400,7 +373,7 @@
 		{/each}
 
 		<!-- Next step locked message -->
-		{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1) && !isAtComplete}
+		{#if currentStep < storyline.sections.length - 1 && !canProceed(currentStep + 1) && !isAtComplete}
 			<div class="text-center py-4 text-gray-500 border-t border-dashed" style="text-align: center; padding: 1rem 0; color: #6b7280; border-top: 1px dashed #d1d5db;">
 				<span class="text-lg" style="font-size: 1.125rem;">Locked</span>
 				<p class="text-sm mt-1" style="font-size: 0.875rem; margin-top: 0.25rem;">Execute the current command to unlock the next step</p>
@@ -419,7 +392,7 @@
 			Previous
 		</button>
 		<div class="flex gap-1 overflow-x-auto max-w-[200px]" style="display: flex; gap: 0.25rem; overflow-x: auto; max-width: 200px;">
-			{#each activeStoryline.sections as section, i}
+			{#each storyline.sections as section, i}
 				{#if section.type === 'phase'}
 					<div class="w-1 h-3 bg-indigo-400 rounded-full mx-1" style="width: 4px; height: 12px; background: #818cf8; border-radius: 9999px; margin: 0 4px;"></div>
 				{:else}
@@ -445,10 +418,10 @@
 			<button
 				class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 				style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: inherit;"
-				disabled={currentStep >= activeStoryline.sections.length - 1 || !canProceed(currentStep + 1)}
+				disabled={currentStep >= storyline.sections.length - 1 || !canProceed(currentStep + 1)}
 				onclick={nextStep}
 			>
-				{#if currentStep < activeStoryline.sections.length - 1 && !canProceed(currentStep + 1)}
+				{#if currentStep < storyline.sections.length - 1 && !canProceed(currentStep + 1)}
 					Locked
 				{:else}
 					Next
@@ -457,6 +430,7 @@
 		{/if}
 	</div>
 </div>
+{/if}
 
 <style>
 	.animate-fade-in {
