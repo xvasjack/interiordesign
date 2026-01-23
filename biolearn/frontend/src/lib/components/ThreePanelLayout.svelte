@@ -353,11 +353,11 @@ Component summary:
 	<div class="h-10 bg-gray-800 flex items-center justify-between px-4 border-b border-gray-700" style="display: flex; align-items: center; justify-content: space-between; height: 40px; flex-shrink: 0;">
 		<div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 0.5rem;">
 			<a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-				<span class="text-green-400 font-bold text-sm">BioLearn</span>
+				<span class="text-blue-100 font-bold text-sm">BioLearn</span>
 			</a>
 			<span class="text-gray-400 text-xs">| Bioinformatics Training Platform</span>
 			{#if storyline}
-				<span class="text-gray-600 text-xs">|</span>
+				<span class="text-blue-100 text-xs">|</span>
 				<span class="text-blue-400 text-xs">{storyline.title}</span>
 			{/if}
 		</div>
