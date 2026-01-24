@@ -5431,9 +5431,37 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			fullPath = `${currentDir}/${filename}`;
 		}
 
-		// Check if file was created during this session (e.g., grep output)
+		// Check if file was created during this session (e.g., grep output or copied file)
 		if (createdFiles[fullPath]) {
-			const content = createdFiles[fullPath];
+			const storedValue = createdFiles[fullPath];
+
+			// Check if this is a copied file reference (format: "cp:filename")
+			if (storedValue.startsWith('cp:')) {
+				const copiedFileName = storedValue.substring(3);
+				// Fetch from template API using the filename
+				const content = await fetchRootFileContent(copiedFileName);
+				if (content) {
+					const lines = content.split('\n');
+					let outputLines: string[];
+					if (cmd === 'head') {
+						outputLines = lines.slice(0, numLines);
+					} else if (cmd === 'tail') {
+						outputLines = lines.slice(-numLines);
+					} else {
+						outputLines = lines;
+					}
+					for (const line of outputLines) {
+						terminal.writeln(line);
+					}
+					return;
+				}
+				// If API fetch fails, show error
+				terminal.writeln(`\x1b[31m${cmd}: ${filename}: Unable to read file\x1b[0m`);
+				return;
+			}
+
+			// Regular created file (e.g., grep output)
+			const content = storedValue;
 			const lines = content.split('\n');
 			const maxLines = cmd === 'head' ? numLines : (cmd === 'tail' ? numLines : lines.length);
 			const startLine = cmd === 'tail' ? Math.max(0, lines.length - maxLines) : 0;
@@ -5660,10 +5688,19 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			return;
 		}
 
-		// Resolve destination path using normalizePath to handle ./ and ../
-		const destPath = dest === '.'
-			? currentDir
-			: normalizePath(dest);
+		// Get source filename
+		const sourceFile = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+
+		// Resolve destination path - include filename if dest is a directory or '.'
+		let destPath: string;
+		if (dest === '.') {
+			destPath = `${currentDir}/${sourceFile}`;
+		} else if (dest.endsWith('/') || filesystem[normalizePath(dest)] !== undefined) {
+			// Destination is a directory
+			destPath = `${normalizePath(dest)}/${sourceFile}`;
+		} else {
+			destPath = normalizePath(dest);
+		}
 
 		// Simulate copy success
 		if (sourceIsDir) {
@@ -5672,7 +5709,6 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		} else {
 			// Check source file exists
 			const sourceDir = sourcePath.substring(0, sourcePath.lastIndexOf('/')) || '/';
-			const sourceFile = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
 			const filesInDir = filesystem[sourceDir] || [];
 
 			if (!filesInDir.includes(sourceFile)) {
@@ -5680,7 +5716,9 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 				return;
 			}
 
-			createdFiles[destPath] = sourcePath;
+			// Store the source file reference with a special marker
+			// Format: "cp:sourcePath" to indicate this is a copied file reference
+			createdFiles[destPath] = `cp:${sourceFile}`;
 			terminal.writeln(`\x1b[32m✓ Copied: ${source} -> ${dest}\x1b[0m`);
 		}
 	}
