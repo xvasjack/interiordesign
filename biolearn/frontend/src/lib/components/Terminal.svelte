@@ -6,7 +6,7 @@
 	import { formatAmrGeneRows, formatMlstRow, formatFileColor } from '$lib/utils/format-utils';
 
 	// Import terminal outputs from storylines
-	import { helpTexts as tutorialHelpTexts, fileContents as tutorialFileContents } from '$lib/storylines/tutorial/terminal-outputs';
+	import { helpTexts as tutorialHelpTexts } from '$lib/storylines/tutorial/terminal-outputs';
 	import { helpTexts as wgsBacteriaHelpTexts } from '$lib/storylines/wgs-bacteria/terminal-outputs';
 	import { getStorylineStats } from '$lib/storylines/tool-outputs-index';
 
@@ -5438,13 +5438,8 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 			// Check if this is a copied file reference (format: "cp:filename")
 			if (storedValue.startsWith('cp:')) {
 				const copiedFileName = storedValue.substring(3);
-				// Try to fetch from template API, fallback to hardcoded content
-				let content = await fetchRootFileContent(copiedFileName);
-
-				// Fallback to tutorial file contents if API fails
-				if (!content && tutorialFileContents[copiedFileName]) {
-					content = tutorialFileContents[copiedFileName];
-				}
+				// Fetch from template API
+				const content = await fetchRootFileContent(copiedFileName);
 
 				if (content) {
 					const lines = content.split('\n');
@@ -5461,7 +5456,7 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 					}
 					return;
 				}
-				// If both API and fallback fail, show error
+				// API fetch failed
 				terminal.writeln(`\x1b[31m${cmd}: ${filename}: Unable to read file\x1b[0m`);
 				return;
 			}
@@ -5519,11 +5514,6 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		} else {
 			// Try fetching as root file
 			content = await fetchRootFileContent(baseName);
-		}
-
-		// Fallback to tutorial file contents if API fails
-		if (!content && tutorialFileContents[baseName]) {
-			content = tutorialFileContents[baseName];
 		}
 
 		if (content) {

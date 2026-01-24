@@ -259,21 +259,8 @@ export const helpTexts: Record<string, Record<string, string>> = {
 	}
 };
 
-// Simulated file contents for cat/head/tail commands
-export const fileContents: Record<string, string> = {
-	'sample_info.txt': [
-		'Sample Information File',
-		'=======================',
-		'Project: K. pneumoniae WGS Analysis',
-		'Date: 2024-01-15',
-		'',
-		'Sample ID: SRR36708862',
-		'Organism: Klebsiella pneumoniae',
-		'Platform: Illumina NovaSeq 6000',
-		'Read Length: 150bp paired-end',
-		'Coverage: ~100x'
-	].join('\n')
-};
+// File contents now served from template API
+// See: biolearn/template/tutorial/basic_linux_commands/
 
 // Directory listings for ls command
 export const directoryListings: Record<string, string[]> = {
