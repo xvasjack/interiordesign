@@ -3,6 +3,7 @@
 	import { executedCommands, executedSteps, currentDirectory, storylineDataDir } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
 	import type { Storyline, StorylineSection } from '$lib/storylines/types';
+	import { onMount } from 'svelte';
 
 	let { storyline = null }: { storyline?: Storyline | null } = $props();
 
@@ -11,6 +12,14 @@
 	let userCurrentDir = $state('/data/outbreak_investigation');
 	let isFinished = $state(false);
 	let selectedDecision = $state<string | null>(null);
+
+	// Reset executed commands when tutorial opens (Issue 1 fix)
+	onMount(() => {
+		// Clear executed commands to start fresh each time tutorial opens
+		executedCommands.set([]);
+		completedSteps = new Set();
+		currentStep = 0;
+	});
 
 	// Get current phase from the current section
 	const currentPhase = $derived(() => {
@@ -42,20 +51,40 @@
 				const commandLines = section.command.split('\n').filter(line => line.trim());
 
 				if (commandLines.length > 1) {
-					// Multi-line command: ALL commands must be executed
-					const allCommandsExecuted = commandLines.every(line => {
+					// Multi-line command: count how many lines have been executed
+					// Each line must be matched in order of execution (Issue 2 fix)
+					let matchedCount = 0;
+					const usedCmdIndices = new Set<number>();
+
+					for (const line of commandLines) {
 						const normalizedLine = normalizeCmd(line);
 						const toolName = line.trim().split(' ')[0];
 
-						if (toolName === 'ls') {
-							// ls is tracked with count (ls:1, ls:2, etc.)
-							const lsExecutions = cmds.filter(c => c.startsWith('ls:')).length;
-							return lsExecutions >= 1;
+						// Find a matching command that hasn't been used yet
+						let found = false;
+						for (let i = 0; i < cmds.length; i++) {
+							if (usedCmdIndices.has(i)) continue;
+
+							const c = cmds[i];
+							if (toolName === 'ls') {
+								// ls is tracked with count (ls:1, ls:2, etc.)
+								if (c.startsWith('ls:')) {
+									usedCmdIndices.add(i);
+									matchedCount++;
+									found = true;
+									break;
+								}
+							} else if (normalizeCmd(c) === normalizedLine || c.startsWith(toolName + ' ') || c === toolName) {
+								usedCmdIndices.add(i);
+								matchedCount++;
+								found = true;
+								break;
+							}
 						}
-						// Check for exact match or tool name match (for commands stored as full strings)
-						return cmds.some(c => normalizeCmd(c) === normalizedLine || c.startsWith(toolName + ' ') || c === toolName);
-					});
-					if (allCommandsExecuted) {
+					}
+
+					// Only mark complete if ALL lines have been executed
+					if (matchedCount >= commandLines.length) {
 						completedSteps.add(index);
 					}
 				} else {
