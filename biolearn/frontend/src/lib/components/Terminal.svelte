@@ -3762,11 +3762,13 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 
 					// Check if input file exists
 					let inputFilename: string | undefined;
+					let numLines = 10; // default for head/tail
 					for (let i = 0; i < inputArgs.length; i++) {
 						if (inputArgs[i] === '-n' && i + 1 < inputArgs.length) {
+							numLines = parseInt(inputArgs[i + 1], 10) || 10;
 							i++; // skip the number
 						} else if (inputArgs[i].startsWith('-n')) {
-							// Handle -n8 format (no space) - skip
+							numLines = parseInt(inputArgs[i].substring(2), 10) || 10;
 						} else if (!inputArgs[i].startsWith('-')) {
 							inputFilename = inputArgs[i];
 						}
@@ -3776,23 +3778,26 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 						const filesystem = getFilesystem();
 
 						// Resolve input path
-						let dirPath: string;
-						let baseName: string;
+						let inputDirPath: string;
+						let inputBaseName: string;
+						let inputFullPath: string;
 
 						if (inputFilename.includes('/')) {
 							const parts = inputFilename.split('/');
-							baseName = parts.pop() || '';
+							inputBaseName = parts.pop() || '';
 							const relativeDirPath = parts.join('/');
-							dirPath = relativeDirPath.startsWith('/')
+							inputDirPath = relativeDirPath.startsWith('/')
 								? relativeDirPath
 								: `${currentDir}/${relativeDirPath}`.replace(/\/+/g, '/');
+							inputFullPath = `${inputDirPath}/${inputBaseName}`;
 						} else {
-							baseName = inputFilename;
-							dirPath = currentDir;
+							inputBaseName = inputFilename;
+							inputDirPath = currentDir;
+							inputFullPath = `${currentDir}/${inputFilename}`;
 						}
 
-						const filesInDir = filesystem[dirPath] || [];
-						const fileExists = filesInDir.some(f => f === baseName);
+						const filesInDir = filesystem[inputDirPath] || [];
+						const fileExists = filesInDir.some(f => f === inputBaseName);
 
 						if (!fileExists) {
 							terminal.writeln(`\x1b[31m${command}: ${inputFilename}: No such file or directory\x1b[0m`);
@@ -3821,66 +3826,53 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 							outputPath = `${currentDir}/${outputFile}`;
 						}
 
-						// Get actual file content (same logic as handleFileView)
-						let sourceContent: string | null = null;
-						// Check for exact filename matches first
-						for (const [key, value] of Object.entries(fileContents)) {
-							if (baseName === key || baseName.endsWith(key)) {
-								sourceContent = value;
-								break;
-							}
-						}
-						// If no match, try extension
-						if (!sourceContent) {
-							const ext = '.' + baseName.split('.').pop();
-							sourceContent = fileContents[ext] || null;
-						}
-						// Special handling for specific file types
-						if (!sourceContent) {
-							if (baseName.endsWith('.fastq.gz') || baseName.endsWith('.fq.gz')) {
-								sourceContent = fileContents['.fastq.gz'];
-							} else if (baseName.endsWith('.fastq')) {
-								sourceContent = fileContents['.fastq'] || fileContents[baseName] || null;
-							} else if (baseName.endsWith('.fasta') || baseName.endsWith('.fna') || baseName.endsWith('.faa') || baseName.endsWith('.ffn')) {
-								sourceContent = fileContents['assembly.fasta'];
-							} else {
-								sourceContent = fileContents['.txt'];
-							}
+						// Fetch source content from template API (async)
+						const dataDir = get(storylineDataDir);
+						const pathParts = inputFullPath.replace(dataDir, '').split('/').filter(p => p);
+						const relativePath = pathParts.join('/');
+
+						let fetchPromise: Promise<string | null>;
+						if (pathParts.length >= 2 && pathParts[0].startsWith('o_')) {
+							const tool = pathParts[0];
+							fetchPromise = fetchFileContent(tool, inputBaseName);
+						} else {
+							fetchPromise = fetchRootFileContent(relativePath);
 						}
 
-						if (sourceContent) {
-							// Parse -n flag for head/tail
-							let numLines = 10; // default
-							for (let i = 0; i < inputArgs.length; i++) {
-								if (inputArgs[i] === '-n' && i + 1 < inputArgs.length) {
-									numLines = parseInt(inputArgs[i + 1], 10) || 10;
-									i++;
-								} else if (inputArgs[i].startsWith('-n')) {
-									numLines = parseInt(inputArgs[i].substring(2), 10) || 10;
+						fetchPromise.then(sourceContent => {
+							if (sourceContent) {
+								// Apply head/tail logic
+								const lines = sourceContent.split('\n');
+								let outputLines: string[];
+								if (command === 'head') {
+									outputLines = lines.slice(0, numLines);
+								} else if (command === 'tail') {
+									outputLines = lines.slice(-numLines);
+								} else {
+									outputLines = lines;
 								}
-							}
+								const outputContent = outputLines.join('\n');
 
-							// Apply head/tail logic
-							const lines = sourceContent.split('\n');
-							let outputLines: string[];
-							if (command === 'head') {
-								outputLines = lines.slice(0, numLines);
-							} else if (command === 'tail') {
-								outputLines = lines.slice(-numLines);
+								// Handle append (>>) vs overwrite (>)
+								if (hasAppendRedirect && createdFiles[outputPath]) {
+									createdFiles[outputPath] = createdFiles[outputPath] + '\n' + outputContent;
+								} else {
+									createdFiles[outputPath] = outputContent;
+								}
+								terminal.writeln(`\x1b[32m✓ Output saved to ${outputFile}\x1b[0m`);
 							} else {
-								outputLines = lines;
+								terminal.writeln(`\x1b[31m${command}: ${inputFilename}: Unable to read file\x1b[0m`);
 							}
-							const outputContent = outputLines.join('\n');
 
-							// Handle append (>>) vs overwrite (>)
-							if (hasAppendRedirect && createdFiles[outputPath]) {
-								createdFiles[outputPath] = createdFiles[outputPath] + '\n' + outputContent;
-							} else {
-								createdFiles[outputPath] = outputContent;
-							}
-						}
-
-						terminal.writeln(`\x1b[32m✓ Output saved to ${outputFile}\x1b[0m`);
+							// Track command and write prompt
+							const fullCmd = cmd.trim();
+							executedCommands.update(cmds => {
+								if (!cmds.includes(fullCmd)) return [...cmds, fullCmd];
+								return cmds;
+							});
+							writePrompt();
+						});
+						return;
 					}
 				}
 			} else {
