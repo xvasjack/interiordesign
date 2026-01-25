@@ -5506,14 +5506,17 @@ Size: ${(Math.random() * 2 + 1).toFixed(1)} MB
 		const dataDir = get(storylineDataDir);
 		let content: string | null = null;
 
-		// Check if file is in a tool output directory (o_*)
+		// Get relative path from data directory (e.g., 'sequences/sample_R1.fastq')
 		const pathParts = fullPath.replace(dataDir, '').split('/').filter(p => p);
+		const relativePath = pathParts.join('/');
+
+		// Check if file is in a tool output directory (o_*)
 		if (pathParts.length >= 2 && pathParts[0].startsWith('o_')) {
 			const tool = pathParts[0];
 			content = await fetchFileContent(tool, baseName);
 		} else {
-			// Try fetching as root file
-			content = await fetchRootFileContent(baseName);
+			// Try fetching as root file with full relative path
+			content = await fetchRootFileContent(relativePath);
 		}
 
 		if (content) {
