@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { outputData, terminalState, toolExecutionTimes, allowedCommands, blockedCommands, bioTools, executedCommands, executedSteps, currentDirectory, stopSignal, storylineDataDir, templateFiles, storylineContext, API_BASE_URL } from '$lib/stores/terminal';
 	import { get } from 'svelte/store';
-	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize, fetchFileContent, fetchRootFileContent } from '$lib/services/templateService';
+	import { getToolFiles, getToolFileUrl, getRootFileUrl, getFileType, formatFileSize, fetchFileContent, fetchRootFileContent, fetchFilesystemStructure } from '$lib/services/templateService';
 	import { formatAmrGeneRows, formatMlstRow, formatFileColor } from '$lib/utils/format-utils';
 
 	// Import terminal outputs from storylines
@@ -38,7 +38,28 @@
 	let executedToolsList: string[] = [];
 	executedCommands.subscribe(cmds => executedToolsList = cmds);
 
-	// Base filesystem - sequencing data files exist at start (from sequencer)
+	// Template filesystem loaded from API (overrides baseFilesystem for matching paths)
+	let templateFilesystem: Record<string, string[]> = {};
+
+	// Load filesystem from template API when storyline context changes
+	async function loadTemplateFilesystem() {
+		const dataDir = get(storylineDataDir);
+		if (!dataDir) return;
+
+		const result = await fetchFilesystemStructure(dataDir);
+		if (result && result.filesystem) {
+			templateFilesystem = result.filesystem;
+		}
+	}
+
+	// Subscribe to storyline context changes to reload filesystem
+	storylineContext.subscribe(ctx => {
+		if (ctx) {
+			loadTemplateFilesystem();
+		}
+	});
+
+	// Base filesystem - fallback for directories not in template (sequencing data files exist at start)
 	const baseFilesystem: Record<string, string[]> = {
 		// Linux Tutorial directory (results/ is NOT present initially - created by mkdir step)
 		'/data/linux_tutorial': [
@@ -659,8 +680,13 @@
 	function getFilesystem(): Record<string, string[]> {
 		const fs: Record<string, string[]> = {};
 
-		// Start with base filesystem
+		// Start with base filesystem (fallback for paths not in template)
 		for (const [path, files] of Object.entries(baseFilesystem)) {
+			fs[path] = [...files];
+		}
+
+		// Override with template filesystem (loaded from API)
+		for (const [path, files] of Object.entries(templateFilesystem)) {
 			fs[path] = [...files];
 		}
 
