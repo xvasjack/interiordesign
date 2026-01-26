@@ -182,6 +182,37 @@ export async function initializeStoryline(category: string, storyline: string): 
 	return await loadTemplateFiles();
 }
 
+export interface FilesystemStructure {
+	data_dir: string;
+	filesystem: Record<string, string[]>;
+}
+
+/**
+ * Fetch the filesystem structure for a storyline from the template directory
+ */
+export async function fetchFilesystemStructure(dataDir: string): Promise<FilesystemStructure | null> {
+	const context = get(storylineContext);
+	if (!context) {
+		console.warn('No storyline context set');
+		return null;
+	}
+
+	try {
+		const response = await fetch(
+			`${API_BASE_URL}/templates/${context.category}/${context.storyline}/filesystem?data_dir=${encodeURIComponent(dataDir)}`
+		);
+		if (!response.ok) {
+			console.error('Failed to fetch filesystem structure:', response.statusText);
+			return null;
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error('Error fetching filesystem structure:', error);
+		return null;
+	}
+}
+
 /**
  * Get file extension from filename
  */

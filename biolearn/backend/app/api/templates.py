@@ -125,6 +125,49 @@ async def get_storyline_files(category: str, storyline: str) -> StorylineFiles:
     )
 
 
+class FilesystemStructure(BaseModel):
+    """Filesystem structure for a storyline - maps directory paths to file/folder lists."""
+    data_dir: str  # The root data directory (e.g., /data/linux_tutorial)
+    filesystem: dict[str, list[str]]  # path -> list of files/folders
+
+
+@router.get("/{category}/{storyline}/filesystem")
+async def get_storyline_filesystem(category: str, storyline: str, data_dir: str = "/data") -> FilesystemStructure:
+    """Get the filesystem structure for a storyline.
+
+    Scans the template directory recursively and returns all files and directories
+    that should appear in the terminal filesystem.
+    """
+    storyline_path = get_template_path(category, storyline)
+    if not storyline_path.exists():
+        raise HTTPException(status_code=404, detail=f"Storyline '{storyline}' not found in category '{category}'")
+
+    filesystem: dict[str, list[str]] = {}
+    root_data_dir = f"{data_dir}/{storyline}"
+
+    def scan_directory(path: Path, virtual_path: str):
+        """Recursively scan directory and build filesystem structure."""
+        entries = []
+        for item in sorted(path.iterdir()):
+            if item.name == ".gitkeep":
+                continue
+            if item.is_dir():
+                entries.append(item.name + "/")
+                # Recursively scan subdirectory
+                scan_directory(item, f"{virtual_path}/{item.name}")
+            else:
+                entries.append(item.name)
+        if entries:
+            filesystem[virtual_path] = entries
+
+    scan_directory(storyline_path, root_data_dir)
+
+    return FilesystemStructure(
+        data_dir=root_data_dir,
+        filesystem=filesystem
+    )
+
+
 @router.get("/{category}/{storyline}/root/{filename:path}")
 async def get_root_file(category: str, storyline: str, filename: str) -> FileResponse:
     """Serve a file directly from the storyline folder (not in an o_tool/ subdirectory).
