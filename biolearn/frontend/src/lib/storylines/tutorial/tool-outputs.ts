@@ -69,8 +69,8 @@ export const kpneumoniaeDemo: StorylineStats = {
 	// CHECKM2 - Quality assessment
 	// ============================================
 	checkm: {
-		completeness: 99.92,
-		contamination: 0.38,
+		completeness: 100.0,
+		contamination: 0.16,
 		strain_heterogeneity: 0.00,
 		quality: 'High'
 	},
@@ -99,63 +99,63 @@ export const kpneumoniaeDemo: StorylineStats = {
 	amrDatabase: 'ncbi',
 	amrGenes: [
 		{
-			gene: 'blaKPC-2',
+			gene: 'blaNDM-7',
 			coverage: 100.00,
 			identity: 100.00,
-			accession: 'NG_049253.1',
-			product: 'KPC-2 carbapenemase',
+			accession: 'NG_049339.1',
+			product: 'subclass B1 metallo-beta-lactamase NDM-7',
 			resistance: 'CARBAPENEM',
 			contig: 'contig_1',
-			start: 2345678,
-			end: 2346559,
+			start: 2466,
+			end: 3278,
 			strand: '+'
 		},
 		{
-			gene: 'blaSHV-11',
-			coverage: 100.00,
-			identity: 99.77,
-			accession: 'NG_049956.1',
-			product: 'SHV-11 beta-lactamase',
-			resistance: 'BETA-LACTAM',
-			contig: 'contig_1',
-			start: 1234567,
-			end: 1235432,
-			strand: '+'
-		},
-		{
-			gene: 'fosA',
+			gene: 'blaTEM-1',
 			coverage: 100.00,
 			identity: 100.00,
-			accession: 'NG_047840.1',
-			product: 'FosA fosfomycin resistance',
-			resistance: 'FOSFOMYCIN',
+			accession: 'NG_050145.1',
+			product: 'broad-spectrum class A beta-lactamase TEM-1',
+			resistance: 'BETA-LACTAM',
 			contig: 'contig_1',
-			start: 3456789,
-			end: 3457208,
+			start: 3659,
+			end: 4519,
 			strand: '-'
 		},
 		{
-			gene: 'oqxA',
+			gene: 'fosA6',
 			coverage: 100.00,
-			identity: 99.91,
-			accession: 'NG_048024.1',
-			product: 'OqxA efflux pump',
+			identity: 99.76,
+			accession: 'NG_051497.1',
+			product: 'fosfomycin resistance glutathione transferase FosA6',
+			resistance: 'FOSFOMYCIN',
+			contig: 'contig_1',
+			start: 354542,
+			end: 354961,
+			strand: '-'
+		},
+		{
+			gene: 'qnrB1',
+			coverage: 100.00,
+			identity: 100.00,
+			accession: 'NG_050469.1',
+			product: 'quinolone resistance pentapeptide repeat protein QnrB1',
 			resistance: 'QUINOLONE',
 			contig: 'contig_1',
-			start: 4567890,
-			end: 4569056,
+			start: 492,
+			end: 1136,
 			strand: '+'
 		},
 		{
-			gene: 'oqxB',
-			coverage: 100.00,
-			identity: 99.87,
+			gene: 'aph(3'')-Ib',
+			coverage: 99.88,
+			identity: 99.88,
 			accession: 'NG_048025.1',
-			product: 'OqxB efflux pump',
+			product: 'aminoglycoside O-phosphotransferase APH(3'')-Ib',
 			resistance: 'QUINOLONE',
 			contig: 'contig_1',
-			start: 4569123,
-			end: 4572278,
+			start: 1300,
+			end: 2102,
 			strand: '+'
 		}
 	],
@@ -165,16 +165,30 @@ export const kpneumoniaeDemo: StorylineStats = {
 	// ============================================
 	plasmids: [
 		{
-			plasmid: 'IncFIB(K)',
-			identity: 98.93,
-			accession: 'JN233704',
+			plasmid: 'Col440I',
+			identity: 97.37,
+			accession: 'CP023920.1',
 			contig: 'contig_2',
 			coverage: 100.00
 		},
+                {
+                        plasmid: 'IncFIB(K)',
+                        identity: 98.93,
+                        accession: 'JN233704',
+                        contig: 'contig_2',
+                        coverage: 100.00
+                },
+                {
+                        plasmid: 'IncFII(K)',
+                        identity: 95.95,
+                        accession: 'CP000648',
+                        contig: 'contig_2',
+                        coverage: 100.00
+                },
 		{
-			plasmid: 'ColRNAI',
+			plasmid: 'IncX3',
 			identity: 100.00,
-			accession: 'DQ298019',
+			accession: 'JN247852',
 			contig: 'contig_3',
 			coverage: 98.45
 		}
